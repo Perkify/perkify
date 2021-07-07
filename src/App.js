@@ -6,6 +6,9 @@ import Console from "./Console";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import PrivateRoute from "./PrivateRoute";
+import DashBoard from "./DashBoard";
+import ManagePeople from "./ManagePeople";
+import ManageGroups from "./ManageGroups";
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
            <Home />
          </Route>
          <PrivateRoute exact path="/console" component={Console} />
+         <PrivateRoute exact path="/dashboard" component={DashBoard} />
+         <PrivateRoute exact path="/people" component={ManagePeople} />
+         <PrivateRoute exact path="/groups" component={ManageGroups} />
          <Route exact path="/login" component={Login} />
          <Route exact path="/signup" component={SignUp} />
        </Switch>
