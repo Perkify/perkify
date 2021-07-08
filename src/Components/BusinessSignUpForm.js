@@ -90,8 +90,8 @@ const BusinessSignUpForm = (props) => {
                     fullWidth
                     autoComplete="shipping address-line1"
                     onChange={fillTextbox(props.setAddress)}
-                    value={props.address}
-                    error = {props.address ==="" && props.invalidStep}
+                    value={props.address1}
+                    error = {props.address1 ==="" && props.invalidStep}
                 />
             </Grid>
             <Grid item xs={12} sm={6}>

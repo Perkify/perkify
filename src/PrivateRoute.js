@@ -1,9 +1,17 @@
-import React, { useContext } from "react";
+import React, {useContext, useEffect} from "react";
 import { Route, Redirect } from "react-router-dom";
 import { AuthContext } from "./Auth";
+import app from "./firebaseapp";
 
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
     const {currentUser} = useContext(AuthContext);
+
+    useEffect(()=>{
+        if (currentUser && currentUser.emailVerified===false){
+            alert("Please verify your email!");
+            app.auth().signOut();
+        }
+    },[currentUser])
     return (
         <Route
             {...rest}

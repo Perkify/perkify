@@ -81,13 +81,13 @@ const SignUpBusinessWebflow = () => {
     const AdminFormProps = {firstName,lastName,email,password};
 
     const [businessName, setBusinessName] = React.useState("");
-    const [address, setAddress] = React.useState("");
+    const [address1, setAddress] = React.useState("");
     const [city, setCity] = React.useState("");
     const [state, setState] = React.useState("");
     const [zip, setZip] = React.useState("");
     const [phone, setPhone] = React.useState("");
     const BusinessFormSetProps = {setBusinessName,setAddress,setCity,setState,setZip,setPhone};
-    const BusinessFormProps = {businessName,address,city,state,zip,phone};
+    const BusinessFormProps = {businessName,address1,city,state,zip,phone};
 
     const [newUser, setNewUser] = React.useState(0);
 
@@ -97,8 +97,8 @@ const SignUpBusinessWebflow = () => {
                 return true;
             case 1:
                 try {
-                    await fetch("https://us-central1-perkify-5790b.cloudfunctions.net/api",{
-                        method: "GET",
+                    await fetch("http://localhost:5001/perkify-5790b/us-central1/user/registerAdminAndBusiness",{
+                        method: "POST",
                         body: JSON.stringify({
                             ...AdminFormProps,
                             ...BusinessFormProps
@@ -106,7 +106,7 @@ const SignUpBusinessWebflow = () => {
                     });
                     const result = await app.auth().signInWithEmailAndPassword(email, password);
                     setNewUser(result.user);
-                    await newUser.sendEmailVerification({
+                    await result.user.sendEmailVerification({
                         url:'https://app.getperkify.com/login',
                     });
                     return true;

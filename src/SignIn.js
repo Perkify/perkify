@@ -41,7 +41,7 @@ const SignIn = ({history}) => {
                 await app
                     .auth()
                     .signInWithEmailAndPassword(email, password);
-                history.push("/console");
+                history.push("/");
             } catch (error) {
                 alert(error);
             }
@@ -52,7 +52,7 @@ const SignIn = ({history}) => {
     const {currentUser} = useContext(AuthContext);
 
     if (currentUser) {
-        return <Redirect to="/console"/>;
+        return <Redirect to="/"/>;
     }
     return (
         <Container maxWidth={"xs"}>
