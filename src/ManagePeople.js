@@ -42,7 +42,7 @@ const columns = [
     {
         field: 'extras',
         headerName: 'Extras',
-        width: "50%",
+        width: 400,
         editable: false,
       },
   ];

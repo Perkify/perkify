@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-const RemoveUsers = ({ history, users }) => {
+const RemovePerks = ({ history, perks }) => {
 
     const classes = useStyles();
     const layout = {
@@ -46,7 +46,7 @@ const RemoveUsers = ({ history, users }) => {
 
       
     const handleRemoveUsers = useCallback(
-      //TO IMPLEMENT; users is a prop which is a list of emails that should be removed
+      //TO IMPLEMENT; perks is a prop which is a list of emails that should be removed
         async event => {
             
         },
@@ -69,7 +69,7 @@ const RemoveUsers = ({ history, users }) => {
             <h2 style={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center", textAlign: "center"}}> Are you sure you want to remove these users?  </h2> 
+          alignItems: "center", textAlign: "center"}}> Are you sure you want to remove these perks?  </h2> 
 
 <Form {...layout}
 
@@ -116,4 +116,4 @@ onFinish={handleRemoveUsers}
     );
 };
 
-export default RemoveUsers
+export default RemovePerks
