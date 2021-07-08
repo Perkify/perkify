@@ -6,28 +6,16 @@ import firebase from "firebase/app";
 import 'firebase/firestore';
 
 
-
-
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
     const {currentUser} = useContext(AuthContext);
 
-    var [numGroups, setNumGroups] = useState(0)
 
-    // useEffect(() => {
-    //     console.log(currentUser.uid)
-    //     var db = firebase.firestore()
-    //     db.collection("admins").doc(currentUser.uid).get().then((doc) => {
-    //         if (doc.exists) {
-    //             console.log("Document data:", doc.data());
-    //         } else {
-    //             // doc.data() will be undefined in this case
-    //             console.log("No such document!");
-    //         }
-    //     }).catch((error) => {
-    //         console.log("Error getting document:", error);
-    //     });
-        
-    //   });
+    useEffect(()=>{
+        if (currentUser && currentUser.emailVerified===false){
+            alert("Please verify your email!");
+            app.auth().signOut();
+        }
+    },[currentUser])
     return (
         <Route
             {...rest}
