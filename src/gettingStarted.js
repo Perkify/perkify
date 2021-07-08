@@ -8,6 +8,8 @@ import { AuthContext } from "./Auth.js";
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'
 import { Select } from 'antd';
+import allPerks from "./constants";
+import allPerksDict from "./allPerksDict";
 
 
 
@@ -27,7 +29,6 @@ const randomPerks = [
    'Netflix', 'Instacart',  'Amazon Prime' 
 ];
 
-const allPerks = ['Netflix', 'Instacart',  'Amazon Prime', "Spotify"]
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -89,19 +90,36 @@ const GettingStarted = ({ history }) => {
       const { Option } = Select;
 
       
-    const handleAddUsers = useCallback(
-        //TO IMPLEMENT api call to save user information 
-        async event => {
+    const handleAddUsers = async (event) => {
+
+            
             console.log(event)
             let emails = event.emails
             emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
             let group = event.group
-            let perks = event.addedPerks
+            let perks = selectedPerks
+            console.log(emails, group, perks)
 
-            
-        },
-        [history]
-    );
+            const bearerToken = await currentUser.getIdToken();
+        console.log(bearerToken);
+        const response = await fetch(
+            "https://us-central1-perkify-5790b.cloudfunctions.net/user/auth/createGroup",
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${bearerToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    group: group,
+                    emails: emails,
+                    perks: perks
+                }),
+            }
+        );
+        history.push('people')
+
+    };  
 
     const { currentUser } = useContext(AuthContext);
 
@@ -157,7 +175,7 @@ onFinish={handleAddUsers}
     <h4 style={{textAlign:"left"}}>Group Name</h4> 
 <Form.Item
   label=""
-  name="groupName"
+  name="group"
   rules={[
     {
       required: true,
@@ -235,7 +253,7 @@ onFinish={handleAddUsers}
     value = {selectedPerks}
     onChange = {handleChange}
     >
-     {allPerks.map(perk => <Option value={perk}>{perk}</Option>)}
+          {allPerks.map(perk => <Option value={perk["Name"]}>{perk["Name"]}</Option>)}
     </Select>
 
     </>
@@ -279,4 +297,4 @@ onFinish={handleAddUsers}
     );
   }
   
-  export default GettingStarted
+  export default withRouter(GettingStarted)

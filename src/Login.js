@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SignIn = ({history}) => {
+const Login = ({history}) => {
     const classes = useStyles();
     const layout = {
         labelCol: {
@@ -140,4 +140,4 @@ const SignIn = ({history}) => {
     );
 };
 
-export default withRouter(SignIn);
+export default withRouter(Login);

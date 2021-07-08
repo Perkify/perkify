@@ -117,19 +117,36 @@ const CreateGroup = ({ history }) => {
       const { Option } = Select;
 
       
-    const handleAddUsers = useCallback(
-        //TO IMPLEMENT api call to save user information 
-        async event => {
-            console.log(event)
-            let emails = event.emails
-            emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
-            let group = event.group
-            let perks = event.addedPerks
+      const handleAddUsers = async (event) => {
 
             
-        },
-        [history]
+        console.log(event)
+        let emails = event.emails
+        emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
+        let group = event.groupName
+        let perks = selectedPerks
+        console.log(emails, group, perks)
+
+        const bearerToken = await currentUser.getIdToken();
+    console.log(bearerToken);
+    const response = await fetch(
+        "https://us-central1-perkify-5790b.cloudfunctions.net/user/auth/createGroup",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                group: group,
+                emails: emails,
+                perks: perks
+            }),
+        }
     );
+    history.push('../people')
+
+};  
 
     const { currentUser } = useContext(AuthContext);
 
@@ -306,7 +323,7 @@ onFinish={handleAddUsers}
 
 <Form.Item style = {{width: "100%", borderRadius: "5px"}} >
   <Button type="primary" htmlType="submit" style = {{width: "100%", borderRadius: "5px"}}>
-    Add Users
+    Create Group
   </Button>
 </Form.Item>
 </Grid>

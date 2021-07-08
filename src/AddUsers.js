@@ -146,6 +146,7 @@ const AddUsers = ({ history }) => {
             emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
             let group = event.group
             let perks = event.addedPerks
+            console.log(emails, groups, perks)
 
             
         },

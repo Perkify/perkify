@@ -36,6 +36,8 @@ import SearchIcon from '@material-ui/icons/Search'
 import ListAltIcon from '@material-ui/icons/ListAlt'
 import PersonIcon from '@material-ui/icons/Person'
 import FeedbackIcon from '@material-ui/icons/Feedback'
+import logo from './Images/logo.png'
+
  
 const drawerWidth = 240
  
@@ -274,7 +276,7 @@ export default function ClippedDrawer({ children, groups}) {
   
    <div className={classes.root}>
      <CssBaseline />
-     <AppBar position="fixed" className={classes.appBar}>
+     <AppBar position="fixed" className={classes.appBar} style={{background: "white"}}>
        <Toolbar>
          <IconButton
            color="inherit"
@@ -285,13 +287,14 @@ export default function ClippedDrawer({ children, groups}) {
          >
            <MenuIcon />
          </IconButton>
-         <img style={{ height: '30px' }} src="/logo.svg" />
+         <img style={{ height: '30px' }} src={logo}/>
        </Toolbar>
      </AppBar>
      <nav className={classes.drawer} aria-label="mailbox folders">
        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
        <Hidden mdUp implementation="css">
          <Drawer
+          
            variant="temporary"
            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
            open={mobileOpen}
