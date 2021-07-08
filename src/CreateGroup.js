@@ -20,6 +20,7 @@ import { Form, Input, Button, Checkbox } from 'antd';
 import 'antd/dist/antd.css';
 import { AutoComplete } from 'antd';
 import allPerks from "./constants";
+import allPerksDict from "./allPerksDict";
 
 
 const groups = ["A", "B", "C"]
@@ -61,6 +62,7 @@ const CreateGroup = ({ history }) => {
 
     const [groupData, setGroupData] = useState([])
     const [selectedPerks, setPerksData] = useState([])
+    var [totalCost, setTotalCost] = useState(0)
 
 
     function getGroupData(){
@@ -76,6 +78,14 @@ const CreateGroup = ({ history }) => {
 
     }
 
+    function getTotalCost(){
+      console.log(selectedPerks)
+      return 100
+    }
+
+    var numPeople = 0 
+    var [costPerPerson, setCost] = useState(0)
+
 
     useEffect(() => {
         getGroupData() 
@@ -83,7 +93,25 @@ const CreateGroup = ({ history }) => {
       });
 
     function handleChange(value) {
+      console.log(value)
         setPerksData(value)
+        var totalCost = 0
+        value.forEach(perk => {
+          console.log(perk)
+          totalCost += allPerksDict[perk].Cost
+        });
+        setCost(totalCost)
+        totalCost = totalCost * numPeople
+        setTotalCost(totalCost)
+      }
+      
+      function handleEmailChange(value) {
+        if(validateEmails(value.target.value)){
+          let emails = value.target.value.replace(/[,'"]+/gi,' ' ).split(/\s+/)
+          numPeople = emails.length
+          console.log(costPerPerson)
+          setTotalCost(emails.length * costPerPerson)
+        }
       }
 
       const { Option } = Select;
@@ -182,6 +210,7 @@ onFinish={handleAddUsers}
 <Form.Item
   label=""
   name="emails"
+  onChange ={handleEmailChange}
   rules={[
     ({ getFieldValue }) => ({
         validator(_, value) {
@@ -240,6 +269,26 @@ onFinish={handleAddUsers}
 
     </>
 </Form.Item>
+</Grid> 
+<Grid item xs> </Grid>
+</Grid>
+</div> 
+
+<div>
+    <Grid container spacing={0}>
+
+    <Grid item xs={1}> </Grid>
+    <Grid item xs={10}>
+    <Grid container spacing={0}>
+    <Grid item xs={8}>
+
+     <h4 style={{textAlign:"left"}}>Total Cost: {totalCost}</h4> 
+     </Grid> 
+     <Grid item xs={2} style={{textAlign: "right"}} > 
+    </Grid>
+
+    
+     </Grid>
 </Grid> 
 <Grid item xs> </Grid>
 </Grid>

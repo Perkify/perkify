@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import ClippedDrawer from "./VerticalNav";
 import { DataGrid } from '@material-ui/data-grid';
 import Grid from '@material-ui/core/Grid';
@@ -8,6 +8,11 @@ import Login from './Login';
 import RemoveUsers from './RemoveUsers';
 import AddUsers from './AddUsers';
 
+import firebase from "firebase/app";
+import 'firebase/firestore';
+import { AuthContext } from "./Auth.js";
+
+
 import allPerks from './constants';
 import 'antd/dist/antd.css';
 import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
@@ -16,18 +21,18 @@ import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
 
 
 const columns = [
-    {
-      field: 'firstName',
-      headerName: 'First name',
-      width: 150,
-      editable: false,
-    },
-    {
-      field: 'lastName',
-      headerName: 'Last name',
-      width: 150,
-      editable: false,
-    },
+    // {
+    //   field: 'firstName',
+    //   headerName: 'First name',
+    //   width: 150,
+    //   editable: false,
+    // },
+    // {
+    //   field: 'lastName',
+    //   headerName: 'Last name',
+    //   width: 150,
+    //   editable: false,
+    // },
     {
       field: 'email',
       headerName: 'Email',
@@ -40,12 +45,12 @@ const columns = [
         width: 200,
         editable: false,
       },
-    {
-        field: 'extras',
-        headerName: 'Extras',
-        width: 400,
-        editable: false,
-      },
+    // {
+    //     field: 'extras',
+    //     headerName: 'Extras',
+    //     width: 400,
+    //     editable: false,
+    //   },
   ];
 
   
@@ -105,40 +110,52 @@ const columns = [
     }
 
     const [peopleData, setPeopleData] = useState([])
-    var groupData = []
-    var fillerGroupData = [
-      {
-        name: "A",
-        id: "abc123"
-      },
-      {
-        name: "B",
-        id: "abc133"
-      },
-    ]
 
     function getRows(){
         //TO IMPLEMENT
         setPeopleData(rows)
       }
+      const { currentUser } = useContext(AuthContext);
 
-      function getGroupData(){
-        //TO IMPLEMENT 
-        groupData = fillerGroupData
-      }
 
-    useEffect(() => {
+   
+
+      useEffect(() => {
+        getRows()
+        console.log('ran');
+        var db = firebase.firestore()
+          db.collection("admins").doc(currentUser.uid).get().then((doc) => {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+                let businessId = doc.data()["companyID"]
+
+                db.collection("users").where("businessID", "==", businessId).get().then((querySnapshot) => {
+                  var emails = [] 
+                  var index = 0 
+                  querySnapshot.forEach((doc) => {
+                      // doc.data() is never undefined for query doc snapshots
+                      console.log(doc.id, " => ", doc.data());
+                      emails.push({email: doc.id, id: index, group: doc.data()["group"]})
+                      index +=1 
+                  });
+                  console.log(emails)
+                  setPeopleData(emails)
+              })
+              .catch((error) => {
+                  console.log("Error getting documents: ", error);
+              });
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                }
+            }).catch((error) => {
+                console.log("Error getting document:", error);
+            });
         
-        getRows() 
-        console.log(peopleData)
-        console.log(groupData)
-        
-      });
+      }, []);
     
 
-      getGroupData()
     return (<>
-        <ClippedDrawer groups={groupData}>
+        <ClippedDrawer>
             <Grid container spacing={0} justifyContent="center" alignItems="center">
             <Grid item xs={6} md={8}>
             <h1>Manage People</h1> 

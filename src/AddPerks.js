@@ -1,4 +1,10 @@
 import React, { useCallback, useContext } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useParams
+} from "react-router-dom";
 import { useState, useEffect } from 'react';
 
 import { withRouter, Redirect } from "react-router";
@@ -7,7 +13,10 @@ import { AuthContext } from "./Auth.js";
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'
 import { Select } from 'antd';
-import allPerks from "./constants.js";
+import firebase from "firebase/app";
+import 'firebase/firestore';
+import allPerks from "./constants";
+import allPerksDict from "./allPerksDict";
 
 
 
@@ -49,8 +58,10 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-const AddPerks = ({ history }) => {
+const AddPerks = ({ history, existingPerks }) => {
 
+
+  let { id } = useParams();
     function validateEmails(emailString){
         let emails = emailString.replace(/[,'"]+/gi,' ' ).split(/\s+/)
         let retValue = true
@@ -108,14 +119,10 @@ const AddPerks = ({ history }) => {
       const { Option } = Select;
 
       
-    const handleAddUsers = useCallback(
+    const handleAddPerks = useCallback(
         //TO IMPLEMENT api call to save user information 
         async event => {
             console.log(event)
-            let emails = event.emails
-            emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
-            let group = event.group
-            let perks = event.addedPerks
 
             
         },
@@ -133,7 +140,7 @@ const AddPerks = ({ history }) => {
             <Grid container spacing={3}>
         <Grid item xs>
         </Grid>
-        <Grid item xs={8} sm={8} style={{height: "650px"}}>
+        <Grid item xs={8} sm={8} style={{height: "300px"}}>
           <br></br>
             <h1 style={{
           display: "flex",
@@ -146,7 +153,7 @@ name="basic"
 initialValues={{
   remember: true,
 }}
-onFinish={handleAddUsers}
+onFinish={handleAddPerks}
 > 
 
 <div>
@@ -157,7 +164,7 @@ onFinish={handleAddUsers}
     <Grid container spacing={0}>
     <Grid item xs={8}>
 
-     <h4 style={{textAlign:"left"}}>Total Perks</h4> 
+     <h4 style={{textAlign:"left"}}>Add Perks</h4> 
      </Grid> 
      <Grid item xs={2} style={{textAlign: "right"}} > 
     </Grid>
@@ -169,18 +176,22 @@ onFinish={handleAddUsers}
   name="addedPerks"
   rules={[
     {
-      required: false,
+      required: true,
+      message: "Please select a perk to add"
     },
   ]}
->   <> 
+> 
     <Select
     mode="multiple"
     style = {{width: "100%", borderRadius: "5px"}}
     >
-     {allPerks.map(perk => <Option value={perk.Name}>{perk.Name}</Option>)}
+     {allPerks.map(perk => {
+       
+       if ((existingPerks.includes(perk.Name)) === false){
+     return (<Option value={perk.Name}>{perk.Name}</Option>)}
+    })
+    }
     </Select>
-
-    </>
 </Form.Item>
 </Grid> 
 <Grid item xs> </Grid>
@@ -199,7 +210,7 @@ onFinish={handleAddUsers}
 
 <Form.Item style = {{width: "100%", borderRadius: "5px"}} >
   <Button type="primary" htmlType="submit" style = {{width: "100%", borderRadius: "5px"}}>
-    Add Users
+    Add Perks
   </Button>
 </Form.Item>
 </Grid>

@@ -5,7 +5,16 @@ import { AuthContext } from "./Auth.js";
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useParams
+} from "react-router-dom";
+import firebase from "firebase/app";
+import 'firebase/firestore';
+import allPerks from "./constants";
+import allPerksDict from "./allPerksDict";
 
 
 
@@ -27,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const RemovePerks = ({ history, perks }) => {
-
+  console.log(perks)
     const classes = useStyles();
     const layout = {
         labelCol: {
@@ -45,13 +54,12 @@ const RemovePerks = ({ history, perks }) => {
       };
 
       
-    const handleRemoveUsers = useCallback(
-      //TO IMPLEMENT; perks is a prop which is a list of emails that should be removed
-        async event => {
-            
-        },
-        [history]
-    );
+    const handleRemoveUsers = () => {
+      console.log(perks)
+      
+      
+
+    }
 
     const { currentUser } = useContext(AuthContext);
 

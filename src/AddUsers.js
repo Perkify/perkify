@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 
 import { withRouter, Redirect } from "react-router";
 import app from "./firebaseapp.js";
-import { AuthContext } from "./Auth.js";
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'
 import { Select } from 'antd';
+import firebase from "firebase/app";
+import 'firebase/firestore';
+import { AuthContext } from "./Auth";
 
 
 
@@ -68,7 +70,7 @@ const AddUsers = ({ history }) => {
     
 
 
-    const [groupData, setGroupData] = useState([])
+    var [groupData, setGroupData] = useState([])
     const [selectedPerks, setPerksData] = useState([])
 
 
@@ -85,11 +87,33 @@ const AddUsers = ({ history }) => {
 
     }
 
+    const [useEffectComplete, setUseEffectComplete] = useState(false)
+
+
 
     useEffect(() => {
-        getGroupData() 
         console.log(groupData[0])
-      });
+        var db = firebase.firestore()
+      db.collection("admins").doc(currentUser.uid).get().then((doc) => {
+     if (doc.exists) {
+         console.log("Document data:", doc.data());
+         var adminData = doc.data()
+         let businessId = doc.data()["companyID"]
+         db.collection("businesses").doc(businessId).get().then((doc) => {
+           
+           setGroupData(Object.keys(doc.data()["groups"]))
+           console.log(doc.data()["groups"])
+           setUseEffectComplete(true)
+       
+         })
+             // doc.data() will be undefined in this case
+             console.log("No such document!");
+         }
+     }).catch((error) => {
+         console.log("Error getting document:", error);
+     });
+ 
+ }, []);
 
     function handleChange(value) {
         setPerksData(value)
@@ -220,45 +244,7 @@ onFinish={handleAddUsers}
 </Grid>
 </div> 
 
-<div>
-    <Grid container spacing={0}>
 
-    <Grid item xs={1}> </Grid>
-    <Grid item xs={10}>
-    <Grid container spacing={0}>
-    <Grid item xs={8}>
-
-     <h4 style={{textAlign:"left"}}>This autopopulates w/ group perks add/remove extras below</h4> 
-     </Grid> 
-     <Grid item xs={2} style={{textAlign: "right"}} > 
-    </Grid>
-
-    
-     </Grid>
-    <Form.Item
-  label=""
-  name="addedPerks"
-  rules={[
-    {
-      required: false,
-    },
-  ]}
->   <> 
-    <Select
-    mode="multiple"
-    style = {{width: "100%", borderRadius: "5px"}}
-    value = {selectedPerks}
-    onChange = {handleChange}
-    >
-     {allPerks.map(perk => <Option value={perk}>{perk}</Option>)}
-    </Select>
-
-    </>
-</Form.Item>
-</Grid> 
-<Grid item xs> </Grid>
-</Grid>
-</div> 
 
 
 
