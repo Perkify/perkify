@@ -1,4 +1,11 @@
 import React, {useState, useEffect} from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams
+} from "react-router-dom";
 import ClippedDrawer from "./VerticalNav";
 import { DataGrid } from '@material-ui/data-grid';
 import Grid from '@material-ui/core/Grid';
@@ -71,6 +78,8 @@ const columns = [
   export default function ManageGroups()  
 {
 
+  let { id } = useParams();
+  
     const [peopleData, setPeopleData] = useState([])
 
     const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
@@ -112,12 +121,34 @@ const columns = [
         setPeopleData(rows)
       }
 
+      var groupData = []
+    var fillerGroupData = [
+      {
+        name: "A",
+        id: "abc123"
+      },
+      {
+        name: "B",
+        id: "abc133"
+      },
+    ]
+
+      function getGroupData(){
+        //TO IMPLEMENT 
+        groupData = fillerGroupData
+      }
+
+      
+
+      getGroupData()
+
       useEffect(() => {
         getPeopleRowData() 
         getPerksData()
         
       }, []);
-
+      
+      
       function getRemovedPerks(){
         var removedPerks = []
         selectedPerks.forEach(index => {
@@ -134,7 +165,7 @@ const columns = [
 
     return (
         <>
-        <ClippedDrawer>
+        <ClippedDrawer groups={groupData}>
             <div style={{width: 500}}> 
             <Grid container spacing={0} justifyContent="center" alignItems="center">
             <Grid item xs={6} md={8}>

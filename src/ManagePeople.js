@@ -8,6 +8,7 @@ import Login from './Login';
 import RemoveUsers from './RemoveUsers';
 import AddUsers from './AddUsers';
 
+import allPerks from './constants';
 import 'antd/dist/antd.css';
 import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
 
@@ -104,23 +105,40 @@ const columns = [
     }
 
     const [peopleData, setPeopleData] = useState([])
+    var groupData = []
+    var fillerGroupData = [
+      {
+        name: "A",
+        id: "abc123"
+      },
+      {
+        name: "B",
+        id: "abc133"
+      },
+    ]
 
     function getRows(){
         //TO IMPLEMENT
         setPeopleData(rows)
       }
 
+      function getGroupData(){
+        //TO IMPLEMENT 
+        groupData = fillerGroupData
+      }
+
     useEffect(() => {
+        
         getRows() 
         console.log(peopleData)
+        console.log(groupData)
         
       });
     
 
-
-
+      getGroupData()
     return (<>
-        <ClippedDrawer>
+        <ClippedDrawer groups={groupData}>
             <Grid container spacing={0} justifyContent="center" alignItems="center">
             <Grid item xs={6} md={8}>
             <h1>Manage People</h1> 

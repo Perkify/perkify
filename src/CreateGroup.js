@@ -1,3 +1,4 @@
+import ClippedDrawer from "./VerticalNav";
 import React, { useCallback, useContext } from "react";
 import { useState, useEffect } from 'react';
 
@@ -7,7 +8,6 @@ import { AuthContext } from "./Auth.js";
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'
 import { Select } from 'antd';
-import allPerks from "./constants.js";
 
 
 
@@ -19,37 +19,28 @@ import Paper from '@material-ui/core/Paper';
 import { Form, Input, Button, Checkbox } from 'antd';
 import 'antd/dist/antd.css';
 import { AutoComplete } from 'antd';
+import allPerks from "./constants";
 
 
+const groups = ["A", "B", "C"]
+
+const randomPerks = [
+   'Netflix', 'Instacart',  'Amazon Prime' 
+];
 
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-      flexGrow: 1,
-    },
-    paper: {
-      padding: theme.spacing(2),
-      textAlign: 'center',
-      color: theme.palette.text.secondary,
-    },
-  }));
-
-  const groups = ["A", "B", "C"]
-
-  const randomPerks = [
-     'Netflix', 'Instacart',  'Amazon Prime' 
-  ];
-
-
-  function validateEmail(email) {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
 }
-  
 
 
 
-const AddPerks = ({ history }) => {
+
+
+
+
+const CreateGroup = ({ history }) => {
 
     function validateEmails(emailString){
         let emails = emailString.replace(/[,'"]+/gi,' ' ).split(/\s+/)
@@ -68,9 +59,14 @@ const AddPerks = ({ history }) => {
     
 
 
+    const [groupData, setGroupData] = useState([])
     const [selectedPerks, setPerksData] = useState([])
 
 
+    function getGroupData(){
+        //TO IMPLEMENT with group data set groupData = all perks a group should hold onto 
+        setGroupData(groups)
+      }
 
     function getPerksData(){
         //TO IMPLEMENT randomPerks => actual perks of the selected group
@@ -82,28 +78,13 @@ const AddPerks = ({ history }) => {
 
 
     useEffect(() => {
-        getPerksData()
+        getGroupData() 
+        console.log(groupData[0])
       });
 
     function handleChange(value) {
         setPerksData(value)
       }
-
-    const classes = useStyles();
-    const layout = {
-        labelCol: {
-          span: 8,
-        },
-        wrapperCol: {
-          span: 40,
-        },
-      };
-      const tailLayout = {
-        wrapperCol: {
-          offset: 8,
-          span: 50,
-        },
-      };
 
       const { Option } = Select;
 
@@ -124,31 +105,106 @@ const AddPerks = ({ history }) => {
 
     const { currentUser } = useContext(AuthContext);
 
+    
+    var groupsData = []
+    var fillerGroupData = [
+      {
+        name: "A",
+        id: "abc123"
+      },
+      {
+        name: "B",
+        id: "abc133"
+      },
+    ]
+
+
+    function getGroupsData(){
+        //TO IMPLEMENT 
+        groupsData = fillerGroupData
+      }
+
+      getGroupsData()
+
     return (
+      <ClippedDrawer groups={groupsData}>
 
-
-        <div>
-         <br></br>
+          <div>
 
             <Grid container spacing={3}>
         <Grid item xs>
         </Grid>
-        <Grid item xs={8} sm={8} style={{height: "650px"}}>
+        <Grid item xs={8} sm={8} md={6} lg={5} style={{height: "650px"}}>
           <br></br>
             <h1 style={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "left", textAlign: "center"}}> Add Perks</h1> 
+          alignItems: "left", textAlign: "center"}}> Create Group</h1> 
 
-<Form {...layout}
+<Form
 
 name="basic"
 initialValues={{
   remember: true,
 }}
 onFinish={handleAddUsers}
-> 
+>
+<div>
+    <Grid container spacing={0}>
 
+    <Grid item xs={1}> </Grid>
+    <Grid item xs={10}>
+    <h4 style={{textAlign:"left"}}>Group Name</h4> 
+<Form.Item
+  label=""
+  name="groupName"
+  rules={[
+    {
+      required: true,
+      message: 'Please input a group name!',
+    },
+  ]}
+  
+>
+  <Input style = {{width: "100%", borderRadius: "5px"}} />
+</Form.Item>
+</Grid> 
+<Grid item xs> </Grid>
+</Grid>
+</div> 
+
+    <div>
+    <Grid container spacing={0}>
+
+    <Grid item xs={1}> </Grid>
+    <Grid item xs={10}>
+    <h4 style={{textAlign:"left"}}>Paste Emails Below</h4> 
+<Form.Item
+  label=""
+  name="emails"
+  rules={[
+    ({ getFieldValue }) => ({
+        validator(_, value) {
+            if (value === ""){
+                return Promise.reject(new Error('Please input atleast one email'));
+              }
+          if (validateEmails(value)){
+            return Promise.resolve();
+          }
+          else{
+            return Promise.reject(new Error('Please input proper emails'));
+          }
+        },
+      }),
+  ]}
+  
+>
+<TextArea placeholder="Paste emails as CSV or seperated by a line" rows={5} allowClear style = {{width: "100%", borderRadius: "5px"}}/>
+</Form.Item>
+</Grid> 
+<Grid item xs> </Grid>
+</Grid>
+</div> 
 <div>
     <Grid container spacing={0}>
 
@@ -157,7 +213,7 @@ onFinish={handleAddUsers}
     <Grid container spacing={0}>
     <Grid item xs={8}>
 
-     <h4 style={{textAlign:"left"}}>Total Perks</h4> 
+     <h4 style={{textAlign:"left"}}>Perks</h4> 
      </Grid> 
      <Grid item xs={2} style={{textAlign: "right"}} > 
     </Grid>
@@ -176,8 +232,10 @@ onFinish={handleAddUsers}
     <Select
     mode="multiple"
     style = {{width: "100%", borderRadius: "5px"}}
+    value = {selectedPerks}
+    onChange = {handleChange}
     >
-     {allPerks.map(perk => <Option value={perk.Name}>{perk.Name}</Option>)}
+     {allPerks.map(perk => <Option value={perk["Name"]}>{perk["Name"]}</Option>)}
     </Select>
 
     </>
@@ -218,7 +276,8 @@ onFinish={handleAddUsers}
             
             
         </div>
+      </ClippedDrawer>
     );
-};
-
-export default AddPerks
+  }
+  
+  export default CreateGroup

@@ -1,8 +1,14 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from "react";
 import Button from '@material-ui/core/Button'
 import { makeStyles, useTheme, Theme } from '@material-ui/core/styles'
 import { createStyles } from '@material-ui/core/styles'
 import { useLocation, Link } from 'react-router-dom'
+import AddIcon from '@material-ui/icons/Add';
+import app from "./firebaseapp.js";
+import firebase from "firebase/app";
+import 'firebase/firestore';
+import { AuthContext } from "./Auth";
+
 
 import InboxIcon from '@material-ui/icons/MoveToInbox'
 import MailIcon from '@material-ui/icons/Mail'
@@ -80,10 +86,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ClippedDrawer({ children }) {
+export default function ClippedDrawer({ children, groups}) {
   const classes = useStyles()
   const theme = useTheme()
   const [mobileOpen, setMobileOpen] = React.useState(false)
+  var [groupViews, setGroupViews] = useState([])
 
   const location = useLocation()
 
@@ -94,7 +101,7 @@ export default function ClippedDrawer({ children }) {
   const generalNav: [string, string, any][] = [
     ['People & Permissions', '/people', <PersonIcon />],
     // ['Your Study Stats', '/userstats', <EqualizerIcon />],
-    ['Groups', '/groups', <GroupIcon />],
+    
   ]
 
   const appNav: [string, string, any][] = [
@@ -105,17 +112,20 @@ export default function ClippedDrawer({ children }) {
     ['Profile', '/profile', <PersonIcon />],
   ]
 
-  const infoNav: [string, string, any][] = [
-    // ['FAQ', '/faq', <LiveHelpIcon />],
-    ['Feedback Form', 'https://forms.gle/6AKTsMDz2DmJVAvy5', <FeedbackIcon />],
-  ]
+
+  groupViews.push(['Add New Group', '/create/group', <AddIcon /> ])
+
+  const infoNav: [string, string, any][] = groupViews
+  
 
   const navSections: [string, [string, string, any][]][] = [
-    ['Manage', generalNav],
+    ['People', generalNav],
     // ['Apps', appNav],
     // ['Settings', settingsNav],
-    //['Info', infoNav],
+    ['Groups', infoNav],
   ]
+
+
 
   const drawer = (
     <div>
@@ -190,6 +200,51 @@ export default function ClippedDrawer({ children }) {
       </div>
     </div>
   )
+
+  const {currentUser} = useContext(AuthContext);
+
+  //BELOW CODE DOESNT WORK 
+  useEffect(() => {
+    var db = firebase.firestore()
+    db.collection("admins").doc(currentUser.uid).get().then((doc) => {
+      if (doc.exists) {
+          console.log("Document data:", doc.data());
+          let businessId = doc.data()["companyID"]
+          db.collection("businesses").doc(businessId).get().then((doc) => {
+            groupViews = doc.data()["groups"]
+            console.log(groupViews)
+            const infoNav: [string, string, any][] = groupViews
+            const navSections: [string, [string, string, any][]][] = [
+              ['People', generalNav],
+              // ['Apps', appNav],
+              // ['Settings', settingsNav],
+              ['Groups', infoNav],
+            ]
+          })
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+          }
+      }).catch((error) => {
+          console.log("Error getting document:", error);
+      });
+
+  }, []) 
+
+  function getGroups(){
+    var db = firebase.firestore()
+    db.collection("admins").doc(currentUser.uid).get().then((doc) => {
+      if (doc.exists) {
+          console.log("Document data:", doc.data());
+          } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+          }
+      }).catch((error) => {
+          console.log("Error getting document:", error);
+      });
+  }
+
+      
 
   return (
     <div className={classes.root}>
