@@ -12,7 +12,13 @@ const Login = ({ history }) => {
                 await app
                     .auth()
                     .signInWithEmailAndPassword(email.value, password.value);
-                history.push("/");
+                if(currentUser && currentUser.emailVerified===false) {
+                    alert("please!! verify your email");
+                    app.auth().signOut();
+                }
+                else {
+                    history.push("/console");
+                }
             } catch (error) {
                 alert(error);
             }
@@ -23,7 +29,12 @@ const Login = ({ history }) => {
     const { currentUser } = useContext(AuthContext);
 
     if (currentUser) {
-        return <Redirect to="/console" />;
+        if (currentUser.emailVerified===false){
+            alert("please!! verify your email");
+            app.auth().signOut();
+        }
+        else
+            return <Redirect to="/console" />;
     }
 
     return (
