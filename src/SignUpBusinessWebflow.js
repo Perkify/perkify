@@ -97,7 +97,7 @@ const SignUpBusinessWebflow = () => {
                 return true;
             case 1:
                 try {
-                    await fetch("http://localhost:5001/perkify-5790b/us-central1/user/registerAdminAndBusiness",{
+                    await fetch("https://us-central1-perkify-5790b.cloudfunctions.net/user/registerAdminAndBusiness",{
                         method: "POST",
                         body: JSON.stringify({
                             ...AdminFormProps,

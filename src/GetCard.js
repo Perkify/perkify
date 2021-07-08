@@ -54,7 +54,7 @@ const GetCard = () => {
             dobFormatted = new Date(dobFormatted).toLocaleDateString();
             console.log(dobFormatted);
             const response = await fetch(
-                "http://localhost:5001/perkify-5790b/us-central1/user/registerUser",
+                "https://us-central1-perkify-5790b.cloudfunctions.net/user/registerUser",
                 {
                     method: "POST",
                     body: JSON.stringify({
