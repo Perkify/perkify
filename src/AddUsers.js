@@ -73,7 +73,7 @@ const AddUsers = ({ history }) => {
 
 
     function getGroupData(){
-        //TO IMPLEMENT
+        //TO IMPLEMENT with group data set groupData = all perks a group should hold onto 
         setGroupData(groups)
       }
 
@@ -114,10 +114,15 @@ const AddUsers = ({ history }) => {
       const { Option } = Select;
 
       
-    const handleAddUser = useCallback(
+    const handleAddUsers = useCallback(
+        //TO IMPLEMENT api call to save user information 
         async event => {
+            console.log(event)
             let emails = event.emails
             emails = emails.replace(/[,'"]+/gi,' ' ).split(/\s+/) //Gives email as a list 
+            let group = event.group
+            let perks = event.addedPerks
+
             
         },
         [history]
@@ -147,7 +152,7 @@ name="basic"
 initialValues={{
   remember: true,
 }}
-onFinish={handleAddUser}
+onFinish={handleAddUsers}
 >
     <div>
     <Grid container spacing={0}>

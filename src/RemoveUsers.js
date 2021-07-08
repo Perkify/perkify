@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-const RemoveUsers = ({ history }) => {
+const RemoveUsers = ({ history, users }) => {
 
     const classes = useStyles();
     const layout = {
@@ -43,18 +43,10 @@ const RemoveUsers = ({ history }) => {
       };
 
       
-    const handleLogin = useCallback(
+    const handleRemoveUsers = useCallback(
+      //TO IMPLEMENT; users is a prop which is a list of emails that should be removed
         async event => {
-            const email = event.email 
-            const password = event.password
-            try {
-                await app
-                    .auth()
-                    .signInWithEmailAndPassword(email, password);
-                history.push("/");
-            } catch (error) {
-                alert(error);
-            }
+            
         },
         [history]
     );
@@ -83,7 +75,7 @@ name="basic"
 initialValues={{
   remember: true,
 }}
-onFinish={handleLogin}
+onFinish={handleRemoveUsers}
 >
     
 

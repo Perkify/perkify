@@ -9,6 +9,7 @@ import RemoveUsers from './RemoveUsers';
 import AddUsers from './AddUsers';
 
 import 'antd/dist/antd.css';
+import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
 
 
 
@@ -68,9 +69,14 @@ const columns = [
    
     const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const [selectedUsers, setSelection] = useState([])
 
 
     const showRemoveModal = () => {
+        console.log(selectedUsers)
+        if (selectedUsers.length === 0){
+            return
+        }
       setIsRemoveModalVisible(true);
     };
 
@@ -88,6 +94,14 @@ const columns = [
       setIsRemoveModalVisible(false);
       setIsAddModalVisible(false);
     };
+
+    function getRemovedUserEmails(){
+        var removedUsers = []
+        selectedUsers.forEach(index => {
+            removedUsers.push(peopleData[index].email)
+        });
+        return removedUsers
+    }
 
     const [peopleData, setPeopleData] = useState([])
 
@@ -126,11 +140,13 @@ const columns = [
             columns={columns}
             pageSize={100}
             checkboxSelection
-            disableSelectionOnClick
+            onSelectionModelChange={(newSelection) => {
+                setSelection(newSelection.selectionModel);
+              }}
           />
         </div>
         </ClippedDrawer>
-        <Modal visible={isRemoveModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null}><><RemoveUsers></RemoveUsers></></Modal> 
+        <Modal visible={isRemoveModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null}><><RemoveUsers users={getRemovedUserEmails()}></RemoveUsers></></Modal> 
         <Modal visible={isAddModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null}><><AddUsers></AddUsers></></Modal> 
 
         </>
