@@ -6,9 +6,7 @@ import {
   useGridSlotComponentProps,
 } from "@material-ui/data-grid";
 import Grid from "@material-ui/core/Grid";
-// import { Form, Input, Button, Checkbox } from "antd";
 import Button from "@material-ui/core/Button";
-import { Modal, Tabs } from "antd";
 import Login from "./Login";
 import RemoveUsers from "./RemoveUsers";
 import AddUsers from "./AddUsers";
@@ -18,9 +16,8 @@ import "firebase/firestore";
 import { AuthContext } from "./Auth.js";
 
 import allPerks from "./constants";
-import "antd/dist/antd.css";
 import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
-import { Theme, Typography } from "@material-ui/core";
+import { MenuItem, Select, Theme, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/styles";
 
 import clsx from "clsx";
@@ -44,6 +41,14 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import { AddRemoveTable } from "./Components/AddRemoveTable";
 
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { validateEmails } from "./utils/emailValidation";
+
 const columns = [
   {
     field: "email",
@@ -63,18 +68,9 @@ export default function ManagePeople() {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
-
-  const showRemoveModal = () => {
-    console.log(selectedUsers);
-    if (selectedUsers.length === 0) {
-      return;
-    }
-    setIsRemoveModalVisible(true);
-  };
-
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
-  };
+  const [groupData, setGroupData] = useState(["Cole's Group"]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [emails, setEmails] = useState("");
 
   const handleOk = () => {
     setIsRemoveModalVisible(false);
@@ -95,48 +91,30 @@ export default function ManagePeople() {
   }
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
-
-  // function getRows() {
-  //   //TO IMPLEMENT
-  //   setPeopleData(rows);
-  // }
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    // getRows();
-    console.log("ran");
-    var db = firebase.firestore();
+    const db = firebase.firestore();
     db.collection("admins")
       .doc(currentUser.uid)
       .get()
       .then((doc) => {
-        if (doc.exists) {
-          console.log("Document data:", doc.data());
-          let businessId = doc.data()["companyID"];
+        const userData = doc.data();
+        if (userData) {
+          const businessId = userData["companyID"];
 
           db.collection("users")
             .where("businessID", "==", businessId)
             .get()
             .then((querySnapshot) => {
-              var emails: any[] = [];
-              var index = 0;
-              querySnapshot.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
-                emails.push({
-                  email: doc.id,
-                  id: index,
-                  group: doc.data()["group"],
-                });
-                index += 1;
-              });
-              console.log(emails);
+              const emails = querySnapshot.docs.map((doc, index) => ({
+                email: doc.id,
+                id: index,
+                group: doc.data()["group"],
+              }));
               setPeopleData(emails);
-            })
-            .catch((error) => {
-              console.log("Error getting documents: ", error);
             });
-          // doc.data() will be undefined in this case
+        } else {
           console.log("No such document!");
         }
       })
@@ -153,31 +131,91 @@ export default function ManagePeople() {
             rows={peopleData}
             columns={columns}
             setSelected={setSelection}
-            onClickAdd={showAddModal}
-            onClickDelete={showRemoveModal}
+            onClickAdd={() => setIsAddModalVisible(true)}
+            onClickDelete={() => {
+              console.log("Clicked");
+              setIsRemoveModalVisible(true);
+            }}
           />
         </div>
       </ClippedDrawer>
-      <Modal
-        visible={isRemoveModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}
+      <Dialog
+        open={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
+        aria-labelledby="form-dialog-title"
       >
-        <>
-          <RemoveUsers users={getRemovedUserEmails()}></RemoveUsers>
-        </>
-      </Modal>
-      <Modal
-        visible={isAddModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}
+        <DialogTitle id="form-dialog-title">Add Users</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To add users to this organization, please enter their email
+            addresses below and select a group from the dropdown.
+          </DialogContentText>
+          <Typography style={{ marginTop: "30px" }}>Emails</Typography>
+          <TextField
+            id="emailaddresses"
+            label="Insert emails separated by commas or newlines"
+            value={emails}
+            onChange={(event) => setEmails(event.target.value)}
+            fullWidth
+            multiline
+            rowsMax={4}
+          />
+          <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+            Perk Group
+          </Typography>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={selectedGroup}
+            displayEmpty
+            onChange={(event) => {
+              setSelectedGroup(event.target.value as string);
+            }}
+          >
+            <MenuItem value="" disabled>
+              Select Perk Group
+            </MenuItem>
+            {groupData.map((name) => (
+              <MenuItem value={name}>{name}</MenuItem>
+            ))}
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsAddModalVisible(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => setIsAddModalVisible(false)} color="primary">
+            Add Users
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isRemoveModalVisible}
+        onClose={() => setIsRemoveModalVisible(false)}
+        aria-labelledby="form-dialog-title"
       >
-        <>
-          <AddUsers></AddUsers>
-        </>
-      </Modal>
+        <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete 5 users? This cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setIsRemoveModalVisible(false)}
+            color="primary"
+          >
+            No
+          </Button>
+          <Button
+            onClick={() => setIsRemoveModalVisible(false)}
+            color="primary"
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
