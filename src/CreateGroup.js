@@ -26,6 +26,9 @@ function validateEmail(email) {
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
+function money_round(num) {
+  return Math.ceil(num * 100) / 100;
+}
 
 const CreateGroup = ({ history }) => {
   function validateEmails(emailString) {
@@ -39,6 +42,8 @@ const CreateGroup = ({ history }) => {
     console.log("WTF");
     return retValue;
   }
+
+
 
   const { TextArea } = Input;
   const allPerksView = [];
@@ -112,10 +117,6 @@ const CreateGroup = ({ history }) => {
         }
         return         
       }
-      console.log(numPeople)
-      setNumPeople(Math.max(0, numPeople))
-      console.log(numPeople)
-      setTotalCost(numPeople * costPerPerson);
   }
 
   const { Option } = Select;
@@ -315,7 +316,7 @@ const CreateGroup = ({ history }) => {
                     <Grid container spacing={0}>
                       <Grid item xs={8}>
                         <h4 style={{ textAlign: "left" }}>
-                          Total Cost: {totalCost}
+                          Total Cost: {money_round(totalCost)}
                         </h4>
                       </Grid>
                       <Grid item xs={2} style={{ textAlign: "right" }}></Grid>

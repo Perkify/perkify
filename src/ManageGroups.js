@@ -361,7 +361,7 @@ export default function ManageGroups() {
         footer={null}
       >
         <>
-          <AddPerks existingPerks={getPerkNames(groupPerks)}></AddPerks>
+          <AddPerks existingPerks={getPerkNames(groupPerks)} numPeople={groupEmails.length}></AddPerks>
         </>
       </Modal>
     </>

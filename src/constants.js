@@ -71,12 +71,12 @@ var allPerks = [
   },
   {
     Name: "The Economist Digital",
-    Cost: 55,
+    Cost: 55.00,
     Period: "Quarterly",
   },
   {
     Name: "The Economist Digital + Print",
-    Cost: 69,
+    Cost: 69.00,
     Period: "Quarterly",
   },
   {
@@ -106,27 +106,27 @@ var allPerks = [
   },
   {
     Name: "ClassPass (6 credits or 2 classes)",
-    Cost: 15,
+    Cost: 15.00,
     Period: "Monthly",
   },
   {
     Name: "ClassPass (23 credits or 8 classes)",
-    Cost: 49,
+    Cost: 49.00,
     Period: "Monthly",
   },
   {
     Name: "ClassPass (38 credits or 13 classes)",
-    Cost: 79,
+    Cost: 79.00,
     Period: "Monthly",
   },
   {
     Name: "ClassPass (68 credits or 24 classes)",
-    Cost: 139,
+    Cost: 139.00,
     Period: "Monthly",
   },
   {
     Name: "ClassPass (100 credits or 35 classes)",
-    Cost: 199,
+    Cost: 199.00,
     Period: "Monthly",
   },
   {
@@ -206,7 +206,7 @@ var allPerks = [
   },
   {
     Name: "Rosetta Stone",
-    Cost: 36,
+    Cost: 36.00,
     Period: "Quarterly",
   },
   {

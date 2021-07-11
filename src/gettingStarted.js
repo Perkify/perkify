@@ -27,7 +27,59 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
+function money_round(num) {
+  return Math.ceil(num * 100) / 100;
+}
+
 const GettingStarted = ({ history }) => {
+  var [totalCost, setTotalCost] = useState(0);
+  var [numPeople,setNumPeople] = useState(0)
+  var [costPerPerson, setCostPerPerson] = useState(0)
+
+  function handleChange(value) {
+    console.log(numPeople)
+    console.log(value);
+    setPerksData(value);
+    var cost = 0;
+    value.forEach((perk) => {
+      console.log(perk);
+      cost += allPerksDict[perk].Cost;
+    });
+    setCostPerPerson(cost)
+    console.log(cost)
+    console.log(numPeople)
+    cost = cost * numPeople;
+    console.log(cost)
+    setTotalCost(cost);
+  }
+
+  function handleEmailChange(value) {
+    if (value.target.value === ""){
+        setNumPeople(0)
+        setTotalCost(0)
+        return
+    }
+      let emails = value.target.value.replace(/[,'"]+/gi, " ").split(/\s+/);
+      if (validateEmail(emails[emails.length - 1])){
+        console.log(emails.length)
+        setNumPeople(emails.length)
+        setTotalCost(emails.length * costPerPerson);
+        return
+      }
+      else{
+        if (emails.length == 0){
+          setNumPeople(0)
+          setTotalCost(0)
+        }
+        else{
+          setNumPeople(emails.length - 1)
+          setTotalCost((emails.length - 1)* costPerPerson);
+        }
+        return         
+      }
+  }
+
+
   function validateEmails(emailString) {
     let emails = emailString.replace(/[,'"]+/gi, " ").split(/\s+/);
     let retValue = true;
@@ -62,13 +114,12 @@ const GettingStarted = ({ history }) => {
     console.log(groupData[0]);
   });
 
-  function handleChange(value) {
-    setPerksData(value);
-  }
+
 
   const { Option } = Select;
 
   const handleAddUsers = async (event) => {
+    //TODO: LOADING SCREEN 
     console.log(event);
     let emails = event.emails;
     emails = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
@@ -178,6 +229,7 @@ const GettingStarted = ({ history }) => {
                   <Form.Item
                     label=""
                     name="emails"
+                    onChange={handleEmailChange}
                     rules={[
                       ({ getFieldValue }) => ({
                         validator(_, value) {
@@ -252,6 +304,27 @@ const GettingStarted = ({ history }) => {
               </Grid>
             </div>
 
+            <div>
+                <Grid container spacing={0}>
+                  <Grid item xs={1}>
+                    {" "}
+                  </Grid>
+                  <Grid item xs={10}>
+                    <Grid container spacing={0}>
+                      <Grid item xs={8}>
+                        <h4 style={{ textAlign: "left" }}>
+                          Total Cost: {money_round(totalCost)}
+                        </h4>
+                      </Grid>
+                      <Grid item xs={2} style={{ textAlign: "right" }}></Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs>
+                    {" "}
+                  </Grid>
+                </Grid>
+              </div>
+
             <Grid container spacing={0}>
               <Grid item xs={1}>
                 {" "}
@@ -273,6 +346,7 @@ const GettingStarted = ({ history }) => {
         <Grid item xs></Grid>
       </Grid>
     </div>
+
   );
 };
 

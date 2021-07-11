@@ -24,6 +24,10 @@ import { Form, Input, Button, Checkbox } from "antd";
 import "antd/dist/antd.css";
 import { AutoComplete } from "antd";
 
+function money_round(num) {
+  return Math.ceil(num * 100) / 100;
+}
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -45,7 +49,10 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-const AddPerks = ({ history, existingPerks }) => {
+const AddPerks = ({ history, existingPerks, numPeople }) => {
+  var [totalCost, setTotalCost] = useState(0);
+
+  console.log(numPeople)
   let { id } = useParams();
   function validateEmails(emailString) {
     let emails = emailString.replace(/[,'"]+/gi, " ").split(/\s+/);
@@ -76,6 +83,12 @@ const AddPerks = ({ history, existingPerks }) => {
 
   function handleChange(value) {
     setPerksData(value);
+    var cost = 0;
+    value.forEach((perk) => {
+      cost += allPerksDict[perk].Cost;
+    });
+    cost = cost * numPeople;
+    setTotalCost(cost);
   }
 
   const classes = useStyles();
@@ -158,6 +171,7 @@ const AddPerks = ({ history, existingPerks }) => {
                   >
                     <Select
                       mode="multiple"
+                      onChange={handleChange}
                       style={{ width: "100%", borderRadius: "5px" }}
                     >
                       {allPerks.map((perk) => {
@@ -173,6 +187,27 @@ const AddPerks = ({ history, existingPerks }) => {
                 </Grid>
               </Grid>
             </div>
+
+            <div>
+                <Grid container spacing={0}>
+                  <Grid item xs={1}>
+                    {" "}
+                  </Grid>
+                  <Grid item xs={10}>
+                    <Grid container spacing={0}>
+                      <Grid item xs={8}>
+                        <h4 style={{ textAlign: "left" }}>
+                          Total Cost: {money_round(totalCost)}
+                        </h4>
+                      </Grid>
+                      <Grid item xs={2} style={{ textAlign: "right" }}></Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs>
+                    {" "}
+                  </Grid>
+                </Grid>
+              </div>
 
             <Grid container spacing={0}>
               <Grid item xs={1}>
