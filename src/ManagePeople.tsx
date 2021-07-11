@@ -13,7 +13,7 @@ import AddUsers from "./AddUsers";
 
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "./Auth.js";
+import { AuthContext } from "./contexts/Auth.js";
 
 import allPerks from "./constants";
 import { LocalConvenienceStoreOutlined } from "@material-ui/icons";

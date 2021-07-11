@@ -1,4 +1,4 @@
-import { AuthProvider } from "./Auth";
+import { AuthProvider } from "./contexts/Auth";
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,7 +9,6 @@ import Home from "./Home";
 import React from "react";
 import Console from "./Console";
 import PrivateRoute from "./PrivateRoute";
-import DashBoard from "./DashBoard";
 import ManagePeople from "./ManagePeople.tsx";
 import ManageGroups from "./ManageGroups";
 import createGroup from "./CreateGroup";

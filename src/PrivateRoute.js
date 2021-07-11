@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Route, Redirect } from "react-router-dom";
-import { AuthContext } from "./Auth";
+import { AuthContext } from "./contexts/Auth";
 import app from "./firebaseapp.js";
 import firebase from "firebase/app";
 import "firebase/firestore";

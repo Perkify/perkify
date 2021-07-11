@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import app from "./firebaseapp.js";
-import { AuthContext } from "./Auth";
+import { AuthContext } from "./contexts/Auth";
 
 const Console = () => {
   const { currentUser } = useContext(AuthContext);

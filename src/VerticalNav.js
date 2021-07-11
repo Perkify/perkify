@@ -7,7 +7,7 @@ import AddIcon from "@material-ui/icons/Add";
 import app from "./firebaseapp.js";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "./Auth";
+import { AuthContext } from "./contexts/Auth";
 
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";

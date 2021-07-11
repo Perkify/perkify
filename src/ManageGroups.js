@@ -15,7 +15,7 @@ import RemovePerks from "./RemovePerks";
 import AddPerks from "./AddPerks";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "./Auth";
+import { AuthContext } from "./contexts/Auth";
 import allPerks from "./constants";
 import allPerksDict from "./allPerksDict";
 
