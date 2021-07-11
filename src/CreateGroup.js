@@ -63,8 +63,8 @@ const CreateGroup = ({ history }) => {
     return 100;
   }
 
-  var numPeople = 0;
-  var [costPerPerson, setCost] = useState(0);
+  var [numPeople,setNumPeople] = useState(0)
+  var [costPerPerson, setCostPerPerson] = useState(0)
 
   useEffect(() => {
     getGroupData();
@@ -72,25 +72,50 @@ const CreateGroup = ({ history }) => {
   });
 
   function handleChange(value) {
+    console.log(numPeople)
     console.log(value);
     setPerksData(value);
-    var totalCost = 0;
+    var cost = 0;
     value.forEach((perk) => {
       console.log(perk);
-      totalCost += allPerksDict[perk].Cost;
+      cost += allPerksDict[perk].Cost;
     });
-    setCost(totalCost);
-    totalCost = totalCost * numPeople;
-    setTotalCost(totalCost);
+    setCostPerPerson(cost)
+    console.log(cost)
+    console.log(numPeople)
+    cost = cost * numPeople;
+    console.log(cost)
+    setTotalCost(cost);
   }
 
   function handleEmailChange(value) {
-    if (validateEmails(value.target.value)) {
-      let emails = value.target.value.replace(/[,'"]+/gi, " ").split(/\s+/);
-      numPeople = emails.length;
-      console.log(costPerPerson);
-      setTotalCost(emails.length * costPerPerson);
+    if (value.target.value === ""){
+        setNumPeople(0)
+        setTotalCost(0)
+        return
     }
+      let emails = value.target.value.replace(/[,'"]+/gi, " ").split(/\s+/);
+      if (validateEmail(emails[emails.length - 1])){
+        console.log(emails.length)
+        setNumPeople(emails.length)
+        setTotalCost(emails.length * costPerPerson);
+        return
+      }
+      else{
+        if (emails.length == 0){
+          setNumPeople(0)
+          setTotalCost(0)
+        }
+        else{
+          setNumPeople(emails.length - 1)
+          setTotalCost((emails.length - 1)* costPerPerson);
+        }
+        return         
+      }
+      console.log(numPeople)
+      setNumPeople(Math.max(0, numPeople))
+      console.log(numPeople)
+      setTotalCost(numPeople * costPerPerson);
   }
 
   const { Option } = Select;
