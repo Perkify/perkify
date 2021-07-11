@@ -20,13 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noImplicitAny": false,
-    "baseUrl": "src",
-    "paths": {
-      "@components/*": ["components/*"],
-      "@contexts/*": ["contexts/*"],
-      "@utils/*": ["utils/*"],
-      "@views/*": ["views/*"]
-    }
+    "baseUrl": "src"
   },
   "include": [
     "src"
