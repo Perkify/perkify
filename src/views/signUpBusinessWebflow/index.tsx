@@ -1,8 +1,8 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
-import SignUpGraphic from "./Images/SignUpGraphic.png";
-import logo from "./Images/logo.png";
+import SignUpGraphic from "images/SignUpGraphic.png";
+import logo from "images/logo.png";
 import TextField from "@material-ui/core/TextField";
 
 import { withStyles, createStyles } from "@material-ui/core/styles";
@@ -13,10 +13,11 @@ import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Button from "@material-ui/core/Button";
 
-import AdminSignUpForm from "@components/AdminSignUpForm";
-import BusinessSignUpForm from "@components/BusinessSignUpForm";
-import VerifyEmail from "@components/VerifyEmail";
+import AdminSignUpForm from "components/AdminSignUpForm";
+import BusinessSignUpForm from "components/BusinessSignUpForm";
+import VerifyEmail from "components/VerifyEmail";
 import app from "firebaseApp";
+import firebase from "firebase/app";
 
 const crypto = require("crypto");
 
@@ -102,7 +103,9 @@ const SignUpBusinessWebflow = () => {
   };
   const BusinessFormProps = { businessName, address1, city, state, zip, phone };
 
-  const [newUser, setNewUser] = React.useState(0);
+  const [newUser, setNewUser] = React.useState<firebase.User>(
+    null as firebase.User | null
+  );
 
   const processStep = async (step) => {
     switch (step) {

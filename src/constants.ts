@@ -216,10 +216,14 @@ export const allPerks = [
   },
 ];
 
-export const allPerksDict = allPerks.map((perk) => {
-  allPerksDict[perk.Name] = {
-    Cost: perk["Cost"],
-    Period: perk["Period"],
-    Name: perk.Name,
-  };
-});
+export const allPerksDict = allPerks.reduce(
+  (map, perk) => (
+    (map[perk.Name] = {
+      Cost: perk["Cost"],
+      Period: perk["Period"],
+      Name: perk.Name,
+    }),
+    map
+  ),
+  {}
+);

@@ -6,7 +6,7 @@ import {
   Link,
   useParams,
 } from "react-router-dom";
-import ClippedDrawer from "@components/VerticalNav";
+import ClippedDrawer from "components/VerticalNav";
 import { DataGrid } from "@material-ui/data-grid";
 import Grid from "@material-ui/core/Grid";
 import { Button } from "@material-ui/core";
@@ -16,8 +16,9 @@ import AddPerks from "./AddPerks";
 
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "@contexts/Auth";
+import { AuthContext } from "contexts/Auth";
 import { allPerks, allPerksDict } from "../../constants";
+import { AddRemoveTable } from "components/AddRemoveTable";
 
 const columns = [
   // {
@@ -275,8 +276,17 @@ export default function ManageGroups() {
   return (
     <>
       <ClippedDrawer>
-        <div style={{ width: 500 }}>
-          <Grid
+        <div style={{ height: 300 }}>
+          <AddRemoveTable
+            rows={groupPerks}
+            columns={perkColumns}
+            setSelected={setSelection}
+            onClickAdd={() => {}}
+            onClickDelete={() => {}}
+            tableName="Group Perks"
+            addButtonText="Add Group Perk"
+          />
+          {/* <Grid
             container
             spacing={0}
             justifyContent="center"
@@ -287,13 +297,13 @@ export default function ManageGroups() {
             </Grid>
             <Grid item xs={3} alignItems="flex-end" justifyContent="center">
               <Button
-                type="primary"
+                color="primary"
                 onClick={showAddModal}
-                htmlType="submit"
+                // htmlType="submit"
                 style={{
                   width: "80%",
                   borderRadius: "5px",
-                  alignText: "center",
+                  //   alignText: "center",
                   height: "40px",
                 }}
               >
@@ -303,14 +313,14 @@ export default function ManageGroups() {
 
             <Grid item xs={3}>
               <Button
-                type="primary"
+                color="primary"
                 onClick={showRemoveModal}
-                htmlType="submit"
+                // htmlType="submit"
                 style={{
                   width: "80%",
                   borderRadius: "5px",
                   height: "40px",
-                  alignText: "center",
+                  //   alignText: "center",
                 }}
               >
                 Remove
@@ -332,9 +342,21 @@ export default function ManageGroups() {
               setSelection(newSelection.selectionModel);
             }}
           />
+        </div> */}
+        </div>
+        <div style={{ height: 300, marginTop: 50 }}>
+          <AddRemoveTable
+            rows={groupEmails}
+            columns={columns}
+            setSelected={setSelection}
+            onClickAdd={() => {}}
+            onClickDelete={() => {}}
+            tableName="Group Employees"
+            addButtonText="Add Employees"
+          />
         </div>
 
-        <br></br>
+        {/* <br></br>
 
         <Grid container spacing={0} justifyContent="center" alignItems="center">
           <Grid item xs={6} md={8}>
@@ -344,8 +366,8 @@ export default function ManageGroups() {
         <div style={{ height: 400, width: 500 }}>
           <DataGrid rows={groupEmails} columns={columns} pageSize={100} />
         </div>
-      </ClippedDrawer>
-      {/* <Modal
+      </ClippedDrawer> */}
+        {/* <Modal
         visible={isRemoveModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -365,6 +387,7 @@ export default function ManageGroups() {
           <AddPerks existingPerks={getPerkNames(groupPerks)}></AddPerks>
         </>
       </Modal> */}
+      </ClippedDrawer>
     </>
   );
 }

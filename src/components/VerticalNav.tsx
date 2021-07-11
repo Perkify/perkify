@@ -7,7 +7,7 @@ import AddIcon from "@material-ui/icons/Add";
 import app from "firebaseApp";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "@contexts/Auth";
+import { AuthContext } from "contexts/Auth";
 
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
@@ -35,7 +35,8 @@ import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import PersonIcon from "@material-ui/icons/Person";
 import FeedbackIcon from "@material-ui/icons/Feedback";
-import logo from "./Images/logo.png";
+import logo from "images/logo.png";
+import { assert } from "console";
 
 const drawerWidth = 240;
 
@@ -69,6 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerContainer: {
       overflow: "auto",
+      marginTop: 30,
     },
     avatarCard: {
       display: "flex",
@@ -82,6 +84,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
       minWidth: "200px",
       padding: theme.spacing(3),
+    },
+    listItem: {
+      //       fontSize: 14,
     },
   })
 );
@@ -149,7 +154,7 @@ export default function ClippedDrawer({ children }) {
        </Paper>
        <Divider /> */}
         {navSections.map(([sectionName, section], index) => (
-          <>
+          <div key={sectionName}>
             <Typography style={{ margin: "20px 0 0 20px" }} component="div">
               <Box fontWeight="fontWeightBold">{sectionName}</Box>
             </Typography>
@@ -172,7 +177,10 @@ export default function ClippedDrawer({ children }) {
                     >
                       {e}
                     </ListItemIcon>
-                    <ListItemText primary={name} />
+                    <ListItemText
+                      primary={name}
+                      classes={{ primary: classes.listItem }}
+                    />
                   </ListItem>
                 ) : (
                   //FIX LATER
@@ -181,24 +189,27 @@ export default function ClippedDrawer({ children }) {
                     component={Link}
                     to={route}
                     key={name}
-                    style={{
-                      color: location.pathname == route && "#FF6F61",
-                    }}
+                    //     style={{
+                    //       color: location.pathname == route && "#FF6F61",
+                    //     }}
                   >
                     <ListItemIcon
                       style={{
                         justifyContent: "center",
-                        color: location.pathname == route && "#FF6F61",
+                        // color: location.pathname == route && "#FF6F61",
                       }}
                     >
                       {e}
                     </ListItemIcon>
-                    <ListItemText primary={name} />
+                    <ListItemText
+                      primary={name}
+                      classes={{ primary: classes.listItem }}
+                    />
                   </ListItem>
                 )
               )}
             </List>
-          </>
+          </div>
         ))}
       </div>
     </div>
@@ -210,52 +221,36 @@ export default function ClippedDrawer({ children }) {
 
   //BELOW CODE DOESNT WORK
   useEffect(() => {
-    var db = firebase.firestore();
-    db.collection("admins")
-      .doc(currentUser.uid)
-      .get()
-      .then((doc) => {
-        const adminData = doc.data();
-        if (adminData) {
-          //   console.log("Document data:", doc.data());
-          let businessId = adminData["companyID"];
-          db.collection("businesses")
-            .doc(businessId)
-            .get()
-            .then((doc) => {
-              const groupData = doc.data();
-              if (groupData) {
-                console.log(groupData["groups"]);
-                setGroupViews(groupData["groups"]);
-                setUseEffectComplete(true);
-              }
-            });
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
+    if (currentUser) {
+      const db = firebase.firestore();
+      db.collection("admins")
+        .doc(currentUser.uid)
+        .get()
+        .then((doc) => {
+          const adminData = doc.data();
+          if (adminData) {
+            //   console.log("Document data:", doc.data());
+            let businessId = adminData["companyID"];
+            db.collection("businesses")
+              .doc(businessId)
+              .get()
+              .then((doc) => {
+                const groupData = doc.data();
+                if (groupData) {
+                  console.log(groupData["groups"]);
+                  setGroupViews(groupData["groups"]);
+                  setUseEffectComplete(true);
+                }
+              });
+            // doc.data() will be undefined in this case
+            //     console.log("No such document!");
+          }
+        })
+        .catch((error) => {
+          console.log("Error getting document:", error);
+        });
+    }
   }, []);
-
-  function getGroups() {
-    var db = firebase.firestore();
-    db.collection("admins")
-      .doc(currentUser.uid)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("Document data:", doc.data());
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-  }
 
   if (useEffectComplete === false) {
     return <></>;

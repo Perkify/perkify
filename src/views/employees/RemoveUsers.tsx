@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from "react";
 import { withRouter, Redirect } from "react-router";
 import app from "firebaseApp";
-import { AuthContext } from "@contexts/Auth.js";
+import { AuthContext } from "contexts/Auth";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import "antd/dist/antd.css";

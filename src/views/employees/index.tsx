@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
-import VerticalNav from "@components/VerticalNav";
+import VerticalNav from "components/VerticalNav";
 import Button from "@material-ui/core/Button";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "@contexts/Auth.js";
+import { AuthContext } from "contexts/Auth";
 
 import { allPerks } from "../../constants";
-import { MenuItem, Select, Theme, Typography } from "@material-ui/core";
+import { Card, MenuItem, Select, Theme, Typography } from "@material-ui/core";
 
-import { AddRemoveTable } from "@components/AddRemoveTable";
+import { AddRemoveTable } from "components/AddRemoveTable";
 
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -16,7 +16,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { validateEmails } from "@utils/emailValidation";
+import { validateEmails } from "utils/emailValidation";
 
 const columns = [
   {
@@ -38,7 +38,7 @@ export default function ManagePeople() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
   const [groupData, setGroupData] = useState(["Cole's Group"]);
-  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState([]);
   const [emails, setEmails] = useState("");
 
   const handleOk = () => {
@@ -71,6 +71,8 @@ export default function ManagePeople() {
         const userData = doc.data();
         if (userData) {
           const businessId = userData["companyID"];
+          console.log("Business ID");
+          console.log(businessId);
 
           db.collection("users")
             .where("businessID", "==", businessId)
@@ -81,7 +83,12 @@ export default function ManagePeople() {
                 id: index,
                 group: doc.data()["group"],
               }));
+              console.log("EMAILS");
+              console.log(emails);
               setPeopleData(emails);
+            })
+            .catch((error) => {
+              alert(error);
             });
         } else {
           console.log("No such document!");
@@ -95,7 +102,7 @@ export default function ManagePeople() {
   return (
     <>
       <VerticalNav>
-        <div style={{ height: 500 }}>
+        <Card style={{ height: 500, border: 0 }} variant="outlined">
           <AddRemoveTable
             rows={peopleData}
             columns={columns}
@@ -105,8 +112,10 @@ export default function ManagePeople() {
               console.log("Clicked");
               setIsRemoveModalVisible(true);
             }}
+            tableName="Manage Employees"
+            addButtonText="Add Employees"
           />
-        </div>
+        </Card>
       </VerticalNav>
       <Dialog
         open={isAddModalVisible}
@@ -119,14 +128,18 @@ export default function ManagePeople() {
             To add users to this organization, please enter their email
             addresses below and select a group from the dropdown.
           </DialogContentText>
-          <Typography style={{ marginTop: "30px" }}>Emails</Typography>
+          <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+            Emails
+          </Typography>
           <TextField
             id="emailaddresses"
+            variant="outlined"
             label="Insert emails separated by commas or newlines"
             value={emails}
             onChange={(event) => setEmails(event.target.value)}
             fullWidth
             multiline
+            rows={4}
             rowsMax={4}
           />
           <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
@@ -135,17 +148,22 @@ export default function ManagePeople() {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
+            variant="outlined"
             value={selectedGroup}
             displayEmpty
+            multiple
+            fullWidth
             onChange={(event) => {
-              setSelectedGroup(event.target.value as string);
+              setSelectedGroup(event.target.value as string[]);
             }}
           >
             <MenuItem value="" disabled>
               Select Perk Group
             </MenuItem>
             {groupData.map((name) => (
-              <MenuItem value={name}>{name}</MenuItem>
+              <MenuItem value={name} key={name}>
+                {name}
+              </MenuItem>
             ))}
           </Select>
         </DialogContent>

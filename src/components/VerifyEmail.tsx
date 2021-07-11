@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactComponent as EmailSVG } from "../Images/email.svg";
+import { ReactComponent as EmailSVG } from "images/email.svg";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";

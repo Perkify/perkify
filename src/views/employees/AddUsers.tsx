@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { Select } from "antd";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "@contexts/Auth";
+import { AuthContext } from "contexts/Auth";
 
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";

@@ -1,21 +1,16 @@
 import { AuthProvider } from "./contexts/Auth";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  useParams,
-} from "react-router-dom";
-import Home from "@views/home";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Home from "views/home";
 import React from "react";
 // import Console from "./Console";
-import PrivateRoute from "@components/PrivateRoute";
-import ManagePeople from "@views/employees";
-import ManageGroups from "@views/manageGroups";
-import createGroup from "@views/createGroup";
-import GettingStarted from "@views/gettingStarted";
-import Login from "@views/login";
-import SignUpBusinessWebflow from "@views/signUpBusinessWebflow";
-import GetCard from "@views/getCard";
+import PrivateRoute from "components/PrivateRoute";
+import ManagePeople from "views/employees";
+import ManageGroups from "views/manageGroups";
+import createGroup from "views/createGroup";
+import GettingStarted from "views/gettingStarted";
+import Login from "views/login";
+import SignUpBusinessWebflow from "views/signUpBusinessWebflow";
+import GetCard from "views/getCard";
 
 function App() {
   return (

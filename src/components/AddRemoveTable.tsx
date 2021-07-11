@@ -67,7 +67,7 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
             backgroundColor: theme.palette.secondary.dark,
           },
     title: {
-      flex: "1 1 100%",
+      flex: "1 1 auto",
       marginLeft: "10px",
     },
   })
@@ -79,6 +79,8 @@ export const AddRemoveTable = ({
   setSelected,
   onClickAdd,
   onClickDelete,
+  tableName,
+  addButtonText,
 }) => {
   const CustomToolbar = () => {
     const classes = useToolbarStyles();
@@ -107,7 +109,7 @@ export const AddRemoveTable = ({
             id="tableTitle"
             component="div"
           >
-            Manage People
+            {tableName}
           </Typography>
         )}
 
@@ -121,9 +123,9 @@ export const AddRemoveTable = ({
           <Button
             color="primary"
             onClick={onClickAdd}
-            style={{ width: "120px", marginRight: "10px" }}
+            style={{ marginRight: "10px" }}
           >
-            Add People
+            {addButtonText}
           </Button>
         )}
       </GridToolbarContainer>

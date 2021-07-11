@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from "react";
+import firebase from "firebase/app";
 import app from "../firebaseApp";
 
-export const AuthContext = React.createContext();
+type ContextProps = {
+  currentUser: firebase.User | null;
+  authenticated: boolean;
+  setCurrentUser: any;
+  loadingAuthState: boolean;
+};
+
+export const AuthContext = React.createContext<Partial<ContextProps>>({});
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [pending, setPending] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
+  const [loadingAuthState, setLoadingAuthState] = useState(true);
 
   useEffect(() => {
     app.auth().onAuthStateChanged((user) => {
       setCurrentUser(user);
-      setPending(false);
+      setLoadingAuthState(false);
     });
   }, []);
 
-  if (pending) {
+  if (loadingAuthState) {
     return <>Loading...</>;
   }
 
@@ -22,6 +30,9 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         currentUser,
+        authenticated: currentUser !== null,
+        setCurrentUser,
+        loadingAuthState,
       }}
     >
       {children}

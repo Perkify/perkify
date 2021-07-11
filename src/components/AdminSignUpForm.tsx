@@ -3,7 +3,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
 import React from "react";
 import { makeStyles, withStyles, createStyles } from "@material-ui/core/styles";
-import SignUpGraphic from "../Images/SignUpGraphic.png";
+import SignUpGraphic from "images/SignUpGraphic.png";
 import TextField from "@material-ui/core/TextField";
 
 const BootstrapInput = withStyles((theme) => ({
