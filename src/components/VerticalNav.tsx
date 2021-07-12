@@ -70,7 +70,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerContainer: {
       overflow: "auto",
-      marginTop: 30,
     },
     avatarCard: {
       display: "flex",
@@ -96,7 +95,9 @@ export default function ClippedDrawer({ children }) {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [useEffectComplete, setUseEffectComplete] = useState(false);
-  var [groupV, setGroupViews] = useState({});
+  const [groupV, setGroupViews] = useState({});
+
+  const { currentUser } = useContext(AuthContext);
 
   const location = useLocation();
 
@@ -142,17 +143,19 @@ export default function ClippedDrawer({ children }) {
     <div>
       <Toolbar />
       <div className={classes.drawerContainer}>
-        {/* <Paper className={classes.avatarCard}>
-         <Avatar
-           alt="Remy Sharp"
-           src="https://material-ui.com/static/images/avatar/1.jpg"
-         />
-         <span>
-           <Typography>Cole Killian</Typography>
-           <Typography variant="caption">Your Plan: Premium</Typography>
-         </span>
-       </Paper>
-       <Divider /> */}
+        <Paper className={classes.avatarCard} variant="outlined">
+          <Avatar
+            alt={currentUser?.displayName}
+            src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.m.wikipedia.org%2Fwiki%2FFile%3AMissing_avatar.svg&psig=AOvVaw3NzqKvydDCWL1eCABVrnYM&ust=1626138371997000&source=images&cd=vfe&ved=0CAoQjRxqFwoTCJjZqtOr3PECFQAAAAAdAAAAABAD"
+          />
+          <span>
+            <Typography style={{ lineHeight: "40px" }}>
+              {currentUser?.displayName}
+            </Typography>
+            {/* <Typography variant="caption">Your Plan: Premium</Typography> */}
+          </span>
+        </Paper>
+        <Divider />
         {navSections.map(([sectionName, section], index) => (
           <div key={sectionName}>
             <Typography style={{ margin: "20px 0 0 20px" }} component="div">
@@ -214,8 +217,6 @@ export default function ClippedDrawer({ children }) {
       </div>
     </div>
   );
-
-  const { currentUser } = useContext(AuthContext);
 
   let adminData: any = {};
 

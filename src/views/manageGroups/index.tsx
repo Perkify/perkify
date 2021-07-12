@@ -7,12 +7,7 @@ import {
   useParams,
 } from "react-router-dom";
 import ClippedDrawer from "components/VerticalNav";
-import { DataGrid } from "@material-ui/data-grid";
-import Grid from "@material-ui/core/Grid";
-import { Button } from "@material-ui/core";
-import { Modal, Tabs } from "antd";
-import RemovePerks from "./RemovePerks";
-import AddPerks from "./AddPerks";
+import { Button, Card } from "@material-ui/core";
 
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -276,7 +271,7 @@ export default function ManageGroups() {
   return (
     <>
       <ClippedDrawer>
-        <div style={{ height: 300 }}>
+        <Card style={{ height: 300, border: 0 }} variant="outlined">
           <AddRemoveTable
             rows={groupPerks}
             columns={perkColumns}
@@ -343,8 +338,11 @@ export default function ManageGroups() {
             }}
           />
         </div> */}
-        </div>
-        <div style={{ height: 300, marginTop: 50 }}>
+        </Card>
+        <Card
+          style={{ height: 300, marginTop: 50, border: 0 }}
+          variant="outlined"
+        >
           <AddRemoveTable
             rows={groupEmails}
             columns={columns}
@@ -354,7 +352,7 @@ export default function ManageGroups() {
             tableName="Group Employees"
             addButtonText="Add Employees"
           />
-        </div>
+        </Card>
 
         {/* <br></br>
 

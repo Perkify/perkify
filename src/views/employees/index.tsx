@@ -38,8 +38,10 @@ export default function ManagePeople() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
   const [groupData, setGroupData] = useState(["Cole's Group"]);
-  const [selectedGroup, setSelectedGroup] = useState([]);
+  const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
   const [emails, setEmails] = useState("");
+  const [emailsError, setEmailsError] = useState("");
+  const [selectedPerksError, setSelectedPerksError] = useState("");
 
   const handleOk = () => {
     setIsRemoveModalVisible(false);
@@ -99,6 +101,33 @@ export default function ManagePeople() {
       });
   }, []);
 
+  const handleEmailError = (event) => {
+    setEmails(event.target.value);
+    if (event.target.value === "") {
+      setEmailsError("Please input atleast one email");
+    } else if (!validateEmails(event.target.value)) {
+      setEmailsError("Please input proper emails");
+    } else {
+      setEmailsError("");
+    }
+  };
+
+  const addToPerkGroup = (event) => {
+    event.preventDefault();
+    let error = false;
+    if (emails == "") {
+      setEmailsError("Enter emails");
+      error = true;
+    }
+    if (selectedPerkGroup.length == 0) {
+      setSelectedPerksError("Select perks");
+      error = true;
+    }
+    if (!error) {
+      setIsAddModalVisible(false);
+    }
+  };
+
   return (
     <>
       <VerticalNav>
@@ -134,13 +163,16 @@ export default function ManagePeople() {
           <TextField
             id="emailaddresses"
             variant="outlined"
-            label="Insert emails separated by commas or newlines"
+            label=""
+            placeholder="Insert emails separated by commas or newlines"
             value={emails}
-            onChange={(event) => setEmails(event.target.value)}
+            onChange={handleEmailError}
             fullWidth
             multiline
             rows={4}
             rowsMax={4}
+            error={emailsError != ""}
+            helperText={emailsError}
           />
           <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
             Perk Group
@@ -148,14 +180,23 @@ export default function ManagePeople() {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            variant="outlined"
-            value={selectedGroup}
             displayEmpty
+            renderValue={(selected) => {
+              if ((selected as string[]).length === 0) {
+                return "Select Perks";
+              }
+
+              return (selected as string[]).join(", ");
+            }}
+            variant="outlined"
+            value={selectedPerkGroup}
             multiple
             fullWidth
             onChange={(event) => {
-              setSelectedGroup(event.target.value as string[]);
+              setSelectedPerksError("");
+              setSelectedPerkGroup(event.target.value as string[]);
             }}
+            error={selectedPerksError != ""}
           >
             <MenuItem value="" disabled>
               Select Perk Group
@@ -171,7 +212,7 @@ export default function ManagePeople() {
           <Button onClick={() => setIsAddModalVisible(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => setIsAddModalVisible(false)} color="primary">
+          <Button onClick={addToPerkGroup} color="primary">
             Add Users
           </Button>
         </DialogActions>

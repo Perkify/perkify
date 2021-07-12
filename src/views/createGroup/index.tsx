@@ -61,6 +61,8 @@ const CreateGroup = ({ history }) => {
     // update the controlled form
     const perks = event.target.value as string[];
 
+    setSelectedPerksError("");
+
     setSelectedPerks(perks);
 
     let cost = 0;
@@ -184,7 +186,10 @@ const CreateGroup = ({ history }) => {
           label="Group Name"
           placeholder="Cole's Group"
           value={groupName}
-          onChange={(event) => setGroupName(event.target.value)}
+          onChange={(event) => {
+            setGroupName(event.target.value);
+            setGroupNameError("");
+          }}
           fullWidth
           error={groupNameError != ""}
           helperText={groupNameError}
