@@ -150,6 +150,8 @@ const validateUserEmail = async (email) => {
   const userRef = await db.collection("users").doc(email).get();
   if (!userRef.exists) {
     return Promise.reject(new Error("You are not added by your employer"));
+  } else {
+    return Promise.resolve();
   }
 };
 
@@ -163,6 +165,7 @@ const validateEmails = async (emails) => {
   } else {
     return Promise.reject(new Error("send array of emails"));
   }
+  return Promise.resolve();
 };
 
 const sanitizeEmails = (emails) => {
@@ -181,6 +184,7 @@ const validatePerks = async (perks) => {
   } else {
     return Promise.reject(new Error("send array of perks"));
   }
+  return Promise.resolve();
 };
 
 // --------------- Rapyd API Calls --------------- //
