@@ -1,6 +1,6 @@
+import { Grid } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import ClippedDrawer from "components/VerticalNav";
 import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -263,23 +263,39 @@ export default function ManageGroups() {
 
   return (
     <>
-      <ClippedDrawer>
-        <Header
-          title="Manage Perk Groups"
-          crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
-        />
+      <Header
+        title="Manage Perk Groups"
+        crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
+      />
 
-        <AddRemoveTable
-          rows={groupPerks}
-          height={400}
-          columns={perkColumns}
-          setSelected={setSelection}
-          onClickAdd={() => {}}
-          onClickDelete={() => {}}
-          tableName="Group Perks"
-          addButtonText="Add Group Perk"
-        />
-        {/* <Grid
+      <Grid container spacing={5}>
+        <Grid item sm={6} xs={12}>
+          <AddRemoveTable
+            rows={groupPerks}
+            height={600}
+            columns={perkColumns}
+            setSelected={setSelection}
+            onClickAdd={() => {}}
+            onClickDelete={() => {}}
+            tableName="Group Perks"
+            addButtonText="Add Group Perk"
+          />
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          <AddRemoveTable
+            height={600}
+            rows={groupEmails}
+            columns={columns}
+            setSelected={setSelection}
+            onClickAdd={() => {}}
+            onClickDelete={() => {}}
+            tableName="Group Employees"
+            addButtonText="Add Employees"
+          />
+        </Grid>
+      </Grid>
+
+      {/* <Grid
             container
             spacing={0}
             justifyContent="center"
@@ -336,20 +352,8 @@ export default function ManageGroups() {
             }}
           />
         </div> */}
-        <div style={{ marginTop: "50px" }}>
-          <AddRemoveTable
-            height={400}
-            rows={groupEmails}
-            columns={columns}
-            setSelected={setSelection}
-            onClickAdd={() => {}}
-            onClickDelete={() => {}}
-            tableName="Group Employees"
-            addButtonText="Add Employees"
-          />
-        </div>
 
-        {/* <br></br>
+      {/* <br></br>
 
         <Grid container spacing={0} justifyContent="center" alignItems="center">
           <Grid item xs={6} md={8}>
@@ -360,7 +364,7 @@ export default function ManageGroups() {
           <DataGrid rows={groupEmails} columns={columns} pageSize={100} />
         </div>
       </ClippedDrawer> */}
-        {/* <Modal
+      {/* <Modal
         visible={isRemoveModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -380,7 +384,6 @@ export default function ManageGroups() {
           <AddPerks existingPerks={getPerkNames(groupPerks)}></AddPerks>
         </>
       </Modal> */}
-      </ClippedDrawer>
     </>
   );
 }

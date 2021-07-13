@@ -114,7 +114,6 @@ export const AddRemoveTable = ({
         ) : (
           <Button
             color="primary"
-            variant="contained"
             onClick={onClickAdd}
             style={{ marginRight: "10px" }}
           >

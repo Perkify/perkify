@@ -18,6 +18,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import AddIcon from "@material-ui/icons/Add";
 import DashboardIcon from "@material-ui/icons/Dashboard";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import GroupIcon from "@material-ui/icons/Group";
 import PersonIcon from "@material-ui/icons/Person";
 import { AuthContext } from "contexts/Auth";
@@ -69,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "20px 25px",
       padding: "0px 10px",
       border: 0,
-      backgroundColor: "#F2F3F5",
+      backgroundColor: "#e6edff",
       height: "80px",
       alignItems: "center",
     },
@@ -104,7 +105,7 @@ export default function ClippedDrawer({ children }) {
   ];
 
   const peopleNav: [string, string, any][] = [
-    ["Employees", "/people", <PersonIcon />],
+    ["Employees", "/dashboard/people", <PersonIcon />],
   ];
 
   var groupViews: [string, string, any][] = [];
@@ -115,18 +116,23 @@ export default function ClippedDrawer({ children }) {
     Object.keys(groupV)
       .sort()
       .forEach((group) => {
-        groupViews.push([group, "/group/" + group, <GroupIcon />]);
+        groupViews.push([group, "/dashboard/group/" + group, <GroupIcon />]);
       });
   }
 
-  groupViews.push(["Add New Group", "/create/group", <AddIcon />]);
+  groupViews.push(["Add New Group", "/dashboard/create/group", <AddIcon />]);
 
   const infoNav: [string, string, any][] = groupViews;
+
+  const accountNav: [string, string, any][] = [
+    ["Logout", "/logout", <ExitToAppIcon />],
+  ];
 
   const navSections: [string, [string, string, any][]][] = [
     ["General", generalNav],
     ["People", peopleNav],
     ["Perk Groups", infoNav],
+    ["Account", accountNav],
   ];
 
   const drawer = (
@@ -139,7 +145,8 @@ export default function ClippedDrawer({ children }) {
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
             alt={currentUser?.displayName}
-            src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.m.wikipedia.org%2Fwiki%2FFile%3AMissing_avatar.svg&psig=AOvVaw3NzqKvydDCWL1eCABVrnYM&ust=1626138371997000&source=images&cd=vfe&ved=0CAoQjRxqFwoTCJjZqtOr3PECFQAAAAAdAAAAABAD"
+            src="brokenimage"
+            style={{ backgroundColor: theme.palette.primary.main }}
           />
           <span>
             <Typography style={{ fontSize: "14px" }}>

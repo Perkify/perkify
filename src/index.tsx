@@ -19,7 +19,7 @@ const theme = createTheme({
   },
 
   shape: {
-    borderRadius: 8,
+    borderRadius: 20,
   },
   typography: {
     fontFamily: `"Public Sans", "Roboto", "Helvetica", "Arial", sans-serif`,

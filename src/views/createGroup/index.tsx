@@ -7,7 +7,6 @@ import {
 } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Header from "components/Header";
-import ClippedDrawer from "components/VerticalNav";
 import { AuthContext } from "contexts/Auth";
 import React, { useContext, useState } from "react";
 import { validateEmails } from "utils/emailValidation";
@@ -133,10 +132,10 @@ const CreateGroup = ({ history }) => {
   }
 
   return (
-    <ClippedDrawer>
+    <>
       <Header
         title="Create Gruop"
-        crumbs={["Dashboard", "Perk Groups", "Create Gruop"]}
+        crumbs={["Dashboard", "Perk Groups", "Create Group"]}
       />
 
       <Paper
@@ -214,16 +213,11 @@ const CreateGroup = ({ history }) => {
         <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
           Estimated Cost: ${totalCost}
         </Typography>
-        <Button
-          onClick={createPerkGroup}
-          variant="contained"
-          color="primary"
-          fullWidth
-        >
+        <Button onClick={createPerkGroup} variant="contained" color="primary">
           Create Perk Group
         </Button>
       </Paper>
-    </ClippedDrawer>
+    </>
   );
 };
 

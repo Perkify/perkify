@@ -8,7 +8,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import VerticalNav from "components/VerticalNav";
 import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -127,26 +126,24 @@ export default function ManagePeople() {
 
   return (
     <>
-      <VerticalNav>
-        <Header
-          title="Manage Employees"
-          crumbs={["Dashboard", "People", "Employees"]}
-        />
+      <Header
+        title="Manage Employees"
+        crumbs={["Dashboard", "People", "Employees"]}
+      />
 
-        <AddRemoveTable
-          rows={peopleData}
-          columns={columns}
-          setSelected={setSelection}
-          height={500}
-          onClickAdd={() => setIsAddModalVisible(true)}
-          onClickDelete={() => {
-            console.log("Clicked");
-            setIsRemoveModalVisible(true);
-          }}
-          tableName="Employees"
-          addButtonText="Add Employees"
-        />
-      </VerticalNav>
+      <AddRemoveTable
+        rows={peopleData}
+        columns={columns}
+        setSelected={setSelection}
+        height={500}
+        onClickAdd={() => setIsAddModalVisible(true)}
+        onClickDelete={() => {
+          console.log("Clicked");
+          setIsRemoveModalVisible(true);
+        }}
+        tableName="Employees"
+        addButtonText="Add Employees"
+      />
       <Dialog
         open={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
