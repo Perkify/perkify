@@ -51,6 +51,7 @@
     ]
   },
   "devDependencies": {
-    "prettier": "^2.3.2"
+    "prettier": "^2.3.2",
+    "prettier-plugin-organize-imports": "^2.2.0"
   }
 }

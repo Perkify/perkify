@@ -27,6 +27,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
+import Header from "components/Header";
 
 const fillerGroupData = [
   {
@@ -149,28 +150,11 @@ const CreateGroup = ({ history }) => {
 
   return (
     <ClippedDrawer>
-      <Typography gutterBottom variant="h5" component="h2">
-        <Box fontWeight="bold">Create Group</Box>
-      </Typography>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link
-          color="inherit"
-          href="/"
-          onClick={handleClick}
-          style={{ color: "grey" }}
-        >
-          Dashboard
-        </Link>
-        <Link
-          color="inherit"
-          href="/getting-started/installation/"
-          onClick={handleClick}
-          style={{ color: "grey" }}
-        >
-          Perk Groups
-        </Link>
-        <Typography color="textPrimary">Create Group</Typography>
-      </Breadcrumbs>
+      <Header
+        title="Create Gruop"
+        crumbs={["Dashboard", "Perk Groups", "Create Gruop"]}
+      />
+
       <Paper
         style={{ width: 700, padding: 30, marginTop: 30 }}
         variant="outlined"

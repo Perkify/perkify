@@ -7,6 +7,7 @@ import {
   useParams,
 } from "react-router-dom";
 import ClippedDrawer from "components/VerticalNav";
+import Header from "components/Header";
 import { Box, Breadcrumbs, Button, Card, Typography } from "@material-ui/core";
 
 import firebase from "firebase/app";
@@ -272,32 +273,10 @@ export default function ManageGroups() {
   return (
     <>
       <ClippedDrawer>
-        <div style={{ marginBottom: "50px" }}>
-          <Typography gutterBottom variant="h5" component="h2">
-            <Box fontWeight="bold">Manage Perk Group</Box>
-          </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              color="inherit"
-              href="/"
-              //     onClick={handleClick}
-              style={{ color: "grey", fontSize: "14px" }}
-            >
-              Dashboard
-            </Link>
-            <Link
-              color="inherit"
-              href="/getting-started/installation/"
-              //     onClick={handleClick}
-              style={{ color: "grey", fontSize: "14px" }}
-            >
-              Perk Groups
-            </Link>
-            <Typography color="textPrimary" style={{ fontSize: "14px" }}>
-              Cole's Group
-            </Typography>
-          </Breadcrumbs>
-        </div>
+        <Header
+          title="Manage Perk Groups"
+          crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
+        />
 
         <AddRemoveTable
           rows={groupPerks}

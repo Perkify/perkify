@@ -26,6 +26,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { validateEmails } from "utils/emailValidation";
+import Header from "components/Header";
 
 const columns = [
   {
@@ -140,32 +141,10 @@ export default function ManagePeople() {
   return (
     <>
       <VerticalNav>
-        <div style={{ marginBottom: "50px" }}>
-          <Typography gutterBottom variant="h5" component="h2">
-            <Box fontWeight="bold">Manage Employees</Box>
-          </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              color="inherit"
-              href="/"
-              //     onClick={handleClick}
-              style={{ color: "grey", fontSize: "14px" }}
-            >
-              Dashboard
-            </Link>
-            <Link
-              color="inherit"
-              href="/getting-started/installation/"
-              //     onClick={handleClick}
-              style={{ color: "grey", fontSize: "14px" }}
-            >
-              People
-            </Link>
-            <Typography color="textPrimary" style={{ fontSize: "14px" }}>
-              Employees
-            </Typography>
-          </Breadcrumbs>
-        </div>
+        <Header
+          title="Manage Employees"
+          crumbs={["Dashboard", "People", "Employees"]}
+        />
 
         <AddRemoveTable
           rows={peopleData}
