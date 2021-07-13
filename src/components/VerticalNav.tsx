@@ -37,8 +37,9 @@ import PersonIcon from "@material-ui/icons/Person";
 import FeedbackIcon from "@material-ui/icons/Feedback";
 import logo from "images/logo.png";
 import { assert } from "console";
+import DashboardIcon from "@material-ui/icons/Dashboard";
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,7 +78,12 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > *": {
         margin: theme.spacing(1),
       },
-      margin: "20px 10px",
+      margin: "20px 25px",
+      padding: "0px 10px",
+      border: 0,
+      backgroundColor: "#F2F3F5",
+      height: "80px",
+      alignItems: "center",
     },
     content: {
       flexGrow: 1,
@@ -85,7 +91,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(3),
     },
     listItem: {
-      //       fontSize: 14,
+      fontSize: 14,
     },
   })
 );
@@ -106,16 +112,11 @@ export default function ClippedDrawer({ children }) {
   };
 
   const generalNav: [string, string, any][] = [
+    ["Dashboard", "/dashboard", <DashboardIcon />],
+  ];
+
+  const peopleNav: [string, string, any][] = [
     ["Employees", "/people", <PersonIcon />],
-    // ['Your Study Stats', '/userstats', <EqualizerIcon />],
-  ];
-
-  const appNav: [string, string, any][] = [
-    ["Todo (Coming Soon)", "/todoApp", <ListAltIcon />],
-  ];
-
-  const settingsNav: [string, string, any][] = [
-    ["Profile", "/profile", <PersonIcon />],
   ];
 
   var groupViews: [string, string, any][] = [];
@@ -135,71 +136,68 @@ export default function ClippedDrawer({ children }) {
   const infoNav: [string, string, any][] = groupViews;
 
   const navSections: [string, [string, string, any][]][] = [
-    ["People", generalNav],
+    ["General", generalNav],
+    ["People", peopleNav],
     ["Perk Groups", infoNav],
   ];
 
   const drawer = (
     <div>
-      <Toolbar />
+      {/* <Toolbar /> */}
       <div className={classes.drawerContainer}>
+        <div style={{ padding: "40px 30px" }}>
+          <img style={{ height: "30px" }} src={logo} />
+        </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
             alt={currentUser?.displayName}
             src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.m.wikipedia.org%2Fwiki%2FFile%3AMissing_avatar.svg&psig=AOvVaw3NzqKvydDCWL1eCABVrnYM&ust=1626138371997000&source=images&cd=vfe&ved=0CAoQjRxqFwoTCJjZqtOr3PECFQAAAAAdAAAAABAD"
           />
           <span>
-            <Typography style={{ lineHeight: "40px" }}>
-              {currentUser?.displayName}
+            <Typography style={{ fontSize: "14px" }}>
+              <Box fontWeight="bold">{currentUser?.displayName}</Box>
             </Typography>
-            {/* <Typography variant="caption">Your Plan: Premium</Typography> */}
+            <Typography variant="caption">admin</Typography>
           </span>
         </Paper>
-        <Divider />
-        {navSections.map(([sectionName, section], index) => (
-          <div key={sectionName}>
-            <Typography style={{ margin: "20px 0 0 20px" }} component="div">
-              <Box fontWeight="fontWeightBold">{sectionName}</Box>
-            </Typography>
-            <List>
-              {section.map(([name, route, e], index) =>
-                route.substring(0, 5) == "https" ? (
-                  <ListItem
-                    button
-                    component={Link}
-                    to={{
-                      pathname: route,
-                    }}
-                    target="_blank"
-                    key={name}
-                  >
-                    <ListItemIcon
-                      style={{
-                        justifyContent: "center",
-                      }}
-                    >
-                      {e}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={name}
-                      classes={{ primary: classes.listItem }}
-                    />
-                  </ListItem>
-                ) : (
-                  //FIX LATER
+        <div style={{ padding: "10px 0" }}>
+          {navSections.map(([sectionName, section], index) => (
+            <div key={sectionName}>
+              <Typography
+                style={{
+                  margin: "30px 0 0 40px",
+                  fontSize: "12px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+                component="div"
+              >
+                <Box fontWeight={700}>{sectionName}</Box>
+              </Typography>
+              <List>
+                {section.map(([name, route, e], index) => (
                   <ListItem
                     button
                     component={Link}
                     to={route}
                     key={name}
-                    //     style={{
-                    //       color: location.pathname == route && "#FF6F61",
-                    //     }}
+                    style={{
+                      backgroundColor: location.pathname == route && "#e6edff",
+                      color:
+                        location.pathname == route &&
+                        theme.palette.primary.main,
+                      borderRight:
+                        location.pathname == route &&
+                        `3px solid ${theme.palette.primary.main}`,
+                      paddingLeft: "30px",
+                    }}
                   >
                     <ListItemIcon
                       style={{
                         justifyContent: "center",
-                        // color: location.pathname == route && "#FF6F61",
+                        color:
+                          location.pathname == route &&
+                          theme.palette.primary.main,
                       }}
                     >
                       {e}
@@ -209,11 +207,11 @@ export default function ClippedDrawer({ children }) {
                       classes={{ primary: classes.listItem }}
                     />
                   </ListItem>
-                )
-              )}
-            </List>
-          </div>
-        ))}
+                ))}
+              </List>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -263,10 +261,11 @@ export default function ClippedDrawer({ children }) {
         <CssBaseline />
         <AppBar
           position="fixed"
+          variant="outlined"
           className={classes.appBar}
           style={{ background: "white" }}
         >
-          <Toolbar>
+          {/* <Toolbar>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -277,7 +276,7 @@ export default function ClippedDrawer({ children }) {
               <MenuIcon />
             </IconButton>
             <img style={{ height: "30px" }} src={logo} />
-          </Toolbar>
+          </Toolbar> */}
         </AppBar>
         <nav className={classes.drawer} aria-label="mailbox folders">
           {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
@@ -310,8 +309,7 @@ export default function ClippedDrawer({ children }) {
           </Hidden>
         </nav>
         <main className={classes.content}>
-          <Toolbar />
-          <Box margin="5px 0 0 0 ">{children}</Box>
+          <Box margin="60px 20px 20px 20px">{children}</Box>
         </main>
       </div>
     );

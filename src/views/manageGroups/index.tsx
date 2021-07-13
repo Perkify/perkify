@@ -7,13 +7,14 @@ import {
   useParams,
 } from "react-router-dom";
 import ClippedDrawer from "components/VerticalNav";
-import { Button, Card } from "@material-ui/core";
+import { Box, Breadcrumbs, Button, Card, Typography } from "@material-ui/core";
 
 import firebase from "firebase/app";
 import "firebase/firestore";
 import { AuthContext } from "contexts/Auth";
 import { allPerks, allPerksDict } from "../../constants";
 import { AddRemoveTable } from "components/AddRemoveTable";
+import { useTheme } from "@material-ui/core/styles";
 
 const columns = [
   // {
@@ -271,17 +272,44 @@ export default function ManageGroups() {
   return (
     <>
       <ClippedDrawer>
-        <Card style={{ height: 300, border: 0 }} variant="outlined">
-          <AddRemoveTable
-            rows={groupPerks}
-            columns={perkColumns}
-            setSelected={setSelection}
-            onClickAdd={() => {}}
-            onClickDelete={() => {}}
-            tableName="Group Perks"
-            addButtonText="Add Group Perk"
-          />
-          {/* <Grid
+        <div style={{ marginBottom: "50px" }}>
+          <Typography gutterBottom variant="h5" component="h2">
+            <Box fontWeight="bold">Manage Perk Group</Box>
+          </Typography>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              color="inherit"
+              href="/"
+              //     onClick={handleClick}
+              style={{ color: "grey", fontSize: "14px" }}
+            >
+              Dashboard
+            </Link>
+            <Link
+              color="inherit"
+              href="/getting-started/installation/"
+              //     onClick={handleClick}
+              style={{ color: "grey", fontSize: "14px" }}
+            >
+              Perk Groups
+            </Link>
+            <Typography color="textPrimary" style={{ fontSize: "14px" }}>
+              Cole's Group
+            </Typography>
+          </Breadcrumbs>
+        </div>
+
+        <AddRemoveTable
+          rows={groupPerks}
+          height={400}
+          columns={perkColumns}
+          setSelected={setSelection}
+          onClickAdd={() => {}}
+          onClickDelete={() => {}}
+          tableName="Group Perks"
+          addButtonText="Add Group Perk"
+        />
+        {/* <Grid
             container
             spacing={0}
             justifyContent="center"
@@ -338,12 +366,9 @@ export default function ManageGroups() {
             }}
           />
         </div> */}
-        </Card>
-        <Card
-          style={{ height: 300, marginTop: 50, border: 0 }}
-          variant="outlined"
-        >
+        <div style={{ marginTop: "50px" }}>
           <AddRemoveTable
+            height={400}
             rows={groupEmails}
             columns={columns}
             setSelected={setSelection}
@@ -352,7 +377,7 @@ export default function ManageGroups() {
             tableName="Group Employees"
             addButtonText="Add Employees"
           />
-        </Card>
+        </div>
 
         {/* <br></br>
 

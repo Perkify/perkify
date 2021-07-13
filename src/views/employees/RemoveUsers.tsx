@@ -4,12 +4,10 @@ import app from "firebaseApp";
 import { AuthContext } from "contexts/Auth";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import "antd/dist/antd.css";
 
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { Form, Input, Button, Checkbox } from "antd";
-import "antd/dist/antd.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {

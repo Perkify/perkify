@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { Form, Input, Checkbox } from "antd";
-import "antd/dist/antd.css";
 import { validateEmail, validateEmails } from "utils/emailValidation";
 import { allPerks, allPerksDict } from "../../constants";
 import {

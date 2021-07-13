@@ -9,9 +9,8 @@ import Button from "@material-ui/core/Button";
 import firebase from "firebase/app";
 import "firebase/firestore";
 
-import "antd/dist/antd.css";
 import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
-import { Theme, Typography } from "@material-ui/core";
+import { Card, Theme, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/styles";
 
 import clsx from "clsx";
@@ -73,6 +72,15 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const useDataGridStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      border: "none",
+      padding: "10px 20px",
+    },
+  })
+);
+
 export const AddRemoveTable = ({
   rows,
   columns,
@@ -81,7 +89,10 @@ export const AddRemoveTable = ({
   onClickDelete,
   tableName,
   addButtonText,
+  height,
 }) => {
+  const dataGridClasses = useDataGridStyles();
+
   const CustomToolbar = () => {
     const classes = useToolbarStyles();
     const { state } = useGridSlotComponentProps();
@@ -122,6 +133,7 @@ export const AddRemoveTable = ({
         ) : (
           <Button
             color="primary"
+            variant="contained"
             onClick={onClickAdd}
             style={{ marginRight: "10px" }}
           >
@@ -133,17 +145,22 @@ export const AddRemoveTable = ({
   };
 
   return (
-    <DataGrid
-      rows={rows}
-      columns={columns}
-      pageSize={10}
-      checkboxSelection
-      onSelectionModelChange={(newSelection) => {
-        setSelected(newSelection.selectionModel);
-      }}
-      components={{
-        Toolbar: CustomToolbar,
-      }}
-    />
+    <Card style={{ height, border: 0 }} elevation={4}>
+      <DataGrid
+        classes={{ root: dataGridClasses.root }}
+        rows={rows}
+        columns={columns}
+        pageSize={10}
+        rowHeight={60}
+        headerHeight={60}
+        checkboxSelection
+        onSelectionModelChange={(newSelection) => {
+          setSelected(newSelection.selectionModel);
+        }}
+        components={{
+          Toolbar: CustomToolbar,
+        }}
+      />
+    </Card>
   );
 };

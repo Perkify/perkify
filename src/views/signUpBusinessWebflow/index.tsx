@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) =>
     root: {
       height: "100vh",
       fontFamily: "Plusjakartadisplay",
+      backgroundColor: "white",
     },
     image: {
       backgroundImage: `url(${SignUpGraphic})`,

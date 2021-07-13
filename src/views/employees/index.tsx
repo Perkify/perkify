@@ -6,7 +6,16 @@ import "firebase/firestore";
 import { AuthContext } from "contexts/Auth";
 
 import { allPerks } from "../../constants";
-import { Card, MenuItem, Select, Theme, Typography } from "@material-ui/core";
+import {
+  Box,
+  Breadcrumbs,
+  Card,
+  Link,
+  MenuItem,
+  Select,
+  Theme,
+  Typography,
+} from "@material-ui/core";
 
 import { AddRemoveTable } from "components/AddRemoveTable";
 
@@ -131,20 +140,46 @@ export default function ManagePeople() {
   return (
     <>
       <VerticalNav>
-        <Card style={{ height: 500, border: 0 }} variant="outlined">
-          <AddRemoveTable
-            rows={peopleData}
-            columns={columns}
-            setSelected={setSelection}
-            onClickAdd={() => setIsAddModalVisible(true)}
-            onClickDelete={() => {
-              console.log("Clicked");
-              setIsRemoveModalVisible(true);
-            }}
-            tableName="Manage Employees"
-            addButtonText="Add Employees"
-          />
-        </Card>
+        <div style={{ marginBottom: "50px" }}>
+          <Typography gutterBottom variant="h5" component="h2">
+            <Box fontWeight="bold">Manage Employees</Box>
+          </Typography>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              color="inherit"
+              href="/"
+              //     onClick={handleClick}
+              style={{ color: "grey", fontSize: "14px" }}
+            >
+              Dashboard
+            </Link>
+            <Link
+              color="inherit"
+              href="/getting-started/installation/"
+              //     onClick={handleClick}
+              style={{ color: "grey", fontSize: "14px" }}
+            >
+              People
+            </Link>
+            <Typography color="textPrimary" style={{ fontSize: "14px" }}>
+              Employees
+            </Typography>
+          </Breadcrumbs>
+        </div>
+
+        <AddRemoveTable
+          rows={peopleData}
+          columns={columns}
+          setSelected={setSelection}
+          height={500}
+          onClickAdd={() => setIsAddModalVisible(true)}
+          onClickDelete={() => {
+            console.log("Clicked");
+            setIsRemoveModalVisible(true);
+          }}
+          tableName="Employees"
+          addButtonText="Add Employees"
+        />
       </VerticalNav>
       <Dialog
         open={isAddModalVisible}

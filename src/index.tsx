@@ -13,12 +13,20 @@ const theme = createTheme({
       main: "#185cff",
     },
     background: {
-      default: "#F4F5F7",
+      // default: "#F4F5F7",
+      default: "#FFFFFF",
     },
   },
 
   shape: {
     borderRadius: 8,
+  },
+  typography: {
+    fontFamily: `"Public Sans", "Roboto", "Helvetica", "Arial", sans-serif`,
+    // fontSize: 14,
+    // fontWeightLight: 300,
+    // fontWeightRegular: 400,
+    // fontWeightMedium: 500,
   },
 });
 
