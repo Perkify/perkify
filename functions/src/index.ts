@@ -1,12 +1,12 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-import * as express from "express";
+import axios from "axios";
 import * as cors from "cors";
+import * as cryptoJS from "crypto-js";
+import * as express from "express";
 import { body, validationResult } from "express-validator";
+import * as admin from "firebase-admin";
+import * as functions from "firebase-functions";
 import * as validator from "validator";
 import { allPerks } from "../shared";
-import axios from "axios";
-import * as cryptoJS from "crypto-js";
 
 // rapyd credentials
 const rapydSecretKey =

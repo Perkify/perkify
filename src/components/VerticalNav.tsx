@@ -1,43 +1,31 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import Button from "@material-ui/core/Button";
-import { makeStyles, useTheme, Theme } from "@material-ui/core/styles";
-import { createStyles } from "@material-ui/core/styles";
-import { useLocation, Link } from "react-router-dom";
-import AddIcon from "@material-ui/icons/Add";
-import app from "firebaseApp";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import { AuthContext } from "contexts/Auth";
-
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import Hidden from "@material-ui/core/Hidden";
-import GroupIcon from "@material-ui/icons/Group";
-
-import Box from "@material-ui/core/Box";
-import Drawer from "@material-ui/core/Drawer";
+import { Paper } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Toolbar from "@material-ui/core/Toolbar";
+import Drawer from "@material-ui/core/Drawer";
+import Hidden from "@material-ui/core/Hidden";
 import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import TableChartIcon from "@material-ui/icons/TableChart";
-import EqualizerIcon from "@material-ui/icons/Equalizer";
-import { Card, Paper } from "@material-ui/core";
-import SearchIcon from "@material-ui/icons/Search";
-import ListAltIcon from "@material-ui/icons/ListAlt";
-import PersonIcon from "@material-ui/icons/Person";
-import FeedbackIcon from "@material-ui/icons/Feedback";
-import logo from "images/logo.png";
-import { assert } from "console";
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  useTheme,
+} from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import AddIcon from "@material-ui/icons/Add";
 import DashboardIcon from "@material-ui/icons/Dashboard";
+import GroupIcon from "@material-ui/icons/Group";
+import PersonIcon from "@material-ui/icons/Person";
+import { AuthContext } from "contexts/Auth";
+import firebase from "firebase/app";
+import "firebase/firestore";
+import logo from "images/logo.png";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const drawerWidth = 280;
 

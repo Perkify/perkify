@@ -1,28 +1,22 @@
-import React, { useState, useContext } from "react";
+import { Snackbar } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
-import { useHistory } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
 import Card from "@material-ui/core/Card";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
 // import axios from "services/api";
 import { makeStyles } from "@material-ui/core/styles";
-// import Particles from "react-particles-js";
-import { SettingsInputAntennaTwoTone } from "@material-ui/icons";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
 import GitHubIcon from "@material-ui/icons/GitHub";
-
-import { Snackbar } from "@material-ui/core";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { Alert } from "@material-ui/lab";
 import app from "firebaseApp";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (

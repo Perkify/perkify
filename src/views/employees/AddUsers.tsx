@@ -1,19 +1,9 @@
-import React, { useCallback, useContext } from "react";
-import { useState, useEffect } from "react";
-
-import { withRouter, Redirect } from "react-router";
-import app from "firebaseApp";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import { Select } from "antd";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import { AuthContext } from "contexts/Auth";
-
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { Form, Input, Button, Checkbox } from "antd";
-import { AutoComplete } from "antd";
+import { makeStyles } from "@material-ui/core/styles";
+import { Form, Input, Select } from "antd";
+import { AuthContext } from "contexts/Auth";
+import "firebase/firestore";
+import React, { useCallback, useContext, useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {

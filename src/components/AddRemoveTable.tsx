@@ -1,37 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import { Card, Theme, Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import { lighten } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
 import {
   DataGrid,
   GridToolbarContainer,
   useGridSlotComponentProps,
 } from "@material-ui/data-grid";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import firebase from "firebase/app";
-import "firebase/firestore";
-
-import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
-import { Card, Theme, Typography } from "@material-ui/core";
-import { createStyles, makeStyles } from "@material-ui/styles";
-
-import clsx from "clsx";
-import { lighten } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Toolbar from "@material-ui/core/Toolbar";
-import Paper from "@material-ui/core/Paper";
-import Checkbox from "@material-ui/core/Checkbox";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
 import DeleteIcon from "@material-ui/icons/Delete";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import { createStyles, makeStyles } from "@material-ui/styles";
+import clsx from "clsx";
+import "firebase/firestore";
+import React from "react";
 
 const columns = [
   {

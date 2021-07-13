@@ -1,33 +1,17 @@
-import ClippedDrawer from "components/VerticalNav";
-import React, { useCallback, useContext } from "react";
-import { useState, useEffect } from "react";
-
-import { withRouter, Redirect } from "react-router";
-import app from "firebaseApp";
-import { AuthContext } from "contexts/Auth";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-// import { Select } from "antd";
-
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { Form, Input, Checkbox } from "antd";
-import { validateEmail, validateEmails } from "utils/emailValidation";
-import { allPerks, allPerksDict } from "../../constants";
 import {
-  Box,
-  Breadcrumbs,
   Button,
-  Card,
-  CardContent,
-  FormHelperText,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
   Typography,
 } from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
 import Header from "components/Header";
+import ClippedDrawer from "components/VerticalNav";
+import { AuthContext } from "contexts/Auth";
+import React, { useContext, useState } from "react";
+import { validateEmails } from "utils/emailValidation";
+import { allPerks, allPerksDict } from "../../constants";
 
 const fillerGroupData = [
   {

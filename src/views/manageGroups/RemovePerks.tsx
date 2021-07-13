@@ -1,22 +1,9 @@
-import React, { useCallback, useContext } from "react";
-import { withRouter, Redirect } from "react-router";
-import app from "firebaseApp";
-import { AuthContext } from "contexts/Auth";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  useParams,
-} from "react-router-dom";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import { allPerks, allPerksDict } from "../../constants";
-
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { Form, Input, Button, Checkbox } from "antd";
+import { makeStyles } from "@material-ui/core/styles";
+import { Form } from "antd";
+import { AuthContext } from "contexts/Auth";
+import "firebase/firestore";
+import React, { useContext } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {

@@ -1,32 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
-import VerticalNav from "components/VerticalNav";
+import { MenuItem, Select, Typography } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import { AuthContext } from "contexts/Auth";
-
-import { allPerks } from "../../constants";
-import {
-  Box,
-  Breadcrumbs,
-  Card,
-  Link,
-  MenuItem,
-  Select,
-  Theme,
-  Typography,
-} from "@material-ui/core";
-
-import { AddRemoveTable } from "components/AddRemoveTable";
-
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { validateEmails } from "utils/emailValidation";
+import TextField from "@material-ui/core/TextField";
+import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
+import VerticalNav from "components/VerticalNav";
+import { AuthContext } from "contexts/Auth";
+import firebase from "firebase/app";
+import "firebase/firestore";
+import React, { useContext, useEffect, useState } from "react";
+import { validateEmails } from "utils/emailValidation";
 
 const columns = [
   {

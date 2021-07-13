@@ -1,21 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import ClippedDrawer from "components/VerticalNav";
+import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import { Box, Breadcrumbs, Button, Card, Typography } from "@material-ui/core";
-
+import ClippedDrawer from "components/VerticalNav";
+import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { AuthContext } from "contexts/Auth";
-import { allPerks, allPerksDict } from "../../constants";
-import { AddRemoveTable } from "components/AddRemoveTable";
-import { useTheme } from "@material-ui/core/styles";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { allPerksDict } from "../../constants";
 
 const columns = [
   // {
