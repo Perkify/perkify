@@ -138,7 +138,6 @@ export default function ManagePeople() {
         height={500}
         onClickAdd={() => setIsAddModalVisible(true)}
         onClickDelete={() => {
-          console.log("Clicked");
           setIsRemoveModalVisible(true);
         }}
         tableName="Employees"
@@ -224,7 +223,7 @@ export default function ManagePeople() {
         <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete 5 users? This cannot be undone.
+            Are you sure you want to delete these users? This cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -57,7 +57,7 @@ const useDataGridStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       border: "none",
-      padding: "10px 20px",
+      // padding: "10px 20px",
     },
   })
 );

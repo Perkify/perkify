@@ -1,27 +1,16 @@
 import {
   Button,
+  Card,
   MenuItem,
   Select,
   TextField,
   Typography,
 } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
 import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import React, { useContext, useState } from "react";
 import { validateEmails } from "utils/emailValidation";
 import { allPerks, allPerksDict } from "../../constants";
-
-const fillerGroupData = [
-  {
-    name: "A",
-    id: "abc123",
-  },
-  {
-    name: "B",
-    id: "abc133",
-  },
-];
 
 const CreateGroup = ({ history }) => {
   const [availablePerks, setAvailablePerks] = useState(
@@ -126,22 +115,14 @@ const CreateGroup = ({ history }) => {
     }
   };
 
-  function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    event.preventDefault();
-    console.info("You clicked a breadcrumb.");
-  }
-
   return (
     <>
       <Header
-        title="Create Gruop"
+        title="Create Group"
         crumbs={["Dashboard", "Perk Groups", "Create Group"]}
       />
 
-      <Paper
-        style={{ width: 700, padding: 30, marginTop: 30 }}
-        variant="outlined"
-      >
+      <Card style={{ width: 700, padding: 30, marginTop: 30 }} elevation={4}>
         {/* <Typography variant="body2" color="textSecondary" component="p">
             Create a perk group
           </Typography> */}
@@ -216,7 +197,7 @@ const CreateGroup = ({ history }) => {
         <Button onClick={createPerkGroup} variant="contained" color="primary">
           Create Perk Group
         </Button>
-      </Paper>
+      </Card>
     </>
   );
 };

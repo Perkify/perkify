@@ -22,7 +22,6 @@ function App() {
             component={GettingStarted}
           />
           <Route exact path="/login" component={Login} />
-          {/* <Route exact path="/sigin" component={Login} /> */}
           <Route exact path="/signup" component={SignUpBusinessWebflow} />
           <Route exact path="/getcard" component={GetCard} />
         </Switch>
