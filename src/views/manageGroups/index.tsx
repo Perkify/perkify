@@ -1,21 +1,14 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-} from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
-import "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { allPerksDict } from "../../constants";
+import AddEmployees from "./AddEmployees";
 import AddPerks from "./AddPerks";
+import RemoveEmployees from "./RemoveEmployees";
 import RemovePerks from "./RemovePerks";
 
 const columns = [
@@ -63,6 +56,7 @@ export default function ManageGroups() {
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
 
   const [selectedPerks, setSelectedPerks] = useState([]);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
   function getPerkNames(perks) {
@@ -195,7 +189,7 @@ export default function ManageGroups() {
             height={600}
             rows={groupEmails}
             columns={columns}
-            setSelected={setSelectedPerks}
+            setSelected={setSelectedEmployees}
             onClickAdd={() => {
               setIsAddEmployeesModalVisible(true);
             }}
@@ -208,32 +202,17 @@ export default function ManageGroups() {
         </Grid>
       </Grid>
 
-      <Dialog
-        open={isRemoveEmployeesModalVisible}
-        onClose={() => setIsRemoveEmployeesModalVisible(false)}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete these users? This cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setIsRemoveEmployeesModalVisible(false)}
-            color="primary"
-          >
-            No
-          </Button>
-          <Button
-            onClick={() => setIsRemoveEmployeesModalVisible(false)}
-            color="primary"
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <AddEmployees
+        isAddEmployeesModalVisible={isAddEmployeesModalVisible}
+        setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
+      />
+      <RemoveEmployees
+        isRemoveEmployeesModalVisible={isRemoveEmployeesModalVisible}
+        setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
+        selectedEmployees={selectedEmployees}
+        setSelectedEmployees={setSelectedEmployees}
+      />
+
       <AddPerks
         isAddPerksModalVisible={isAddPerksModalVisible}
         setIsAddPerksModalVisible={setIsAddPerksModalVisible}
