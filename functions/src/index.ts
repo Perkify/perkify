@@ -26,9 +26,11 @@ const app = express();
 app.use(
   cors({
     origin: [
+      /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
     ],
+    credentials: true,
   })
 );
 
