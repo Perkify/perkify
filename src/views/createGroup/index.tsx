@@ -9,6 +9,7 @@ import {
 import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import React, { useContext, useState } from "react";
+import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 import { allPerks, allPerksDict } from "../../constants";
 
@@ -48,7 +49,7 @@ const CreateGroup = ({ history }) => {
   const handleEmailError = (event) => {
     setEmails(event.target.value);
     if (event.target.value === "") {
-      setEmailsError("Please input atleast one email");
+      setEmailsError("Please input at least one email");
     } else if (!validateEmails(event.target.value)) {
       setEmailsError("Please input proper emails");
     } else {
@@ -75,43 +76,51 @@ const CreateGroup = ({ history }) => {
     setTotalCost(tmpNumPeople * costPerPerson);
   };
 
-  const handleAddUsers = async (event) => {
-    const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
-
-    const bearerToken = await currentUser.getIdToken();
-    // call the api to create the group
-    const response = await fetch(
-      "https://us-central1-perkify-5790b.cloudfunctions.net/user/auth/createGroup",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          group: groupName,
-          emails: emailList,
-          perks: selectedPerks,
-        }),
-      }
-    );
-    history.push("../people");
-  };
-
   const createPerkGroup = (e) => {
     e.preventDefault();
     let error = false;
+
     if (groupName == "") {
       setGroupNameError("Enter a group name");
       error = true;
     }
+
     if (emails == "") {
-      setEmailsError("Enter emails");
+      setEmailsError("Please input at least one email");
+      error = true;
+    } else if (!validateEmails(emails)) {
+      setEmailsError("Please input proper emails");
       error = true;
     }
+
     if (selectedPerks.length == 0) {
       setSelectedPerksError("Select perks");
       error = true;
+    }
+
+    if (!error) {
+      const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+        console.log(bearerToken);
+        // call the api to create the group
+        const response = await PerkifyApi.post(
+          "user/auth/createGroup",
+          JSON.stringify({
+            group: groupName,
+            emails: emailList,
+            perks: selectedPerks,
+          }),
+
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        history.push("../people");
+      })();
     }
   };
 
