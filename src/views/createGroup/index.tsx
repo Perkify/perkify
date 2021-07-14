@@ -104,7 +104,7 @@ const CreateGroup = ({ history }) => {
         const bearerToken = await currentUser.getIdToken();
         console.log(bearerToken);
         // call the api to create the group
-        const response = await PerkifyApi.post(
+        PerkifyApi.post(
           "user/auth/createGroup",
           JSON.stringify({
             group: groupName,
@@ -118,8 +118,13 @@ const CreateGroup = ({ history }) => {
               "Content-Type": "application/json",
             },
           }
-        );
-        history.push("../people");
+        )
+          .then(() => {
+            history.push("../people");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })();
     }
   };
