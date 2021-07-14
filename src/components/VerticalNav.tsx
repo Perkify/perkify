@@ -22,8 +22,7 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import GroupIcon from "@material-ui/icons/Group";
 import PersonIcon from "@material-ui/icons/Person";
 import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
-import "firebase/firestore";
+import { db } from "firebaseApp";
 import logo from "images/logo.png";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -216,7 +215,6 @@ export default function ClippedDrawer({ children }) {
   //BELOW CODE DOESNT WORK
   useEffect(() => {
     if (currentUser) {
-      const db = firebase.firestore();
       db.collection("admins")
         .doc(currentUser.uid)
         .get()

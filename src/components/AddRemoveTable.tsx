@@ -11,7 +11,6 @@ import {
 import DeleteIcon from "@material-ui/icons/Delete";
 import { createStyles, makeStyles } from "@material-ui/styles";
 import clsx from "clsx";
-import "firebase/firestore";
 import React from "react";
 
 const columns = [

@@ -9,8 +9,7 @@ import TextField from "@material-ui/core/TextField";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
-import "firebase/firestore";
+import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { validateEmails } from "utils/emailValidation";
 
@@ -61,7 +60,6 @@ export default function ManagePeople() {
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    const db = firebase.firestore();
     db.collection("admins")
       .doc(currentUser.uid)
       .get()
