@@ -44,8 +44,6 @@ const perkColumns = [
 export default function ManageGroups() {
   let { id } = useParams();
 
-  const [peopleData, setPeopleData] = useState([]);
-
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
     useState(false);
   const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
@@ -205,6 +203,9 @@ export default function ManageGroups() {
       <AddEmployees
         isAddEmployeesModalVisible={isAddEmployeesModalVisible}
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
+        group={id}
+        employees={groupEmails}
+        selectedPerks={groupPerks}
       />
       <RemoveEmployees
         isRemoveEmployeesModalVisible={isRemoveEmployeesModalVisible}
@@ -216,6 +217,9 @@ export default function ManageGroups() {
       <AddPerks
         isAddPerksModalVisible={isAddPerksModalVisible}
         setIsAddPerksModalVisible={setIsAddPerksModalVisible}
+        selectedPerks={groupPerks}
+        group={id}
+        emails={groupEmails}
       />
       <RemovePerks
         isRemovePerksModalVisible={isRemovePerksModalVisible}
