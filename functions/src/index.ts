@@ -788,6 +788,46 @@ const updatePerkGroup = async (req, res) => {
   }
 };
 
+const deletePerkGroupValidators = [body("group").not().isEmpty()];
+
+const deletePerkGroup = async (req, res) => {
+  const {
+    group, // TODO: make this param
+  } = req.body;
+
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(errors);
+      const error = {
+        status: 400,
+        reason: "Bad Request",
+        reason_detail: JSON.stringify(errors.array()),
+      };
+      throw error;
+    }
+
+    // get admins business
+    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const businessID = adminSnap.data().companyID;
+
+    await db
+      .collection("businesses")
+      .doc(businessID)
+      .update({
+        [`groups.${group}`]: admin.firestore.FieldValue.delete(),
+      });
+
+    // TODO figure out what to do with users after deleting a perk group
+
+    res.status(200).end();
+  } catch (err) {
+    console.log("Returning error");
+    console.log(err);
+    res.status(500).end();
+  }
+};
+
 const registerUserValidators = [
   body("email")
     .isEmail()
@@ -974,5 +1014,6 @@ app.post("/registerUser", registerUserValidators, registerUser);
 app.post("/sendCardEmail", sendCardEmailValidators, sendCardEmail);
 app.post("/auth/createGroup", createGroupValidators, createGroup);
 app.put("/auth/updatePerkGroup", updatePerkGroupValidators, updatePerkGroup);
+app.post("/auth/deletePerkGroup", deletePerkGroupValidators, deletePerkGroup);
 
 exports.user = functions.https.onRequest(app);

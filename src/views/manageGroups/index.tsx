@@ -5,6 +5,7 @@ import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { PerkifyApi } from "services";
 import { allPerksDict } from "../../constants";
 import AddEmployees from "./AddEmployees";
 import AddPerks from "./AddPerks";
@@ -76,6 +77,25 @@ export default function ManageGroups() {
       id: "abc133",
     },
   ];
+
+  const deletePerkGroup = () => {
+    (async () => {
+      const bearerToken = await currentUser.getIdToken();
+
+      await PerkifyApi.post(
+        "user/auth/deletePerkGroup",
+        JSON.stringify({
+          group: id,
+        }),
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    })();
+  };
 
   function getGroupData() {
     //TO IMPLEMENT
@@ -163,6 +183,10 @@ export default function ManageGroups() {
       <Header
         title="Manage Perk Groups"
         crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
+        button={{
+          type: "delete",
+          onClick: deletePerkGroup,
+        }}
       />
 
       <Grid container spacing={5}>
