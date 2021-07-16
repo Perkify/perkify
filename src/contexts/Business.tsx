@@ -14,19 +14,20 @@ export const BusinessProvider = ({ children }) => {
       const businessId = admin["companyID"];
       db.collection("businesses")
         .doc(businessId)
-        .get()
-        .then((businessDoc) => {
-          const businessData = businessDoc.data();
-          console.log("Business Data:");
-          console.log(businessData);
-          if (businessData) {
-            console.log("setting business data");
-            setBusiness({ ...businessData });
+        .onSnapshot(
+          (businessDoc) => {
+            const businessData = businessDoc.data();
+            console.log("Business Data:");
+            console.log(businessData);
+            if (businessData) {
+              console.log("setting business data");
+              setBusiness({ ...businessData });
+            }
+          },
+          (error) => {
+            console.log("Snapshot permissions error");
           }
-        })
-        .catch((error) => {
-          console.log("Error getting business doc:", error);
-        });
+        );
     }
   }, [admin]);
 

@@ -16,10 +16,10 @@ import SignUpBusinessWebflow from "views/signUpBusinessWebflow";
 
 function App() {
   return (
-    <AuthProvider>
-      <AdminProvider>
-        <BusinessProvider>
-          <Router>
+    <Router>
+      <AuthProvider>
+        <AdminProvider>
+          <BusinessProvider>
             <Switch>
               <Route exact path="/">
                 <Redirect to="/dashboard" />
@@ -36,10 +36,10 @@ function App() {
               <Route exact path="/signup" component={SignUpBusinessWebflow} />
               <Route exact path="/getcard" component={GetCard} />
             </Switch>
-          </Router>
-        </BusinessProvider>
-      </AdminProvider>
-    </AuthProvider>
+          </BusinessProvider>
+        </AdminProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

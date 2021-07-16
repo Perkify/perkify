@@ -39,6 +39,7 @@ const Header = (props: HeaderProps) => {
           <Breadcrumbs aria-label="breadcrumb">
             {props.crumbs.map((crumb, i) => (
               <Typography
+                key={i}
                 style={{
                   color: props.crumbs.length - 1 != i ? "grey" : "black",
                   fontSize: "14px",
@@ -63,7 +64,7 @@ const Header = (props: HeaderProps) => {
             Delete
           </Button>
         ) : (
-          <div>Other buttons</div>
+          <p>Other buttons</p>
         ))}
     </div>
   );

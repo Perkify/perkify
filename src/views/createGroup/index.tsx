@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import Header from "components/Header";
-import { AuthContext } from "contexts/Auth";
+import { AuthContext } from "contexts";
 import React, { useContext, useState } from "react";
 import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
@@ -99,6 +99,7 @@ const CreateGroup = ({ history }) => {
     }
 
     if (!error) {
+      console.log("No errors");
       const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();
@@ -106,11 +107,11 @@ const CreateGroup = ({ history }) => {
         // call the api to create the group
         PerkifyApi.post(
           "user/auth/createGroup",
-          JSON.stringify({
+          {
             group: groupName,
             emails: emailList,
             perks: selectedPerks,
-          }),
+          },
 
           {
             headers: {
@@ -120,7 +121,7 @@ const CreateGroup = ({ history }) => {
           }
         )
           .then(() => {
-            history.push("../people");
+            history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
             console.log(err);

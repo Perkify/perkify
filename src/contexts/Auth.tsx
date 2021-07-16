@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import app from "../firebaseApp";
 
 type ContextProps = {
@@ -14,17 +15,22 @@ export const AuthContext = React.createContext<Partial<ContextProps>>({});
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
   const [loadingAuthState, setLoadingAuthState] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     app.auth().onAuthStateChanged((user) => {
-      setCurrentUser(user);
-      setLoadingAuthState(false);
+      // console.log("Updating auth");
+      // console.log(currentUser);
+      if (!currentUser) {
+        setCurrentUser(user);
+        setLoadingAuthState(false);
+        history.push("/dashboard");
+      } else {
+        setCurrentUser(user);
+        setLoadingAuthState(false);
+      }
     });
   }, []);
-
-  if (loadingAuthState) {
-    return <>Loading...</>;
-  }
 
   return (
     <AuthContext.Provider
