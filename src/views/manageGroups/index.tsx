@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
 import { AdminContext, BusinessContext } from "contexts";
@@ -54,6 +54,7 @@ export default function ManageGroups() {
   const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] =
     useState(false);
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
+  const [groupNotFound, setGroupNotFound] = useState(false);
 
   const [selectedPerks, setSelectedPerks] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -127,20 +128,47 @@ export default function ManageGroups() {
 
   useEffect(() => {
     if (Object.keys(business).length != 0) {
-      setPerksData(
-        business.groups[id].map((perk, index) => ({
-          id: index,
-          ...allPerksDict[perk],
-        }))
-      );
+      if (Object.keys(business.groups).includes(id)) {
+        setPerksData(
+          business.groups[id].map((perk, index) => ({
+            id: index,
+            ...allPerksDict[perk],
+          }))
+        );
+        setGroupNotFound(false);
+      } else {
+        setGroupNotFound(true);
+      }
     }
   }, [business, id]);
+
+  if (groupNotFound) {
+    return (
+      <>
+        <Header
+          title="Manage Perk Groups"
+          crumbs={["Dashboard", "Perk Groups", id]}
+          button={{
+            type: "delete",
+            onClick: deletePerkGroup,
+          }}
+        />
+        <div style={{ width: "50%", marginTop: "100px" }}>
+          <Typography variant="h2">Perk Group Not Found</Typography>
+          <Typography variant="h5" style={{ marginTop: "20px" }}>
+            The perk group could not be found. Please email
+            contact@getperkify.com if you think this is an error
+          </Typography>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <Header
         title="Manage Perk Groups"
-        crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
+        crumbs={["Dashboard", "Perk Groups", id]}
         button={{
           type: "delete",
           onClick: deletePerkGroup,

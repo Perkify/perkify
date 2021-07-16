@@ -24,9 +24,7 @@ function App() {
               <Route exact path="/">
                 <Redirect to="/dashboard" />
               </Route>
-
               <PrivateRoute path="/dashboard" component={Dashboard} />
-
               <PrivateRoute
                 exact
                 path="/gettingStarted"

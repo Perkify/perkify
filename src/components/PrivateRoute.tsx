@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, loadingAuthState } = useContext(AuthContext);
 
   useEffect(() => {
     if (currentUser && currentUser.emailVerified === false) {
@@ -17,10 +17,10 @@ const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
     <Route
       {...rest}
       render={(routeProps) =>
-        !!currentUser ? (
-          <RouteComponent {...routeProps} />
-        ) : (
+        !currentUser && !loadingAuthState ? (
           <Redirect to={"/login"} />
+        ) : (
+          <RouteComponent {...routeProps} />
         )
       }
     />

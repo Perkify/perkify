@@ -21,14 +21,9 @@ export const AuthProvider = ({ children }) => {
     app.auth().onAuthStateChanged((user) => {
       // console.log("Updating auth");
       // console.log(currentUser);
-      if (!currentUser) {
-        setCurrentUser(user);
-        setLoadingAuthState(false);
-        history.push("/dashboard");
-      } else {
-        setCurrentUser(user);
-        setLoadingAuthState(false);
-      }
+      console.log("Loading auth state complete");
+      setCurrentUser(user);
+      setLoadingAuthState(false);
     });
   }, []);
 
