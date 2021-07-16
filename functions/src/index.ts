@@ -738,12 +738,14 @@ const updatePerkGroup = async (req, res) => {
 
     console.log(perks);
 
-    await db
-      .collection("businesses")
-      .doc(businessID)
-      .update({
-        [`groups.${group}`]: perks,
-      });
+    if (perks.length != 0) {
+      await db
+        .collection("businesses")
+        .doc(businessID)
+        .update({
+          [`groups.${group}`]: perks,
+        });
+    }
 
     // create user entry with email, companyID, and groupID
     for (const email of emails) {

@@ -11,6 +11,7 @@ import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
+import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 
 const columns = [
@@ -32,7 +33,7 @@ export default function ManagePeople() {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
-  const [groupData, setGroupData] = useState(["Cole's Group"]);
+  const [groupData, setGroupData] = useState([]);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
   const [emails, setEmails] = useState("");
   const [emailsError, setEmailsError] = useState("");
@@ -86,6 +87,17 @@ export default function ManagePeople() {
             .catch((error) => {
               alert(error);
             });
+
+          db.collection("businesses")
+            .doc(businessId)
+            .get()
+            .then((doc) => {
+              const groupData = doc.data();
+              console.log(groupData);
+              if (groupData) {
+                setGroupData(Object.keys(groupData["groups"]).sort());
+              }
+            });
         } else {
           console.log("No such document!");
         }
@@ -119,6 +131,31 @@ export default function ManagePeople() {
     }
     if (!error) {
       setIsAddModalVisible(false);
+
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+
+        const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+
+        await PerkifyApi.put(
+          "user/auth/updatePerkGroup",
+          JSON.stringify({
+            selectedPerkGroup,
+            perks: [],
+            emails: emailList.concat(
+              peopleData
+                .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
+                .map((employeeObj) => employeeObj.email)
+            ),
+          }),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      })();
     }
   };
 
@@ -178,7 +215,7 @@ export default function ManagePeople() {
             displayEmpty
             renderValue={(selected) => {
               if ((selected as string[]).length === 0) {
-                return "Select Perks";
+                return "Select Perk Group";
               }
 
               return (selected as string[]).join(", ");
