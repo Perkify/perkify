@@ -1,11 +1,12 @@
 import { Grid, Typography } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
+import ConfirmationModal from "components/ConfirmationModal";
 import Header from "components/Header";
 import { AdminContext, BusinessContext } from "contexts";
 import { AuthContext } from "contexts/Auth";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { PerkifyApi } from "services";
 import { allPerksDict } from "../../constants";
 import AddEmployees from "./AddEmployees";
@@ -60,8 +61,13 @@ export default function ManageGroups() {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
+  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
+    useState(false);
+
   const { admin } = useContext(AdminContext);
   const { business } = useContext(BusinessContext);
+
+  const history = useHistory();
 
   function getPerkNames(perks) {
     const retNames = perks.map((perk) => {
@@ -99,6 +105,8 @@ export default function ManageGroups() {
           },
         }
       );
+
+      history.push("/dashboard");
     })();
   };
 
@@ -148,10 +156,6 @@ export default function ManageGroups() {
         <Header
           title="Manage Perk Groups"
           crumbs={["Dashboard", "Perk Groups", id]}
-          button={{
-            type: "delete",
-            onClick: deletePerkGroup,
-          }}
         />
         <div style={{ width: "50%", marginTop: "100px" }}>
           <Typography variant="h2">Perk Group Not Found</Typography>
@@ -171,7 +175,9 @@ export default function ManageGroups() {
         crumbs={["Dashboard", "Perk Groups", id]}
         button={{
           type: "delete",
-          onClick: deletePerkGroup,
+          onClick: () => {
+            setIsDeletePerkGroupModalVisible(true);
+          },
         }}
       />
 
@@ -236,6 +242,13 @@ export default function ManageGroups() {
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
+      />
+      <ConfirmationModal
+        isModalVisible={isDeletePerkGroupModalVisible}
+        setIsModalVisible={setIsDeletePerkGroupModalVisible}
+        title="Delete Perk Group"
+        description="Are you sure you want to delete this perk group and all of its employees? This cannot be undone."
+        onConfirmation={deletePerkGroup}
       />
     </>
   );
