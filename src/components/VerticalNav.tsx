@@ -127,8 +127,8 @@ export default function ClippedDrawer({ children }) {
   const infoNav: [string, string, any][] = groupViews;
 
   const accountNav: [string, string, any][] = [
-    ["Settings", "/settings", <SettingsIcon />],
-    ["Logout", "/logout", <ExitToAppIcon />],
+    ["Settings", "/dashboard/settings", <SettingsIcon />],
+    ["Logout", "/dashboard/logout", <ExitToAppIcon />],
   ];
 
   const navSections: [string, [string, string, any][]][] = [
