@@ -1,8 +1,9 @@
 import { Grid } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
+import { AdminContext, BusinessContext } from "contexts";
 import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
+import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PerkifyApi } from "services";
@@ -58,6 +59,9 @@ export default function ManageGroups() {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
+  const { admin } = useContext(AdminContext);
+  const { business } = useContext(BusinessContext);
+
   function getPerkNames(perks) {
     const retNames = perks.map((perk) => {
       retNames.push(perk.Name);
@@ -97,86 +101,40 @@ export default function ManageGroups() {
     })();
   };
 
-  function getGroupData() {
-    //TO IMPLEMENT
-    groupData = fillerGroupData;
-  }
-
-  const [useEffectComplete, setUseEffectComplete] = useState(false);
   const [groupEmails, setEmails] = useState([]);
   const { currentUser } = useContext(AuthContext);
 
-  getGroupData();
+  useEffect(() => {
+    if (Object.keys(admin).length != 0) {
+      // get list of emails that belong to the perk group
+      db.collection("users")
+        .where("businessID", "==", admin.companyID)
+        .where("group", "==", id)
+        .get()
+        .then((querySnapshot) => {
+          setEmails(
+            querySnapshot.docs.map((doc, index) => ({
+              email: doc.id,
+              id: index,
+            }))
+          );
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+    }
+  }, [admin, id]);
 
   useEffect(() => {
-    console.log("ran");
-    var db = firebase.firestore();
-    db.collection("admins")
-      .doc(currentUser.uid)
-      .get()
-      .then((doc) => {
-        const adminDoc = doc.data();
-        if (adminDoc) {
-          //   console.log("Document data:", doc.data());
-          let businessId = adminDoc["companyID"];
-          db.collection("businesses")
-            .doc(businessId)
-            .get()
-            .then((doc) => {
-              const businessDoc = doc.data();
-              if (businessDoc) {
-                console.log(businessDoc.groups);
-
-                setViewWithPerksData(businessDoc.groups[id]);
-                setUseEffectComplete(true);
-              }
-            });
-
-          db.collection("users")
-            .where("businessID", "==", businessId)
-            .where("group", "==", id)
-            .get()
-            .then((querySnapshot) => {
-              setEmails(
-                querySnapshot.docs.map((doc, index) => ({
-                  email: doc.id,
-                  id: index,
-                }))
-              );
-            })
-            .catch((error) => {
-              console.log("Error getting documents: ", error);
-            });
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-  }, [id]);
-
-  function getRemovedPerks() {
-    const removedPerks = selectedPerks.map((index) => {
-      console.log(index);
-      removedPerks.push(groupPerks[index]);
-    });
-    console.log(removedPerks);
-    return removedPerks;
-  }
-
-  function setViewWithPerksData(perkData) {
-    //TO IMPLEMENT randomPerks => actual perks of the selected group
-    console.log(perkData);
-    const ret = perkData.map((perk) => allPerksDict[perk]);
-    var index = 0;
-    ret.forEach((perk) => {
-      perk["id"] = index;
-      index += 1;
-    });
-    console.log(ret);
-    setPerksData(ret);
-  }
+    if (Object.keys(business).length != 0) {
+      setPerksData(
+        business.groups[id].map((perk, index) => ({
+          id: index,
+          ...allPerksDict[perk],
+        }))
+      );
+    }
+  }, [business, id]);
 
   return (
     <>

@@ -8,7 +8,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import { AuthContext } from "contexts/Auth";
+import { AdminContext, AuthContext, BusinessContext } from "contexts";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { PerkifyApi } from "services";
@@ -33,7 +33,6 @@ export default function ManagePeople() {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
-  const [groupData, setGroupData] = useState([]);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
   const [emails, setEmails] = useState("");
   const [emailsError, setEmailsError] = useState("");
@@ -59,51 +58,26 @@ export default function ManagePeople() {
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
   const { currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
+  const { admin } = useContext(AdminContext);
+  const groupData = Object.keys(business["groups"]).sort();
 
   useEffect(() => {
-    db.collection("admins")
-      .doc(currentUser.uid)
+    // get list of employees that belong to the business
+    db.collection("users")
+      .where("businessID", "==", admin.companyID)
       .get()
-      .then((doc) => {
-        const userData = doc.data();
-        if (userData) {
-          const businessId = userData["companyID"];
-          console.log("Business ID");
-          console.log(businessId);
-
-          db.collection("users")
-            .where("businessID", "==", businessId)
-            .get()
-            .then((querySnapshot) => {
-              const emails = querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()["group"],
-              }));
-              console.log("EMAILS");
-              console.log(emails);
-              setPeopleData(emails);
-            })
-            .catch((error) => {
-              alert(error);
-            });
-
-          db.collection("businesses")
-            .doc(businessId)
-            .get()
-            .then((doc) => {
-              const groupData = doc.data();
-              console.log(groupData);
-              if (groupData) {
-                setGroupData(Object.keys(groupData["groups"]).sort());
-              }
-            });
-        } else {
-          console.log("No such document!");
-        }
+      .then((querySnapshot) => {
+        setPeopleData(
+          querySnapshot.docs.map((doc, index) => ({
+            email: doc.id,
+            id: index,
+            group: doc.data()["group"],
+          }))
+        );
       })
       .catch((error) => {
-        console.log("Error getting document:", error);
+        console.log(error);
       });
   }, []);
 
