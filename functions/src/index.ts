@@ -711,7 +711,6 @@ const createGroup = async (req, res) => {
 const updatePerkGroupValidators = [
   body("group").not().isEmpty(),
   body("emails").custom(validateEmails).customSanitizer(sanitizeEmails),
-  body("perks").custom(validatePerks),
 ];
 
 const updatePerkGroup = async (req, res) => {

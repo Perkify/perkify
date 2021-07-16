@@ -140,7 +140,7 @@ export default function ManagePeople() {
         await PerkifyApi.put(
           "user/auth/updatePerkGroup",
           JSON.stringify({
-            selectedPerkGroup,
+            group: selectedPerkGroup,
             perks: [],
             emails: emailList.concat(
               peopleData
@@ -213,16 +213,8 @@ export default function ManagePeople() {
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             displayEmpty
-            renderValue={(selected) => {
-              if ((selected as string[]).length === 0) {
-                return "Select Perk Group";
-              }
-
-              return (selected as string[]).join(", ");
-            }}
             variant="outlined"
             value={selectedPerkGroup}
-            multiple
             fullWidth
             onChange={(event) => {
               setSelectedPerksError("");
