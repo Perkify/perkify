@@ -2,11 +2,11 @@ import axios from "axios";
 import * as cors from "cors";
 import * as cryptoJS from "crypto-js";
 import * as express from "express";
-import {body, validationResult} from "express-validator";
+import { body, validationResult } from "express-validator";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as validator from "validator";
-import {allPerks} from "../shared";
+import { allPerks } from "../shared";
 // import {user} from "firebase-functions/lib/providers/auth";
 // import {Simulate} from "react-dom/test-utils";
 // import contextMenu = Simulate.contextMenu;
@@ -27,14 +27,14 @@ const db = admin.firestore();
 const app = express();
 
 app.use(
-    cors({
-      origin: [
-        /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
-        /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
-        /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
-      ],
-      credentials: true,
-    })
+  cors({
+    origin: [
+      /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
+      /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
+      /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
+    ],
+    credentials: true,
+  })
 );
 
 // --------------- Middleware/Helpers --------------- //
@@ -77,11 +77,11 @@ const validateFirebaseIdToken = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
-    console.log("Found \"Authorization\" header");
+    console.log('Found "Authorization" header');
     // Read the ID Token from the Authorization header.
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else if (req.cookies) {
-    console.log("Found \"__session\" cookie");
+    console.log('Found "__session" cookie');
     // Read the ID Token from cookie.
     idToken = req.cookies.__session;
   } else {
@@ -125,16 +125,16 @@ const generateRapydHeaders = (httpMethod, urlPath, body = "") => {
     rapydSecretKey +
     body;
   let signature = cryptoJS.enc.Hex.stringify(
-      // eslint-disable-next-line new-cap
-      cryptoJS.HmacSHA256(toSign, rapydSecretKey)
+    // eslint-disable-next-line new-cap
+    cryptoJS.HmacSHA256(toSign, rapydSecretKey)
   );
   signature = cryptoJS.enc.Base64.stringify(cryptoJS.enc.Utf8.parse(signature));
   return {
     "Content-Type": "application/json",
-    "access_key": rapydAccessKey,
-    "salt": salt,
-    "timestamp": timestamp,
-    "signature": signature,
+    access_key: rapydAccessKey,
+    salt: salt,
+    timestamp: timestamp,
+    signature: signature,
   };
 };
 
@@ -156,7 +156,10 @@ const deleteUserHelper = async (userDoc) => {
     console.log(blockCardResults);
   }
 
-  const deleteUserResults = await db.collection("users").doc(userDoc.id).delete();
+  const deleteUserResults = await db
+    .collection("users")
+    .doc(userDoc.id)
+    .delete();
   console.log(deleteUserResults);
 };
 
@@ -218,15 +221,15 @@ const validatePerks = async (perks) => {
 // --------------- Rapyd API Calls --------------- //
 
 const createWallet = async (
-    firstName,
-    lastName,
-    email,
-    businessName,
-    address1,
-    city,
-    state,
-    zip,
-    phone
+  firstName,
+  lastName,
+  email,
+  businessName,
+  address1,
+  city,
+  state,
+  zip,
+  phone
 ) => {
   const httpMethod = "post";
   const urlPath = "/v1/user";
@@ -347,9 +350,9 @@ const createWallet = async (
   };
    */
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   console.log(headers);
   try {
@@ -363,7 +366,7 @@ const createWallet = async (
     const contactID = walletResp.data.data.contacts.data[0].id;
     console.log(walletID);
     console.log(contactID);
-    return {walletID, contactID};
+    return { walletID, contactID };
   } catch (e) {
     console.error(e);
     throw e;
@@ -391,15 +394,15 @@ const getWallet = async (walletID) => {
 
 // eslint-disable-next-line no-unused-vars
 const addContact = async (
-    walletID,
-    firstName,
-    lastName,
-    email,
-    address,
-    city,
-    state,
-    zip,
-    dob
+  walletID,
+  firstName,
+  lastName,
+  email,
+  address,
+  city,
+  state,
+  zip,
+  dob
 ) => {
   // TODO: fix DOB static
   const httpMethod = "post";
@@ -421,9 +424,9 @@ const addContact = async (
   };
 
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const newContact = await axios({
@@ -487,9 +490,9 @@ const depositWallet = async (walletID, amount) => {
     currency: "USD",
   };
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const walletResp = await axios({
@@ -514,9 +517,9 @@ const issueCard = async (contactID) => {
     country: "US",
   };
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const cardResp = await axios({
@@ -540,9 +543,9 @@ const activateCard = async (cardID) => {
     card: cardID,
   };
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const cardResp = await axios({
@@ -569,9 +572,9 @@ const getCardDetails = async (cardID) => {
     logo_orientation: "landscape",
   };
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const cardDetails = await axios({
@@ -596,9 +599,9 @@ const blockCard = async (cardID) => {
     status: "block",
   };
   const headers = generateRapydHeaders(
-      httpMethod,
-      urlPath,
-      JSON.stringify(body)
+    httpMethod,
+    urlPath,
+    JSON.stringify(body)
   );
   try {
     const cardResp = await axios({
@@ -625,7 +628,7 @@ const registerAdminAndBusinessValidators = [
   body("businessName").not().isEmpty(),
   body("address1").not().isEmpty(),
   body("city").not().isEmpty(),
-  body("state").isLength({min: 2, max: 2}),
+  body("state").isLength({ min: 2, max: 2 }),
   body("zip").not().isEmpty(),
   body("phone").isMobilePhone("en-US"),
 ];
@@ -658,16 +661,16 @@ const registerAdminAndBusiness = async (req, res) => {
     }
 
     // create company with rapyd API
-    const {walletID, contactID} = await createWallet(
-        firstName,
-        lastName,
-        email,
-        businessName,
-        address1,
-        city,
-        state,
-        zip.toString(),
-        phone.toString()
+    const { walletID, contactID } = await createWallet(
+      firstName,
+      lastName,
+      email,
+      businessName,
+      address1,
+      city,
+      state,
+      zip.toString(),
+      phone.toString()
     );
     // globalWalletID = walletID;
 
@@ -744,9 +747,9 @@ const createGroup = async (req, res) => {
 
     // query business for address and wallet
     const businessSnap = await db
-        .collection("businesses")
-        .doc(businessID)
-        .get();
+      .collection("businesses")
+      .doc(businessID)
+      .get();
     const walletID = businessSnap.data().walletID;
 
     // charge wallet for price*perks*employees
@@ -761,11 +764,11 @@ const createGroup = async (req, res) => {
     // add group and perks to db
     // TODO: reuse businessSnap
     await db
-        .collection("businesses")
-        .doc(businessID)
-        .update({
-          [`groups.${group}`]: perks,
-        });
+      .collection("businesses")
+      .doc(businessID)
+      .update({
+        [`groups.${group}`]: perks,
+      });
 
     // create user entry with email, companyID, and groupID
     for (const email of emails) {
@@ -839,11 +842,11 @@ const updatePerkGroup = async (req, res) => {
 
     if (perks.length != 0) {
       await db
-          .collection("businesses")
-          .doc(businessID)
-          .update({
-            [`groups.${group}`]: perks,
-          });
+        .collection("businesses")
+        .doc(businessID)
+        .update({
+          [`groups.${group}`]: perks,
+        });
     }
 
     const usersRef = db.collection("users");
@@ -852,7 +855,7 @@ const updatePerkGroup = async (req, res) => {
     const deleteUsers = [];
     const oldUserEmails = [];
     groupUsersSnapshot.forEach((userDoc) => {
-      if (emails.includes(userDoc.id) ) {
+      if (emails.includes(userDoc.id)) {
         if (group != userDoc.data().group) {
           const error = {
             status: 400,
@@ -877,7 +880,9 @@ const updatePerkGroup = async (req, res) => {
     }
     await Promise.all(usersToDelete);
 
-    const addUserEmails = emails.filter((email) => !oldUserEmails.includes(email));
+    const addUserEmails = emails.filter(
+      (email) => !oldUserEmails.includes(email)
+    );
     console.log(`addUserEmails: ${addUserEmails}`);
 
     // create user entry with email, companyID, and groupID
@@ -964,11 +969,11 @@ const deletePerkGroup = async (req, res) => {
 
     // delete group from businesss' groups
     await db
-        .collection("businesses")
-        .doc(businessID)
-        .update({
-          [`groups.${group}`]: admin.firestore.FieldValue.delete(),
-        });
+      .collection("businesses")
+      .doc(businessID)
+      .update({
+        [`groups.${group}`]: admin.firestore.FieldValue.delete(),
+      });
 
     res.status(200).end();
   } catch (err) {
@@ -980,16 +985,16 @@ const deletePerkGroup = async (req, res) => {
 
 const registerUserValidators = [
   body("email")
-      .isEmail()
-      .normalizeEmail(emailNormalizationOptions)
-      .custom(validateUserEmail),
+    .isEmail()
+    .normalizeEmail(emailNormalizationOptions)
+    .custom(validateUserEmail),
   body("firstName").not().isEmpty(),
   body("lastName").not().isEmpty(),
   body("dob").isDate(),
 ];
 
 const registerUser = async (req, res) => {
-  const {email, firstName, lastName, dob, ...rest} = req.body;
+  const { email, firstName, lastName, dob, ...rest } = req.body;
 
   // TODO: make email a req param
   // const email = req.params.email;
@@ -1018,9 +1023,9 @@ const registerUser = async (req, res) => {
     const userSnap = await db.collection("users").doc(email).get();
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-        .collection("businesses")
-        .doc(businessID)
-        .get();
+      .collection("businesses")
+      .doc(businessID)
+      .get();
     const walletID = businessSnap.data().walletID;
     const walletResp = await getWallet(walletID);
     let walletAddress;
@@ -1033,21 +1038,21 @@ const registerUser = async (req, res) => {
     if (!walletAddress) {
       walletAddress =
         walletResp.data.contacts.data[walletResp.data.contacts.data.length - 1]
-            .address;
+          .address;
     }
     // eslint-disable-next-line no-unused-vars
     // TODO: support address line_2
     console.log(walletAddress);
     const newContact = await addContact(
-        walletID,
-        firstName,
-        lastName,
-        email,
-        walletAddress.line_1,
-        walletAddress.city,
-        walletAddress.state,
-        walletAddress.zip.toString(),
-        dob.toString()
+      walletID,
+      firstName,
+      lastName,
+      email,
+      walletAddress.line_1,
+      walletAddress.city,
+      walletAddress.state,
+      walletAddress.zip.toString(),
+      dob.toString()
     );
     const newContactID = newContact.data.id;
 
@@ -1093,12 +1098,12 @@ const registerUser = async (req, res) => {
 
 const sendCardEmailValidators = [
   body("email")
-      .isEmail()
-      .normalizeEmail(emailNormalizationOptions)
-      .custom(validateUserEmail),
+    .isEmail()
+    .normalizeEmail(emailNormalizationOptions)
+    .custom(validateUserEmail),
 ];
 const sendCardEmail = async (req, res) => {
-  const {email, ...rest} = req.body;
+  const { email, ...rest } = req.body;
 
   try {
     if (Object.keys(rest).length > 0) {
@@ -1115,9 +1120,9 @@ const sendCardEmail = async (req, res) => {
     const cardID = userSnap.data().cardID;
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-        .collection("businesses")
-        .doc(businessID)
-        .get();
+      .collection("businesses")
+      .doc(businessID)
+      .get();
 
     if (!cardID) {
       const error = {
@@ -1156,9 +1161,9 @@ const sendCardEmail = async (req, res) => {
 
 app.use("/auth", validateFirebaseIdToken);
 app.post(
-    "/registerAdminAndBusiness",
-    registerAdminAndBusinessValidators,
-    registerAdminAndBusiness
+  "/registerAdminAndBusiness",
+  registerAdminAndBusinessValidators,
+  registerAdminAndBusiness
 );
 app.post("/registerUser", registerUserValidators, registerUser);
 app.post("/sendCardEmail", sendCardEmailValidators, sendCardEmail);
