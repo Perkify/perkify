@@ -2,11 +2,14 @@ import axios from "axios";
 import * as cors from "cors";
 import * as cryptoJS from "crypto-js";
 import * as express from "express";
-import { body, validationResult } from "express-validator";
+import {body, validationResult} from "express-validator";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as validator from "validator";
-import { allPerks } from "../shared";
+import {allPerks} from "../shared";
+// import {user} from "firebase-functions/lib/providers/auth";
+// import {Simulate} from "react-dom/test-utils";
+// import contextMenu = Simulate.contextMenu;
 
 // rapyd credentials
 const rapydSecretKey =
@@ -24,14 +27,14 @@ const db = admin.firestore();
 const app = express();
 
 app.use(
-  cors({
-    origin: [
-      /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
-      /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
-      /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
-    ],
-    credentials: true,
-  })
+    cors({
+      origin: [
+        /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
+        /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
+        /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
+      ],
+      credentials: true,
+    })
 );
 
 // --------------- Middleware/Helpers --------------- //
@@ -74,11 +77,11 @@ const validateFirebaseIdToken = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
-    console.log('Found "Authorization" header');
+    console.log("Found \"Authorization\" header");
     // Read the ID Token from the Authorization header.
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else if (req.cookies) {
-    console.log('Found "__session" cookie');
+    console.log("Found \"__session\" cookie");
     // Read the ID Token from cookie.
     idToken = req.cookies.__session;
   } else {
@@ -122,17 +125,39 @@ const generateRapydHeaders = (httpMethod, urlPath, body = "") => {
     rapydSecretKey +
     body;
   let signature = cryptoJS.enc.Hex.stringify(
-    // eslint-disable-next-line new-cap
-    cryptoJS.HmacSHA256(toSign, rapydSecretKey)
+      // eslint-disable-next-line new-cap
+      cryptoJS.HmacSHA256(toSign, rapydSecretKey)
   );
   signature = cryptoJS.enc.Base64.stringify(cryptoJS.enc.Utf8.parse(signature));
   return {
     "Content-Type": "application/json",
-    access_key: rapydAccessKey,
-    salt: salt,
-    timestamp: timestamp,
-    signature: signature,
+    "access_key": rapydAccessKey,
+    "salt": salt,
+    "timestamp": timestamp,
+    "signature": signature,
   };
+};
+
+const deleteUserHelper = async (userDoc) => {
+  console.log("working2");
+  console.log(userDoc.data());
+  console.log(userDoc.id);
+  const user = userDoc.data();
+
+  // TODO: cannot delete users with issued cards. API does not allow it...
+  // if (user.contactId) {
+  //   const deleteContactResults = await deleteContact(walletID, user.contactId);
+  //   console.log("deletingcard");
+  //   console.log(deleteContactResults);
+  // }
+
+  if (user.cardID) {
+    const blockCardResults = await blockCard(user.cardID);
+    console.log(blockCardResults);
+  }
+
+  const deleteUserResults = await db.collection("users").doc(userDoc.id).delete();
+  console.log(deleteUserResults);
 };
 
 // * Validation Helpers * //
@@ -193,15 +218,15 @@ const validatePerks = async (perks) => {
 // --------------- Rapyd API Calls --------------- //
 
 const createWallet = async (
-  firstName,
-  lastName,
-  email,
-  businessName,
-  address1,
-  city,
-  state,
-  zip,
-  phone
+    firstName,
+    lastName,
+    email,
+    businessName,
+    address1,
+    city,
+    state,
+    zip,
+    phone
 ) => {
   const httpMethod = "post";
   const urlPath = "/v1/user";
@@ -322,9 +347,9 @@ const createWallet = async (
   };
    */
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   console.log(headers);
   try {
@@ -338,7 +363,7 @@ const createWallet = async (
     const contactID = walletResp.data.data.contacts.data[0].id;
     console.log(walletID);
     console.log(contactID);
-    return { walletID, contactID };
+    return {walletID, contactID};
   } catch (e) {
     console.error(e);
     throw e;
@@ -366,15 +391,15 @@ const getWallet = async (walletID) => {
 
 // eslint-disable-next-line no-unused-vars
 const addContact = async (
-  walletID,
-  firstName,
-  lastName,
-  email,
-  address,
-  city,
-  state,
-  zip,
-  dob
+    walletID,
+    firstName,
+    lastName,
+    email,
+    address,
+    city,
+    state,
+    zip,
+    dob
 ) => {
   // TODO: fix DOB static
   const httpMethod = "post";
@@ -396,9 +421,9 @@ const addContact = async (
   };
 
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   try {
     const newContact = await axios({
@@ -415,7 +440,44 @@ const addContact = async (
   }
 };
 
-// eslint-disable-next-line no-unused-vars
+/*
+const getContact = async (walletID, contactID) => {
+  const httpMethod = "get";
+  const urlPath = `/v1/ewallets/${walletID}/contacts/${contactID}`;
+  const headers = generateRapydHeaders(httpMethod, urlPath);
+  try {
+    const contactResp = await axios({
+      method: httpMethod,
+      url: urlPath,
+      headers,
+    });
+    // const walletAddress = walletResp.data.data.contacts.data[0].business_details.address;
+    return contactResp.data;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
+const deleteContact = async (walletID, contactID) => {
+  const httpMethod = "delete";
+  const urlPath = `/v1/ewallets/${walletID}/contacts/${contactID}`;
+  const headers = generateRapydHeaders(httpMethod, urlPath);
+  try {
+    const contactResp = await axios({
+      method: httpMethod,
+      url: urlPath,
+      headers,
+    });
+    // const walletAddress = walletResp.data.data.contacts.data[0].business_details.address;
+    return contactResp.data;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+ */
+
 const depositWallet = async (walletID, amount) => {
   const httpMethod = "post";
   const urlPath = "/v1/account/deposit";
@@ -425,9 +487,9 @@ const depositWallet = async (walletID, amount) => {
     currency: "USD",
   };
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   try {
     const walletResp = await axios({
@@ -452,9 +514,9 @@ const issueCard = async (contactID) => {
     country: "US",
   };
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   try {
     const cardResp = await axios({
@@ -478,9 +540,9 @@ const activateCard = async (cardID) => {
     card: cardID,
   };
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   try {
     const cardResp = await axios({
@@ -507,9 +569,9 @@ const getCardDetails = async (cardID) => {
     logo_orientation: "landscape",
   };
   const headers = generateRapydHeaders(
-    httpMethod,
-    urlPath,
-    JSON.stringify(body)
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
   );
   try {
     const cardDetails = await axios({
@@ -526,6 +588,33 @@ const getCardDetails = async (cardID) => {
   }
 };
 
+const blockCard = async (cardID) => {
+  const httpMethod = "post";
+  const urlPath = "/v1/issuing/cards/status";
+  const body = {
+    card: cardID,
+    status: "block",
+  };
+  const headers = generateRapydHeaders(
+      httpMethod,
+      urlPath,
+      JSON.stringify(body)
+  );
+  try {
+    const cardResp = await axios({
+      method: httpMethod,
+      url: urlPath,
+      headers,
+      data: body,
+    });
+
+    return cardResp.data;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
 // --------------- Express Routes --------------- //
 
 const registerAdminAndBusinessValidators = [
@@ -536,7 +625,7 @@ const registerAdminAndBusinessValidators = [
   body("businessName").not().isEmpty(),
   body("address1").not().isEmpty(),
   body("city").not().isEmpty(),
-  body("state").isLength({ min: 2, max: 2 }),
+  body("state").isLength({min: 2, max: 2}),
   body("zip").not().isEmpty(),
   body("phone").isMobilePhone("en-US"),
 ];
@@ -569,16 +658,16 @@ const registerAdminAndBusiness = async (req, res) => {
     }
 
     // create company with rapyd API
-    const { walletID, contactID } = await createWallet(
-      firstName,
-      lastName,
-      email,
-      businessName,
-      address1,
-      city,
-      state,
-      zip.toString(),
-      phone.toString()
+    const {walletID, contactID} = await createWallet(
+        firstName,
+        lastName,
+        email,
+        businessName,
+        address1,
+        city,
+        state,
+        zip.toString(),
+        phone.toString()
     );
     // globalWalletID = walletID;
 
@@ -655,9 +744,9 @@ const createGroup = async (req, res) => {
 
     // query business for address and wallet
     const businessSnap = await db
-      .collection("businesses")
-      .doc(businessID)
-      .get();
+        .collection("businesses")
+        .doc(businessID)
+        .get();
     const walletID = businessSnap.data().walletID;
 
     // charge wallet for price*perks*employees
@@ -672,15 +761,27 @@ const createGroup = async (req, res) => {
     // add group and perks to db
     // TODO: reuse businessSnap
     await db
-      .collection("businesses")
-      .doc(businessID)
-      .update({
-        [`groups.${group}`]: perks,
-      });
+        .collection("businesses")
+        .doc(businessID)
+        .update({
+          [`groups.${group}`]: perks,
+        });
 
     // create user entry with email, companyID, and groupID
     for (const email of emails) {
-      await db.collection("users").doc(email).set({
+      const docRef = db.collection("users").doc(email);
+
+      const docSnapshot = await docRef.get();
+      if (docSnapshot.exists) {
+        const error = {
+          status: 400,
+          reason: "Bad Request",
+          reason_detail: `added email ${email} that is already in another group`,
+        };
+        throw error;
+      }
+      console.log("Doc exists");
+      await docRef.set({
         businessID,
         group,
         perks: [],
@@ -694,7 +795,6 @@ const createGroup = async (req, res) => {
         },
       });
     }
-
     // << ALL BELOW HAPPENS LATER IN FLOW >>
     // get name, and dob
     // issue card
@@ -739,35 +839,62 @@ const updatePerkGroup = async (req, res) => {
 
     if (perks.length != 0) {
       await db
-        .collection("businesses")
-        .doc(businessID)
-        .update({
-          [`groups.${group}`]: perks,
-        });
+          .collection("businesses")
+          .doc(businessID)
+          .update({
+            [`groups.${group}`]: perks,
+          });
     }
 
-    // create user entry with email, companyID, and groupID
-    for (const email of emails) {
-      const docRef = db.collection("users").doc(email);
+    const usersRef = db.collection("users");
+    const groupUsersSnapshot = await usersRef.where("group", "==", group).get();
 
-      const docSnapshot = await docRef.get();
-
-      if (!docSnapshot.exists) {
-        console.log("Doc exists");
-        await docRef.set({
-          businessID,
-          group,
-          perks: [],
-        });
-        await db.collection("mail").add({
-          to: email,
-          message: {
-            subject: "Your employer has signed you up for Perkify",
-            text: `Your employee gave you free access to these perks:${perks} \n
-                To claim these perks, finish the signup process by visiting: app.getperkify.com/getcard`,
-          },
-        });
+    const deleteUsers = [];
+    const oldUserEmails = [];
+    groupUsersSnapshot.forEach((userDoc) => {
+      if (emails.includes(userDoc.id) ) {
+        if (group != userDoc.data().group) {
+          const error = {
+            status: 400,
+            reason: "Bad Request",
+            reason_detail: `added email ${userDoc.id} that is already in another group`,
+          };
+          throw error;
+        } else {
+          oldUserEmails.push(userDoc.id);
+        }
+      } else {
+        deleteUsers.push(userDoc);
       }
+    });
+
+    console.log(`deleteUsers: ${deleteUsers}`);
+    console.log(`oldUserEmails: ${oldUserEmails}`);
+
+    const usersToDelete = [];
+    for (const deleteUser of deleteUsers) {
+      usersToDelete.push(deleteUserHelper(deleteUser));
+    }
+    await Promise.all(usersToDelete);
+
+    const addUserEmails = emails.filter((email) => !oldUserEmails.includes(email));
+    console.log(`addUserEmails: ${addUserEmails}`);
+
+    // create user entry with email, companyID, and groupID
+    for (const email of addUserEmails) {
+      await db.collection("users").doc(email).set({
+        businessID,
+        group,
+        perks: [],
+      });
+      await db.collection("mail").add({
+        to: email,
+        message: {
+          subject: "Your employer has signed you up for Perkify",
+          text: `Your employee gave you free access to these perks:${perks} \n
+                To claim these perks, finish the signup process by visiting: app.getperkify.com/getcard`,
+        },
+      });
     }
 
     // << ALL BELOW HAPPENS LATER IN FLOW >>
@@ -812,14 +939,36 @@ const deletePerkGroup = async (req, res) => {
     const adminSnap = await db.collection("admins").doc(req.user.uid).get();
     const businessID = adminSnap.data().companyID;
 
-    await db
-      .collection("businesses")
-      .doc(businessID)
-      .update({
-        [`groups.${group}`]: admin.firestore.FieldValue.delete(),
-      });
+    // TOOD: create helper function to get business info from logged in admin
+    // //const businessSnap = await db
+    //     .collection("businesses")
+    //     .doc(businessID)
+    //     .get();
 
-    // TODO figure out what to do with users after deleting a perk group
+    // const walletID = businessSnap.data().walletID;
+
+    const usersRef = db.collection("users");
+    const groupUsersSnapshot = await usersRef.where("group", "==", group).get();
+
+    console.log("working");
+    console.log(group);
+    console.log(groupUsersSnapshot.size);
+
+    if (!groupUsersSnapshot.empty) {
+      const usersToDelete = [];
+      groupUsersSnapshot.forEach((userDoc) => {
+        usersToDelete.push(deleteUserHelper(userDoc));
+      });
+      await Promise.all(usersToDelete);
+    }
+
+    // delete group from businesss' groups
+    await db
+        .collection("businesses")
+        .doc(businessID)
+        .update({
+          [`groups.${group}`]: admin.firestore.FieldValue.delete(),
+        });
 
     res.status(200).end();
   } catch (err) {
@@ -831,16 +980,16 @@ const deletePerkGroup = async (req, res) => {
 
 const registerUserValidators = [
   body("email")
-    .isEmail()
-    .normalizeEmail(emailNormalizationOptions)
-    .custom(validateUserEmail),
+      .isEmail()
+      .normalizeEmail(emailNormalizationOptions)
+      .custom(validateUserEmail),
   body("firstName").not().isEmpty(),
   body("lastName").not().isEmpty(),
   body("dob").isDate(),
 ];
 
 const registerUser = async (req, res) => {
-  const { email, firstName, lastName, dob, ...rest } = req.body;
+  const {email, firstName, lastName, dob, ...rest} = req.body;
 
   // TODO: make email a req param
   // const email = req.params.email;
@@ -869,9 +1018,9 @@ const registerUser = async (req, res) => {
     const userSnap = await db.collection("users").doc(email).get();
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-      .collection("businesses")
-      .doc(businessID)
-      .get();
+        .collection("businesses")
+        .doc(businessID)
+        .get();
     const walletID = businessSnap.data().walletID;
     const walletResp = await getWallet(walletID);
     let walletAddress;
@@ -884,21 +1033,21 @@ const registerUser = async (req, res) => {
     if (!walletAddress) {
       walletAddress =
         walletResp.data.contacts.data[walletResp.data.contacts.data.length - 1]
-          .address;
+            .address;
     }
     // eslint-disable-next-line no-unused-vars
     // TODO: support address line_2
     console.log(walletAddress);
     const newContact = await addContact(
-      walletID,
-      firstName,
-      lastName,
-      email,
-      walletAddress.line_1,
-      walletAddress.city,
-      walletAddress.state,
-      walletAddress.zip.toString(),
-      dob.toString()
+        walletID,
+        firstName,
+        lastName,
+        email,
+        walletAddress.line_1,
+        walletAddress.city,
+        walletAddress.state,
+        walletAddress.zip.toString(),
+        dob.toString()
     );
     const newContactID = newContact.data.id;
 
@@ -912,7 +1061,7 @@ const registerUser = async (req, res) => {
     await db.collection("users").doc(email).update({
       firstName: firstName,
       lastName: lastName,
-      contactId: newContactID,
+      contactID: newContactID,
       cardID: cardID,
     });
 
@@ -944,12 +1093,12 @@ const registerUser = async (req, res) => {
 
 const sendCardEmailValidators = [
   body("email")
-    .isEmail()
-    .normalizeEmail(emailNormalizationOptions)
-    .custom(validateUserEmail),
+      .isEmail()
+      .normalizeEmail(emailNormalizationOptions)
+      .custom(validateUserEmail),
 ];
 const sendCardEmail = async (req, res) => {
-  const { email, ...rest } = req.body;
+  const {email, ...rest} = req.body;
 
   try {
     if (Object.keys(rest).length > 0) {
@@ -966,9 +1115,9 @@ const sendCardEmail = async (req, res) => {
     const cardID = userSnap.data().cardID;
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-      .collection("businesses")
-      .doc(businessID)
-      .get();
+        .collection("businesses")
+        .doc(businessID)
+        .get();
 
     if (!cardID) {
       const error = {
@@ -1007,9 +1156,9 @@ const sendCardEmail = async (req, res) => {
 
 app.use("/auth", validateFirebaseIdToken);
 app.post(
-  "/registerAdminAndBusiness",
-  registerAdminAndBusinessValidators,
-  registerAdminAndBusiness
+    "/registerAdminAndBusiness",
+    registerAdminAndBusinessValidators,
+    registerAdminAndBusiness
 );
 app.post("/registerUser", registerUserValidators, registerUser);
 app.post("/sendCardEmail", sendCardEmailValidators, sendCardEmail);
