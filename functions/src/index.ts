@@ -1,19 +1,19 @@
-import axios from "axios";
-import * as cors from "cors";
-import * as cryptoJS from "crypto-js";
-import * as express from "express";
-import { body, validationResult } from "express-validator";
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
-import * as validator from "validator";
-import { allPerks } from "../shared";
+import axios from 'axios';
+import * as cors from 'cors';
+import * as cryptoJS from 'crypto-js';
+import * as express from 'express';
+import { body, validationResult } from 'express-validator';
+import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions';
+import * as validator from 'validator';
+import { allPerks } from '../shared';
 
 // rapyd credentials
 const rapydSecretKey =
-  "9ddd95bd2a2beb670c8297afec7fdea3a8cca2f64488d30e394aeebf5208d9c78e4f9c0a6ac0d5c8";
-const rapydAccessKey = "C8CF6F6A88C4B7A1DEC8";
+  '9ddd95bd2a2beb670c8297afec7fdea3a8cca2f64488d30e394aeebf5208d9c78e4f9c0a6ac0d5c8';
+const rapydAccessKey = 'C8CF6F6A88C4B7A1DEC8';
 // rapyd base uri
-const rapydBaseURL = "https://sandboxapi.rapyd.net";
+const rapydBaseURL = 'https://sandboxapi.rapyd.net';
 
 admin.initializeApp();
 axios.defaults.baseURL = rapydBaseURL;
@@ -37,10 +37,10 @@ app.use(
 // --------------- Middleware/Helpers --------------- //
 
 const handleError = (err, res) => {
-  if (typeof err !== "object" || typeof err.status !== "number") {
+  if (typeof err !== 'object' || typeof err.status !== 'number') {
     err = {
       status: 500,
-      reason: "INTERNAL_SERVER_ERROR",
+      reason: 'INTERNAL_SERVER_ERROR',
       reason_detail: err ? err.toString() : undefined,
     };
   }
@@ -56,14 +56,14 @@ const handleError = (err, res) => {
 const validateFirebaseIdToken = async (req, res, next) => {
   if (
     (!req.headers.authorization ||
-      !req.headers.authorization.startsWith("Bearer ")) &&
+      !req.headers.authorization.startsWith('Bearer ')) &&
     !(req.cookies && req.cookies.__session)
   ) {
     const err = {
       status: 403,
-      reason: "Unauthorized",
+      reason: 'Unauthorized',
       reason_detail:
-        "No Firebase ID token was passed as a Bearer token in the Authorization header or as cookie",
+        'No Firebase ID token was passed as a Bearer token in the Authorization header or as cookie',
     };
     handleError(err, res);
     return;
@@ -72,11 +72,11 @@ const validateFirebaseIdToken = async (req, res, next) => {
   let idToken;
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer ")
+    req.headers.authorization.startsWith('Bearer ')
   ) {
     console.log('Found "Authorization" header');
     // Read the ID Token from the Authorization header.
-    idToken = req.headers.authorization.split("Bearer ")[1];
+    idToken = req.headers.authorization.split('Bearer ')[1];
   } else if (req.cookies) {
     console.log('Found "__session" cookie');
     // Read the ID Token from cookie.
@@ -85,7 +85,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     // No cookie
     const err = {
       status: 403,
-      reason: "Unauthorized",
+      reason: 'Unauthorized',
     };
     handleError(err, res);
     return;
@@ -93,22 +93,22 @@ const validateFirebaseIdToken = async (req, res, next) => {
 
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-    console.log("ID Token correctly decoded", decodedIdToken);
+    console.log('ID Token correctly decoded', decodedIdToken);
     req.user = decodedIdToken;
     next();
     return;
   } catch (error) {
-    console.error("Error while verifying Firebase ID token:", error);
+    console.error('Error while verifying Firebase ID token:', error);
     const err = {
       status: 403,
-      reason: "Unauthorized",
+      reason: 'Unauthorized',
     };
     handleError(err, res);
     return;
   }
 };
 
-const generateRapydHeaders = (httpMethod, urlPath, body = "") => {
+const generateRapydHeaders = (httpMethod, urlPath, body = '') => {
   // const salt = parseInt(crypto.randomBytes(5).toString("hex"), 16).toString();
   // Randomly generated for each request.
   const salt = cryptoJS.lib.WordArray.random(12).toString();
@@ -127,7 +127,7 @@ const generateRapydHeaders = (httpMethod, urlPath, body = "") => {
   );
   signature = cryptoJS.enc.Base64.stringify(cryptoJS.enc.Utf8.parse(signature));
   return {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     access_key: rapydAccessKey,
     salt: salt,
     timestamp: timestamp,
@@ -149,9 +149,9 @@ const emailNormalizationOptions = {
 };
 
 const validateUserEmail = async (email) => {
-  const userRef = await db.collection("users").doc(email).get();
+  const userRef = await db.collection('users').doc(email).get();
   if (!userRef.exists) {
-    return Promise.reject(new Error("You are not added by your employer"));
+    return Promise.reject(new Error('You are not added by your employer'));
   } else {
     return Promise.resolve();
   }
@@ -166,7 +166,7 @@ const validateEmails = async (emails) => {
       }
     }
   } else {
-    return Promise.reject(new Error("send array of emails"));
+    return Promise.reject(new Error('send array of emails'));
   }
   return Promise.resolve();
 };
@@ -185,7 +185,7 @@ const validatePerks = async (perks) => {
       }
     }
   } else {
-    return Promise.reject(new Error("send array of perks"));
+    return Promise.reject(new Error('send array of perks'));
   }
   return Promise.resolve();
 };
@@ -203,45 +203,45 @@ const createWallet = async (
   zip,
   phone
 ) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/user";
+  const httpMethod = 'post';
+  const urlPath = '/v1/user';
 
   // TODO: improve this logic
   if (phone.length == 10) {
-    phone = "+1" + phone;
+    phone = '+1' + phone;
   } else if (phone.length == 11) {
-    phone = "+" + phone;
+    phone = '+' + phone;
   }
   console.log(phone);
 
   const body = {
     first_name: businessName,
-    type: "company",
+    type: 'company',
     contact: {
       phone_number: phone,
       email: email,
       first_name: firstName,
       last_name: lastName,
-      contact_type: "business",
+      contact_type: 'business',
       address: {
         name: businessName,
         line_1: address1,
         city: city,
         state: state,
-        country: "US",
+        country: 'US',
         zip: zip,
         phone_number: phone,
       },
-      country: "US",
+      country: 'US',
       business_details: {
-        entity_type: "company",
+        entity_type: 'company',
         name: businessName,
         address: {
           name: businessName,
           line_1: address1,
           city: city,
           state: state,
-          country: "US",
+          country: 'US',
           zip: zip,
           phone_number: phone,
         },
@@ -347,8 +347,8 @@ const createWallet = async (
 
 // eslint-disable-next-line no-unused-vars
 const getWallet = async (walletID) => {
-  const httpMethod = "get";
-  const urlPath = "/v1/user/" + walletID;
+  const httpMethod = 'get';
+  const urlPath = '/v1/user/' + walletID;
   const headers = generateRapydHeaders(httpMethod, urlPath);
   try {
     const walletResp = await axios({
@@ -377,17 +377,17 @@ const addContact = async (
   dob
 ) => {
   // TODO: fix DOB static
-  const httpMethod = "post";
+  const httpMethod = 'post';
   const urlPath = `/v1/ewallets/${walletID}/contacts`;
   const body = {
     first_name: firstName,
     last_name: lastName,
-    contact_type: "personal",
+    contact_type: 'personal',
     email: email,
-    date_of_birth: "11/22/2000",
-    country: "US",
+    date_of_birth: '11/22/2000',
+    country: 'US',
     address: {
-      name: firstName + " " + lastName,
+      name: firstName + ' ' + lastName,
       line_1: address,
       city: city,
       state: state,
@@ -409,7 +409,7 @@ const addContact = async (
     });
     return newContact.data;
   } catch (e) {
-    console.error("in add contact");
+    console.error('in add contact');
     console.error(e);
     throw e;
   }
@@ -417,12 +417,12 @@ const addContact = async (
 
 // eslint-disable-next-line no-unused-vars
 const depositWallet = async (walletID, amount) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/account/deposit";
+  const httpMethod = 'post';
+  const urlPath = '/v1/account/deposit';
   const body = {
     ewallet: walletID,
     amount: amount.toString(),
-    currency: "USD",
+    currency: 'USD',
   };
   const headers = generateRapydHeaders(
     httpMethod,
@@ -445,11 +445,11 @@ const depositWallet = async (walletID, amount) => {
 };
 
 const issueCard = async (contactID) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/issuing/cards";
+  const httpMethod = 'post';
+  const urlPath = '/v1/issuing/cards';
   const body = {
     ewallet_contact: contactID,
-    country: "US",
+    country: 'US',
   };
   const headers = generateRapydHeaders(
     httpMethod,
@@ -472,8 +472,8 @@ const issueCard = async (contactID) => {
 };
 
 const activateCard = async (cardID) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/issuing/cards/activate";
+  const httpMethod = 'post';
+  const urlPath = '/v1/issuing/cards/activate';
   const body = {
     card: cardID,
   };
@@ -498,13 +498,13 @@ const activateCard = async (cardID) => {
 };
 
 const getCardDetails = async (cardID) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/hosted/issuing/card_details/" + cardID;
+  const httpMethod = 'post';
+  const urlPath = '/v1/hosted/issuing/card_details/' + cardID;
   const body = {
-    card_color: "#f9f9f9",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTNgldxyUfmVPmQV1YpTcDWo_kjX-TO_EiccQ&usqp=CAU",
-    language: "en",
-    logo_orientation: "landscape",
+    card_color: '#f9f9f9',
+    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTNgldxyUfmVPmQV1YpTcDWo_kjX-TO_EiccQ&usqp=CAU',
+    language: 'en',
+    logo_orientation: 'landscape',
   };
   const headers = generateRapydHeaders(
     httpMethod,
@@ -529,16 +529,16 @@ const getCardDetails = async (cardID) => {
 // --------------- Express Routes --------------- //
 
 const registerAdminAndBusinessValidators = [
-  body("firstName").not().isEmpty(),
-  body("lastName").not().isEmpty(),
-  body("email").isEmail().normalizeEmail(emailNormalizationOptions),
-  body("password").not().isEmpty(),
-  body("businessName").not().isEmpty(),
-  body("address1").not().isEmpty(),
-  body("city").not().isEmpty(),
-  body("state").isLength({ min: 2, max: 2 }),
-  body("zip").not().isEmpty(),
-  body("phone").isMobilePhone("en-US"),
+  body('firstName').not().isEmpty(),
+  body('lastName').not().isEmpty(),
+  body('email').isEmail().normalizeEmail(emailNormalizationOptions),
+  body('password').not().isEmpty(),
+  body('businessName').not().isEmpty(),
+  body('address1').not().isEmpty(),
+  body('city').not().isEmpty(),
+  body('state').isLength({ min: 2, max: 2 }),
+  body('zip').not().isEmpty(),
+  body('phone').isMobilePhone('en-US'),
 ];
 
 const registerAdminAndBusiness = async (req, res) => {
@@ -562,8 +562,8 @@ const registerAdminAndBusiness = async (req, res) => {
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
-        reason: "extraneous parameters",
-        reason_detail: Object.keys(rest).join(","),
+        reason: 'extraneous parameters',
+        reason_detail: Object.keys(rest).join(','),
       };
       throw error;
     }
@@ -586,18 +586,18 @@ const registerAdminAndBusiness = async (req, res) => {
       email,
       emailVerified: false,
       password,
-      displayName: firstName + " " + lastName,
+      displayName: firstName + ' ' + lastName,
       disabled: false,
     });
 
-    const businessRef = await db.collection("businesses").add({
+    const businessRef = await db.collection('businesses').add({
       name: businessName,
       walletID,
       admins: [newUser.uid],
       groups: {},
     });
 
-    await db.collection("admins").doc(newUser.uid).set({
+    await db.collection('admins').doc(newUser.uid).set({
       email,
       firstName,
       lastName,
@@ -613,9 +613,9 @@ const registerAdminAndBusiness = async (req, res) => {
 };
 
 const createGroupValidators = [
-  body("group").not().isEmpty(),
-  body("emails").custom(validateEmails).customSanitizer(sanitizeEmails),
-  body("perks").custom(validatePerks),
+  body('group').not().isEmpty(),
+  body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
+  body('perks').custom(validatePerks),
 ];
 
 const createGroup = async (req, res) => {
@@ -634,7 +634,7 @@ const createGroup = async (req, res) => {
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
-        reason: "Bad Request",
+        reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
       throw error;
@@ -643,19 +643,19 @@ const createGroup = async (req, res) => {
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
-        reason: "extraneous parameters",
-        reason_detail: Object.keys(rest).join(","),
+        reason: 'extraneous parameters',
+        reason_detail: Object.keys(rest).join(','),
       };
       throw error;
     }
 
     // get admins business
-    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
     const businessID = adminSnap.data().companyID;
 
     // query business for address and wallet
     const businessSnap = await db
-      .collection("businesses")
+      .collection('businesses')
       .doc(businessID)
       .get();
     const walletID = businessSnap.data().walletID;
@@ -672,7 +672,7 @@ const createGroup = async (req, res) => {
     // add group and perks to db
     // TODO: reuse businessSnap
     await db
-      .collection("businesses")
+      .collection('businesses')
       .doc(businessID)
       .update({
         [`groups.${group}`]: perks,
@@ -680,15 +680,15 @@ const createGroup = async (req, res) => {
 
     // create user entry with email, companyID, and groupID
     for (const email of emails) {
-      await db.collection("users").doc(email).set({
+      await db.collection('users').doc(email).set({
         businessID,
         group,
         perks: [],
       });
-      await db.collection("mail").add({
+      await db.collection('mail').add({
         to: email,
         message: {
-          subject: "Your employer has signed you up for Perkify",
+          subject: 'Your employer has signed you up for Perkify',
           text: `Your employee gave you free access to these perks:${perks} \n
                 To claim these perks, finish the signup process by visiting: app.getperkify.com/getcard`,
         },
@@ -709,8 +709,8 @@ const createGroup = async (req, res) => {
 };
 
 const updatePerkGroupValidators = [
-  body("group").not().isEmpty(),
-  body("emails").custom(validateEmails).customSanitizer(sanitizeEmails),
+  body('group').not().isEmpty(),
+  body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
 ];
 
 const updatePerkGroup = async (req, res) => {
@@ -725,21 +725,21 @@ const updatePerkGroup = async (req, res) => {
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
-        reason: "Bad Request",
+        reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
       throw error;
     }
 
     // get admins business
-    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
     const businessID = adminSnap.data().companyID;
 
     console.log(perks);
 
     if (perks.length != 0) {
       await db
-        .collection("businesses")
+        .collection('businesses')
         .doc(businessID)
         .update({
           [`groups.${group}`]: perks,
@@ -748,21 +748,21 @@ const updatePerkGroup = async (req, res) => {
 
     // create user entry with email, companyID, and groupID
     for (const email of emails) {
-      const docRef = db.collection("users").doc(email);
+      const docRef = db.collection('users').doc(email);
 
       const docSnapshot = await docRef.get();
 
       if (!docSnapshot.exists) {
-        console.log("Doc exists");
+        console.log('Doc exists');
         await docRef.set({
           businessID,
           group,
           perks: [],
         });
-        await db.collection("mail").add({
+        await db.collection('mail').add({
           to: email,
           message: {
-            subject: "Your employer has signed you up for Perkify",
+            subject: 'Your employer has signed you up for Perkify',
             text: `Your employee gave you free access to these perks:${perks} \n
                 To claim these perks, finish the signup process by visiting: app.getperkify.com/getcard`,
           },
@@ -778,18 +778,18 @@ const updatePerkGroup = async (req, res) => {
 
     // res.json(depositResult).end();
 
-    console.log("Ending res");
+    console.log('Ending res');
     res.status(200).end();
   } catch (err) {
     // TODO: if globalWalletID is set then use rapid api to delete the wallet
     // handleError(err, res);
-    console.log("Returning error");
+    console.log('Returning error');
     console.log(err);
     res.status(500).end();
   }
 };
 
-const deletePerkGroupValidators = [body("group").not().isEmpty()];
+const deletePerkGroupValidators = [body('group').not().isEmpty()];
 
 const deletePerkGroup = async (req, res) => {
   const {
@@ -802,18 +802,18 @@ const deletePerkGroup = async (req, res) => {
       console.log(errors);
       const error = {
         status: 400,
-        reason: "Bad Request",
+        reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
       throw error;
     }
 
     // get admins business
-    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
     const businessID = adminSnap.data().companyID;
 
     await db
-      .collection("businesses")
+      .collection('businesses')
       .doc(businessID)
       .update({
         [`groups.${group}`]: admin.firestore.FieldValue.delete(),
@@ -823,20 +823,20 @@ const deletePerkGroup = async (req, res) => {
 
     res.status(200).end();
   } catch (err) {
-    console.log("Returning error");
+    console.log('Returning error');
     console.log(err);
     res.status(500).end();
   }
 };
 
 const registerUserValidators = [
-  body("email")
+  body('email')
     .isEmail()
     .normalizeEmail(emailNormalizationOptions)
     .custom(validateUserEmail),
-  body("firstName").not().isEmpty(),
-  body("lastName").not().isEmpty(),
-  body("dob").isDate(),
+  body('firstName').not().isEmpty(),
+  body('lastName').not().isEmpty(),
+  body('dob').isDate(),
 ];
 
 const registerUser = async (req, res) => {
@@ -850,7 +850,7 @@ const registerUser = async (req, res) => {
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
-        reason: "Bad Request",
+        reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
       throw error;
@@ -859,17 +859,17 @@ const registerUser = async (req, res) => {
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
-        reason: "extraneous parameters",
-        reason_detail: Object.keys(rest).join(","),
+        reason: 'extraneous parameters',
+        reason_detail: Object.keys(rest).join(','),
       };
       throw error;
     }
 
     // TODO: get field directly
-    const userSnap = await db.collection("users").doc(email).get();
+    const userSnap = await db.collection('users').doc(email).get();
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-      .collection("businesses")
+      .collection('businesses')
       .doc(businessID)
       .get();
     const walletID = businessSnap.data().walletID;
@@ -877,7 +877,7 @@ const registerUser = async (req, res) => {
     let walletAddress;
     for (const contact of walletResp.data.contacts.data) {
       console.log(contact);
-      if (contact.contact_type === "business") {
+      if (contact.contact_type === 'business') {
         walletAddress = contact.business_details.address;
       }
     }
@@ -909,7 +909,7 @@ const registerUser = async (req, res) => {
 
     await activateCard(cardID);
 
-    await db.collection("users").doc(email).update({
+    await db.collection('users').doc(email).update({
       firstName: firstName,
       lastName: lastName,
       contactId: newContactID,
@@ -922,10 +922,10 @@ const registerUser = async (req, res) => {
     const yourPerks = businessSnap.data().groups[userSnap.data().group];
 
     // send email
-    await db.collection("mail").add({
+    await db.collection('mail').add({
       to: email,
       message: {
-        subject: "Your Perkify card is ready!",
+        subject: 'Your Perkify card is ready!',
         text: `We have generated your perkify credit card details.\n 
         Use this link to see your card details and purchase any of your valid subscriptions: ${cardLink}.\n 
         The link above is only active for 5 minutes, to get a new link, go here: https://www.getperkify.com/view-my-card \n
@@ -943,7 +943,7 @@ const registerUser = async (req, res) => {
 };
 
 const sendCardEmailValidators = [
-  body("email")
+  body('email')
     .isEmail()
     .normalizeEmail(emailNormalizationOptions)
     .custom(validateUserEmail),
@@ -955,26 +955,26 @@ const sendCardEmail = async (req, res) => {
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
-        reason: "extraneous parameters",
-        reason_detail: Object.keys(rest).join(","),
+        reason: 'extraneous parameters',
+        reason_detail: Object.keys(rest).join(','),
       };
       throw error;
     }
 
     // TODO: get field directly
-    const userSnap = await db.collection("users").doc(email).get();
+    const userSnap = await db.collection('users').doc(email).get();
     const cardID = userSnap.data().cardID;
     const businessID = userSnap.data().businessID;
     const businessSnap = await db
-      .collection("businesses")
+      .collection('businesses')
       .doc(businessID)
       .get();
 
     if (!cardID) {
       const error = {
         status: 400,
-        reason: "need to sign up first",
-        reason_detail: "www.app.getperkify/getcard",
+        reason: 'need to sign up first',
+        reason_detail: 'www.app.getperkify/getcard',
       };
       throw error;
     }
@@ -985,10 +985,10 @@ const sendCardEmail = async (req, res) => {
     const yourPerks = businessSnap.data().groups[userSnap.data().group];
 
     // send email
-    await db.collection("mail").add({
+    await db.collection('mail').add({
       to: email,
       message: {
-        subject: "Your Perkify card",
+        subject: 'Your Perkify card',
         text: `
         Use this link to see your card details and purchase any of your valid subscriptions: ${cardLink}.\n 
         The link above is only active for 5 minutes, to get a new link, go here: https://www.getperkify.com/view-my-card \n
@@ -1005,16 +1005,16 @@ const sendCardEmail = async (req, res) => {
   }
 };
 
-app.use("/auth", validateFirebaseIdToken);
+app.use('/auth', validateFirebaseIdToken);
 app.post(
-  "/registerAdminAndBusiness",
+  '/registerAdminAndBusiness',
   registerAdminAndBusinessValidators,
   registerAdminAndBusiness
 );
-app.post("/registerUser", registerUserValidators, registerUser);
-app.post("/sendCardEmail", sendCardEmailValidators, sendCardEmail);
-app.post("/auth/createGroup", createGroupValidators, createGroup);
-app.put("/auth/updatePerkGroup", updatePerkGroupValidators, updatePerkGroup);
-app.post("/auth/deletePerkGroup", deletePerkGroupValidators, deletePerkGroup);
+app.post('/registerUser', registerUserValidators, registerUser);
+app.post('/sendCardEmail', sendCardEmailValidators, sendCardEmail);
+app.post('/auth/createGroup', createGroupValidators, createGroup);
+app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
+app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 
 exports.user = functions.https.onRequest(app);
