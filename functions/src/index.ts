@@ -11,6 +11,15 @@ import {allPerks} from "../shared";
 // import {Simulate} from "react-dom/test-utils";
 // import contextMenu = Simulate.contextMenu;
 
+import Stripe from "stripe";
+const stripe = new Stripe(
+    "sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu",
+    {
+      apiVersion: "2020-08-27",
+    }
+);
+
+
 // rapyd credentials
 const rapydSecretKey =
   "9ddd95bd2a2beb670c8297afec7fdea3a8cca2f64488d30e394aeebf5208d9c78e4f9c0a6ac0d5c8";
@@ -370,7 +379,7 @@ const createWallet = async (
   }
 };
 
-// eslint-disable-next-line no-unused-vars
+/*
 const getWallet = async (walletID) => {
   const httpMethod = "get";
   const urlPath = "/v1/user/" + walletID;
@@ -389,7 +398,6 @@ const getWallet = async (walletID) => {
   }
 };
 
-// eslint-disable-next-line no-unused-vars
 const addContact = async (
     walletID,
     firstName,
@@ -440,7 +448,6 @@ const addContact = async (
   }
 };
 
-/*
 const getContact = async (walletID, contactID) => {
   const httpMethod = "get";
   const urlPath = `/v1/ewallets/${walletID}/contacts/${contactID}`;
@@ -506,6 +513,7 @@ const depositWallet = async (walletID, amount) => {
   }
 };
 
+/*
 const issueCard = async (contactID) => {
   const httpMethod = "post";
   const urlPath = "/v1/issuing/cards";
@@ -558,6 +566,7 @@ const activateCard = async (cardID) => {
     throw e;
   }
 };
+*/
 
 const getCardDetails = async (cardID) => {
   const httpMethod = "post";
@@ -985,11 +994,10 @@ const registerUserValidators = [
       .custom(validateUserEmail),
   body("firstName").not().isEmpty(),
   body("lastName").not().isEmpty(),
-  body("dob").isDate(),
 ];
 
 const registerUser = async (req, res) => {
-  const {email, firstName, lastName, dob, ...rest} = req.body;
+  const {email, firstName, lastName, ...rest} = req.body;
 
   // TODO: make email a req param
   // const email = req.params.email;
@@ -1021,66 +1029,48 @@ const registerUser = async (req, res) => {
         .collection("businesses")
         .doc(businessID)
         .get();
-    const walletID = businessSnap.data().walletID;
-    const walletResp = await getWallet(walletID);
-    let walletAddress;
-    for (const contact of walletResp.data.contacts.data) {
-      console.log(contact);
-      if (contact.contact_type === "business") {
-        walletAddress = contact.business_details.address;
-      }
-    }
-    if (!walletAddress) {
-      walletAddress =
-        walletResp.data.contacts.data[walletResp.data.contacts.data.length - 1]
-            .address;
-    }
-    // eslint-disable-next-line no-unused-vars
-    // TODO: support address line_2
-    console.log(walletAddress);
-    const newContact = await addContact(
-        walletID,
-        firstName,
-        lastName,
-        email,
-        walletAddress.line_1,
-        walletAddress.city,
-        walletAddress.state,
-        walletAddress.zip.toString(),
-        dob.toString()
-    );
-    const newContactID = newContact.data.id;
 
-    const newCard = await issueCard(newContactID);
-    const cardID = newCard.data.card_id;
+    const billingAddress = businessSnap.data().billingAddress;
+    const cardholder = await stripe.issuing.cardholders.create({
+      type: "individual",
+      name: `${firstName} ${lastName}`,
+      email: email,
+      billing: {
+        address: billingAddress,
+      },
+      status: "active",
+    });
+    const cardholderID = cardholder.id;
 
-    console.log(cardID);
-
-    await activateCard(cardID);
+    const card = await stripe.issuing.cards.create({
+      cardholder: cardholderID,
+      currency: "usd",
+      type: "virtual",
+      status: "active",
+    });
 
     await db.collection("users").doc(email).update({
       firstName: firstName,
       lastName: lastName,
-      contactID: newContactID,
-      cardID: cardID,
+      cardholderID: cardholderID,
+      cardID: card.id,
     });
-
-    const cardDetails = await getCardDetails(cardID);
-    const cardLink = cardDetails.data.redirect_url;
 
     const yourPerks = businessSnap.data().groups[userSnap.data().group];
 
+    const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
+      url: `http://localhost:3000/login?${email}`, // I don't think you're supposed to do it this way. Maybe less secure
+    });
     // send email
     await db.collection("mail").add({
       to: email,
       message: {
-        subject: "Your Perkify card is ready!",
-        text: `We have generated your perkify credit card details.\n 
-        Use this link to see your card details and purchase any of your valid subscriptions: ${cardLink}.\n 
-        The link above is only active for 5 minutes, to get a new link, go here: https://www.getperkify.com/view-my-card \n
-        
-        Your supported perks are:
+        subject: "Your employer has signed you up for Perkify!",
+        text: `
+        Your employer purchased these Perks for you:\n
         ${yourPerks.toString()} 
+        
+        Use this link to sign into your account and redeem your Perks: ${signInLink}.\n 
         `,
       },
     });
