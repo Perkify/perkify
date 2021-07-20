@@ -31,7 +31,7 @@ const GeneralDashboard = () => {
 
   var [employees, setEmployees] = useState([])
   var [groups, setGroups] = useState({})
-  var [selectedGroup, setSelectedGroup] = useState(")
+  var [selectedGroup, setSelectedGroup] = useState("")
 
   function roundNumber(num){
     return Math.round(10*num)/10; 
