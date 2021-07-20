@@ -2,8 +2,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import ConfirmationModal from "components/ConfirmationModal";
 import Header from "components/Header";
-import { AdminContext, BusinessContext } from "contexts";
-import { AuthContext } from "contexts/Auth";
+import { AuthContext, BusinessContext } from "contexts";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -64,7 +63,7 @@ export default function ManageGroups() {
   const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
     useState(false);
 
-  const { admin } = useContext(AdminContext);
+  const { currentUser, admin } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const history = useHistory();
@@ -111,7 +110,6 @@ export default function ManageGroups() {
   };
 
   const [groupEmails, setEmails] = useState([]);
-  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     if (Object.keys(admin).length != 0) {
