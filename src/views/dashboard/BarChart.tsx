@@ -59,14 +59,14 @@ const BChart = (props) => {
           dataKey="Spent"
           stackId="a"
           fill="#00C49F"
-          radius={[10, 10, 10, 10]}
+          radius={[0, 0, 10, 10]}
           maxBarSize={20}
         />
         <Bar
           dataKey="Unspent"
           stackId="a"
           fill="#185CFF"
-          radius={[10, 10, 10, 10]}
+          radius={[10, 10, 0, 0]}
           maxBarSize={20}
         />
       </BarChart>
