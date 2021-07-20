@@ -1,12 +1,6 @@
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer, Cell, Tooltip, Legend } from 'recharts';
 
-const data = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
-  { name: 'Group C', value: 300 },
-  { name: 'Group D', value: 200 },
-];
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -50,6 +44,8 @@ const renderActiveShape = (props) => {
   );
 };
 
+
+
 const PChart = (props) => {
 
     var [activeIndex, setIndex] = React.useState(0); 
@@ -60,7 +56,7 @@ const PChart = (props) => {
 
     const onPieEnter = (value) => {
         const isIndex = (element) => element.name === value.name;
-        setIndex(data.findIndex(isIndex))
+        setIndex(props.data.findIndex(isIndex))
     };
 
 
@@ -70,7 +66,7 @@ const PChart = (props) => {
           <Pie
             activeIndex={activeIndex}
             activeShape={renderActiveShape}
-            data={data}
+            data={props.data}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -80,11 +76,11 @@ const PChart = (props) => {
             onMouseEnter={onPieEnter}
 
           >
-          {data.map((entry, index) => (
+          {props.data.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
         ))}
         </Pie>
-        <Tooltip />
+        <Tooltip formatter={(label) => label + " %"}/>
         <Legend />
         </PieChart>
       </ResponsiveContainer>

@@ -46,7 +46,7 @@ const BChart = (props) => {
         <BarChart
           width={500}
           height={300}
-          data={data}
+          data={props.data}
           margin={{
             top: 20,
             right: 30,
@@ -58,8 +58,8 @@ const BChart = (props) => {
           <YAxis />
           <Tooltip cursor={false}/>
           <Legend />
-          <Bar dataKey="pv" stackId="a" fill="#8884d8" />
-          <Bar dataKey="uv" stackId="a" fill="#82ca9d" />
+          <Bar dataKey="Spent" stackId="a" fill="#8884d8" />
+          <Bar dataKey="Unspent" stackId="a" fill="#82ca9d" />
         </BarChart>
       </ResponsiveContainer>
     );
