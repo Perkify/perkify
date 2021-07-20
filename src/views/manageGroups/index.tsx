@@ -44,7 +44,7 @@ const perkColumns = [
   },
 ];
 
-export default function ManageGroups() {
+export default function ManageGroups(props) {
   let { id } = useParams();
 
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
@@ -114,6 +114,7 @@ export default function ManageGroups() {
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
+    props.startLoading()
     if (Object.keys(admin).length != 0) {
       // get list of emails that belong to the perk group
       db.collection("users")
@@ -127,6 +128,7 @@ export default function ManageGroups() {
               id: index,
             }))
           );
+          props.doneLoading()
         })
         .catch((error) => {
           console.log("Error getting documents: ", error);

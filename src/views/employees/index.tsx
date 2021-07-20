@@ -29,7 +29,7 @@ const columns = [
   },
 ];
 
-export default function ManagePeople() {
+export default function ManagePeople(props) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
@@ -63,6 +63,7 @@ export default function ManagePeople() {
   const groupData = Object.keys(business["groups"]).sort();
 
   useEffect(() => {
+    props.startLoading()
     // get list of employees that belong to the business
     db.collection("users")
       .where("businessID", "==", admin.companyID)
@@ -75,6 +76,7 @@ export default function ManagePeople() {
             group: doc.data()["group"],
           }))
         );
+        props.doneLoading()
       })
       .catch((error) => {
         console.log(error);
