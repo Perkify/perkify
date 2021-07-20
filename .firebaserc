@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "perkify-5790b"
+  },
+  "targets": {
+    "perkify-5790b": {
+      "hosting": {
+        "admin": [
+          "perkify-5790b"
+        ],
+        "user": [
+          "perkify-user"
+        ]
+      }
+    }
   }
 }
