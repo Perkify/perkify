@@ -20,6 +20,7 @@ import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import "firebase/firestore";
 import { allPerks, allPerksDict } from "../../constants";
+import { gridColumnsTotalWidthSelector } from "@material-ui/data-grid";
 
 
 
@@ -31,10 +32,16 @@ const GeneralDashboard = () => {
 
   var [employees, setEmployees] = useState([])
   var [groups, setGroups] = useState({})
-  var [selectedGroup, setSelectedGroup] = useState("")
+  var [selectedGroup, setSelectedGroup] = useState("All Groups")
 
   function roundNumber(num){
     return Math.round(10*num)/10; 
+  }
+
+  function convertGroups(){
+    let retArr = Object.keys(groups)
+    retArr.push("All Groups")
+    return retArr
   }
 
   function calculatePieData(){
@@ -107,28 +114,16 @@ const GeneralDashboard = () => {
   }
 
   function calculateBarGraphData(){
-    const data = [
-      {
-        name: 'Perk A',
-        uv: 4000,
-        pv: 2400,
-      },
-      {
-        name: 'Perk B',
-        uv: 3000,
-        pv: 1398,
-      },
-      {
-        name: 'Perk C',
-        uv: 2000,
-        pv: 9800,
-      },
-    ];
-
+    console.log("Hello")
     let retData = [] 
     let tempDict = {}
     employees.forEach(employee => {
       let group = employee["group"]
+      if (selectedGroup != "All Groups"){
+        if (group !== selectedGroup){
+          return 0 
+        }
+      }
       if (groups[group] === undefined){
         return 0
       }
@@ -198,6 +193,11 @@ const GeneralDashboard = () => {
       });
   }, []);
 
+  function handleGroupChange(event){
+    console.log(event.target.value[1])
+    setSelectedGroup(event.target.value[1])
+  }
+
   return (
     <div>
       <Header title="Dashboard" crumbs={["General dashboard"]} />
@@ -225,11 +225,42 @@ const GeneralDashboard = () => {
         direction= "row"
       >
         <Grid item xs={4}> 
-          <Card style={{ width: "95%", padding: 10, height: 400 }} elevation={4} > <div style={{width: "100%", height: "100%"}}><h1 style={{marginLeft: 10}}>Perks</h1>
+          <Card style={{ width: "95%", padding: 10, height: 400 }} elevation={4} > <div style={{width: "100%", height: "100%"}}>
+            <h1 style={{marginLeft: 10}}>Perks</h1>
+            
           <PChart data={calculatePieData()}/> </div></Card>
         </Grid> 
         <Grid item xs={8}> 
-        <Card style={{ width: "95%", padding: 10, height: 400 }} elevation={4}><div style={{width: "100%", height: "100%"}}> <h1 style={{marginLeft: 10}}>Perks</h1>
+        <Card style={{ width: "95%", padding: 10, height: 400 }} elevation={4}><div style={{width: "100%", height: "100%"}}> 
+        <Grid container spacing={0} direction="row">
+
+              <Grid item xs={4}>
+            <h1 style={{marginLeft: 10}}>Perks</h1>
+            </Grid>
+
+            <Grid item xs={4}></Grid>
+
+            <Grid item xs={4} justifyContent="flex-end" style={{marginTop: 1}}>
+            <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          displayEmpty
+          variant="outlined"
+          value={[selectedGroup]}
+          onChange={handleGroupChange}
+          multiple
+          fullWidth
+          label="Select Group"
+          placeholder="Select Gruop"
+        >
+          {convertGroups().map((group) => (
+            <MenuItem value={group} key={group}>
+              {group}
+            </MenuItem>
+          ))}
+        </Select>
+            </Grid>
+            </Grid>
           <BChart data={calculateBarGraphData()}/></div> </Card>
         </Grid>
       </Grid>
