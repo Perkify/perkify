@@ -23,10 +23,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        const userDoc = await db
-          .collection("admins")
-          .doc(currentUser.uid)
-          .get();
+        const userDoc = await db.collection("admins").doc(user.uid).get();
         if (userDoc) {
           setCurrentUser(user);
           const adminData = userDoc.data();

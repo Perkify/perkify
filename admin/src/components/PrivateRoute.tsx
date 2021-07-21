@@ -8,8 +8,8 @@ const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
 
   useEffect(() => {
     if (currentUser && currentUser.emailVerified === false) {
-      alert("Please verify your email!");
       auth.signOut();
+      alert("Please verify your email!");
     }
   }, [currentUser]);
 

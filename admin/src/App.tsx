@@ -1,6 +1,7 @@
 // import Console from "./Console";
 import PrivateRoute from "components/PrivateRoute";
-import { AdminProvider, AuthProvider, BusinessProvider } from "contexts";
+import PublicRoute from "components/PublicRoute";
+import { AuthProvider, BusinessProvider } from "contexts";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -18,24 +19,22 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AdminProvider>
-          <BusinessProvider>
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-              <PrivateRoute path="/dashboard" component={Dashboard} />
-              <PrivateRoute
-                exact
-                path="/gettingStarted"
-                component={GettingStarted}
-              />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/signup" component={SignUpBusinessWebflow} />
-              <Route exact path="/getcard" component={GetCard} />
-            </Switch>
-          </BusinessProvider>
-        </AdminProvider>
+        <BusinessProvider>
+          <Switch>
+            <Route exact path="/">
+              <Redirect to="/dashboard" />
+            </Route>
+            <PrivateRoute path="/dashboard" component={Dashboard} />
+            <PrivateRoute
+              exact
+              path="/gettingStarted"
+              component={GettingStarted}
+            />
+            <PublicRoute exact path="/login" component={Login} />
+            <Route exact path="/signup" component={SignUpBusinessWebflow} />
+            <Route exact path="/getcard" component={GetCard} />
+          </Switch>
+        </BusinessProvider>
       </AuthProvider>
     </Router>
   );

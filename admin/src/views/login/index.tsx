@@ -95,7 +95,7 @@ export default function SignInSide(props) {
       await app.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
       // setUser(data.data)
-      history.push("/");
+      // history.push("/");
     } catch (error) {
       setLoading(false);
       errorAlert(error.message);
