@@ -2,11 +2,7 @@ import Header from "components/Header";
 import React from "react";
 
 const GeneralDashboard = (props) => {
-
-  React.useEffect(() => {
-    props.startLoading()
-    props.doneLoading()
-  }, []);
+  React.useEffect(() => {}, []);
   return (
     <div>
       <Header title="Dashboard" crumbs={["Dashboard"]} />
