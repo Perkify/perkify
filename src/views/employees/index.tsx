@@ -8,7 +8,12 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import { AdminContext, AuthContext, BusinessContext } from "contexts";
+import {
+  AdminContext,
+  AuthContext,
+  BusinessContext,
+  LoadingContext,
+} from "contexts";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { PerkifyApi } from "services";
@@ -60,10 +65,11 @@ export default function ManagePeople(props) {
   const { currentUser } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { admin } = useContext(AdminContext);
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
   const groupData = Object.keys(business["groups"]).sort();
 
   useEffect(() => {
-    props.startLoading()
+    setDashboardLoading(true);
     // get list of employees that belong to the business
     db.collection("users")
       .where("businessID", "==", admin.companyID)
@@ -76,7 +82,7 @@ export default function ManagePeople(props) {
             group: doc.data()["group"],
           }))
         );
-        props.doneLoading()
+        setDashboardLoading(false);
       })
       .catch((error) => {
         console.log(error);

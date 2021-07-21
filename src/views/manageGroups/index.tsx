@@ -2,7 +2,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import ConfirmationModal from "components/ConfirmationModal";
 import Header from "components/Header";
-import { AdminContext, BusinessContext } from "contexts";
+import { AdminContext, BusinessContext, LoadingContext } from "contexts";
 import { AuthContext } from "contexts/Auth";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
@@ -112,10 +112,11 @@ export default function ManageGroups(props) {
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser } = useContext(AuthContext);
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    props.startLoading()
     if (Object.keys(admin).length != 0) {
+      setDashboardLoading(true);
       // get list of emails that belong to the perk group
       db.collection("users")
         .where("businessID", "==", admin.companyID)
@@ -128,7 +129,7 @@ export default function ManageGroups(props) {
               id: index,
             }))
           );
-          props.doneLoading()
+          setDashboardLoading(false);
         })
         .catch((error) => {
           console.log("Error getting documents: ", error);
