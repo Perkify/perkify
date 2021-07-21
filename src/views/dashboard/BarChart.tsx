@@ -1,69 +1,77 @@
-import React, { PureComponent } from 'react';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import {Select} from "@material-ui/core";
+import React from "react";
+import {
+  Bar,
+  BarChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const data = [
   {
-    name: 'Perk A',
+    name: "Perk A",
     uv: 4000,
     pv: 2400,
   },
   {
-    name: 'Perk B',
+    name: "Perk B",
     uv: 3000,
     pv: 1398,
   },
   {
-    name: 'Perk C',
+    name: "Perk C",
     uv: 2000,
     pv: 9800,
   },
   {
-    name: 'Perk D',
+    name: "Perk D",
     uv: 2780,
     pv: 3908,
   },
   {
-    name: 'Perk E',
+    name: "Perk E",
     uv: 1890,
     pv: 4800,
   },
   {
-    name: 'Perk F',
+    name: "Perk F",
     uv: 2390,
     pv: 3800,
   },
   {
-    name: 'Page G',
+    name: "Page G",
     uv: 3490,
     pv: 4300,
   },
 ];
 
 const BChart = (props) => {
-
-    return (
-      <ResponsiveContainer width="100%" height="80%">
-        <BarChart
-          width={500}
-          height={300}
-          data={props.data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        > 
+  return (
+    <ResponsiveContainer width="100%" height="80%">
+      <BarChart data={props.data}>
         <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip cursor={false}/>
-          <Legend />
-          <Bar dataKey="Spent" stackId="a" fill="#8884d8" />
-          <Bar dataKey="Unspent" stackId="a" fill="#82ca9d" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  }
+        <YAxis />
+        <Tooltip cursor={false} />
+        <Legend />
+        <Bar
+          dataKey="Spent"
+          stackId="a"
+          fill="#00C49F"
+          radius={[0, 0, 10, 10]}
+          maxBarSize={20}
+        />
+        <Bar
+          dataKey="Unspent"
+          stackId="a"
+          fill="#185CFF"
+          radius={[10, 10, 0, 0]}
+          maxBarSize={20}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
 
-export default BChart
+export default BChart;
