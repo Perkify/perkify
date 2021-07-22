@@ -110,7 +110,7 @@ const GeneralDashboard = () => {
       });
     });
     Object.keys(tempDict).forEach((perk) => {
-      let newRow = { name: perk, Unspent: tempDict[perk], Spent: 0 };
+      let newRow = { name: perk, unspent: tempDict[perk], spent: 0 };
       retData.push(newRow);
     });
 

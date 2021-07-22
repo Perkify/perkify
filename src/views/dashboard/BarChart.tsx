@@ -56,14 +56,16 @@ const BChart = (props) => {
         <Tooltip cursor={false} />
         <Legend />
         <Bar
-          dataKey="Spent"
+          dataKey="spent"
+          name="Spent"
           stackId="a"
           fill="#00C49F"
           radius={[0, 0, 10, 10]}
           maxBarSize={20}
         />
         <Bar
-          dataKey="Unspent"
+          dataKey="unspent"
+          name="Unspent"
           stackId="a"
           fill="#185CFF"
           radius={[10, 10, 0, 0]}
