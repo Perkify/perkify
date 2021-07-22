@@ -27,9 +27,9 @@ const GeneralDashboard = () => {
     return retArr;
   }
 
-  function calculatePieData() {
+  function calculatePieData() { // Returns pie chart data 
     let tempDict = {};
-    employees.forEach((employee) => {
+    employees.forEach((employee) => { //Looks through each employee to create dict of total costs per perk 
       let group = employee["group"];
       if (groups[group] === undefined) {
         return 0;
@@ -44,7 +44,7 @@ const GeneralDashboard = () => {
     });
     let data = [];
     let totalValue = 0;
-    Object.keys(tempDict).forEach((perk) => {
+    Object.keys(tempDict).forEach((perk) => { //Creates array of total cost per perk 
       let newRow = { name: perk, value: tempDict[perk] };
       totalValue = totalValue + tempDict[perk];
       data.push(newRow);
@@ -60,7 +60,7 @@ const GeneralDashboard = () => {
     return data;
   }
 
-  function calculateTotalCost() {
+  function calculateTotalCost() { //Calculates total cost to display cost per employee
     let totalCost = 0;
 
     let groupCost = {};
@@ -78,7 +78,7 @@ const GeneralDashboard = () => {
     return totalCost;
   }
 
-  function calculatePerksOffered() {
+  function calculatePerksOffered() { //returns num of perks offered 
     let perks = new Set([]);
     Object.keys(groups).forEach((group) => {
       groups[group].forEach((perk) => {
@@ -88,12 +88,12 @@ const GeneralDashboard = () => {
     return perks.size;
   }
 
-  function calculateBarGraphData() {
+  function calculateBarGraphData() { //returns bar graph data in array form 
     let retData = [];
     let tempDict = {};
-    employees.forEach((employee) => {
+    employees.forEach((employee) => { //Creates dictionary of total amount spent per perk 
       let group = employee["group"];
-      if (selectedGroup != "All Groups") {
+      if (selectedGroup != "All Groups") { //If group is selected only look at employees belonging to the selected group 
         if (group !== selectedGroup) {
           return 0;
         }
@@ -109,7 +109,7 @@ const GeneralDashboard = () => {
         }
       });
     });
-    Object.keys(tempDict).forEach((perk) => {
+    Object.keys(tempDict).forEach((perk) => { //TODO: Calculate amount spent in comparison to amount not spent
       let newRow = { name: perk, unspent: tempDict[perk], spent: 0 };
       retData.push(newRow);
     });
