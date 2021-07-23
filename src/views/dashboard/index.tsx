@@ -19,7 +19,7 @@ const Dashboard = () => {
         hidden={!dashboardLoading}
         style={{
           zIndex: 10000,
-          height: "3px",
+          height: "6px",
           width: "100%",
           position: "absolute",
         }}

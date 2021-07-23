@@ -4,6 +4,7 @@ import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import { AdminContext, BusinessContext, LoadingContext } from "contexts";
 import React, { useContext, useEffect, useState } from "react";
 import { allPerksDict } from "../../constants";
 import BChart from "./BarChart";
@@ -15,6 +16,7 @@ const GeneralDashboard = () => {
 
   var [employees, setEmployees] = useState([]);
   var [groups, setGroups] = useState({});
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
   var [selectedGroup, setSelectedGroup] = useState("All Groups");
 
   function roundNumber(num) {
@@ -127,6 +129,7 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
+    setDashboardLoading(true);
     const db = firebase.firestore();
     if (currentUser){
       console.log("yes!")
@@ -160,6 +163,7 @@ const GeneralDashboard = () => {
                   if (businessDoc) {
                     setEmployees(people);
                     setGroups(businessDoc.groups);
+                    setDashboardLoading(false);
                   }
                 });
             })
