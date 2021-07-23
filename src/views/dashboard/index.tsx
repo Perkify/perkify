@@ -1,12 +1,12 @@
-import VerticalNav from "components/VerticalNav";
-import React from "react";
-import { Route, Switch, useRouteMatch } from "react-router-dom";
-import CreateGroup from "views/createGroup";
-import ManagePeople from "views/employees";
-import Logout from "views/logout";
-import ManageGroups from "views/manageGroups";
-import Settings from "views/settings";
-import GeneralDashboard from "./GeneralDashboard";
+import VerticalNav from 'components/VerticalNav';
+import React from 'react';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import Billing from 'views/billing';
+import CreateGroup from 'views/createGroup';
+import ManagePeople from 'views/employees';
+import Logout from 'views/logout';
+import ManageGroups from 'views/manageGroups';
+import GeneralDashboard from './GeneralDashboard';
 
 const Dashboard = () => {
   const { path, url } = useRouteMatch();
@@ -19,7 +19,7 @@ const Dashboard = () => {
         <Route path={`${path}/group/:id`} component={ManageGroups} />
         <Route path={`${path}/create/group`} component={CreateGroup} />
         <Route path={`${path}/logout`} component={Logout} />
-        <Route path={`${path}/settings`} component={Settings} />
+        <Route path={`${path}/billing`} component={Billing} />
       </Switch>
     </VerticalNav>
   );
