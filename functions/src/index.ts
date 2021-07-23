@@ -26,9 +26,11 @@ const app = express();
 app.use(
   cors({
     origin: [
+      /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
     ],
+    credentials: true,
   })
 );
 
@@ -158,6 +160,7 @@ const validateUserEmail = async (email) => {
 const validateEmails = async (emails) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {
+      console.log(email);
       if (!validator.isEmail(email)) {
         return Promise.reject(new Error(`email: ${email} is not email`));
       }
@@ -705,6 +708,127 @@ const createGroup = async (req, res) => {
   }
 };
 
+const updatePerkGroupValidators = [
+  body("group").not().isEmpty(),
+  body("emails").custom(validateEmails).customSanitizer(sanitizeEmails),
+];
+
+const updatePerkGroup = async (req, res) => {
+  const {
+    group, // TODO: make this param
+    emails,
+    perks,
+  } = req.body;
+
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = {
+        status: 400,
+        reason: "Bad Request",
+        reason_detail: JSON.stringify(errors.array()),
+      };
+      throw error;
+    }
+
+    // get admins business
+    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const businessID = adminSnap.data().companyID;
+
+    console.log(perks);
+
+    if (perks.length != 0) {
+      await db
+        .collection("businesses")
+        .doc(businessID)
+        .update({
+          [`groups.${group}`]: perks,
+        });
+    }
+
+    // create user entry with email, companyID, and groupID
+    for (const email of emails) {
+      const docRef = db.collection("users").doc(email);
+
+      const docSnapshot = await docRef.get();
+
+      if (!docSnapshot.exists) {
+        console.log("Doc exists");
+        await docRef.set({
+          businessID,
+          group,
+          perks: [],
+        });
+        await db.collection("mail").add({
+          to: email,
+          message: {
+            subject: "Your employer has signed you up for Perkify",
+            text: `Your employee gave you free access to these perks:${perks} \n
+                To claim these perks, finish the signup process by visiting: app.getperkify.com/getcard`,
+          },
+        });
+      }
+    }
+
+    // << ALL BELOW HAPPENS LATER IN FLOW >>
+    // get name, and dob
+    // issue card
+    // issue and then activate cards
+    // send initial email to get cards
+
+    // res.json(depositResult).end();
+
+    console.log("Ending res");
+    res.status(200).end();
+  } catch (err) {
+    // TODO: if globalWalletID is set then use rapid api to delete the wallet
+    // handleError(err, res);
+    console.log("Returning error");
+    console.log(err);
+    res.status(500).end();
+  }
+};
+
+const deletePerkGroupValidators = [body("group").not().isEmpty()];
+
+const deletePerkGroup = async (req, res) => {
+  const {
+    group, // TODO: make this param
+  } = req.body;
+
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(errors);
+      const error = {
+        status: 400,
+        reason: "Bad Request",
+        reason_detail: JSON.stringify(errors.array()),
+      };
+      throw error;
+    }
+
+    // get admins business
+    const adminSnap = await db.collection("admins").doc(req.user.uid).get();
+    const businessID = adminSnap.data().companyID;
+
+    await db
+      .collection("businesses")
+      .doc(businessID)
+      .update({
+        [`groups.${group}`]: admin.firestore.FieldValue.delete(),
+      });
+
+    // TODO figure out what to do with users after deleting a perk group
+
+    res.status(200).end();
+  } catch (err) {
+    console.log("Returning error");
+    console.log(err);
+    res.status(500).end();
+  }
+};
+
 const registerUserValidators = [
   body("email")
     .isEmail()
@@ -890,5 +1014,7 @@ app.post(
 app.post("/registerUser", registerUserValidators, registerUser);
 app.post("/sendCardEmail", sendCardEmailValidators, sendCardEmail);
 app.post("/auth/createGroup", createGroupValidators, createGroup);
+app.put("/auth/updatePerkGroup", updatePerkGroupValidators, updatePerkGroup);
+app.post("/auth/deletePerkGroup", deletePerkGroupValidators, deletePerkGroup);
 
 exports.user = functions.https.onRequest(app);

@@ -9,15 +9,24 @@ import {
   Select,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import { AuthContext } from "contexts/Auth";
+import React, { useContext, useState } from "react";
+import { PerkifyApi } from "services";
 import { allPerks } from "../../constants";
 
-const AddPerks = ({ isAddPerksModalVisible, setIsAddPerksModalVisible }) => {
+const AddPerks = ({
+  isAddPerksModalVisible,
+  setIsAddPerksModalVisible,
+  selectedPerks,
+  group,
+  emails,
+}) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [selectedPerksError, setSelectedPerksError] = useState("");
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
+  const { currentUser } = useContext(AuthContext);
 
   const addPerksToPerkGroup = (event) => {
     event.preventDefault();
@@ -29,6 +38,30 @@ const AddPerks = ({ isAddPerksModalVisible, setIsAddPerksModalVisible }) => {
 
     if (!error) {
       setIsAddPerksModalVisible(false);
+
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+
+        const afterPerks = perksToAdd.concat(
+          selectedPerks.map((perkObj) => perkObj.Name)
+        );
+        console.log(afterPerks);
+
+        await PerkifyApi.put(
+          "user/auth/updatePerkGroup",
+          JSON.stringify({
+            group,
+            emails: emails.map((emailObj) => emailObj.email),
+            perks: afterPerks,
+          }),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      })();
     }
   };
 
@@ -38,7 +71,7 @@ const AddPerks = ({ isAddPerksModalVisible, setIsAddPerksModalVisible }) => {
       onClose={() => setIsAddPerksModalVisible(false)}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
           To add users to this organization, please enter their email addresses
@@ -84,7 +117,7 @@ const AddPerks = ({ isAddPerksModalVisible, setIsAddPerksModalVisible }) => {
           Cancel
         </Button>
         <Button onClick={addPerksToPerkGroup} color="primary">
-          Add Users
+          Add Perks
         </Button>
       </DialogActions>
     </Dialog>

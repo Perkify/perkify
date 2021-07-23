@@ -21,9 +21,8 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import GroupIcon from "@material-ui/icons/Group";
 import PersonIcon from "@material-ui/icons/Person";
-import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
-import "firebase/firestore";
+import SettingsIcon from "@material-ui/icons/Settings";
+import { AuthContext, BusinessContext } from "contexts";
 import logo from "images/logo.png";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -89,10 +88,9 @@ export default function ClippedDrawer({ children }) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [useEffectComplete, setUseEffectComplete] = useState(false);
-  const [groupV, setGroupViews] = useState({});
 
   const { currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
 
   const location = useLocation();
 
@@ -108,23 +106,28 @@ export default function ClippedDrawer({ children }) {
     ["Employees", "/dashboard/people", <PersonIcon />],
   ];
 
-  var groupViews: [string, string, any][] = [];
+  let [groupViews, setGroupViews]: [[string, string, any][], Function] =
+    useState([]);
 
-  console.log(groupV);
+  useEffect(() => {
+    if (Object.keys(business).length != 0) {
+      const tmpGroupViews = Object.keys(business.groups)
+        .sort()
+        .map((group) => [group, "/dashboard/group/" + group, <GroupIcon />]);
 
-  if (groupV !== {}) {
-    Object.keys(groupV)
-      .sort()
-      .forEach((group) => {
-        groupViews.push([group, "/dashboard/group/" + group, <GroupIcon />]);
-      });
-  }
-
-  groupViews.push(["Add New Group", "/dashboard/create/group", <AddIcon />]);
+      tmpGroupViews.push([
+        "Add New Group",
+        "/dashboard/create/group",
+        <AddIcon />,
+      ]);
+      setGroupViews(tmpGroupViews);
+    }
+  }, [business]);
 
   const infoNav: [string, string, any][] = groupViews;
 
   const accountNav: [string, string, any][] = [
+    ["Settings", "/settings", <SettingsIcon />],
     ["Logout", "/logout", <ExitToAppIcon />],
   ];
 
@@ -211,56 +214,16 @@ export default function ClippedDrawer({ children }) {
     </div>
   );
 
-  let adminData: any = {};
-
-  //BELOW CODE DOESNT WORK
-  useEffect(() => {
-    if (currentUser) {
-      const db = firebase.firestore();
-      db.collection("admins")
-        .doc(currentUser.uid)
-        .get()
-        .then((doc) => {
-          const adminData = doc.data();
-          if (adminData) {
-            //   console.log("Document data:", doc.data());
-            let businessId = adminData["companyID"];
-            db.collection("businesses")
-              .doc(businessId)
-              .get()
-              .then((doc) => {
-                const groupData = doc.data();
-                if (groupData) {
-                  console.log(groupData["groups"]);
-                  setGroupViews(groupData["groups"]);
-                  setUseEffectComplete(true);
-                }
-              });
-            // doc.data() will be undefined in this case
-            //     console.log("No such document!");
-          }
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
-    }
-  }, []);
-
-  if (useEffectComplete === false) {
-    return <></>;
-  } else {
-    console.log(useEffectComplete);
-
-    return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="fixed"
-          variant="outlined"
-          className={classes.appBar}
-          style={{ background: "white" }}
-        >
-          {/* <Toolbar>
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        variant="outlined"
+        className={classes.appBar}
+        style={{ background: "white" }}
+      >
+        {/* <Toolbar>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -272,41 +235,40 @@ export default function ClippedDrawer({ children }) {
             </IconButton>
             <img style={{ height: "30px" }} src={logo} />
           </Toolbar> */}
-        </AppBar>
-        <nav className={classes.drawer} aria-label="mailbox folders">
-          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-          <Hidden mdUp implementation="css">
-            <Drawer
-              variant="temporary"
-              anchor={theme.direction === "rtl" ? "right" : "left"}
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
-              classes={{
-                paper: classes.drawerPaper,
-              }}
-              ModalProps={{
-                keepMounted: true, // Better open performance on mobile.
-              }}
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-          <Hidden xsDown implementation="css">
-            <Drawer
-              classes={{
-                paper: classes.drawerPaper,
-              }}
-              variant="permanent"
-              open
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-        </nav>
-        <main className={classes.content}>
-          <Box margin="60px 20px 20px 20px">{children}</Box>
-        </main>
-      </div>
-    );
-  }
+      </AppBar>
+      <nav className={classes.drawer} aria-label="mailbox folders">
+        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+        <Hidden mdUp implementation="css">
+          <Drawer
+            variant="temporary"
+            anchor={theme.direction === "rtl" ? "right" : "left"}
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </Hidden>
+        <Hidden xsDown implementation="css">
+          <Drawer
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+            variant="permanent"
+            open
+          >
+            {drawer}
+          </Drawer>
+        </Hidden>
+      </nav>
+      <main className={classes.content}>
+        <Box margin="60px 20px 20px 20px">{children}</Box>
+      </main>
+    </div>
+  );
 }

@@ -8,15 +8,22 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import { AuthContext } from "contexts/Auth";
+import React, { useContext, useState } from "react";
+import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 
 const AddEmployees = ({
   isAddEmployeesModalVisible,
   setIsAddEmployeesModalVisible,
+  employees,
+  group,
+  selectedPerks,
 }) => {
   const [emailsToAdd, setEmailsToAdd] = useState("");
   const [emailsError, setEmailsError] = useState("");
+
+  const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === "") {
@@ -37,6 +44,32 @@ const AddEmployees = ({
     }
     if (!error) {
       setIsAddEmployeesModalVisible(false);
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+
+        const emailList = emailsToAdd.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+
+        const afterEmployees = emailList.concat(
+          employees.map((employeeObj) => employeeObj.email)
+        );
+
+        console.log(afterEmployees);
+
+        await PerkifyApi.put(
+          "user/auth/updatePerkGroup",
+          JSON.stringify({
+            group,
+            perks: selectedPerks.map((perkObj) => perkObj.Name),
+            emails: afterEmployees,
+          }),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      })();
     }
   };
 

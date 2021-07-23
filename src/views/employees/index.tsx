@@ -8,10 +8,15 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import { AddRemoveTable } from "components/AddRemoveTable";
 import Header from "components/Header";
-import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
-import "firebase/firestore";
+import {
+  AdminContext,
+  AuthContext,
+  BusinessContext,
+  LoadingContext,
+} from "contexts";
+import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
+import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 
 const columns = [
@@ -29,11 +34,10 @@ const columns = [
   },
 ];
 
-export default function ManagePeople() {
+export default function ManagePeople(props) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
-  const [groupData, setGroupData] = useState(["Cole's Group"]);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
   const [emails, setEmails] = useState("");
   const [emailsError, setEmailsError] = useState("");
@@ -59,41 +63,29 @@ export default function ManagePeople() {
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
   const { currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
+  const { admin } = useContext(AdminContext);
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const groupData = Object.keys(business["groups"]).sort();
 
   useEffect(() => {
-    const db = firebase.firestore();
-    db.collection("admins")
-      .doc(currentUser.uid)
+    setDashboardLoading(true);
+    // get list of employees that belong to the business
+    db.collection("users")
+      .where("businessID", "==", admin.companyID)
       .get()
-      .then((doc) => {
-        const userData = doc.data();
-        if (userData) {
-          const businessId = userData["companyID"];
-          console.log("Business ID");
-          console.log(businessId);
-
-          db.collection("users")
-            .where("businessID", "==", businessId)
-            .get()
-            .then((querySnapshot) => {
-              const emails = querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()["group"],
-              }));
-              console.log("EMAILS");
-              console.log(emails);
-              setPeopleData(emails);
-            })
-            .catch((error) => {
-              alert(error);
-            });
-        } else {
-          console.log("No such document!");
-        }
+      .then((querySnapshot) => {
+        setPeopleData(
+          querySnapshot.docs.map((doc, index) => ({
+            email: doc.id,
+            id: index,
+            group: doc.data()["group"],
+          }))
+        );
+        setDashboardLoading(false);
       })
       .catch((error) => {
-        console.log("Error getting document:", error);
+        console.log(error);
       });
   }, []);
 
@@ -121,6 +113,31 @@ export default function ManagePeople() {
     }
     if (!error) {
       setIsAddModalVisible(false);
+
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+
+        const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+
+        await PerkifyApi.put(
+          "user/auth/updatePerkGroup",
+          JSON.stringify({
+            group: selectedPerkGroup,
+            perks: [],
+            emails: emailList.concat(
+              peopleData
+                .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
+                .map((employeeObj) => employeeObj.email)
+            ),
+          }),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      })();
     }
   };
 
@@ -178,16 +195,8 @@ export default function ManagePeople() {
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             displayEmpty
-            renderValue={(selected) => {
-              if ((selected as string[]).length === 0) {
-                return "Select Perks";
-              }
-
-              return (selected as string[]).join(", ");
-            }}
             variant="outlined"
             value={selectedPerkGroup}
-            multiple
             fullWidth
             onChange={(event) => {
               setSelectedPerksError("");

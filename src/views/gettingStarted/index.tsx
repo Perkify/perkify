@@ -10,6 +10,7 @@ import {
 import Header from "components/Header";
 import { AuthContext } from "contexts/Auth";
 import React, { useContext, useState } from "react";
+import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 import { allPerks, allPerksDict } from "../../constants";
 
@@ -81,19 +82,18 @@ const CreateGroup = ({ history }) => {
 
     const bearerToken = await currentUser.getIdToken();
     // call the api to create the group
-    const response = await fetch(
-      "https://us-central1-perkify-5790b.cloudfunctions.net/user/auth/createGroup",
+    const response = await PerkifyApi.post(
+      "/user/auth/createGroup",
+      JSON.stringify({
+        group: groupName,
+        emails: emailList,
+        perks: selectedPerks,
+      }),
       {
-        method: "POST",
         headers: {
           Authorization: `Bearer ${bearerToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          group: groupName,
-          emails: emailList,
-          perks: selectedPerks,
-        }),
       }
     );
     history.push("../people");

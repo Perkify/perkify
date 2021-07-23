@@ -12,6 +12,7 @@ import app from "firebaseApp";
 import logo from "images/logo.png";
 import SignUpGraphic from "images/SignUpGraphic.png";
 import React from "react";
+import { PerkifyApi } from "services";
 
 const crypto = require("crypto");
 
@@ -108,15 +109,12 @@ const SignUpBusinessWebflow = () => {
         return true;
       case 1:
         try {
-          await fetch(
-            "https://us-central1-perkify-5790b.cloudfunctions.net/user/registerAdminAndBusiness",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                ...AdminFormProps,
-                ...BusinessFormProps,
-              }),
-            }
+          await PerkifyApi.post(
+            "user/registerAdminAndBusiness",
+            JSON.stringify({
+              ...AdminFormProps,
+              ...BusinessFormProps,
+            })
           );
           const result = await app
             .auth()

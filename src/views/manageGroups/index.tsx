@@ -1,21 +1,17 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-} from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { AddRemoveTable } from "components/AddRemoveTable";
+import ConfirmationModal from "components/ConfirmationModal";
 import Header from "components/Header";
+import { AdminContext, BusinessContext, LoadingContext } from "contexts";
 import { AuthContext } from "contexts/Auth";
-import firebase from "firebase/app";
-import "firebase/firestore";
+import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
+import { PerkifyApi } from "services";
 import { allPerksDict } from "../../constants";
+import AddEmployees from "./AddEmployees";
 import AddPerks from "./AddPerks";
+import RemoveEmployees from "./RemoveEmployees";
 import RemovePerks from "./RemovePerks";
 
 const columns = [
@@ -48,10 +44,8 @@ const perkColumns = [
   },
 ];
 
-export default function ManageGroups() {
+export default function ManageGroups(props) {
   let { id } = useParams();
-
-  const [peopleData, setPeopleData] = useState([]);
 
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
     useState(false);
@@ -61,9 +55,19 @@ export default function ManageGroups() {
   const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] =
     useState(false);
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
+  const [groupNotFound, setGroupNotFound] = useState(false);
 
   const [selectedPerks, setSelectedPerks] = useState([]);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
+
+  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
+    useState(false);
+
+  const { admin } = useContext(AdminContext);
+  const { business } = useContext(BusinessContext);
+
+  const history = useHistory();
 
   function getPerkNames(perks) {
     const retNames = perks.map((perk) => {
@@ -85,92 +89,99 @@ export default function ManageGroups() {
     },
   ];
 
-  function getGroupData() {
-    //TO IMPLEMENT
-    groupData = fillerGroupData;
-  }
+  const deletePerkGroup = () => {
+    (async () => {
+      const bearerToken = await currentUser.getIdToken();
 
-  const [useEffectComplete, setUseEffectComplete] = useState(false);
+      await PerkifyApi.post(
+        "user/auth/deletePerkGroup",
+        JSON.stringify({
+          group: id,
+        }),
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      history.push("/dashboard");
+    })();
+  };
+
   const [groupEmails, setEmails] = useState([]);
   const { currentUser } = useContext(AuthContext);
-
-  getGroupData();
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    console.log("ran");
-    var db = firebase.firestore();
-    db.collection("admins")
-      .doc(currentUser.uid)
-      .get()
-      .then((doc) => {
-        const adminDoc = doc.data();
-        if (adminDoc) {
-          //   console.log("Document data:", doc.data());
-          let businessId = adminDoc["companyID"];
-          db.collection("businesses")
-            .doc(businessId)
-            .get()
-            .then((doc) => {
-              const businessDoc = doc.data();
-              if (businessDoc) {
-                console.log(businessDoc.groups);
+    if (Object.keys(admin).length != 0) {
+      setDashboardLoading(true);
+      // get list of emails that belong to the perk group
+      db.collection("users")
+        .where("businessID", "==", admin.companyID)
+        .where("group", "==", id)
+        .get()
+        .then((querySnapshot) => {
+          setEmails(
+            querySnapshot.docs.map((doc, index) => ({
+              email: doc.id,
+              id: index,
+            }))
+          );
+          setDashboardLoading(false);
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+    }
+  }, [admin, id]);
 
-                setViewWithPerksData(businessDoc.groups[id]);
-                setUseEffectComplete(true);
-              }
-            });
+  useEffect(() => {
+    if (Object.keys(business).length != 0) {
+      if (Object.keys(business.groups).includes(id)) {
+        setPerksData(
+          business.groups[id].map((perk, index) => ({
+            id: index,
+            ...allPerksDict[perk],
+          }))
+        );
+        setGroupNotFound(false);
+      } else {
+        setGroupNotFound(true);
+      }
+    }
+  }, [business, id]);
 
-          db.collection("users")
-            .where("businessID", "==", businessId)
-            .where("group", "==", id)
-            .get()
-            .then((querySnapshot) => {
-              setEmails(
-                querySnapshot.docs.map((doc, index) => ({
-                  email: doc.id,
-                  id: index,
-                }))
-              );
-            })
-            .catch((error) => {
-              console.log("Error getting documents: ", error);
-            });
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-  }, [id]);
-
-  function getRemovedPerks() {
-    const removedPerks = selectedPerks.map((index) => {
-      console.log(index);
-      removedPerks.push(groupPerks[index]);
-    });
-    console.log(removedPerks);
-    return removedPerks;
-  }
-
-  function setViewWithPerksData(perkData) {
-    //TO IMPLEMENT randomPerks => actual perks of the selected group
-    console.log(perkData);
-    const ret = perkData.map((perk) => allPerksDict[perk]);
-    var index = 0;
-    ret.forEach((perk) => {
-      perk["id"] = index;
-      index += 1;
-    });
-    console.log(ret);
-    setPerksData(ret);
+  if (groupNotFound) {
+    return (
+      <>
+        <Header
+          title="Manage Perk Groups"
+          crumbs={["Dashboard", "Perk Groups", id]}
+        />
+        <div style={{ width: "50%", marginTop: "100px" }}>
+          <Typography variant="h2">Perk Group Not Found</Typography>
+          <Typography variant="h5" style={{ marginTop: "20px" }}>
+            The perk group could not be found. Please email
+            contact@getperkify.com if you think this is an error
+          </Typography>
+        </div>
+      </>
+    );
   }
 
   return (
     <>
       <Header
         title="Manage Perk Groups"
-        crumbs={["Dashboard", "Perk Groups", "Cole's Group"]}
+        crumbs={["Dashboard", "Perk Groups", id]}
+        button={{
+          type: "delete",
+          onClick: () => {
+            setIsDeletePerkGroupModalVisible(true);
+          },
+        }}
       />
 
       <Grid container spacing={5}>
@@ -195,7 +206,7 @@ export default function ManageGroups() {
             height={600}
             rows={groupEmails}
             columns={columns}
-            setSelected={setSelectedPerks}
+            setSelected={setSelectedEmployees}
             onClickAdd={() => {
               setIsAddEmployeesModalVisible(true);
             }}
@@ -208,41 +219,39 @@ export default function ManageGroups() {
         </Grid>
       </Grid>
 
-      <Dialog
-        open={isRemoveEmployeesModalVisible}
-        onClose={() => setIsRemoveEmployeesModalVisible(false)}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete these users? This cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setIsRemoveEmployeesModalVisible(false)}
-            color="primary"
-          >
-            No
-          </Button>
-          <Button
-            onClick={() => setIsRemoveEmployeesModalVisible(false)}
-            color="primary"
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <AddEmployees
+        isAddEmployeesModalVisible={isAddEmployeesModalVisible}
+        setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
+        group={id}
+        employees={groupEmails}
+        selectedPerks={groupPerks}
+      />
+      <RemoveEmployees
+        isRemoveEmployeesModalVisible={isRemoveEmployeesModalVisible}
+        setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
+        selectedEmployees={selectedEmployees}
+        setSelectedEmployees={setSelectedEmployees}
+      />
+
       <AddPerks
         isAddPerksModalVisible={isAddPerksModalVisible}
         setIsAddPerksModalVisible={setIsAddPerksModalVisible}
+        selectedPerks={groupPerks}
+        group={id}
+        emails={groupEmails}
       />
       <RemovePerks
         isRemovePerksModalVisible={isRemovePerksModalVisible}
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
+      />
+      <ConfirmationModal
+        isModalVisible={isDeletePerkGroupModalVisible}
+        setIsModalVisible={setIsDeletePerkGroupModalVisible}
+        title="Delete Perk Group"
+        description="Are you sure you want to delete this perk group and all of its employees? This cannot be undone."
+        onConfirmation={deletePerkGroup}
       />
     </>
   );

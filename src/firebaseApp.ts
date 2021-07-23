@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDy0YjntwrgEwpDVGbqHtJfUtl3fu-9so4",
@@ -13,4 +14,13 @@ const firebaseConfig = {
 
 const app = firebase.initializeApp(firebaseConfig);
 
+const db = app.firestore();
+const auth = app.auth();
+
+if (process.env.REACT_APP_FIRESTORE_MODE == "emulator") {
+  console.log("Using emulator firestore");
+  db.useEmulator("localhost", 8080);
+}
+
 export default app;
+export { db, auth };

@@ -5,6 +5,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import React from "react";
+import { PerkifyApi } from "services";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -52,17 +53,14 @@ const GetCard = () => {
 
       let dobFormatted = new Date(new Date(dob)).toLocaleDateString();
       console.log(dobFormatted);
-      const response = await fetch(
-        "https://us-central1-perkify-5790b.cloudfunctions.net/user/registerUser",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            firstName,
-            lastName,
-            dob: dobFormatted,
-          }),
-        }
+      const response = await PerkifyApi.post(
+        "user/registerUser",
+        JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          dob: dobFormatted,
+        })
       );
       if (response.status != 200) {
         console.log(response);
