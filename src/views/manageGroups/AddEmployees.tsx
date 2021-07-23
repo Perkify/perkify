@@ -7,11 +7,11 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from "@material-ui/core";
-import { AuthContext } from "contexts/Auth";
-import React, { useContext, useState } from "react";
-import { PerkifyApi } from "services";
-import { validateEmails } from "utils/emailValidation";
+} from '@material-ui/core';
+import { AuthContext } from 'contexts/Auth';
+import React, { useContext, useState } from 'react';
+import { PerkifyApi } from 'services';
+import { validateEmails } from 'utils/emailValidation';
 
 const AddEmployees = ({
   isAddEmployeesModalVisible,
@@ -20,26 +20,26 @@ const AddEmployees = ({
   group,
   selectedPerks,
 }) => {
-  const [emailsToAdd, setEmailsToAdd] = useState("");
-  const [emailsError, setEmailsError] = useState("");
+  const [emailsToAdd, setEmailsToAdd] = useState('');
+  const [emailsError, setEmailsError] = useState('');
 
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {
     setEmailsToAdd(event.target.value);
-    if (event.target.value === "") {
-      setEmailsError("Please input atleast one email");
+    if (event.target.value === '') {
+      setEmailsError('Please input atleast one email');
     } else if (!validateEmails(event.target.value)) {
-      setEmailsError("Please input proper emails");
+      setEmailsError('Please input proper emails');
     } else {
-      setEmailsError("");
+      setEmailsError('');
     }
   };
 
   const addEmployeesToPerkGroup = (event) => {
     event.preventDefault();
     let error = false;
-    if (emailsToAdd == "") {
-      setEmailsError("Enter emails");
+    if (emailsToAdd == '') {
+      setEmailsError('Enter emails');
       error = true;
     }
     if (!error) {
@@ -47,7 +47,7 @@ const AddEmployees = ({
       (async () => {
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+        const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
 
         const afterEmployees = emailList.concat(
           employees.map((employeeObj) => employeeObj.email)
@@ -56,7 +56,7 @@ const AddEmployees = ({
         console.log(afterEmployees);
 
         await PerkifyApi.put(
-          "user/auth/updatePerkGroup",
+          'user/auth/updatePerkGroup',
           JSON.stringify({
             group,
             perks: selectedPerks.map((perkObj) => perkObj.Name),
@@ -65,7 +65,7 @@ const AddEmployees = ({
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -85,7 +85,7 @@ const AddEmployees = ({
           To add users to this perk group, please enter their email addresses
           below.
         </DialogContentText>
-        <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Emails
         </Typography>
         <TextField
@@ -98,8 +98,8 @@ const AddEmployees = ({
           fullWidth
           multiline
           rows={4}
-          rowsMax={4}
-          error={emailsError != ""}
+          maxRows={4}
+          error={emailsError != ''}
           helperText={emailsError}
         />
         <DialogActions>

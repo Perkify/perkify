@@ -5,8 +5,13 @@ import * as express from 'express';
 import { body, validationResult } from 'express-validator';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+import Stripe from 'stripe';
 import * as validator from 'validator';
 import { allPerks } from '../shared';
+const stripe = new Stripe(
+  'sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu',
+  { apiVersion: '2020-08-27' }
+);
 
 // rapyd credentials
 const rapydSecretKey =
@@ -1005,6 +1010,20 @@ const sendCardEmail = async (req, res) => {
   }
 };
 
+const getStripePaymentMethods = async (req, res) => {
+  try {
+    const { customer, type } = req.body;
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer,
+      type,
+    });
+
+    res.json(paymentMethods).end();
+  } catch (e) {
+    console.log('Error in getting stripe payment methods');
+  }
+};
+
 app.use('/auth', validateFirebaseIdToken);
 app.post(
   '/registerAdminAndBusiness',
@@ -1016,5 +1035,6 @@ app.post('/sendCardEmail', sendCardEmailValidators, sendCardEmail);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
+app.post('/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);
