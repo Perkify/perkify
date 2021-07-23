@@ -128,6 +128,12 @@ const GeneralDashboard = () => {
 
   useEffect(() => {
     const db = firebase.firestore();
+    if (currentUser){
+      console.log("yes!")
+    }
+    else{
+      return
+    }
     db.collection("admins")
       .doc(currentUser.uid)
       .get()
@@ -167,7 +173,7 @@ const GeneralDashboard = () => {
       .catch((error) => {
         console.log("Error getting document:", error);
       });
-  }, []);
+  }, [currentUser]);
 
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
