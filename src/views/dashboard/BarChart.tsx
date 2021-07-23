@@ -60,16 +60,16 @@ const BChart = (props) => {
           name="Spent"
           stackId="a"
           fill="#00C49F"
-          radius={[0, 0, 10, 10]}
-          maxBarSize={20}
+          radius={[0, 0, 25, 25]}
+          maxBarSize={50}
         />
         <Bar
           dataKey="unspent"
           name="Unspent"
           stackId="a"
           fill="#185CFF"
-          radius={[10, 10, 0, 0]}
-          maxBarSize={20}
+          radius={[25, 25, 0, 0]}
+          maxBarSize={50}
         />
       </BarChart>
     </ResponsiveContainer>
