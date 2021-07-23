@@ -13,7 +13,7 @@ import { PerkifyApi } from "services";
 import { validateEmails } from "utils/emailValidation";
 import { allPerks, allPerksDict } from "../../constants";
 
-const CreateGroup = ({ history }) => {
+const CreateGroup = (props) => {
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
@@ -121,7 +121,7 @@ const CreateGroup = ({ history }) => {
           }
         )
           .then(() => {
-            history.push(`/dashboard/group/${groupName}`);
+            props.history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
             console.log(err);

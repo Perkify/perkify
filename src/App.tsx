@@ -1,6 +1,11 @@
 // import Console from "./Console";
 import PrivateRoute from "components/PrivateRoute";
-import { AdminProvider, AuthProvider, BusinessProvider } from "contexts";
+import {
+  AdminProvider,
+  AuthProvider,
+  BusinessProvider,
+  LoadingProvider,
+} from "contexts";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -17,26 +22,28 @@ import SignUpBusinessWebflow from "views/signUpBusinessWebflow";
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AdminProvider>
-          <BusinessProvider>
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-              <PrivateRoute path="/dashboard" component={Dashboard} />
-              <PrivateRoute
-                exact
-                path="/gettingStarted"
-                component={GettingStarted}
-              />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/signup" component={SignUpBusinessWebflow} />
-              <Route exact path="/getcard" component={GetCard} />
-            </Switch>
-          </BusinessProvider>
-        </AdminProvider>
-      </AuthProvider>
+      <LoadingProvider>
+        <AuthProvider>
+          <AdminProvider>
+            <BusinessProvider>
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/dashboard" />
+                </Route>
+                <PrivateRoute path="/dashboard" component={Dashboard} />
+                <PrivateRoute
+                  exact
+                  path="/gettingStarted"
+                  component={GettingStarted}
+                />
+                <Route exact path="/login" component={Login} />
+                <Route exact path="/signup" component={SignUpBusinessWebflow} />
+                <Route exact path="/getcard" component={GetCard} />
+              </Switch>
+            </BusinessProvider>
+          </AdminProvider>
+        </AuthProvider>
+      </LoadingProvider>
     </Router>
   );
 }
