@@ -8,8 +8,7 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext } from 'contexts';
-import { db } from 'firebaseApp';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
 import { allPerks, allPerksDict } from '../../constants';
@@ -21,7 +20,7 @@ const CreateGroup = ({ history }) => {
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
 
   const [groupName, setGroupName] = useState('');
   const [emails, setEmails] = useState('');
@@ -30,30 +29,6 @@ const CreateGroup = ({ history }) => {
   const [groupNameError, setGroupNameError] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
-
-  const [hasPaymentMethods, setHasPaymentMethods] = useState(false);
-
-  useEffect(() => {
-    if (currentUser) {
-      (async () => {
-        const customerDoc = await db
-          .collection('customers')
-          .doc(currentUser.uid)
-          .get();
-        const customerData = customerDoc.data();
-        const cardPaymentMethods = await PerkifyApi.post(
-          '/user/stripePaymentMethods',
-          {
-            customer: customerData.stripeId,
-            type: 'card',
-          }
-        );
-        if (cardPaymentMethods.data.data.length > 0) {
-          setHasPaymentMethods(true);
-        }
-      })();
-    }
-  }, [currentUser]);
 
   const handlePerkChange = (event) => {
     // update the controlled form

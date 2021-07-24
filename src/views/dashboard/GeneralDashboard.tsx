@@ -1,18 +1,18 @@
-import { Card, MenuItem, Select, Typography } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
+import { Card, Grid, MenuItem, Select, Typography } from '@material-ui/core';
 import Header from 'components/Header';
-import { LoadingContext } from 'contexts';
-import { AuthContext } from 'contexts/Auth';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from '../../constants';
 import BChart from './BarChart';
+import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
 import PChart from './piechart';
+import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, admin, hasPaymentMethods } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
 
   var [employees, setEmployees] = useState([]);
   var [groups, setGroups] = useState({});
@@ -129,54 +129,40 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
+    console.log(business);
     setDashboardLoading(true);
-    const db = firebase.firestore();
-    if (currentUser) {
-      console.log('yes!');
-    } else {
-      return;
-    }
-    db.collection('admins')
-      .doc(currentUser.uid)
-      .get()
-      .then((doc) => {
-        const userData = doc.data();
-        if (userData) {
-          const businessId = userData['companyID'];
+    if (Object.keys(admin).length != 0 && business) {
+      const businessId = admin['companyID'];
 
-          db.collection('users')
-            .where('businessID', '==', businessId)
+      db.collection('users')
+        .where('businessID', '==', businessId)
+        .get()
+        .then((querySnapshot) => {
+          const people = querySnapshot.docs.map((doc, index) => ({
+            email: doc.id,
+            id: index,
+            group: doc.data()['group'],
+            perks: doc.data()['perks'],
+          }));
+          db.collection('businesses')
+            .doc(businessId)
             .get()
-            .then((querySnapshot) => {
-              const people = querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()['group'],
-                perks: doc.data()['perks'],
-              }));
-              db.collection('businesses')
-                .doc(businessId)
-                .get()
-                .then((doc) => {
-                  const businessDoc = doc.data();
-                  if (businessDoc) {
-                    setEmployees(people);
-                    setGroups(businessDoc.groups);
-                    setDashboardLoading(false);
-                  }
-                });
-            })
-            .catch((error) => {
-              alert(error);
+            .then((doc) => {
+              const businessDoc = doc.data();
+              if (businessDoc) {
+                setEmployees(people);
+                setGroups(businessDoc.groups);
+                setDashboardLoading(false);
+              }
             });
-        } else {
-          console.log('No such document!');
-        }
-      })
-      .catch((error) => {
-        console.log('Error getting document:', error);
-      });
-  }, [currentUser]);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    } else {
+      console.log('No such document!');
+    }
+  }, [currentUser, admin, business]);
 
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
@@ -185,115 +171,137 @@ const GeneralDashboard = () => {
   return (
     <div>
       <Header title="Dashboard" crumbs={['General dashboard']} />
-      <Grid container spacing={4}>
-        <Grid item xs={4}>
-          <MetricCard
-            title={'Cost Per Employee'}
-            number={'$' + roundNumber(calculateTotalCost() / employees.length)}
-            icon={
-              <img
-                src="/images/undraw_Investing.svg"
-                style={{ height: '70px', marginLeft: 'auto', display: 'block' }}
-              />
-            }
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MetricCard
-            title={'Number of Employees'}
-            number={employees.length}
-            icon={
-              <img
-                src="/images/undraw_Appreciation.svg"
-                style={{ height: '70px', marginLeft: 'auto', display: 'block' }}
-              />
-            }
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MetricCard
-            title={'Total Perks Offered'}
-            number={calculatePerksOffered()}
-            icon={
-              <img
-                src="/images/undraw_Gifts.svg"
-                style={{ height: '70px', marginLeft: 'auto', display: 'block' }}
-              />
-            }
-          ></MetricCard>
-        </Grid>
-        <Grid item xs={4}>
-          <Card
-            style={{
-              width: '100%',
-              padding: 10,
-              height: '500px',
-              display: 'flex',
-              flexFlow: 'column',
-            }}
-            elevation={4}
-          >
-            <Typography
-              variant="h6"
-              style={{ height: '80px', padding: '15px', fontWeight: 'bold' }}
-            >
-              Perks Distribution
-            </Typography>
-            <div style={{ height: '400px' }}>
-              <PChart data={calculatePieData()} />
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={8}>
-          <Card
-            style={{ width: '100%', padding: 10, height: '500px' }}
-            elevation={4}
-          >
-            <div style={{ width: '100%', height: '100%' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography
-                  variant="h6"
+
+      {!hasPaymentMethods ? (
+        <WelcomeCards />
+      ) : business['groups'] == null ||
+        Object.keys(business['groups']).length == 0 ? (
+        <CreatePerkGroupCard />
+      ) : (
+        <Grid container spacing={4}>
+          <Grid item xs={4}>
+            <MetricCard
+              title={'Cost Per Employee'}
+              number={
+                '$' + roundNumber(calculateTotalCost() / employees.length)
+              }
+              icon={
+                <img
+                  src="/images/undraw_Investing.svg"
                   style={{
-                    height: '80px',
-                    padding: '15px',
-                    fontWeight: 'bold',
+                    height: '70px',
+                    marginLeft: 'auto',
+                    display: 'block',
+                  }}
+                />
+              }
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <MetricCard
+              title={'Number of Employees'}
+              number={employees.length}
+              icon={
+                <img
+                  src="/images/undraw_Appreciation.svg"
+                  style={{
+                    height: '70px',
+                    marginLeft: 'auto',
+                    display: 'block',
+                  }}
+                />
+              }
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <MetricCard
+              title={'Total Perks Offered'}
+              number={calculatePerksOffered()}
+              icon={
+                <img
+                  src="/images/undraw_Gifts.svg"
+                  style={{
+                    height: '70px',
+                    marginLeft: 'auto',
+                    display: 'block',
+                  }}
+                />
+              }
+            ></MetricCard>
+          </Grid>
+          <Grid item xs={4}>
+            <Card
+              style={{
+                width: '100%',
+                padding: 10,
+                height: '500px',
+                display: 'flex',
+                flexFlow: 'column',
+              }}
+              elevation={4}
+            >
+              <Typography
+                variant="h6"
+                style={{ height: '80px', padding: '15px', fontWeight: 'bold' }}
+              >
+                Perks Distribution
+              </Typography>
+              <div style={{ height: '400px' }}>
+                <PChart data={calculatePieData()} />
+              </div>
+            </Card>
+          </Grid>
+          <Grid item xs={8}>
+            <Card
+              style={{ width: '100%', padding: 10, height: '500px' }}
+              elevation={4}
+            >
+              <div style={{ width: '100%', height: '100%' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
-                  Perks Spending
-                </Typography>
-
-                <div style={{ marginLeft: 'auto' }}>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    displayEmpty
-                    variant="outlined"
-                    value={[selectedGroup]}
-                    onChange={handleGroupChange}
-                    multiple
-                    fullWidth
-                    label="Select Group"
-                    placeholder="Select Gruop"
+                  <Typography
+                    variant="h6"
+                    style={{
+                      height: '80px',
+                      padding: '15px',
+                      fontWeight: 'bold',
+                    }}
                   >
-                    {convertGroups().map((group) => (
-                      <MenuItem value={group} key={group}>
-                        {group}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                    Perks Spending
+                  </Typography>
+
+                  <div style={{ marginLeft: 'auto' }}>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      displayEmpty
+                      variant="outlined"
+                      value={[selectedGroup]}
+                      onChange={handleGroupChange}
+                      multiple
+                      fullWidth
+                      label="Select Group"
+                      placeholder="Select Gruop"
+                    >
+                      {convertGroups().map((group) => (
+                        <MenuItem value={group} key={group}>
+                          {group}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
+                <BChart data={calculateBarGraphData()} />
               </div>
-              <BChart data={calculateBarGraphData()} />
-            </div>
-          </Card>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </div>
   );
 };
