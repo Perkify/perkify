@@ -4,10 +4,12 @@ import Grid from "@material-ui/core/Grid";
 import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import React from "react";
+import React, { useContext } from "react";
 import { PerkifyApi } from "services";
 import Card from "@material-ui/core/Card";
 import { ReactComponent as GettingStartedImage } from "images/gettingStarted.svg";
+import { db } from "../../firebaseApp";
+import { AuthContext } from "contexts/Auth";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -46,6 +48,7 @@ const GettingStarted = () => {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [invalidStep, setInvalidStep] = React.useState(false);
+  const { currentUser, setEmployee } = useContext(AuthContext);
   const formFields = { firstName, lastName };
 
   const submitGetCard = async () => {
@@ -56,9 +59,16 @@ const GettingStarted = () => {
       }
       setInvalidStep(false);
 
+      const bearerToken = await currentUser.getIdToken();
       const response = await PerkifyApi.post(
-        "user/registerUser",
-        JSON.stringify(formFields)
+        "user/auth/registerUser",
+        JSON.stringify(formFields),
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (response.status != 200) {
         console.log(response);
@@ -67,6 +77,12 @@ const GettingStarted = () => {
           reason: response.statusText,
         };
       }
+
+      console.log(response);
+      // should I do this here or elsewhere?
+      const userDoc = await db.collection("users").doc(currentUser.email).get();
+      const employeeData = userDoc.data();
+      setEmployee(employeeData);
     } catch (e) {
       alert(JSON.stringify(e));
     }

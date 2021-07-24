@@ -86,7 +86,7 @@ export default function ClippedDrawer({ children }) {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const { currentUser } = useContext(AuthContext);
+  const { employee, currentUser } = useContext(AuthContext);
 
   const location = useLocation();
 
@@ -97,7 +97,6 @@ export default function ClippedDrawer({ children }) {
   const generalNav: [string, string, any][] = [
     ["Dashboard", "/dashboard", <DashboardIcon />],
   ];
-
 
   const accountNav: [string, string, any][] = [
     ["Settings", "/settings", <SettingsIcon />],
@@ -118,15 +117,18 @@ export default function ClippedDrawer({ children }) {
         </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
-            alt={currentUser?.displayName}
+            alt={`${employee?.firstName} ${employee?.lastName}`}
             src="brokenimage"
             style={{ backgroundColor: theme.palette.primary.main }}
           />
           <span>
             <Typography style={{ fontSize: "14px" }}>
-              <Box fontWeight="bold">{currentUser?.displayName}</Box>
+              <Box fontWeight="bold">{`${employee?.firstName} ${employee?.lastName}`}</Box>
             </Typography>
-            <Typography variant="caption">admin</Typography>
+            {
+              // TODO: cut off names if they're too long
+            }
+            <Typography variant="caption">{employee?.group}</Typography>
           </span>
         </Paper>
         <div style={{ padding: "10px 0" }}>
@@ -237,9 +239,7 @@ export default function ClippedDrawer({ children }) {
           </Drawer>
         </Hidden>
       </nav>
-      <main className={classes.content}>
-        <Box margin="60px 20px 20px 20px">{children}</Box>
-      </main>
+      {children}
     </div>
   );
 }

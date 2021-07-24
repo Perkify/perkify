@@ -33,7 +33,7 @@ const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
       render={(routeProps) => {
         if (!currentUser && !loadingAuthState) {
           return <Redirect to={"/login"} />;
-        } else if (!employee.card_number) {
+        } else if (!loadingAuthState && !employee?.card) {
           // could also put this in the dashboard view. Put it in here in case in future there are other private routes
           return <GettingStarted />;
         } else {

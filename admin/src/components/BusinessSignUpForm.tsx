@@ -83,15 +83,15 @@ const BusinessSignUpForm = (props) => {
       <Grid item xs={12}>
         <TextField
           required
-          id="address1"
-          name="address1"
+          id="line1"
+          name="line1"
           label="Address line 1"
           variant="outlined"
           fullWidth
           autoComplete="shipping address-line1"
           onChange={fillTextbox(props.setAddress)}
-          value={props.address1}
-          error={props.address1 === "" && props.invalidStep}
+          value={props.line1}
+          error={props.line1 === "" && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

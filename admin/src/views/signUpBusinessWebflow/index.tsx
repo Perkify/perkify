@@ -84,7 +84,7 @@ const SignUpBusinessWebflow = () => {
   const AdminFormProps = { firstName, lastName, email, password };
 
   const [businessName, setBusinessName] = React.useState("");
-  const [address1, setAddress] = React.useState("");
+  const [line1, setAddress] = React.useState("");
   const [city, setCity] = React.useState("");
   const [state, setState] = React.useState("");
   const [zip, setZip] = React.useState("");
@@ -97,7 +97,7 @@ const SignUpBusinessWebflow = () => {
     setZip,
     setPhone,
   };
-  const BusinessFormProps = { businessName, address1, city, state, zip, phone };
+  const BusinessFormProps = { businessName, line1, city, state, zip, phone };
 
   const [newUser, setNewUser] = React.useState<firebase.User>(
     null as firebase.User | null
