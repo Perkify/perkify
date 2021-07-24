@@ -227,3 +227,54 @@ export const allPerksDict = allPerks.reduce(
   ),
   {}
 );
+
+const reducedPerks = [
+  {
+    Name: 'Netflix Standard',
+    Cost: 13.99,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGDvFKuQQHSHZsmv1ZJtQvL',
+  },
+  {
+    Name: 'Hulu (Standard)',
+    Cost: 5.99,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGsZHKuQQHSHZsmfe2SI4KD',
+  },
+  {
+    Name: 'Audible Plus',
+    Cost: 7.95,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGsfOKuQQHSHZsmXyQ8HzFQ',
+  },
+  {
+    Name: 'Disney+',
+    Cost: 7.99,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGsfhKuQQHSHZsmNmcidByc',
+  },
+  {
+    Name: 'Headspace',
+    Cost: 12.99,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGsfxKuQQHSHZsmIFgBlxsc',
+  },
+  {
+    Name: 'Spotify Individual',
+    Cost: 9.99,
+    Period: 'Monthly',
+    stripePriceId: 'price_1JGsgIKuQQHSHZsmswwdBRYu',
+  },
+];
+
+export const reducedPerksDict = allPerks.reduce(
+  (map, perk) => (
+    (map[perk.Name] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+    }),
+    map
+  ),
+  {}
+);
