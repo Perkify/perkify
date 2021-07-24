@@ -228,7 +228,7 @@ export const allAllPerksDict = allAllPerks.reduce(
   {}
 );
 
-const allPerks = [
+export const allPerks = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,

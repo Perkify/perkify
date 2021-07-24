@@ -657,6 +657,11 @@ const createGroup = async (req, res) => {
     // get admins business
     const adminSnap = await db.collection('admins').doc(req.user.uid).get();
     const businessID = adminSnap.data().companyID;
+    const customerDoc = await db
+      .collection('customers')
+      .doc(req.user.uid)
+      .get();
+    const stripeCustomerId = customerDoc.data().stripeId;
 
     // query business for address and wallet
     const businessSnap = await db
@@ -668,10 +673,23 @@ const createGroup = async (req, res) => {
     // charge wallet for price*perks*employees
     // TODO: setup monthly charges
     // TODO: charge via rapyd collect
-    let price = 0;
-    for (const aPerk of allPerks) {
-      price += emails.length * (perks.includes(aPerk.Name) * aPerk.Cost);
-    }
+    const perkGroupPerks = allPerks.filter((perk) => perks.includes(perk.Name));
+    const price =
+      emails.length *
+      perkGroupPerks.reduce(
+        (accumulator, currentValue) => accumulator + currentValue.Cost,
+        0
+      );
+
+    await Promise.all(
+      perkGroupPerks.map(async (perkObj) => {
+        await stripe.subscriptions.create({
+          customer: stripeCustomerId,
+          items: [{ price: perkObj.stripePriceId }],
+        });
+      })
+    );
+
     const depositResult = await depositWallet(walletID, price);
 
     // add group and perks to db
