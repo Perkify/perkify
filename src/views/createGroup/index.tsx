@@ -49,10 +49,8 @@ const CreateGroup = ({ history }) => {
           }
         );
         if (cardPaymentMethods.data.data.length > 0) {
-          console.log('Has pyament methods!');
           setHasPaymentMethods(true);
         }
-        console.log(cardPaymentMethods);
       })();
     }
   }, [currentUser]);
