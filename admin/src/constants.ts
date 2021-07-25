@@ -1,4 +1,4 @@
-export const allPossiblePerks = [
+export const allAllPerks = [
   {
     Name: 'Netflix Basic',
     Cost: 8.99,
@@ -216,7 +216,7 @@ export const allPossiblePerks = [
   },
 ];
 
-export const allPossiblePerksDict = allPossiblePerks.reduce(
+export const allAllPerksDict = allAllPerks.reduce(
   (map, perk) => (
     (map[perk.Name] = {
       Cost: perk['Cost'],
