@@ -70,7 +70,6 @@ const GeneralDashboard = () => {
     //Calculates total cost to display cost per employee
     let totalCost = 0;
 
-    let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
       let group = employee['group'];
