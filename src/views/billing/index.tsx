@@ -16,6 +16,7 @@ const Billing = () => {
   return (
     <div>
       <Header title="Billing" crumbs={['Dashboard', 'Account', 'Billing']} />
+      <p>Redirecting you to the billing portal...</p>
     </div>
   );
 };

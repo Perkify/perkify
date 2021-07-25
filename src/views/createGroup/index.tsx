@@ -191,8 +191,6 @@ const CreateGroup = ({ history }) => {
           value={selectedPerks}
           multiple
           fullWidth
-          label="Select Group"
-          placeholder="Select Gruop"
           onChange={handlePerkChange}
           error={selectedPerksError != ''}
         >

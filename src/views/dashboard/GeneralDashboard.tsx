@@ -11,7 +11,8 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const { currentUser, admin, hasPaymentMethods } = useContext(AuthContext);
+  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
+    useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   var [employees, setEmployees] = useState([]);
@@ -172,7 +173,9 @@ const GeneralDashboard = () => {
     <div>
       <Header title="Dashboard" crumbs={['General dashboard']} />
 
-      {!hasPaymentMethods ? (
+      {loadingAuthState ? (
+        <p>Loading</p>
+      ) : !hasPaymentMethods ? (
         <WelcomeCards />
       ) : business['groups'] == null ||
         Object.keys(business['groups']).length == 0 ? (
@@ -285,8 +288,6 @@ const GeneralDashboard = () => {
                       onChange={handleGroupChange}
                       multiple
                       fullWidth
-                      label="Select Group"
-                      placeholder="Select Gruop"
                     >
                       {convertGroups().map((group) => (
                         <MenuItem value={group} key={group}>

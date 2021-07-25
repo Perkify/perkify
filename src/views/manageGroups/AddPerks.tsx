@@ -8,11 +8,11 @@ import {
   MenuItem,
   Select,
   Typography,
-} from "@material-ui/core";
-import { AuthContext } from "contexts/Auth";
-import React, { useContext, useState } from "react";
-import { PerkifyApi } from "services";
-import { allPerks } from "../../constants";
+} from '@material-ui/core';
+import { AuthContext } from 'contexts/Auth';
+import React, { useContext, useState } from 'react';
+import { PerkifyApi } from 'services';
+import { allPerks } from '../../constants';
 
 const AddPerks = ({
   isAddPerksModalVisible,
@@ -22,7 +22,7 @@ const AddPerks = ({
   emails,
 }) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
-  const [selectedPerksError, setSelectedPerksError] = useState("");
+  const [selectedPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
@@ -32,7 +32,7 @@ const AddPerks = ({
     event.preventDefault();
     let error = false;
     if (perksToAdd.length == 0) {
-      setSelectedPerksError("Select perks");
+      setSelectedPerksError('Select perks');
       error = true;
     }
 
@@ -48,7 +48,7 @@ const AddPerks = ({
         console.log(afterPerks);
 
         await PerkifyApi.put(
-          "user/auth/updatePerkGroup",
+          'user/auth/updatePerkGroup',
           JSON.stringify({
             group,
             emails: emails.map((emailObj) => emailObj.email),
@@ -57,7 +57,7 @@ const AddPerks = ({
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -77,7 +77,7 @@ const AddPerks = ({
           To add users to this organization, please enter their email addresses
           below and select a group from the dropdown.
         </DialogContentText>
-        <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
         </Typography>
         <Select
@@ -86,21 +86,19 @@ const AddPerks = ({
           displayEmpty
           renderValue={(selected) => {
             if ((selected as string[]).length === 0) {
-              return "Select Perks";
+              return 'Select Perks';
             }
 
-            return (selected as string[]).join(", ");
+            return (selected as string[]).join(', ');
           }}
           variant="outlined"
           value={perksToAdd}
           multiple
           fullWidth
-          label="Select Group"
-          placeholder="Select Gruop"
           onChange={(event) => {
             setPerksToAdd(event.target.value as string[]);
           }}
-          error={selectedPerksError != ""}
+          error={selectedPerksError != ''}
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
