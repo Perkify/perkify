@@ -1113,20 +1113,15 @@ const registerUser = async (req, res) => {
 };
 
 const getStripePaymentMethods = async (req, res) => {
-  try {
-    const customerDoc = await db
-      .collection('customers')
-      .doc(req.user.uid)
-      .get();
-    const customerData = customerDoc.data();
+  const customerDoc = await db.collection('customers').doc(req.user.uid).get();
+  const customerData = customerDoc.data();
 
-    const paymentMethods = await stripe.paymentMethods.list({
-      customer: customerData.stripeId,
-      type: 'card',
-    });
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: customerData.stripeId,
+    type: 'card',
+  });
 
-    res.json(paymentMethods).end();
-  } 
+  res.json(paymentMethods).end();
 };
 
 app.use('/auth', validateFirebaseIdToken);
@@ -1139,6 +1134,6 @@ app.post('/registerUser', registerUserValidators, registerUser);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
-app.post('/auth/stripePaymentMethods', getStripePaymentMethods);
+app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);

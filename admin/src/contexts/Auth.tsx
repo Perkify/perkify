@@ -39,9 +39,8 @@ export const AuthProvider = ({ children }) => {
           const bearerToken = await user.getIdToken();
 
           // check if customer has payment methods
-          const cardPaymentMethods = await PerkifyApi.post(
+          const cardPaymentMethods = await PerkifyApi.get(
             '/user/auth/stripePaymentMethods',
-            {},
             {
               headers: {
                 Authorization: `Bearer ${bearerToken}`,

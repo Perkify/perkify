@@ -15,10 +15,10 @@ const GeneralDashboard = () => {
     useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
-  var [employees, setEmployees] = useState([]);
-  var [groups, setGroups] = useState({});
+  const [employees, setEmployees] = useState([]);
+  const [groups, setGroups] = useState({});
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  var [selectedGroup, setSelectedGroup] = useState('All Groups');
+  const [selectedGroup, setSelectedGroup] = useState('All Groups');
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
