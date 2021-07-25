@@ -8,12 +8,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import { AddRemoveTable } from 'components/AddRemoveTable';
 import Header from 'components/Header';
-import {
-  AdminContext,
-  AuthContext,
-  BusinessContext,
-  LoadingContext,
-} from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -62,9 +57,8 @@ export default function ManagePeople(props) {
   }
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, admin } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
-  const { admin } = useContext(AdminContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
   const groupData = Object.keys(business['groups']).sort();
 

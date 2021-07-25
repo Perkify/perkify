@@ -1,13 +1,13 @@
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import { createStyles, makeStyles, withStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import SignUpGraphic from "images/SignUpGraphic.png";
-import React from "react";
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import SignUpGraphic from 'images/SignUpGraphic.png';
+import React from 'react';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
-    "label + &": {
+    'label + &': {
       marginTop: theme.spacing(2),
     },
   },
@@ -16,43 +16,43 @@ const BootstrapInput = withStyles((theme) => ({
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
-      fontFamily: "Plusjakartadisplay",
+      fontFamily: 'Plusjakartadisplay',
     },
     image: {
       backgroundImage: `url(${SignUpGraphic})`,
-      backgroundRepeat: "no-repeat",
-      backgroundColor: "#5289f2",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
+      backgroundRepeat: 'no-repeat',
+      backgroundColor: '#5289f2',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
     },
     content: {
-      width: "100%",
-      padding: "3% 5%",
+      width: '100%',
+      padding: '3% 5%',
     },
     logo: {
-      display: "block",
-      width: "135px",
-      maxHeight: "40px",
+      display: 'block',
+      width: '135px',
+      maxHeight: '40px',
     },
     header: {
-      marginTop: "0px",
-      marginBottom: "0px",
-      fontFamily: "Plusjakartadisplay",
-      color: "#152c5b",
-      fontSize: "40px",
-      lineHeight: "54px",
+      marginTop: '0px',
+      marginBottom: '0px',
+      fontFamily: 'Plusjakartadisplay',
+      color: '#152c5b',
+      fontSize: '40px',
+      lineHeight: '54px',
       //       fontWeight: "500",
     },
     label: {
-      fontFamily: "Plusjakartadisplay",
-      fontSize: "14px",
-      color: "#152c5b",
+      fontFamily: 'Plusjakartadisplay',
+      fontSize: '14px',
+      color: '#152c5b',
     },
     footer: {
-      fontFamily: "Plusjakartadisplay",
-      color: "#8a95ad",
-      fontSize: "14px",
-      textAlign: "center",
+      fontFamily: 'Plusjakartadisplay',
+      color: '#8a95ad',
+      fontSize: '14px',
+      textAlign: 'center',
     },
   })
 );
@@ -77,21 +77,21 @@ const BusinessSignUpForm = (props) => {
           autoComplete="given-name"
           onChange={fillTextbox(props.setBusinessName)}
           value={props.businessName}
-          error={props.businessName === "" && props.invalidStep}
+          error={props.businessName === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12}>
         <TextField
           required
-          id="address1"
-          name="address1"
+          id="line1"
+          name="line1"
           label="Address line 1"
           variant="outlined"
           fullWidth
           autoComplete="shipping address-line1"
           onChange={fillTextbox(props.setAddress)}
-          value={props.address1}
-          error={props.address1 === "" && props.invalidStep}
+          value={props.line1}
+          error={props.line1 === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -105,7 +105,7 @@ const BusinessSignUpForm = (props) => {
           autoComplete="shipping address-level2"
           onChange={fillTextbox(props.setCity)}
           value={props.city}
-          error={props.city === "" && props.invalidStep}
+          error={props.city === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -118,7 +118,7 @@ const BusinessSignUpForm = (props) => {
           inputProps={{ maxLength: 2 }}
           onChange={fillTextbox(props.setState)}
           value={props.state}
-          error={props.state === "" && props.invalidStep}
+          error={props.state === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -132,7 +132,7 @@ const BusinessSignUpForm = (props) => {
           autoComplete="shipping postal-code"
           onChange={fillTextbox(props.setZip)}
           value={props.zip}
-          error={props.zip === "" && props.invalidStep}
+          error={props.zip === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -150,12 +150,12 @@ const BusinessSignUpForm = (props) => {
           autoComplete="phone number"
           onChange={fillTextbox(props.setPhone)}
           value={props.phone}
-          error={props.phone === "" && props.invalidStep}
+          error={props.phone === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={6} md={6}>
         <Button
-          style={{ width: "100%", height: "60px", textTransform: "none" }}
+          style={{ width: '100%', height: '60px', textTransform: 'none' }}
           disableElevation={true}
           onClick={props.backStep}
         >
@@ -166,7 +166,7 @@ const BusinessSignUpForm = (props) => {
         <Button
           variant="contained"
           color="primary"
-          style={{ width: "100%", height: "60px", textTransform: "none" }}
+          style={{ width: '100%', height: '60px', textTransform: 'none' }}
           disableElevation={true}
           onClick={() => props.nextStep(props.nextReady)}
         >
