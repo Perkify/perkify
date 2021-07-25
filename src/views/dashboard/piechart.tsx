@@ -85,9 +85,9 @@ const PChart = (props) => {
           activeShape={renderActiveShape}
           data={props.data}
           cx="50%"
-          cy="50%"
-          innerRadius={70}
-          outerRadius={90}
+          cy="40%"
+          innerRadius={100}
+          outerRadius={120}
           fill="#8884d8"
           dataKey="value"
           onMouseEnter={onPieEnter}
