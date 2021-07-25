@@ -51,25 +51,15 @@ const BChart = (props) => {
   return (
     <ResponsiveContainer width="100%" height="80%">
       <BarChart data={props.data}>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip cursor={false} />
-        <Legend />
+        <XAxis dataKey="name" domain={[0, 100]}/>
+        <YAxis height={100} unit="%"/>
+        <Tooltip formatter={(label) => label + " %"} cursor={false}/>
         <Bar
           dataKey="spent"
           name="Spent"
           stackId="a"
           fill="#00C49F"
-          radius={[0, 0, 25, 25]}
-          maxBarSize={50}
-        />
-        <Bar
-          dataKey="unspent"
-          name="Unspent"
-          stackId="a"
-          fill="#185CFF"
-          radius={[25, 25, 0, 0]}
-          maxBarSize={50}
+          maxBarSize={100}
         />
       </BarChart>
     </ResponsiveContainer>

@@ -95,6 +95,11 @@ const GeneralDashboard = () => {
     return perks.size;
   }
 
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
   function calculateBarGraphData() {
     //returns bar graph data in array form
     let retData = [];
@@ -121,7 +126,7 @@ const GeneralDashboard = () => {
     });
     Object.keys(tempDict).forEach((perk) => {
       //TODO: Calculate amount spent in comparison to amount not spent
-      let newRow = { name: perk, unspent: tempDict[perk], spent: 0 };
+      let newRow = { name: perk, spent: getRandomInt(100), total: 100 };
       retData.push(newRow);
     });
 
