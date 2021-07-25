@@ -185,7 +185,7 @@ export default function ManageGroups(props) {
       />
 
       <Grid container spacing={5}>
-        <Grid item sm={6} xs={12}>
+        <Grid item md={6} sm={12}>
           <AddRemoveTable
             rows={groupPerks}
             height={600}
@@ -201,7 +201,7 @@ export default function ManageGroups(props) {
             addButtonText="Add Group Perk"
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item md={6} sm={12}>
           <AddRemoveTable
             height={600}
             rows={groupEmails}
