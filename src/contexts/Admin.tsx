@@ -1,6 +1,6 @@
-import { AuthContext } from "contexts/Auth";
-import { db } from "firebaseApp";
-import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from 'contexts/Auth';
+import { db } from 'firebaseApp';
+import React, { useContext, useEffect, useState } from 'react';
 
 export const AdminContext = React.createContext<any>({});
 
@@ -10,7 +10,7 @@ export const AdminProvider = ({ children }) => {
 
   useEffect(() => {
     if (currentUser) {
-      db.collection("admins")
+      db.collection('admins')
         .doc(currentUser.uid)
         .get()
         .then((doc) => {
@@ -18,7 +18,7 @@ export const AdminProvider = ({ children }) => {
           setAdmin(adminData);
         })
         .catch((error) => {
-          console.log("Error getting admin doc:", error);
+          console.log('Error getting admin doc:', error);
         });
     }
   }, [currentUser]);

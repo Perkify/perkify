@@ -5,42 +5,42 @@ import {
   Select,
   TextField,
   Typography,
-} from "@material-ui/core";
-import Header from "components/Header";
-import { AuthContext } from "contexts";
-import React, { useContext, useState } from "react";
-import { PerkifyApi } from "services";
-import { validateEmails } from "utils/emailValidation";
-import { allPerks, allPerksDict } from "../../constants";
+} from '@material-ui/core';
+import Header from 'components/Header';
+import { AuthContext } from 'contexts';
+import React, { useContext, useState } from 'react';
+import { PerkifyApi } from 'services';
+import { validateEmails } from 'utils/emailValidation';
+import { allPerks, allPerksDict } from '../../constants';
 
-const CreateGroup = (props) => {
+const CreateGroup = ({ history }) => {
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
 
-  const [groupName, setGroupName] = useState("");
-  const [emails, setEmails] = useState("");
+  const [groupName, setGroupName] = useState('');
+  const [emails, setEmails] = useState('');
   const [selectedPerks, setSelectedPerks] = useState([]);
 
-  const [groupNameError, setGroupNameError] = useState("");
-  const [emailsError, setEmailsError] = useState("");
-  const [selectedPerksError, setSelectedPerksError] = useState("");
+  const [groupNameError, setGroupNameError] = useState('');
+  const [emailsError, setEmailsError] = useState('');
+  const [selectedPerksError, setSelectedPerksError] = useState('');
 
   const handlePerkChange = (event) => {
     // update the controlled form
     const perks = event.target.value as string[];
 
-    setSelectedPerksError("");
+    setSelectedPerksError('');
 
     setSelectedPerks(perks);
 
     let cost = 0;
     perks.forEach((perk) => {
-      cost += allPerksDict[perk]["Cost"];
+      cost += allPerksDict[perk]['Cost'];
     });
     setCostPerPerson(cost);
     setTotalCost(cost * numPeople);
@@ -48,19 +48,19 @@ const CreateGroup = (props) => {
 
   const handleEmailError = (event) => {
     setEmails(event.target.value);
-    if (event.target.value === "") {
-      setEmailsError("Please input at least one email");
+    if (event.target.value === '') {
+      setEmailsError('Please input at least one email');
     } else if (!validateEmails(event.target.value)) {
-      setEmailsError("Please input proper emails");
+      setEmailsError('Please input proper emails');
     } else {
-      setEmailsError("");
+      setEmailsError('');
     }
   };
 
   const handleEmailChange = (event) => {
     handleEmailError(event);
     let tmpNumPeople = numPeople;
-    if (event.target.value === "") {
+    if (event.target.value === '') {
       // if empty, set num people to 0
       tmpNumPeople = 0;
     } else if (!validateEmails(event.target.value)) {
@@ -68,7 +68,7 @@ const CreateGroup = (props) => {
       // user is typing
     } else {
       // if not error, update the number of people
-      const emails = event.target.value.replace(/[,'"]+/gi, " ").split(/\s+/);
+      const emails = event.target.value.replace(/[,'"]+/gi, ' ').split(/\s+/);
       tmpNumPeople = emails.length;
     }
     // update the number of people and total cost
@@ -80,33 +80,33 @@ const CreateGroup = (props) => {
     e.preventDefault();
     let error = false;
 
-    if (groupName == "") {
-      setGroupNameError("Enter a group name");
+    if (groupName == '') {
+      setGroupNameError('Enter a group name');
       error = true;
     }
 
-    if (emails == "") {
-      setEmailsError("Please input at least one email");
+    if (emails == '') {
+      setEmailsError('Please input at least one email');
       error = true;
     } else if (!validateEmails(emails)) {
-      setEmailsError("Please input proper emails");
+      setEmailsError('Please input proper emails');
       error = true;
     }
 
     if (selectedPerks.length == 0) {
-      setSelectedPerksError("Select perks");
+      setSelectedPerksError('Select perks');
       error = true;
     }
 
     if (!error) {
-      console.log("No errors");
-      const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+      console.log('No errors');
+      const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();
         console.log(bearerToken);
         // call the api to create the group
         PerkifyApi.post(
-          "user/auth/createGroup",
+          'user/auth/createGroup',
           {
             group: groupName,
             emails: emailList,
@@ -116,12 +116,12 @@ const CreateGroup = (props) => {
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
           }
         )
           .then(() => {
-            props.history.push(`/dashboard/group/${groupName}`);
+            history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
             console.log(err);
@@ -134,14 +134,14 @@ const CreateGroup = (props) => {
     <>
       <Header
         title="Create Group"
-        crumbs={["Dashboard", "Perk Groups", "Create Group"]}
+        crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
       />
 
       <Card style={{ width: 700, padding: 30, marginTop: 30 }} elevation={4}>
         {/* <Typography variant="body2" color="textSecondary" component="p">
             Create a perk group
           </Typography> */}
-        <Typography style={{ marginBottom: "15px" }}>Group Name</Typography>
+        <Typography style={{ marginBottom: '15px' }}>Group Name</Typography>
         <TextField
           id="group_name"
           variant="outlined"
@@ -150,13 +150,13 @@ const CreateGroup = (props) => {
           value={groupName}
           onChange={(event) => {
             setGroupName(event.target.value);
-            setGroupNameError("");
+            setGroupNameError('');
           }}
           fullWidth
-          error={groupNameError != ""}
+          error={groupNameError != ''}
           helperText={groupNameError}
         />
-        <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Emails
         </Typography>
         <TextField
@@ -169,11 +169,11 @@ const CreateGroup = (props) => {
           fullWidth
           multiline
           rows={4}
-          rowsMax={4}
-          error={emailsError != ""}
+          maxRows={4}
+          error={emailsError != ''}
           helperText={emailsError}
         />
-        <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
         </Typography>
         <Select
@@ -182,19 +182,17 @@ const CreateGroup = (props) => {
           displayEmpty
           renderValue={(selected) => {
             if ((selected as string[]).length === 0) {
-              return "Select Perks";
+              return 'Select Perks';
             }
 
-            return (selected as string[]).join(", ");
+            return (selected as string[]).join(', ');
           }}
           variant="outlined"
           value={selectedPerks}
           multiple
           fullWidth
-          label="Select Group"
-          placeholder="Select Gruop"
           onChange={handlePerkChange}
-          error={selectedPerksError != ""}
+          error={selectedPerksError != ''}
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
@@ -206,10 +204,15 @@ const CreateGroup = (props) => {
           <FormHelperText>{selectedGroupError}</FormHelperText>
         )} */}
 
-        <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Estimated Cost: ${totalCost}
         </Typography>
-        <Button onClick={createPerkGroup} variant="contained" color="primary">
+        <Button
+          onClick={createPerkGroup}
+          variant="contained"
+          color="primary"
+          disabled={!hasPaymentMethods}
+        >
           Create Perk Group
         </Button>
       </Card>

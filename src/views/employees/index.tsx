@@ -1,34 +1,34 @@
-import { MenuItem, Select, Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
-import { AddRemoveTable } from "components/AddRemoveTable";
-import Header from "components/Header";
+import { MenuItem, Select, Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
+import { AddRemoveTable } from 'components/AddRemoveTable';
+import Header from 'components/Header';
 import {
   AdminContext,
   AuthContext,
   BusinessContext,
   LoadingContext,
-} from "contexts";
-import { db } from "firebaseApp";
-import React, { useContext, useEffect, useState } from "react";
-import { PerkifyApi } from "services";
-import { validateEmails } from "utils/emailValidation";
+} from 'contexts';
+import { db } from 'firebaseApp';
+import React, { useContext, useEffect, useState } from 'react';
+import { PerkifyApi } from 'services';
+import { validateEmails } from 'utils/emailValidation';
 
 const columns = [
   {
-    field: "email",
-    headerName: "Email",
+    field: 'email',
+    headerName: 'Email',
     width: 300,
     editable: false,
   },
   {
-    field: "group",
-    headerName: "Group",
+    field: 'group',
+    headerName: 'Group',
     width: 200,
     editable: false,
   },
@@ -39,9 +39,9 @@ export default function ManagePeople(props) {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedUsers, setSelection] = useState([]);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
-  const [emails, setEmails] = useState("");
-  const [emailsError, setEmailsError] = useState("");
-  const [selectedPerksError, setSelectedPerksError] = useState("");
+  const [emails, setEmails] = useState('');
+  const [emailsError, setEmailsError] = useState('');
+  const [selectedPerksError, setSelectedPerksError] = useState('');
 
   const handleOk = () => {
     setIsRemoveModalVisible(false);
@@ -66,20 +66,20 @@ export default function ManagePeople(props) {
   const { business } = useContext(BusinessContext);
   const { admin } = useContext(AdminContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  const groupData = Object.keys(business["groups"]).sort();
+  const groupData = Object.keys(business['groups']).sort();
 
   useEffect(() => {
     setDashboardLoading(true);
     // get list of employees that belong to the business
-    db.collection("users")
-      .where("businessID", "==", admin.companyID)
+    db.collection('users')
+      .where('businessID', '==', admin.companyID)
       .get()
       .then((querySnapshot) => {
         setPeopleData(
           querySnapshot.docs.map((doc, index) => ({
             email: doc.id,
             id: index,
-            group: doc.data()["group"],
+            group: doc.data()['group'],
           }))
         );
         setDashboardLoading(false);
@@ -91,24 +91,24 @@ export default function ManagePeople(props) {
 
   const handleEmailError = (event) => {
     setEmails(event.target.value);
-    if (event.target.value === "") {
-      setEmailsError("Please input atleast one email");
+    if (event.target.value === '') {
+      setEmailsError('Please input atleast one email');
     } else if (!validateEmails(event.target.value)) {
-      setEmailsError("Please input proper emails");
+      setEmailsError('Please input proper emails');
     } else {
-      setEmailsError("");
+      setEmailsError('');
     }
   };
 
   const addToPerkGroup = (event) => {
     event.preventDefault();
     let error = false;
-    if (emails == "") {
-      setEmailsError("Enter emails");
+    if (emails == '') {
+      setEmailsError('Enter emails');
       error = true;
     }
     if (selectedPerkGroup.length == 0) {
-      setSelectedPerksError("Select perks");
+      setSelectedPerksError('Select perks');
       error = true;
     }
     if (!error) {
@@ -117,10 +117,10 @@ export default function ManagePeople(props) {
       (async () => {
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emails.replace(/[,'"]+/gi, " ").split(/\s+/); //Gives email as a list
+        const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
 
         await PerkifyApi.put(
-          "user/auth/updatePerkGroup",
+          'user/auth/updatePerkGroup',
           JSON.stringify({
             group: selectedPerkGroup,
             perks: [],
@@ -133,7 +133,7 @@ export default function ManagePeople(props) {
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -145,7 +145,7 @@ export default function ManagePeople(props) {
     <>
       <Header
         title="Manage Employees"
-        crumbs={["Dashboard", "People", "Employees"]}
+        crumbs={['Dashboard', 'People', 'Employees']}
       />
 
       <AddRemoveTable
@@ -171,7 +171,7 @@ export default function ManagePeople(props) {
             To add users to this organization, please enter their email
             addresses below and select a group from the dropdown.
           </DialogContentText>
-          <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+          <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
             Emails
           </Typography>
           <TextField
@@ -184,11 +184,11 @@ export default function ManagePeople(props) {
             fullWidth
             multiline
             rows={4}
-            rowsMax={4}
-            error={emailsError != ""}
+            maxRows={4}
+            error={emailsError != ''}
             helperText={emailsError}
           />
-          <Typography style={{ marginTop: "30px", marginBottom: "15px" }}>
+          <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
             Perk Group
           </Typography>
           <Select
@@ -199,10 +199,10 @@ export default function ManagePeople(props) {
             value={selectedPerkGroup}
             fullWidth
             onChange={(event) => {
-              setSelectedPerksError("");
+              setSelectedPerksError('');
               setSelectedPerkGroup(event.target.value as string[]);
             }}
-            error={selectedPerksError != ""}
+            error={selectedPerksError != ''}
           >
             <MenuItem value="" disabled>
               Select Perk Group
