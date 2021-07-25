@@ -1,23 +1,23 @@
-
-import axios from "axios";
-import * as cors from "cors";
-import * as cryptoJS from "crypto-js";
-import * as express from "express";
-import { body, validationResult } from "express-validator";
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
-import * as validator from "validator";
-import { allPerks } from "../shared";
+import axios from 'axios';
+import * as cors from 'cors';
+import * as cryptoJS from 'crypto-js';
+import * as express from 'express';
+import { body, validationResult } from 'express-validator';
+import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions';
+import * as validator from 'validator';
+import { allPerks } from '../shared';
 // import {user} from "firebase-functions/lib/providers/auth";
 // import {Simulate} from "react-dom/test-utils";
 // import contextMenu = Simulate.contextMenu;
 
-import Stripe from "stripe";
+import Stripe from 'stripe';
 const stripe = new Stripe(
-  "sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu",
+  'sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu',
   {
-    apiVersion: "2020-08-27",
+    apiVersion: '2020-08-27',
   }
+);
 
 // rapyd credentials
 const rapydSecretKey =
@@ -85,11 +85,11 @@ const validateFirebaseIdToken = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer ')
   ) {
-    console.log("Found Authorization header");
+    console.log('Found Authorization header');
     // Read the ID Token from the Authorization header.
     idToken = req.headers.authorization.split('Bearer ')[1];
   } else if (req.cookies) {
-    console.log("Found __session cookie");
+    console.log('Found __session cookie');
     // Read the ID Token from cookie.
     idToken = req.cookies.__session;
   } else {
@@ -147,7 +147,7 @@ const generateRapydHeaders = (httpMethod, urlPath, body = '') => {
 };
 
 const createUserHelper = async (email, businessID, group, perks) => {
-  const docRef = db.collection("users").doc(email);
+  const docRef = db.collection('users').doc(email);
 
   await docRef.set({
     businessID,
@@ -156,14 +156,14 @@ const createUserHelper = async (email, businessID, group, perks) => {
   });
 
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
-    url: "http://localhost:3000/dashboard", // I don't think you're supposed to do it this way. Maybe less secure
+    url: 'http://localhost:3000/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
   });
 
   // send email
-  await db.collection("mail").add({
+  await db.collection('mail').add({
     to: email,
     message: {
-      subject: "Your employer has signed you up for Perkify!",
+      subject: 'Your employer has signed you up for Perkify!',
       text: `
         Your employer purchased these Perks for you:\n
         ${perks} 
@@ -175,7 +175,7 @@ const createUserHelper = async (email, businessID, group, perks) => {
 };
 
 const deleteUserHelper = async (userDoc) => {
-  console.log("working2");
+  console.log('working2');
   console.log(userDoc.data());
   console.log(userDoc.id);
   const user = userDoc.data();
@@ -193,7 +193,7 @@ const deleteUserHelper = async (userDoc) => {
   }
 
   const deleteUserResults = await db
-    .collection("users")
+    .collection('users')
     .doc(userDoc.id)
     .delete();
   console.log(deleteUserResults);
@@ -212,7 +212,6 @@ const emailNormalizationOptions = {
   icloud_remove_subaddress: false,
 };
 
-/*
 const validateUserEmail = async (email) => {
   const userRef = await db.collection('users').doc(email).get();
   if (!userRef.exists) {
@@ -221,7 +220,6 @@ const validateUserEmail = async (email) => {
     return Promise.resolve();
   }
 };
- */
 
 const validateEmails = async (emails) => {
   if (Array.isArray(emails) && emails.length > 0) {
@@ -630,11 +628,11 @@ const getCardDetails = async (cardID) => {
 */
 
 const blockCard = async (cardID) => {
-  const httpMethod = "post";
-  const urlPath = "/v1/issuing/cards/status";
+  const httpMethod = 'post';
+  const urlPath = '/v1/issuing/cards/status';
   const body = {
     card: cardID,
-    status: "block",
+    status: 'block',
   };
   const headers = generateRapydHeaders(
     httpMethod,
@@ -659,15 +657,15 @@ const blockCard = async (cardID) => {
 // --------------- Express Routes --------------- //
 
 const registerAdminAndBusinessValidators = [
-  body("firstName").not().isEmpty(),
-  body("lastName").not().isEmpty(),
-  body("email").isEmail().normalizeEmail(emailNormalizationOptions),
-  body("password").not().isEmpty(),
-  body("businessName").not().isEmpty(),
-  body("line1").not().isEmpty(),
-  body("city").not().isEmpty(),
-  body("state").isLength({ min: 2, max: 2 }),
-  body("postalCode").not().isEmpty(),
+  body('firstName').not().isEmpty(),
+  body('lastName').not().isEmpty(),
+  body('email').isEmail().normalizeEmail(emailNormalizationOptions),
+  body('password').not().isEmpty(),
+  body('businessName').not().isEmpty(),
+  body('line1').not().isEmpty(),
+  body('city').not().isEmpty(),
+  body('state').isLength({ min: 2, max: 2 }),
+  body('postalCode').not().isEmpty(),
 ];
 
 const registerAdminAndBusiness = async (req, res) => {
@@ -707,7 +705,7 @@ const registerAdminAndBusiness = async (req, res) => {
       city,
       state,
       postalCode.toString(),
-      ""
+      ''
     );
     console.log(walletID);
     // globalWalletID = walletID;
@@ -724,7 +722,7 @@ const registerAdminAndBusiness = async (req, res) => {
       name: businessName,
       billingAddress: {
         city,
-        country: "US",
+        country: 'US',
         line1,
         line2,
         postal_code: postalCode,
@@ -836,13 +834,13 @@ const createGroup = async (req, res) => {
     // make sure all emails are good
     // TODO: we shouldn't use array.filter and still add those right?
     for (const email of emails) {
-      const docRef = db.collection("users").doc(email);
+      const docRef = db.collection('users').doc(email);
 
       const docSnapshot = await docRef.get();
       if (docSnapshot.exists) {
         const error = {
           status: 400,
-          reason: "Bad Request",
+          reason: 'Bad Request',
           reason_detail: `added email ${email} that is already in another group`,
         };
         throw error;
@@ -899,8 +897,8 @@ const updatePerkGroup = async (req, res) => {
         });
     }
 
-    const usersRef = db.collection("users");
-    const groupUsersSnapshot = await usersRef.where("group", "==", group).get();
+    const usersRef = db.collection('users');
+    const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
 
     const deleteUsers = [];
     const oldUserEmails = [];
@@ -923,13 +921,13 @@ const updatePerkGroup = async (req, res) => {
 
     // TODO: move this to a function
     for (const email of addUserEmails) {
-      const docRef = db.collection("users").doc(email);
+      const docRef = db.collection('users').doc(email);
 
       const docSnapshot = await docRef.get();
       if (docSnapshot.exists) {
         const error = {
           status: 400,
-          reason: "Bad Request",
+          reason: 'Bad Request',
           reason_detail: `added email ${email} that is already in another group`,
         };
         throw error;
@@ -987,10 +985,10 @@ const deletePerkGroup = async (req, res) => {
 
     // const walletID = businessSnap.data().walletID;
 
-    const usersRef = db.collection("users");
-    const groupUsersSnapshot = await usersRef.where("group", "==", group).get();
+    const usersRef = db.collection('users');
+    const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
 
-    console.log("working");
+    console.log('working');
     console.log(group);
     console.log(groupUsersSnapshot.size);
 
@@ -1063,29 +1061,29 @@ const registerUser = async (req, res) => {
     const billingAddress = businessSnap.data().billingAddress;
     console.log(billingAddress);
     const cardholder = await stripe.issuing.cardholders.create({
-      type: "individual",
+      type: 'individual',
       name: `${firstName} ${lastName}`,
       email: email,
       billing: {
         address: billingAddress,
       },
-      status: "active",
+      status: 'active',
     });
     const cardholderID = cardholder.id;
 
     const card = await stripe.issuing.cards.create({
       cardholder: cardholderID,
-      currency: "usd",
-      type: "virtual",
-      status: "active",
+      currency: 'usd',
+      type: 'virtual',
+      status: 'active',
     });
 
     const cardDetails = await stripe.issuing.cards.retrieve(card.id, {
-      expand: ["number", "cvc"],
+      expand: ['number', 'cvc'],
     });
 
     await db
-      .collection("users")
+      .collection('users')
       .doc(email)
       .update({
         firstName: firstName,
@@ -1116,16 +1114,19 @@ const registerUser = async (req, res) => {
 
 const getStripePaymentMethods = async (req, res) => {
   try {
-    const { customer, type } = req.body;
+    const customerDoc = await db
+      .collection('customers')
+      .doc(req.user.uid)
+      .get();
+    const customerData = customerDoc.data();
+
     const paymentMethods = await stripe.paymentMethods.list({
-      customer,
-      type,
+      customer: customerData.stripeId,
+      type: 'card',
     });
 
     res.json(paymentMethods).end();
-  } catch (e) {
-    console.log('Error in getting stripe payment methods');
-  }
+  } 
 };
 
 app.use('/auth', validateFirebaseIdToken);
@@ -1138,6 +1139,6 @@ app.post('/registerUser', registerUserValidators, registerUser);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
-app.post('/stripePaymentMethods', getStripePaymentMethods);
+app.post('/auth/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);

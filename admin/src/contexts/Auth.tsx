@@ -36,17 +36,17 @@ export const AuthProvider = ({ children }) => {
           const adminData = userDoc.data();
           setAdmin(adminData);
 
+          const bearerToken = await user.getIdToken();
+
           // check if customer has payment methods
-          const customerDoc = await db
-            .collection('customers')
-            .doc(user.uid)
-            .get();
-          const customerData = customerDoc.data();
           const cardPaymentMethods = await PerkifyApi.post(
-            '/user/stripePaymentMethods',
+            '/user/auth/stripePaymentMethods',
+            {},
             {
-              customer: customerData.stripeId,
-              type: 'card',
+              headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
+              },
             }
           );
           if (cardPaymentMethods.data.data.length > 0) {
