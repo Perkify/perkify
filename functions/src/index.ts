@@ -51,11 +51,3 @@ app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);
-
-exports.deleteUsers = functions.https.onRequest(
-  async (req, res): Promise<any> => {
-    const allUsers = await auth.listUsers();
-    const allUsersUID = allUsers.users.map((user) => user.uid);
-    return auth.deleteUsers(allUsersUID).then(() => res.send('deleted'));
-  }
-);
