@@ -13,8 +13,8 @@ code {
 }
 
 @font-face {
-  font-family: "Plusjakartadisplay";
-  src: url("fonts/PlusJakartaDisplay-Medium.ttf") format("truetype");
+  font-family: 'Plusjakartadisplay';
+  src: url('fonts/PlusJakartaDisplay-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;

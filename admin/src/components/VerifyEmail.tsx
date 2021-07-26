@@ -1,12 +1,12 @@
-import Button from "@material-ui/core/Button";
-import { ReactComponent as EmailSVG } from "images/email.svg";
-import React from "react";
+import Button from '@material-ui/core/Button';
+import { ReactComponent as EmailSVG } from 'images/email.svg';
+import React from 'react';
 
 const VerifyEmail = ({ email, newUser }) => {
   const resendVerificationEmail = async () => {
     try {
       await newUser.sendEmailVerification({
-        url: "https://app.getperkify.com/login",
+        url: 'https://app.getperkify.com/login',
       });
     } catch (e) {
       alert(e);
@@ -14,7 +14,7 @@ const VerifyEmail = ({ email, newUser }) => {
   };
 
   return (
-    <div style={{ padding: "5%", width: "80%", textAlign: "center" }}>
+    <div style={{ padding: '5%', width: '80%', textAlign: 'center' }}>
       <EmailSVG width="200" height="200" />
       <h1>Please verify your email</h1>
       <h2>You're almost there!</h2>
@@ -24,7 +24,7 @@ const VerifyEmail = ({ email, newUser }) => {
       <Button
         variant="contained"
         color="primary"
-        style={{ width: "50%", height: "60px", textTransform: "none" }}
+        style={{ width: '50%', height: '60px', textTransform: 'none' }}
         disableElevation={true}
         onClick={resendVerificationEmail}
       >

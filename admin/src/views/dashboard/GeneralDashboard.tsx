@@ -11,8 +11,12 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
-    useContext(AuthContext);
+  const {
+    currentUser,
+    admin,
+    hasPaymentMethods,
+    loadingAuthState,
+  } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const [employees, setEmployees] = useState([]);

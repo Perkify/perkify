@@ -1,52 +1,52 @@
-import { Paper } from "@material-ui/core";
-import AppBar from "@material-ui/core/AppBar";
-import Avatar from "@material-ui/core/Avatar";
-import Box from "@material-ui/core/Box";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import { Paper } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Drawer from '@material-ui/core/Drawer';
+import Hidden from '@material-ui/core/Hidden';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import {
   createStyles,
   makeStyles,
   Theme,
   useTheme,
-} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import SettingsIcon from "@material-ui/icons/Settings";
-import { AuthContext } from "contexts";
-import logo from "images/logo.png";
-import React, { useContext, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+} from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import SettingsIcon from '@material-ui/icons/Settings';
+import { AuthContext } from 'contexts';
+import logo from 'images/logo.png';
+import React, { useContext } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const drawerWidth = 280;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex",
+      display: 'flex',
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
     },
     drawer: {
-      [theme.breakpoints.down("sm")]: {
-        display: "none",
+      [theme.breakpoints.down('sm')]: {
+        display: 'none',
       },
-      [theme.breakpoints.up("md")]: {
+      [theme.breakpoints.up('md')]: {
         width: drawerWidth,
         flexShrink: 0,
       },
     },
     menuButton: {
       marginRight: theme.spacing(2),
-      [theme.breakpoints.up("md")]: {
-        display: "none",
+      [theme.breakpoints.up('md')]: {
+        display: 'none',
       },
     },
     // necessary for content to be below app bar
@@ -55,24 +55,24 @@ const useStyles = makeStyles((theme: Theme) =>
       width: drawerWidth,
     },
     drawerContainer: {
-      overflow: "auto",
+      overflow: 'auto',
     },
     avatarCard: {
-      display: "flex",
+      display: 'flex',
 
-      "& > *": {
+      '& > *': {
         margin: theme.spacing(1),
       },
-      margin: "20px 25px",
-      padding: "0px 10px",
+      margin: '20px 25px',
+      padding: '0px 10px',
       border: 0,
-      backgroundColor: "#e6edff",
-      height: "80px",
-      alignItems: "center",
+      backgroundColor: '#e6edff',
+      height: '80px',
+      alignItems: 'center',
     },
     content: {
       flexGrow: 1,
-      minWidth: "200px",
+      minWidth: '200px',
       padding: theme.spacing(3),
     },
     listItem: {
@@ -95,25 +95,25 @@ export default function ClippedDrawer({ children }) {
   };
 
   const generalNav: [string, string, any][] = [
-    ["Dashboard", "/dashboard", <DashboardIcon />],
+    ['Dashboard', '/dashboard', <DashboardIcon />],
   ];
 
   const accountNav: [string, string, any][] = [
-    ["Settings", "/settings", <SettingsIcon />],
-    ["Logout", "/logout", <ExitToAppIcon />],
+    ['Settings', '/settings', <SettingsIcon />],
+    ['Logout', '/logout', <ExitToAppIcon />],
   ];
 
   const navSections: [string, [string, string, any][]][] = [
-    ["General", generalNav],
-    ["Account", accountNav],
+    ['General', generalNav],
+    ['Account', accountNav],
   ];
 
   const drawer = (
     <div>
       {/* <Toolbar /> */}
       <div className={classes.drawerContainer}>
-        <div style={{ padding: "40px 30px" }}>
-          <img style={{ height: "30px" }} src={logo} />
+        <div style={{ padding: '40px 30px' }}>
+          <img style={{ height: '30px' }} src={logo} />
         </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
@@ -122,7 +122,7 @@ export default function ClippedDrawer({ children }) {
             style={{ backgroundColor: theme.palette.primary.main }}
           />
           <span>
-            <Typography style={{ fontSize: "14px" }}>
+            <Typography style={{ fontSize: '14px' }}>
               <Box fontWeight="bold">{`${employee?.firstName} ${employee?.lastName}`}</Box>
             </Typography>
             {
@@ -131,15 +131,15 @@ export default function ClippedDrawer({ children }) {
             <Typography variant="caption">{employee?.group}</Typography>
           </span>
         </Paper>
-        <div style={{ padding: "10px 0" }}>
+        <div style={{ padding: '10px 0' }}>
           {navSections.map(([sectionName, section], index) => (
             <div key={sectionName}>
               <Typography
                 style={{
-                  margin: "30px 0 0 40px",
-                  fontSize: "12px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
+                  margin: '30px 0 0 40px',
+                  fontSize: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
                 }}
                 component="div"
               >
@@ -153,19 +153,19 @@ export default function ClippedDrawer({ children }) {
                     to={route}
                     key={name}
                     style={{
-                      backgroundColor: location.pathname == route && "#e6edff",
+                      backgroundColor: location.pathname == route && '#e6edff',
                       color:
                         location.pathname == route &&
                         theme.palette.primary.main,
                       borderRight:
                         location.pathname == route &&
                         `3px solid ${theme.palette.primary.main}`,
-                      paddingLeft: "30px",
+                      paddingLeft: '30px',
                     }}
                   >
                     <ListItemIcon
                       style={{
-                        justifyContent: "center",
+                        justifyContent: 'center',
                         color:
                           location.pathname == route &&
                           theme.palette.primary.main,
@@ -194,7 +194,7 @@ export default function ClippedDrawer({ children }) {
         position="fixed"
         variant="outlined"
         className={classes.appBar}
-        style={{ background: "white" }}
+        style={{ background: 'white' }}
       >
         {/* <Toolbar>
             <IconButton
@@ -214,7 +214,7 @@ export default function ClippedDrawer({ children }) {
         <Hidden mdUp implementation="css">
           <Drawer
             variant="temporary"
-            anchor={theme.direction === "rtl" ? "right" : "left"}
+            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
             open={mobileOpen}
             onClose={handleDrawerToggle}
             classes={{

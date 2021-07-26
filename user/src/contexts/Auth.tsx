@@ -1,7 +1,7 @@
-import firebase from "firebase/app";
-import app, { auth, db } from "firebaseApp";
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import firebase from 'firebase/app';
+import app, { auth, db } from 'firebaseApp';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type ContextProps = {
   currentUser: firebase.User | null;
@@ -22,11 +22,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (firebase.auth().isSignInWithEmailLink(location.search)) {
-      let email = window.localStorage.getItem("emailForSignIn");
+      let email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
         // User opened the link on a different device. To prevent session fixation
         // attacks, ask the user to provide the associated email again. For example:
-        email = window.prompt("Please provide your email for confirmation");
+        email = window.prompt('Please provide your email for confirmation');
       }
       // check if email is registered before signing in?
       firebase
@@ -34,13 +34,13 @@ export const AuthProvider = ({ children }) => {
         .signInWithEmailLink(email, location.search)
         .then((result) => {
           // Clear email from storage.
-          window.localStorage.removeItem("emailForSignIn");
+          window.localStorage.removeItem('emailForSignIn');
           // should i do:
           // setCurrentUser(result.user);?
         })
         .catch((error) => {
           console.log(error);
-          alert("an error occurred");
+          alert('an error occurred');
         });
     }
   }, [location]);
@@ -48,17 +48,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        const userDoc = await db.collection("users").doc(user.email).get();
+        const userDoc = await db.collection('users').doc(user.email).get();
         if (userDoc.exists) {
           setCurrentUser(user);
           const employeeData = userDoc.data();
           setEmployee(employeeData);
         } else {
           auth.signOut();
-          alert("You do not have a registered user account");
+          alert('You do not have a registered user account');
         }
       }
-      console.log("Loading auth state complete");
+      console.log('Loading auth state complete');
       setLoadingAuthState(false);
     });
   }, []);

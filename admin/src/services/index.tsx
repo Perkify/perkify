@@ -1,1 +1,1 @@
-export * from "./PerkifyApi";
+export * from './PerkifyApi';

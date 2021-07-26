@@ -106,8 +106,10 @@ export default function ClippedDrawer({ children }) {
     ['Employees', '/dashboard/people', <PersonIcon />],
   ];
 
-  let [groupViews, setGroupViews]: [[string, string, any][], Function] =
-    useState([]);
+  let [groupViews, setGroupViews]: [
+    [string, string, any][],
+    Function
+  ] = useState([]);
 
   useEffect(() => {
     if (Object.keys(business).length != 0) {

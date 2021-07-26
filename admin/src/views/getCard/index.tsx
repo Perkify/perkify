@@ -1,15 +1,15 @@
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import React from "react";
-import { PerkifyApi } from "services";
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import InputLabel from '@material-ui/core/InputLabel';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import React from 'react';
+import { PerkifyApi } from 'services';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
-    "label + &": {
+    'label + &': {
       marginTop: theme.spacing(2),
     },
   },
@@ -17,35 +17,35 @@ const BootstrapInput = withStyles((theme) => ({
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    fontFamily: "Plusjakartadisplay",
-    minHeight: "100vh",
+    fontFamily: 'Plusjakartadisplay',
+    minHeight: '100vh',
   },
   label: {
-    fontFamily: "Plusjakartadisplay",
-    fontSize: "14px",
-    color: "#152c5b",
+    fontFamily: 'Plusjakartadisplay',
+    fontSize: '14px',
+    color: '#152c5b',
   },
   footer: {
-    fontFamily: "Plusjakartadisplay",
-    color: "#8a95ad",
-    fontSize: "14px",
-    textAlign: "center",
+    fontFamily: 'Plusjakartadisplay',
+    color: '#8a95ad',
+    fontSize: '14px',
+    textAlign: 'center',
   },
 }));
 
 const GetCard = () => {
   const classes = useStyles();
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [dob, setDob] = React.useState("");
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [dob, setDob] = React.useState('');
   const [invalidStep, setInvalidStep] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const formFields = { firstName, lastName, email, dob };
 
   const submitGetCard = async () => {
     try {
-      if (Object.values(formFields).some((fieldprop) => fieldprop === "")) {
+      if (Object.values(formFields).some((fieldprop) => fieldprop === '')) {
         setInvalidStep(true);
         return;
       }
@@ -54,7 +54,7 @@ const GetCard = () => {
       let dobFormatted = new Date(new Date(dob)).toLocaleDateString();
       console.log(dobFormatted);
       const response = await PerkifyApi.post(
-        "user/registerUser",
+        'user/registerUser',
         JSON.stringify({
           email,
           firstName,
@@ -104,8 +104,8 @@ const GetCard = () => {
                 variant="outlined"
                 onChange={fillTextbox(setEmail)}
                 value={email}
-                error={email === "" && invalidStep}
-                style={{ width: "100%" }}
+                error={email === '' && invalidStep}
+                style={{ width: '100%' }}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -116,10 +116,10 @@ const GetCard = () => {
                 placeholder="John"
                 id="firstName"
                 variant="outlined"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 onChange={fillTextbox(setFirstName)}
                 value={firstName}
-                error={firstName === "" && invalidStep}
+                error={firstName === '' && invalidStep}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -130,10 +130,10 @@ const GetCard = () => {
                 placeholder="Smith"
                 id="lastName"
                 variant="outlined"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 onChange={fillTextbox(setLastName)}
                 value={lastName}
-                error={lastName === "" && invalidStep}
+                error={lastName === '' && invalidStep}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -143,17 +143,17 @@ const GetCard = () => {
               <BootstrapInput
                 id="dob"
                 type="date"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 onChange={fillTextbox(setDob)}
                 value={dob}
-                error={dob === "" && invalidStep}
+                error={dob === '' && invalidStep}
               />
             </Grid>
             <Grid item xs={12} md={12}>
               <Button
                 variant="contained"
                 color="primary"
-                style={{ width: "100%", height: "60px", textTransform: "none" }}
+                style={{ width: '100%', height: '60px', textTransform: 'none' }}
                 disableElevation={true}
                 onClick={submitGetCard}
               >

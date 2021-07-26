@@ -1,6 +1,6 @@
-import { AuthContext } from "contexts/Auth";
-import { db } from "firebaseApp";
-import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from 'contexts/Auth';
+import { db } from 'firebaseApp';
+import React, { useContext, useEffect, useState } from 'react';
 
 export const BusinessContext = React.createContext<any>({});
 
@@ -10,8 +10,8 @@ export const BusinessProvider = ({ children }) => {
 
   useEffect(() => {
     if (currentUser && employee) {
-      const businessId = employee["businessID"];
-      db.collection("businesses")
+      const businessId = employee['businessID'];
+      db.collection('businesses')
         .doc(businessId)
         .onSnapshot(
           (businessDoc) => {
@@ -21,7 +21,7 @@ export const BusinessProvider = ({ children }) => {
             }
           },
           (error) => {
-            console.log("Snapshot permissions error");
+            console.log('Snapshot permissions error');
           }
         );
     }

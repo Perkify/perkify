@@ -1,6 +1,6 @@
-import { Box, Card, Typography } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import React from "react";
+import { Box, Card, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import React from 'react';
 
 const MetricCard = ({ title, number, icon }) => {
   return (
@@ -14,7 +14,7 @@ const MetricCard = ({ title, number, icon }) => {
           justifyContent="center"
         >
           <Grid item xs={6}>
-            <b style={{ fontSize: 14, marginBottom: "20px", display: "block" }}>
+            <b style={{ fontSize: 14, marginBottom: '20px', display: 'block' }}>
               {title}
             </b>
             <Typography variant="h4">

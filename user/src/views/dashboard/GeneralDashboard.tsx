@@ -1,36 +1,35 @@
-import React, { useContext } from "react";
-import { Box, Grid, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import { AuthContext, BusinessContext } from "contexts";
-import Grow from "@material-ui/core/Grow";
-import Paper from "@material-ui/core/Paper";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import Container from "@material-ui/core/Container";
-import { green } from "@material-ui/core/colors";
-import Avatar from "@material-ui/core/Avatar";
-import { allPerksDict } from "../../constants";
+import { Box, Grid, Typography } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import Card from '@material-ui/core/Card';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { green } from '@material-ui/core/colors';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import { AuthContext, BusinessContext } from 'contexts';
+import React, { useContext } from 'react';
+import { allPerksDict } from '../../constants';
 
 const useStyles = makeStyles((theme) => ({
-  root: { minHeight: "100vh" },
+  root: { minHeight: '100vh' },
   details: {
-    color: "#ABABAB",
+    color: '#ABABAB',
   },
   perkContainer: {
-    display: "flex",
-    flexWrap: "wrap",
+    display: 'flex',
+    flexWrap: 'wrap',
   },
   perkCard: {
     margin: theme.spacing(4),
-    width: "200px",
-    height: "200px",
-    boxShadow: "0px 9px 45px 1px rgba(0,0,0,0.1)",
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '200px',
+    height: '200px',
+    boxShadow: '0px 9px 45px 1px rgba(0,0,0,0.1)',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }));
 
@@ -70,16 +69,16 @@ const GeneralDashboard = () => {
                 style={{
                   fontSize: 32,
                   color: green[400],
-                  position: "absolute",
-                  right: "0",
-                  top: "0",
-                  margin: "18px",
+                  position: 'absolute',
+                  right: '0',
+                  top: '0',
+                  margin: '18px',
                 }}
               />
               <Avatar
                 src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perk].Img}`}
                 alt={perk}
-                style={{ height: "70px", width: "70px" }}
+                style={{ height: '70px', width: '70px' }}
               />
               <Typography variant="body1">
                 <Box fontWeight={600} mt={2}>
@@ -98,7 +97,7 @@ const GeneralDashboard = () => {
   if (!loadingAuthState)
     return (
       <Grid container spacing={3} className={classes.root}>
-        <Grid item xs={12} md={8} style={{ padding: "10% 5% 5% 5%" }}>
+        <Grid item xs={12} md={8} style={{ padding: '10% 5% 5% 5%' }}>
           <Typography gutterBottom variant="h3" component="h1">
             <Box fontWeight="bold">Hi {employee?.firstName},</Box>
           </Typography>
@@ -110,9 +109,9 @@ const GeneralDashboard = () => {
         <Grid item xs={12} md={4}>
           <Card
             style={{
-              height: "95%",
-              margin: "5%",
-              backgroundColor: "#F6F8FA", //#e6edff
+              height: '95%',
+              margin: '5%',
+              backgroundColor: '#F6F8FA', //#e6edff
             }}
             elevation={0}
           >
@@ -122,22 +121,22 @@ const GeneralDashboard = () => {
               direction="column"
               alignItems="center"
               justify="center"
-              style={{ height: "100%", padding: "0 15%" }}
+              style={{ height: '100%', padding: '0 15%' }}
             >
               <Card
                 style={{
-                  width: "100%",
-                  maxWidth: "400px",
-                  height: "250px",
+                  width: '100%',
+                  maxWidth: '400px',
+                  height: '250px',
                   background:
-                    "linear-gradient(112.03deg, #C69DFF 0%, #4F76FF 100%)",
+                    'linear-gradient(112.03deg, #C69DFF 0%, #4F76FF 100%)',
                 }}
                 elevation={3}
               ></Card>
               <Grid
                 container
                 spacing={1}
-                style={{ width: "100%", paddingTop: "40px" }}
+                style={{ width: '100%', paddingTop: '40px' }}
               >
                 <Grid item xs={12}>
                   <Typography gutterBottom variant="h5" component="h2">
@@ -146,7 +145,7 @@ const GeneralDashboard = () => {
                 </Grid>
                 {detailsList([
                   {
-                    name: "Card Number",
+                    name: 'Card Number',
                     value: `${employee.card.number.substring(
                       0,
                       4
@@ -159,40 +158,40 @@ const GeneralDashboard = () => {
                     )} ${employee.card.number.substring(12, 16)}`,
                   },
                   {
-                    name: "Name on Card",
+                    name: 'Name on Card',
                     value: `${employee.firstName} ${employee.lastName}`,
                   },
                   {
-                    name: "Expiration Date",
+                    name: 'Expiration Date',
                     value: `${employee.card.exp.month}/${String(
                       employee.card.exp.year
                     ).substring(0, 2)}`,
                   },
                   {
-                    name: "CVC",
+                    name: 'CVC',
                     value: employee.card.cvc,
                   },
                 ])}
-                <Grid item xs={12} style={{ paddingTop: "40px" }}>
+                <Grid item xs={12} style={{ paddingTop: '40px' }}>
                   <Typography gutterBottom variant="h5" component="h2">
                     <Box fontWeight="bold">Billing Address</Box>
                   </Typography>
                 </Grid>
                 {detailsList([
                   {
-                    name: "Line 1",
+                    name: 'Line 1',
                     value: employee.card.billing.address.line1,
                   },
                   {
-                    name: "City",
+                    name: 'City',
                     value: employee.card.billing.address.city,
                   },
                   {
-                    name: "State",
+                    name: 'State',
                     value: employee.card.billing.address.state,
                   },
                   {
-                    name: "Zip",
+                    name: 'Zip',
                     value: employee.card.billing.address.postal_code,
                   },
                 ])}

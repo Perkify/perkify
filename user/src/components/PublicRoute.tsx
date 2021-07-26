@@ -1,6 +1,6 @@
-import { AuthContext } from "contexts/Auth";
-import React, { useContext } from "react";
-import { Redirect, Route } from "react-router-dom";
+import { AuthContext } from 'contexts/Auth';
+import React, { useContext } from 'react';
+import { Redirect, Route } from 'react-router-dom';
 
 const PublicRoute = ({ component: RouteComponent, ...rest }) => {
   const { currentUser, loadingAuthState } = useContext(AuthContext);
@@ -10,7 +10,7 @@ const PublicRoute = ({ component: RouteComponent, ...rest }) => {
       {...rest}
       render={(routeProps) =>
         currentUser && !loadingAuthState ? (
-          <Redirect to={"/"} />
+          <Redirect to={'/'} />
         ) : (
           <RouteComponent {...routeProps} />
         )
