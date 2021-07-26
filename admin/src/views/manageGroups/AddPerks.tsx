@@ -9,6 +9,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
+import { ContactPhoneOutlined } from '@material-ui/icons';
 import { AuthContext } from 'contexts/Auth';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -21,11 +22,29 @@ const AddPerks = ({
   group,
   emails,
 }) => {
+  console.log(selectedPerks)
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [selectedPerksError, setSelectedPerksError] = useState('');
-  const [availablePerks, setAvailablePerks] = useState(
-    allPerks.map((perkObj) => perkObj.Name)
-  );
+  var [availablePerks, setAvailablePerks] = useState([]);
+
+  React.useEffect(() => {
+    console.log("Hello World")
+    console.log(availablePerks)
+    availablePerks = allPerks.map((perkObj) => perkObj.Name)
+    console.log(availablePerks)
+    setAvailablePerks(availablePerks.filter(perk => {
+      console.log(perk)
+      let retVal = true
+      selectedPerks.forEach(perkObj => {
+        console.log(perkObj)
+        if (perkObj.Name === perk){
+          console.log("hello")
+          retVal = false
+        }
+      });
+      return retVal
+    }))
+  }, [selectedPerks])
   const { currentUser } = useContext(AuthContext);
 
   const addPerksToPerkGroup = (event) => {
