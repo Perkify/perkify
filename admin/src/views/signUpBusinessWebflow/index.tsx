@@ -109,13 +109,10 @@ const SignUpBusinessWebflow = () => {
         return true;
       case 1:
         try {
-          await PerkifyApi.post(
-            'user/registerAdminAndBusiness',
-            JSON.stringify({
-              ...AdminFormProps,
-              ...BusinessFormProps,
-            })
-          );
+          await PerkifyApi.post('user/registerAdminAndBusiness', {
+            ...AdminFormProps,
+            ...BusinessFormProps,
+          });
           const result = await app
             .auth()
             .signInWithEmailAndPassword(email, password);
