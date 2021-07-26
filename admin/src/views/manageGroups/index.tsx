@@ -243,7 +243,10 @@ export default function ManageGroups(props) {
         isRemovePerksModalVisible={isRemovePerksModalVisible}
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
+        groupPerks={groupPerks}
         setSelectedPerks={setSelectedPerks}
+        group={id}
+        emails={groupEmails}
       />
       <ConfirmationModal
         isModalVisible={isDeletePerkGroupModalVisible}
