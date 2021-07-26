@@ -72,11 +72,14 @@ export const AddRemoveTable = ({
   height,
 }) => {
   const dataGridClasses = useDataGridStyles();
+  console.log('HERE EKALJFKLJWELJEWAFJEKLAW');
+  console.log(rows);
 
   const CustomToolbar = () => {
     const classes = useToolbarStyles();
     const { state } = useGridSlotComponentProps();
     const numSelected = Object.keys(state.selection).length;
+    console.log(state.selection)
 
     return (
       <GridToolbarContainer

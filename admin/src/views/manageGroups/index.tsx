@@ -128,13 +128,14 @@ export default function ManageGroups(props) {
               id: index,
             }))
           );
+          console.log(groupEmails);
           setDashboardLoading(false);
         })
         .catch((error) => {
           console.log('Error getting documents: ', error);
         });
     }
-  }, [admin, id]);
+  }, [admin, id, isAddEmployeesModalVisible]);
 
   useEffect(() => {
     if (Object.keys(business).length != 0) {
@@ -230,6 +231,9 @@ export default function ManageGroups(props) {
         setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
         selectedEmployees={selectedEmployees}
         setSelectedEmployees={setSelectedEmployees}
+        group={id}
+        employees={groupEmails}
+        selectedPerks={groupPerks}
       />
 
       <AddPerks

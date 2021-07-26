@@ -23,6 +23,7 @@ const AddEmployees = ({
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
 
+
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {
     setEmailsToAdd(event.target.value);
@@ -43,7 +44,6 @@ const AddEmployees = ({
       error = true;
     }
     if (!error) {
-      setIsAddEmployeesModalVisible(false);
       (async () => {
         const bearerToken = await currentUser.getIdToken();
 
@@ -52,8 +52,6 @@ const AddEmployees = ({
         const afterEmployees = emailList.concat(
           employees.map((employeeObj) => employeeObj.email)
         );
-
-        console.log(afterEmployees);
 
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',
@@ -69,6 +67,7 @@ const AddEmployees = ({
             },
           }
         );
+        setIsAddEmployeesModalVisible(false);
       })();
     }
   };
