@@ -61,7 +61,6 @@ export const AuthProvider = ({ children }) => {
             setCustomerPortalUrl(data.url);
           })();
 
-          setLoadingAuthState(false);
           if (!location.pathname.includes('dashboard')) {
             history.push('/dashboard');
           }
@@ -70,6 +69,7 @@ export const AuthProvider = ({ children }) => {
           alert('You do not have a registered admin account');
         }
       }
+      setLoadingAuthState(false);
     });
   }, []);
 
