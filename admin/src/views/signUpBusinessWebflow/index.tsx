@@ -1,4 +1,5 @@
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Stepper from '@material-ui/core/Stepper';
@@ -70,7 +71,7 @@ const SignUpBusinessWebflow = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [invalidStep, setInvalidStep] = React.useState(false);
-
+  const [dashboardLoading, setDashboardLoading] = React.useState(false);
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -89,6 +90,7 @@ const SignUpBusinessWebflow = () => {
   const [state, setState] = React.useState('');
   const [postalCode, setPostalCode] = React.useState('');
   const [phone, setPhone] = React.useState('');
+
   const BusinessFormSetProps = {
     setBusinessName,
     setAddress,
@@ -116,6 +118,7 @@ const SignUpBusinessWebflow = () => {
         return true;
       case 1:
         try {
+          setDashboardLoading(true);
           await PerkifyApi.post('user/registerAdminAndBusiness', {
             ...AdminFormProps,
             ...BusinessFormProps,
@@ -128,8 +131,10 @@ const SignUpBusinessWebflow = () => {
           await result?.user?.sendEmailVerification({
             url: 'https://app.getperkify.com/login',
           });
+          setDashboardLoading(false);
           return true;
         } catch (error) {
+          setDashboardLoading(false);
           alert(error);
           return false;
         }
@@ -191,44 +196,63 @@ const SignUpBusinessWebflow = () => {
   };
 
   return (
-    <Grid container component="main" className={classes.root}>
-      <Grid
-        container
-        direction="column"
-        xs={12}
-        sm={12}
-        md={6}
-        className={classes.content}
-      >
-        <a href="/" className={classes.logo}>
-          <img src={logo} style={{ width: '100%' }} />
-        </a>
+    <div
+      style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}
+    >
+      <LinearProgress
+        hidden={!dashboardLoading}
+        style={{
+          zIndex: 10000,
+          height: '6px',
+          width: '100%',
+          position: 'absolute',
+        }}
+      />
+      <Grid container component="main" className={classes.root}>
         <Grid
           container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: '80vh' }}
+          direction="column"
+          xs={12}
+          sm={12}
+          md={6}
+          className={classes.content}
         >
-          <Grid item style={{ marginTop: '90px' }}>
-            <h2 className={classes.header}>
-              Get your business set up with Perkify
-            </h2>
-          </Grid>
-          <Stepper
-            activeStep={activeStep}
-            style={{ paddingLeft: '0', width: '90%' }}
+          <a href="/" className={classes.logo}>
+            <img src={logo} style={{ width: '100%' }} />
+          </a>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: '80vh' }}
           >
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          {getStepContent(activeStep)}
+            <Grid item style={{ marginTop: '90px' }}>
+              <h2 className={classes.header}>
+                Get your business set up with Perkify
+              </h2>
+            </Grid>
+            <Stepper
+              activeStep={activeStep}
+              style={{ paddingLeft: '0', width: '90%' }}
+            >
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            {getStepContent(activeStep)}
+          </Grid>
         </Grid>
+        <Grid
+          item
+          xs={false}
+          sm={false}
+          md={6}
+          className={classes.image}
+        ></Grid>
       </Grid>
-      <Grid item xs={false} sm={false} md={6} className={classes.image}></Grid>
-    </Grid>
+    </div>
   );
 };
 

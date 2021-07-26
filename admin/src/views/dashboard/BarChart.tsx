@@ -1,47 +1,46 @@
-import React from "react";
+import React from 'react';
 import {
   Bar,
   BarChart,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
 
 const data = [
   {
-    name: "Perk A",
+    name: 'Perk A',
     uv: 4000,
     pv: 2400,
   },
   {
-    name: "Perk B",
+    name: 'Perk B',
     uv: 3000,
     pv: 1398,
   },
   {
-    name: "Perk C",
+    name: 'Perk C',
     uv: 2000,
     pv: 9800,
   },
   {
-    name: "Perk D",
+    name: 'Perk D',
     uv: 2780,
     pv: 3908,
   },
   {
-    name: "Perk E",
+    name: 'Perk E',
     uv: 1890,
     pv: 4800,
   },
   {
-    name: "Perk F",
+    name: 'Perk F',
     uv: 2390,
     pv: 3800,
   },
   {
-    name: "Page G",
+    name: 'Page G',
     uv: 3490,
     pv: 4300,
   },
@@ -52,8 +51,8 @@ const BChart = (props) => {
     <ResponsiveContainer width="100%" height="80%">
       <BarChart data={props.data}>
         <XAxis dataKey="name" />
-        <YAxis height={100} unit="%" domain={[0, 100]}/>
-        <Tooltip formatter={(label) => label + " %"} cursor={false}/>
+        <YAxis height={100} unit="%" domain={[0, 100]} />
+        <Tooltip formatter={(label) => label + ' %'} cursor={false} />
         <Bar
           dataKey="spent"
           name="Spent"
