@@ -11,8 +11,12 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
-    useContext(AuthContext);
+  const {
+    currentUser,
+    admin,
+    hasPaymentMethods,
+    loadingAuthState,
+  } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const [employees, setEmployees] = useState([]);
@@ -129,9 +133,8 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
+    console.log(business);
     setDashboardLoading(true);
-    console.log('Use effect');
-    console.log(admin, business);
     if (Object.keys(admin).length != 0 && business) {
       const businessId = admin['companyID'];
 
@@ -139,15 +142,12 @@ const GeneralDashboard = () => {
         .where('businessID', '==', businessId)
         .get()
         .then((querySnapshot) => {
-          console.log('Getting people');
           const people = querySnapshot.docs.map((doc, index) => ({
             email: doc.id,
             id: index,
             group: doc.data()['group'],
             perks: doc.data()['perks'],
           }));
-          console.log('Got people');
-          console.log(people);
           setEmployees(people);
 
           console.log(business);
