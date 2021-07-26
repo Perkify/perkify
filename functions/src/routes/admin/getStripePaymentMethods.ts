@@ -1,4 +1,4 @@
-import { db, stripe } from 'models';
+import { db, stripe } from '../../models';
 
 export const getStripePaymentMethods = async (req, res) => {
   const customerDoc = await db.collection('customers').doc(req.user.uid).get();

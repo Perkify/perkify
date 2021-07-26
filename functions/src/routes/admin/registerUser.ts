@@ -1,7 +1,10 @@
 import { body, validationResult } from 'express-validator';
-import { handleError } from 'middleware';
-import { db, stripe } from 'models';
-import { emailNormalizationOptions, validateUserEmail } from 'utils';
+import { db, stripe } from '../../models';
+import {
+  emailNormalizationOptions,
+  handleError,
+  validateUserEmail,
+} from '.././../utils';
 
 export const registerUserValidators = [
   body('email')

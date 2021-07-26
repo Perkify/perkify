@@ -1,13 +1,13 @@
 import { body, validationResult } from 'express-validator';
-import { handleError } from 'middleware';
-import { db, stripe } from 'models';
+import { allPerks } from '../../../shared';
+import { db, stripe } from '../../models';
 import {
   createUserHelper,
+  handleError,
   sanitizeEmails,
   validateEmails,
   validatePerks,
-} from 'utils';
-import { allPerks } from '../../../shared';
+} from '../../utils';
 
 export const createGroupValidators = [
   body('group').not().isEmpty(),

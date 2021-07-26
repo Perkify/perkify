@@ -4,7 +4,7 @@ import { rapydAccessKey, rapydSecretKey } from '../configs';
 
 // --------------- Rapyd API Calls --------------- //
 
-const generateRapydHeaders = (httpMethod, urlPath, body = '') => {
+export const generateRapydHeaders = (httpMethod, urlPath, body = '') => {
   // const salt = parseInt(crypto.randomBytes(5).toString("hex"), 16).toString();
   // Randomly generated for each request.
   const salt = cryptoJS.lib.WordArray.random(12).toString();
@@ -31,7 +31,7 @@ const generateRapydHeaders = (httpMethod, urlPath, body = '') => {
   };
 };
 
-const createWallet = async (
+export const createWallet = async (
   firstName,
   lastName,
   email,
@@ -165,7 +165,6 @@ const createWallet = async (
     urlPath,
     JSON.stringify(body)
   );
-  console.log(headers);
   try {
     const walletResp = await axios({
       method: httpMethod,
@@ -290,7 +289,7 @@ const deleteContact = async (walletID, contactID) => {
 };
  */
 
-const depositWallet = async (walletID, amount) => {
+export const depositWallet = async (walletID, amount) => {
   const httpMethod = 'post';
   const urlPath = '/v1/account/deposit';
   const body = {
@@ -402,7 +401,7 @@ const getCardDetails = async (cardID) => {
 };
 */
 
-const blockCard = async (cardID) => {
+export const blockCard = async (cardID) => {
   const httpMethod = 'post';
   const urlPath = '/v1/issuing/cards/status';
   const body = {

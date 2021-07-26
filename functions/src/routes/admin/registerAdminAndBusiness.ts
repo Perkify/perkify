@@ -1,7 +1,6 @@
 import { body, validationResult } from 'express-validator';
-import { handleError } from 'middleware';
-import admin, { db } from 'models';
-import { emailNormalizationOptions } from 'utils';
+import admin, { db } from '../../models';
+import { emailNormalizationOptions, handleError } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
   body('firstName').not().isEmpty(),
