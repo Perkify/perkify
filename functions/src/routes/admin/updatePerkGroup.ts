@@ -1,11 +1,11 @@
 import { body, validationResult } from 'express-validator';
-import { db } from 'models';
+import { db } from '../../models';
 import {
   createUserHelper,
   deleteUserHelper,
   sanitizeEmails,
   validateEmails,
-} from 'utils';
+} from '../../utils';
 
 export const updatePerkGroupValidators = [
   body('group').not().isEmpty(),

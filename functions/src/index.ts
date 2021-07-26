@@ -1,8 +1,8 @@
 // import axios from 'axios';
 import * as cors from 'cors';
 import * as express from 'express';
-import { validateFirebaseIdToken } from 'middleware';
-import { functions } from 'models';
+import { validateFirebaseIdToken } from './utils';
+import { functions, auth } from './models';
 import {
   createGroup,
   createGroupValidators,
@@ -15,7 +15,7 @@ import {
   registerUserValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
-} from 'routes';
+} from './routes';
 
 // express endpoint
 
@@ -51,3 +51,11 @@ app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);
+
+exports.deleteUsers = functions.https.onRequest(
+  async (req, res): Promise<any> => {
+    const allUsers = await auth.listUsers();
+    const allUsersUID = allUsers.users.map((user) => user.uid);
+    return auth.deleteUsers(allUsersUID).then(() => res.send('deleted'));
+  }
+);

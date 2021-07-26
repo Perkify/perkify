@@ -9,7 +9,7 @@
     "target": "es2017",
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "baseUrl": "src"
+    "baseUrl": "src",
   },
   "compileOnSave": true,
   "include": ["src"]
