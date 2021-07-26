@@ -98,7 +98,7 @@ const GeneralDashboard = () => {
       });
       totalCost += cost;
     });
-    return totalCost;
+    return totalCost / employees.length;
   }
 
   function calculatePerksOffered() {
@@ -208,7 +208,7 @@ const GeneralDashboard = () => {
             <MetricCard
               title={'Cost Per Employee'}
               number={
-                '$' + roundNumber(calculateTotalCost() / employees.length)
+                '$' + roundNumber(calculateTotalCost())
               }
               icon={
                 <img
