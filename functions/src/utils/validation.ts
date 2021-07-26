@@ -1,6 +1,6 @@
-import { db } from '../models';
-import { allPerks } from '../../shared';
 import * as validator from 'validator';
+import { allPerks } from '../../shared';
+import { db } from '../models';
 // * Validation Helpers * //
 
 // gmail treats emails with and without dots as the same.

@@ -1,8 +1,6 @@
 import { body, validationResult } from 'express-validator';
-import { validateEmails, sanitizeEmails, validatePerks } from 'utils';
 import admin, { db } from 'models';
-import { handleError } from 'middleware';
-import { createUserHelper, deleteUserHelper } from 'utils';
+import { deleteUserHelper } from 'utils';
 
 export const deletePerkGroupValidators = [body('group').not().isEmpty()];
 

@@ -1,29 +1,21 @@
 // import axios from 'axios';
 import * as cors from 'cors';
 import * as express from 'express';
-import { allPerks } from '../shared';
-import { body, validationResult } from 'express-validator';
-import { handleError, validateFirebaseIdToken } from 'middleware';
+import { validateFirebaseIdToken } from 'middleware';
+import { functions } from 'models';
 import {
-  emailNormalizationOptions,
-  validateUserEmail,
-  deleteUserHelper,
-} from 'utils';
-import {
-  registerAdminAndBusiness,
-  registerAdminAndBusinessValidators,
   createGroup,
   createGroupValidators,
-  updatePerkGroup,
-  updatePerkGroupValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
+  getStripePaymentMethods,
+  registerAdminAndBusiness,
+  registerAdminAndBusinessValidators,
   registerUser,
   registerUserValidators,
-  getStripePaymentMethods,
+  updatePerkGroup,
+  updatePerkGroupValidators,
 } from 'routes';
-
-import admin, { db, functions } from 'models';
 
 // express endpoint
 

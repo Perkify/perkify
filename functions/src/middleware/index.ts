@@ -1,4 +1,4 @@
-import admin, { db } from '../models';
+import admin from '../models';
 // --------------- Middleware/Helpers --------------- //
 
 export const handleError = (err, res) => {

@@ -1,14 +1,7 @@
 import { body, validationResult } from 'express-validator';
-import {
-  emailNormalizationOptions,
-  validateUserEmail,
-  validateEmails,
-  sanitizeEmails,
-  validatePerks,
-} from 'utils';
-import admin, { db, stripe } from 'models';
 import { handleError } from 'middleware';
-import { createUserHelper, deleteUserHelper } from 'utils';
+import { db, stripe } from 'models';
+import { emailNormalizationOptions, validateUserEmail } from 'utils';
 
 export const registerUserValidators = [
   body('email')

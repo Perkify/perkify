@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import { privateStripeKey } from 'configs';
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import Stripe from 'stripe';
 
