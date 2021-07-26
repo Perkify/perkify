@@ -1,15 +1,24 @@
 import Header from 'components/Header';
-import { AuthContext } from 'contexts';
+import { LoadingContext } from 'contexts';
+import { functions } from 'firebaseApp';
 import React, { useContext, useEffect } from 'react';
 
 const Billing = () => {
-  const { customerPortalUrl } = useContext(AuthContext);
+  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    if (customerPortalUrl != '') {
-      window.location.assign(customerPortalUrl);
-    }
-  }, [customerPortalUrl]);
+    (async () => {
+      setDashboardLoading(true);
+      const functionRef = functions.httpsCallable(
+        'ext-firestore-stripe-subscriptions-createPortalLink'
+      );
+      const { data } = await functionRef({
+        returnUrl: window.location.origin,
+      });
+      console.log(data);
+      window.location.assign(data.url);
+    })();
+  }, []);
   return (
     <div>
       <Header title="Billing" crumbs={['Dashboard', 'Account', 'Billing']} />

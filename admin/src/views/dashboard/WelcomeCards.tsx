@@ -7,8 +7,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 export const WelcomeCards = () => {
+  const history = useHistory();
   return (
     <div>
       <Grid container spacing={4}>
@@ -39,6 +41,9 @@ export const WelcomeCards = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                  }}
+                  onClick={() => {
+                    history.push('/dashboard/billing');
                   }}
                 >
                   Set up billing
