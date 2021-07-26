@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Cell,
   Legend,
@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
   Sector,
   Tooltip,
-} from "recharts";
+} from 'recharts';
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -32,7 +32,7 @@ const renderActiveShape = (props) => {
   const my = cy + (outerRadius + 30) * sin;
   const ex = mx + (cos >= 0 ? 1 : -1) * 22;
   const ey = my;
-  const textAnchor = cos >= 0 ? "start" : "end";
+  const textAnchor = cos >= 0 ? 'start' : 'end';
 
   return (
     <g>
@@ -70,7 +70,7 @@ const renderActiveShape = (props) => {
 
 const PChart = (props) => {
   var [activeIndex, setIndex] = React.useState(0);
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   const onPieEnter = (value) => {
     const isIndex = (element) => element.name === value.name;
@@ -96,7 +96,7 @@ const PChart = (props) => {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(label) => label + " %"} />
+        <Tooltip formatter={(label) => label + ' %'} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>

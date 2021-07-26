@@ -1,28 +1,28 @@
-import { Card, Theme, Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import { lighten } from "@material-ui/core/styles";
-import Tooltip from "@material-ui/core/Tooltip";
+import { Card, Theme, Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import { lighten } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   DataGrid,
   GridToolbarContainer,
   useGridSlotComponentProps,
-} from "@material-ui/data-grid";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { createStyles, makeStyles } from "@material-ui/styles";
-import clsx from "clsx";
-import React from "react";
+} from '@material-ui/data-grid';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { createStyles, makeStyles } from '@material-ui/styles';
+import clsx from 'clsx';
+import React from 'react';
 
 const columns = [
   {
-    field: "email",
-    headerName: "Email",
+    field: 'email',
+    headerName: 'Email',
     width: 300,
     editable: false,
   },
   {
-    field: "group",
-    headerName: "Group",
+    field: 'group',
+    headerName: 'Group',
     width: 200,
     editable: false,
   },
@@ -33,10 +33,10 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
     root: {
       paddingLeft: theme.spacing(2),
       paddingRight: theme.spacing(1),
-      height: "60px",
+      height: '60px',
     },
     highlight:
-      theme.palette.type === "light"
+      theme.palette.type === 'light'
         ? {
             color: theme.palette.secondary.main,
             backgroundColor: lighten(theme.palette.secondary.light, 0.85),
@@ -46,8 +46,8 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
             backgroundColor: theme.palette.secondary.dark,
           },
     title: {
-      flex: "1 1 auto",
-      marginLeft: "10px",
+      flex: '1 1 auto',
+      marginLeft: '10px',
     },
   })
 );
@@ -55,7 +55,7 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
 const useDataGridStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      border: "none",
+      border: 'none',
       // padding: "10px 20px",
     },
   })
@@ -114,7 +114,7 @@ export const AddRemoveTable = ({
           <Button
             color="primary"
             onClick={onClickAdd}
-            style={{ marginRight: "10px" }}
+            style={{ marginRight: '10px' }}
           >
             {addButtonText}
           </Button>

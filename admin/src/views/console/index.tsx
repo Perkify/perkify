@@ -1,7 +1,7 @@
-import { AuthContext } from "contexts/Auth";
-import app from "firebaseApp";
-import React, { useContext } from "react";
-import { PerkifyApi } from "services";
+import { AuthContext } from 'contexts/Auth';
+import app from 'firebaseApp';
+import React, { useContext } from 'react';
+import { PerkifyApi } from 'services';
 
 const Console = () => {
   const { currentUser } = useContext(AuthContext);
@@ -10,16 +10,16 @@ const Console = () => {
     const bearerToken = await currentUser.getIdToken();
     console.log(bearerToken);
     const response = await PerkifyApi.post(
-      "/user/auth/createGroup",
+      '/user/auth/createGroup',
       JSON.stringify({
-        group: "A",
-        emails: ["prateek@humane.com", "prateek.humane@gmail.com"],
-        perks: ["Netflix Basic", "Masterclass"],
+        group: 'A',
+        emails: ['prateek@humane.com', 'prateek.humane@gmail.com'],
+        perks: ['Netflix Basic', 'Masterclass'],
       }),
       {
         headers: {
           Authorization: `Bearer ${bearerToken}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       }
     );
