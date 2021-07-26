@@ -71,14 +71,12 @@ const GettingStarted = () => {
         }
       );
       if (response.status != 200) {
-        console.log(response);
         throw {
           status: response.status,
           reason: response.statusText,
         };
       }
 
-      console.log(response);
       // should I do this here or elsewhere?
       const userDoc = await db.collection('users').doc(currentUser.email).get();
       const employeeData = userDoc.data();

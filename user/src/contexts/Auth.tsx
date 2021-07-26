@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
           // setCurrentUser(result.user);?
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           alert('an error occurred');
         });
     }
@@ -58,7 +58,6 @@ export const AuthProvider = ({ children }) => {
           alert('You do not have a registered user account');
         }
       }
-      console.log('Loading auth state complete');
       setLoadingAuthState(false);
     });
   }, []);

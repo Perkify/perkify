@@ -45,7 +45,6 @@ const AddPerks = ({
         const afterPerks = perksToAdd.concat(
           selectedPerks.map((perkObj) => perkObj.Name)
         );
-        console.log(afterPerks);
 
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',

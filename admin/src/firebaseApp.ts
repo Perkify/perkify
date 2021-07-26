@@ -20,7 +20,7 @@ const auth = app.auth();
 const functions = app.functions();
 
 if (process.env.REACT_APP_FIRESTORE_MODE == 'emulator') {
-  console.log('Using emulator firestore');
+  console.info('Using emulator firestore');
   db.useEmulator('localhost', 8080);
 }
 

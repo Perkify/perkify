@@ -82,7 +82,7 @@ export default function SignInSide(props) {
   const history = useHistory();
 
   const errorAlert = (error) => {
-    console.log(error);
+    console.error(error);
     setErrorMessage(error);
     setOpen(true);
   };
@@ -90,7 +90,6 @@ export default function SignInSide(props) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log('Loading set to true');
     try {
       await app.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
@@ -100,21 +99,6 @@ export default function SignInSide(props) {
       setLoading(false);
       errorAlert(error.message);
     }
-
-    //     axios
-    //       .post("/get_user_data", {
-    //         email: email,
-    //         password: password,
-    //       })
-    //       .then((data) => {
-    //         setUser(data.data);
-    //         setLoading(false);
-    //       })
-    //       .catch((e) => {
-    //         console.log("Error");
-    //         setLoading(false);
-    //         setOpen(true);
-    //       });
   };
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {

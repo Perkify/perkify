@@ -56,12 +56,11 @@ const GeneralDashboard = () => {
 
   const perksList = () => {
     let increasingDelay = 0;
-    console.log(business);
     if (business.groups) {
       return business.groups[employee.group].map((perk) => {
         increasingDelay += 500;
         // TODO: this is preferred:
-        // console.log(require(`images/perkLogos/${allPerksDict[perk].Img}`));
+        // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
         return (
           <Grow in={true} timeout={increasingDelay}>
             <Paper className={classes.perkCard}>

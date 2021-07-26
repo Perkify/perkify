@@ -53,8 +53,6 @@ const AddEmployees = ({
           employees.map((employeeObj) => employeeObj.email)
         );
 
-        console.log(afterEmployees);
-
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',
           JSON.stringify({

@@ -2,7 +2,7 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import { validateFirebaseIdToken } from './utils';
-import { functions, auth } from './models';
+import { functions } from './models';
 import {
   createGroup,
   createGroupValidators,

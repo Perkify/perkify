@@ -86,7 +86,7 @@ export default function ManagePeople(props) {
           setDashboardLoading(false);
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
         });
     }
   }, [admin]);

@@ -99,11 +99,9 @@ const CreateGroup = ({ history }) => {
     }
 
     if (!error) {
-      console.log('No errors');
       const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();
-        console.log(bearerToken);
         // call the api to create the group
         PerkifyApi.post(
           'user/auth/createGroup',
@@ -124,7 +122,7 @@ const CreateGroup = ({ history }) => {
             history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
           });
       })();
     }

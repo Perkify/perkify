@@ -26,7 +26,6 @@ export const validateUserEmail = async (email) => {
 export const validateEmails = async (emails) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {
-      console.log(email);
       if (!validator.isEmail(email)) {
         return Promise.reject(new Error(`email: ${email} is not email`));
       }

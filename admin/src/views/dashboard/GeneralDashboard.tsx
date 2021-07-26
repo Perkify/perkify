@@ -11,12 +11,8 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const {
-    currentUser,
-    admin,
-    hasPaymentMethods,
-    loadingAuthState,
-  } = useContext(AuthContext);
+  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
+    useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const [employees, setEmployees] = useState([]);
@@ -133,7 +129,6 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    console.log(business);
     setDashboardLoading(true);
     if (Object.keys(admin).length != 0 && business) {
       const businessId = admin['companyID'];
@@ -150,7 +145,6 @@ const GeneralDashboard = () => {
           }));
           setEmployees(people);
 
-          console.log(business);
           setGroups(business.groups);
           setDashboardLoading(false);
         })
@@ -158,7 +152,7 @@ const GeneralDashboard = () => {
           alert(error);
         });
     } else {
-      console.log('No such document!');
+      console.info('No such document!');
     }
   }, [currentUser, admin, business]);
 

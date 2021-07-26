@@ -47,17 +47,13 @@ const perkColumns = [
 export default function ManageGroups(props) {
   let { id } = useParams();
 
-  const [
-    isRemoveEmployeesModalVisible,
-    setIsRemoveEmployeesModalVisible,
-  ] = useState(false);
-  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] = useState(
-    false
-  );
+  const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
+    useState(false);
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
+    useState(false);
 
-  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] = useState(
-    false
-  );
+  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] =
+    useState(false);
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
   const [groupNotFound, setGroupNotFound] = useState(false);
 
@@ -65,10 +61,8 @@ export default function ManageGroups(props) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const [
-    isDeletePerkGroupModalVisible,
-    setIsDeletePerkGroupModalVisible,
-  ] = useState(false);
+  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
+    useState(false);
 
   const { business } = useContext(BusinessContext);
 
@@ -137,7 +131,7 @@ export default function ManageGroups(props) {
           setDashboardLoading(false);
         })
         .catch((error) => {
-          console.log('Error getting documents: ', error);
+          console.error('Error getting documents: ', error);
         });
     }
   }, [admin, id]);

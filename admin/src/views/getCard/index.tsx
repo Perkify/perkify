@@ -52,7 +52,6 @@ const GetCard = () => {
       setInvalidStep(false);
 
       let dobFormatted = new Date(new Date(dob)).toLocaleDateString();
-      console.log(dobFormatted);
       const response = await PerkifyApi.post(
         'user/registerUser',
         JSON.stringify({
@@ -63,7 +62,6 @@ const GetCard = () => {
         })
       );
       if (response.status != 200) {
-        console.log(response);
         throw {
           status: response.status,
           reason: response.statusText,

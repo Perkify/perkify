@@ -8,7 +8,6 @@ const Console = () => {
 
   const addGroup = async () => {
     const bearerToken = await currentUser.getIdToken();
-    console.log(bearerToken);
     const response = await PerkifyApi.post(
       '/user/auth/createGroup',
       JSON.stringify({
