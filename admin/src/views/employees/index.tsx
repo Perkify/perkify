@@ -60,28 +60,36 @@ export default function ManagePeople(props) {
   const { currentUser, admin } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  const groupData = Object.keys(business['groups']).sort();
+  const [groupData, setGroupData] = useState([]);
+
+  useEffect(() => {
+    if (business && business['groups']) {
+      setGroupData(Object.keys(business['groups']).sort());
+    }
+  }, [business]);
 
   useEffect(() => {
     setDashboardLoading(true);
     // get list of employees that belong to the business
-    db.collection('users')
-      .where('businessID', '==', admin.companyID)
-      .get()
-      .then((querySnapshot) => {
-        setPeopleData(
-          querySnapshot.docs.map((doc, index) => ({
-            email: doc.id,
-            id: index,
-            group: doc.data()['group'],
-          }))
-        );
-        setDashboardLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    if (Object.keys(admin).length != 0) {
+      db.collection('users')
+        .where('businessID', '==', admin.companyID)
+        .get()
+        .then((querySnapshot) => {
+          setPeopleData(
+            querySnapshot.docs.map((doc, index) => ({
+              email: doc.id,
+              id: index,
+              group: doc.data()['group'],
+            }))
+          );
+          setDashboardLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [admin]);
 
   const handleEmailError = (event) => {
     setEmails(event.target.value);

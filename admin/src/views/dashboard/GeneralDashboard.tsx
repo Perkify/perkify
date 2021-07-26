@@ -15,10 +15,10 @@ const GeneralDashboard = () => {
     useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
-  var [employees, setEmployees] = useState([]);
-  var [groups, setGroups] = useState({});
+  const [employees, setEmployees] = useState([]);
+  const [groups, setGroups] = useState({});
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  var [selectedGroup, setSelectedGroup] = useState('All Groups');
+  const [selectedGroup, setSelectedGroup] = useState('All Groups');
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
@@ -36,7 +36,7 @@ const GeneralDashboard = () => {
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['group'];
-      if (groups[group] === undefined) {
+      if (groups === undefined || groups[group] === undefined) {
         return 0;
       }
       groups[group].forEach((perk) => {
@@ -144,17 +144,11 @@ const GeneralDashboard = () => {
             group: doc.data()['group'],
             perks: doc.data()['perks'],
           }));
-          db.collection('businesses')
-            .doc(businessId)
-            .get()
-            .then((doc) => {
-              const businessDoc = doc.data();
-              if (businessDoc) {
-                setEmployees(people);
-                setGroups(businessDoc.groups);
-                setDashboardLoading(false);
-              }
-            });
+          setEmployees(people);
+
+          console.log(business);
+          setGroups(business.groups);
+          setDashboardLoading(false);
         })
         .catch((error) => {
           alert(error);
