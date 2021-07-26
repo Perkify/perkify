@@ -14,17 +14,20 @@ const GeneralDashboard = () => {
   const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
     useContext(AuthContext);
   const { business } = useContext(BusinessContext);
-
-  const [employees, setEmployees] = useState([]);
-  const [groups, setGroups] = useState({});
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  const [selectedGroup, setSelectedGroup] = useState('All Groups');
+
+  var [employees, setEmployees] = useState([]);
+  var [groups, setGroups] = useState({});
+  var [selectedGroup, setSelectedGroup] = useState('All Groups');
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
   }
 
   function convertGroups() {
+    if (dashboardLoading) {
+      return [];
+    }
     let retArr = Object.keys(groups);
     retArr.push('All Groups');
     return retArr;
@@ -32,11 +35,14 @@ const GeneralDashboard = () => {
 
   function calculatePieData() {
     // Returns pie chart data
+    if (dashboardLoading) {
+      return [];
+    }
     let tempDict = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['group'];
-      if (groups === undefined || groups[group] === undefined) {
+      if (groups[group] === undefined) {
         return 0;
       }
       groups[group].forEach((perk) => {
@@ -67,9 +73,15 @@ const GeneralDashboard = () => {
   }
 
   function calculateTotalCost() {
+    if (dashboardLoading) {
+      return 0;
+    }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
-
+    if (groups === undefined) {
+      return 0;
+    }
+    let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
       let group = employee['group'];
@@ -81,10 +93,13 @@ const GeneralDashboard = () => {
       });
       totalCost += cost;
     });
-    return totalCost;
+    return totalCost / employees.length;
   }
 
   function calculatePerksOffered() {
+    if (dashboardLoading) {
+      return 0;
+    }
     //returns num of perks offered
     let perks = new Set([]);
     Object.keys(groups).forEach((group) => {
@@ -95,9 +110,16 @@ const GeneralDashboard = () => {
     return perks.size;
   }
 
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
   function calculateBarGraphData() {
     //returns bar graph data in array form
     let retData = [];
+    if (dashboardLoading) {
+      return retData;
+    }
     let tempDict = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
@@ -121,7 +143,7 @@ const GeneralDashboard = () => {
     });
     Object.keys(tempDict).forEach((perk) => {
       //TODO: Calculate amount spent in comparison to amount not spent
-      let newRow = { name: perk, unspent: tempDict[perk], spent: 0 };
+      let newRow = { name: perk, spent: getRandomInt(100), total: 100 };
       retData.push(newRow);
     });
 
@@ -176,9 +198,7 @@ const GeneralDashboard = () => {
           <Grid item xs={4}>
             <MetricCard
               title={'Cost Per Employee'}
-              number={
-                '$' + roundNumber(calculateTotalCost() / employees.length)
-              }
+              number={'$' + roundNumber(calculateTotalCost())}
               icon={
                 <img
                   src="/images/undraw_Investing.svg"
