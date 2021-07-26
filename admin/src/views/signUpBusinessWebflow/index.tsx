@@ -87,17 +87,24 @@ const SignUpBusinessWebflow = () => {
   const [line1, setAddress] = React.useState('');
   const [city, setCity] = React.useState('');
   const [state, setState] = React.useState('');
-  const [zip, setZip] = React.useState('');
+  const [postalCode, setPostalCode] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const BusinessFormSetProps = {
     setBusinessName,
     setAddress,
     setCity,
     setState,
-    setZip,
+    setPostalCode,
     setPhone,
   };
-  const BusinessFormProps = { businessName, line1, city, state, zip, phone };
+  const BusinessFormProps = {
+    businessName,
+    line1,
+    city,
+    state,
+    postalCode,
+    phone,
+  };
 
   const [newUser, setNewUser] = React.useState<firebase.User>(
     null as firebase.User | null
@@ -112,6 +119,7 @@ const SignUpBusinessWebflow = () => {
           await PerkifyApi.post('user/registerAdminAndBusiness', {
             ...AdminFormProps,
             ...BusinessFormProps,
+            line2: '',
           });
           const result = await app
             .auth()

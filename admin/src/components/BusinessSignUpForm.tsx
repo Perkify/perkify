@@ -124,15 +124,15 @@ const BusinessSignUpForm = (props) => {
       <Grid item xs={12} sm={6}>
         <TextField
           required
-          id="zip"
-          name="zip"
+          id="postalCode"
+          name="postalCode"
           label="Zip / Postal code"
           variant="outlined"
           fullWidth
           autoComplete="shipping postal-code"
-          onChange={fillTextbox(props.setZip)}
-          value={props.zip}
-          error={props.zip === '' && props.invalidStep}
+          onChange={fillTextbox(props.setPostalCode)}
+          value={props.postalCode}
+          error={props.postalCode === '' && props.invalidStep}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

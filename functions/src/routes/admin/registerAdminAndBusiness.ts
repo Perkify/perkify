@@ -26,7 +26,6 @@ export const registerAdminAndBusiness = async (req, res) => {
     city,
     state,
     postalCode,
-    ...rest
   } = req.body;
 
   try {
@@ -41,14 +40,14 @@ export const registerAdminAndBusiness = async (req, res) => {
       throw error;
     }
 
-    if (Object.keys(rest).length > 0) {
-      const error = {
-        status: 400,
-        reason: 'extraneous parameters',
-        reason_detail: Object.keys(rest).join(','),
-      };
-      throw error;
-    }
+    // if (Object.keys(rest).length > 0) {
+    //   const error = {
+    //     status: 400,
+    //     reason: 'extraneous parameters',
+    //     reason_detail: Object.keys(rest).join(','),
+    //   };
+    //   throw error;
+    // }
 
     // create firebase user
     const newUser = await admin.auth().createUser({
