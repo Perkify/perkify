@@ -42,7 +42,7 @@ const GeneralDashboard = () => {
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['group'];
-      if (groups[group] === undefined) {
+      if (groups === undefined || groups[group] === undefined) {
         return 0;
       }
       groups[group].forEach((perk) => {
