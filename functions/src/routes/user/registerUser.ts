@@ -4,7 +4,7 @@ import {
   emailNormalizationOptions,
   handleError,
   validateUserEmail,
-} from '.././../utils';
+} from '../../utils';
 
 export const registerUserValidators = [
   body('email')

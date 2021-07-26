@@ -15,11 +15,14 @@ import {
   registerUserValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
+  stripeWebhooks,
 } from './routes';
+import * as bodyParser from 'body-parser';
 
 // express endpoint
 
 const app = express();
+const stripeWebhooksApp = express();
 
 app.use(
   cors({
@@ -51,6 +54,14 @@ app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
 
 exports.user = functions.https.onRequest(app);
+
+stripeWebhooksApp.use(express.json());
+stripeWebhooksApp.post(
+  '/webhook',
+  bodyParser.raw({ type: 'application/json' }),
+  stripeWebhooks
+);
+exports.stripe = functions.https.onRequest(stripeWebhooksApp);
 
 exports.deleteUsers = functions.https.onRequest(
   async (req, res): Promise<any> => {
