@@ -1,8 +1,8 @@
 // import axios from 'axios';
+import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
-import { validateFirebaseIdToken } from './utils';
-import { functions, auth } from './models';
+import { auth, functions } from './models';
 import {
   createGroup,
   createGroupValidators,
@@ -13,11 +13,11 @@ import {
   registerAdminAndBusinessValidators,
   registerUser,
   registerUserValidators,
+  stripeWebhooks,
   updatePerkGroup,
   updatePerkGroupValidators,
-  stripeWebhooks,
 } from './routes';
-import * as bodyParser from 'body-parser';
+import { validateFirebaseIdToken } from './utils';
 
 // express endpoint
 

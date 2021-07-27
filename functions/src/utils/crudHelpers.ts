@@ -1,4 +1,4 @@
-import admin, { db } from '../models';
+import admin, { db, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
   const docRef = db.collection('users').doc(email);
@@ -6,7 +6,7 @@ export const createUserHelper = async (email, businessID, group, perks) => {
   await docRef.set({
     businessID,
     group,
-    perks: [],
+    perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
   });
 
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
@@ -29,5 +29,8 @@ export const createUserHelper = async (email, businessID, group, perks) => {
 };
 
 export const deleteUserHelper = async (userDoc) => {
+  await stripe.issuing.cards.update(userDoc.data().card.id, {
+    status: 'canceled',
+  });
   await db.collection('users').doc(userDoc.id).delete();
 };
