@@ -40,9 +40,8 @@ app.post(
   registerAdminAndBusiness
 );
 
-app.post('/registerUser', registerUserValidators, registerUser);
-
 app.use('/auth', validateFirebaseIdToken);
+app.post('/auth/registerUser', registerUserValidators, registerUser);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);

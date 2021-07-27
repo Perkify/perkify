@@ -1,19 +1,10 @@
 import { body, validationResult } from 'express-validator';
 import { db, stripe } from '../../models';
-import {
-  emailNormalizationOptions,
-  handleError,
-  validateUserEmail,
-} from '.././../utils';
+import { handleError } from '.././../utils';
 
 export const registerUserValidators = [
-  body('email')
-    .isEmail()
-    .normalizeEmail(emailNormalizationOptions)
-    .custom(validateUserEmail),
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
-  body('dob').isDate(),
 ];
 export const registerUser = async (req, res) => {
   const { firstName, lastName, ...rest } = req.body;
@@ -21,6 +12,7 @@ export const registerUser = async (req, res) => {
   try {
     // check for validation errors
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
@@ -69,6 +61,11 @@ export const registerUser = async (req, res) => {
     }
 
     const billingAddress = businessData.billingAddress;
+
+    if (billingAddress && billingAddress?.line2 == '') {
+      delete billingAddress['line2'];
+    }
+
     const cardholder = await stripe.issuing.cardholders.create({
       type: 'individual',
       name: `${firstName} ${lastName}`,
@@ -90,10 +87,6 @@ export const registerUser = async (req, res) => {
     const cardDetails = await stripe.issuing.cards.retrieve(card.id, {
       expand: ['number', 'cvc'],
     });
-
-    if (billingAddress && billingAddress?.line2 == '') {
-      delete billingAddress['line2'];
-    }
 
     await db
       .collection('users')
