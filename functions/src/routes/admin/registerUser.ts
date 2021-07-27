@@ -91,6 +91,10 @@ export const registerUser = async (req, res) => {
       expand: ['number', 'cvc'],
     });
 
+    if (billingAddress && billingAddress?.line2 == '') {
+      delete billingAddress['line2'];
+    }
+
     await db
       .collection('users')
       .doc(email)
