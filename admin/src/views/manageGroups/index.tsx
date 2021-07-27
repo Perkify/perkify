@@ -230,6 +230,8 @@ export default function ManageGroups(props) {
         setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
         selectedEmployees={selectedEmployees}
         setSelectedEmployees={setSelectedEmployees}
+        group={id}
+        employees={groupEmails}
       />
 
       <AddPerks
@@ -244,6 +246,9 @@ export default function ManageGroups(props) {
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
+        groupPerks={selectedPerks}
+        group={id}
+        emails={groupEmails}
       />
       <ConfirmationModal
         isModalVisible={isDeletePerkGroupModalVisible}

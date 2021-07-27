@@ -23,10 +23,18 @@ const AddPerks = ({
 }) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [selectedPerksError, setSelectedPerksError] = useState('');
-  const [availablePerks, setAvailablePerks] = useState(
-    allPerks.map((perkObj) => perkObj.Name)
-  );
+  const [availablePerks, setAvailablePerks] = useState([]);
   const { currentUser } = useContext(AuthContext);
+
+  React.useEffect(() => {
+    setAvailablePerks(
+      allPerks
+        .map((perkObj) => perkObj.Name)
+        .filter((perk) => {
+          return !selectedPerks.some((perkObj) => perkObj.name == perk);
+        })
+    );
+  }, [selectedPerks]);
 
   const addPerksToPerkGroup = (event) => {
     event.preventDefault();
