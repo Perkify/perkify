@@ -6,14 +6,56 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import React from 'react';
+import { AuthContext } from 'contexts';
+import React, { useContext } from 'react';
+import { PerkifyApi } from 'services';
 
 const RemoveEmployees = ({
   isRemoveEmployeesModalVisible,
   setIsRemoveEmployeesModalVisible,
   selectedEmployees,
   setSelectedEmployees,
+  group,
+  employees,
 }) => {
+  const { currentUser } = useContext(AuthContext);
+
+  const removeUsers = (event) => {
+    let error = false;
+
+    event.preventDefault();
+    if (!error) {
+      setIsRemoveEmployeesModalVisible(false);
+
+      (async () => {
+        const bearerToken = await currentUser.getIdToken();
+        // get all employees that are not selected
+        // by removing all employees that were selected
+        const afterEmployees = employees.filter(
+          (employee, index) => selectedEmployees.indexOf(index) == -1
+        );
+        const afterEmails = afterEmployees.map((employee) => employee.email);
+
+        await PerkifyApi.put(
+          'user/auth/updatePerkGroup',
+          JSON.stringify({
+            group,
+            emails: afterEmails,
+            perks: undefined,
+          }),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        setIsRemoveEmployeesModalVisible(false);
+        setSelectedEmployees([]);
+      })();
+    }
+  };
+
   return (
     <Dialog
       open={isRemoveEmployeesModalVisible}
@@ -33,10 +75,7 @@ const RemoveEmployees = ({
         >
           No
         </Button>
-        <Button
-          onClick={() => setIsRemoveEmployeesModalVisible(false)}
-          color="primary"
-        >
+        <Button onClick={removeUsers} color="primary">
           Yes
         </Button>
       </DialogActions>

@@ -64,7 +64,8 @@ const useDataGridStyles = makeStyles((theme: Theme) =>
 export const AddRemoveTable = ({
   rows,
   columns,
-  setSelected,
+  selectedRows,
+  setSelectedRows,
   onClickAdd,
   onClickDelete,
   tableName,
@@ -133,8 +134,9 @@ export const AddRemoveTable = ({
         rowHeight={60}
         headerHeight={60}
         checkboxSelection
-        onSelectionModelChange={(newSelection) => {
-          setSelected(newSelection.selectionModel);
+        selectionModel={selectedRows}
+        onSelectionModelChange={(selectionModel) => {
+          setSelectedRows(selectionModel);
         }}
         components={{
           Toolbar: CustomToolbar,

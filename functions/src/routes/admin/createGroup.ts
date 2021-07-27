@@ -49,7 +49,7 @@ export const createGroup = async (req, res) => {
       const docRef = db.collection('users').doc(email);
 
       const docSnapshot = await docRef.get();
-      if (docSnapshot.exists && docSnapshot.data().businessID) {
+      if (docSnapshot.exists && docSnapshot.data()?.businessID) {
         const error = {
           status: 400,
           reason: 'Bad Request',
@@ -60,13 +60,24 @@ export const createGroup = async (req, res) => {
     }
 
     // get admins business
-    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
-    const businessID = adminSnap.data().companyID;
-    const customerDoc = await db
-      .collection('customers')
-      .doc(req.user.uid)
-      .get();
-    const stripeCustomerId = customerDoc.data().stripeId;
+    const adminData = (
+      await db.collection('admins').doc(req.user.uid).get()
+    ).data();
+    const customerData = (
+      await db.collection('customers').doc(req.user.uid).get()
+    ).data();
+
+    if (adminData == null || customerData == null) {
+      const error = {
+        status: 500,
+        reason: 'Missing documents',
+        reason_detail: `Documents missing from firestore`,
+      };
+      throw error;
+    }
+
+    const businessID = adminData.companyID;
+    const stripeCustomerId = customerData.stripeId;
 
     // charge wallet for price*perks*employees
     // TODO: setup monthly charges

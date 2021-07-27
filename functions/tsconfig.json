@@ -8,7 +8,7 @@
     "strict": true,
     "target": "es2017",
     "noImplicitAny": false,
-    "strictNullChecks": false,
+    // "strictNullChecks": false,
     // "baseUrl": "src",
   },
   "compileOnSave": true,

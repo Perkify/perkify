@@ -43,7 +43,6 @@ const AddEmployees = ({
       error = true;
     }
     if (!error) {
-      setIsAddEmployeesModalVisible(false);
       (async () => {
         const bearerToken = await currentUser.getIdToken();
 
@@ -67,6 +66,7 @@ const AddEmployees = ({
             },
           }
         );
+        setIsAddEmployeesModalVisible(false);
       })();
     }
   };

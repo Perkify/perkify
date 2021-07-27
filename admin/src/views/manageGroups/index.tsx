@@ -120,19 +120,20 @@ export default function ManageGroups(props) {
       db.collection('users')
         .where('businessID', '==', admin.companyID)
         .where('group', '==', id)
-        .get()
-        .then((querySnapshot) => {
-          setEmails(
-            querySnapshot.docs.map((doc, index) => ({
-              email: doc.id,
-              id: index,
-            }))
-          );
-          setDashboardLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error getting documents: ', error);
-        });
+        .onSnapshot(
+          (querySnapshot) => {
+            setEmails(
+              querySnapshot.docs.map((doc, index) => ({
+                email: doc.id,
+                id: index,
+              }))
+            );
+            setDashboardLoading(false);
+          },
+          (error) => {
+            console.error('Error getting documents: ', error);
+          }
+        );
     }
   }, [admin, id]);
 
@@ -189,7 +190,8 @@ export default function ManageGroups(props) {
             rows={groupPerks}
             height={600}
             columns={perkColumns}
-            setSelected={setSelectedPerks}
+            selectedRows={selectedPerks}
+            setSelectedRows={setSelectedPerks}
             onClickAdd={() => {
               setIsAddPerksModalVisible(true);
             }}
@@ -205,7 +207,8 @@ export default function ManageGroups(props) {
             height={600}
             rows={groupEmails}
             columns={columns}
-            setSelected={setSelectedEmployees}
+            selectedRows={selectedEmployees}
+            setSelectedRows={setSelectedEmployees}
             onClickAdd={() => {
               setIsAddEmployeesModalVisible(true);
             }}
@@ -230,6 +233,8 @@ export default function ManageGroups(props) {
         setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
         selectedEmployees={selectedEmployees}
         setSelectedEmployees={setSelectedEmployees}
+        group={id}
+        employees={groupEmails}
       />
 
       <AddPerks
@@ -244,6 +249,9 @@ export default function ManageGroups(props) {
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
+        groupPerks={selectedPerks}
+        group={id}
+        emails={groupEmails}
       />
       <ConfirmationModal
         isModalVisible={isDeletePerkGroupModalVisible}
