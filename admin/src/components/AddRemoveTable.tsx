@@ -135,7 +135,7 @@ export const AddRemoveTable = ({
         headerHeight={60}
         checkboxSelection
         selectionModel={selectedRows}
-        onSelectionModelChange={({ selectionModel }) => {
+        onSelectionModelChange={(selectionModel) => {
           setSelectedRows(selectionModel);
         }}
         components={{

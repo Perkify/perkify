@@ -166,8 +166,9 @@ const GeneralDashboard = () => {
             perks: doc.data()['perks'],
           }));
           setEmployees(people);
-
-          setGroups(business.groups);
+          if (business) {
+            setGroups(business.groups);
+          }
           setDashboardLoading(false);
         })
         .catch((error) => {

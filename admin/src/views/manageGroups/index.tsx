@@ -120,19 +120,20 @@ export default function ManageGroups(props) {
       db.collection('users')
         .where('businessID', '==', admin.companyID)
         .where('group', '==', id)
-        .get()
-        .then((querySnapshot) => {
-          setEmails(
-            querySnapshot.docs.map((doc, index) => ({
-              email: doc.id,
-              id: index,
-            }))
-          );
-          setDashboardLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error getting documents: ', error);
-        });
+        .onSnapshot(
+          (querySnapshot) => {
+            setEmails(
+              querySnapshot.docs.map((doc, index) => ({
+                email: doc.id,
+                id: index,
+              }))
+            );
+            setDashboardLoading(false);
+          },
+          (error) => {
+            console.error('Error getting documents: ', error);
+          }
+        );
     }
   }, [admin, id]);
 

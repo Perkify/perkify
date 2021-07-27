@@ -21,8 +21,19 @@ export const deletePerkGroup = async (req, res) => {
     }
 
     // get admins business
-    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
-    const businessID = adminSnap.data().companyID;
+    const adminData = (
+      await db.collection('admins').doc(req.user.uid).get()
+    ).data();
+
+    if (adminData == null) {
+      const error = {
+        status: 500,
+        reason: 'Missing documents',
+        reason_detail: `Documents missing from firestore`,
+      };
+      throw error;
+    }
+    const businessID = adminData.companyID;
 
     // TOOD: create helper function to get business info from logged in admin
     // //const businessSnap = await db
@@ -36,7 +47,7 @@ export const deletePerkGroup = async (req, res) => {
     const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
 
     if (!groupUsersSnapshot.empty) {
-      const usersToDelete = [];
+      const usersToDelete: any[] = [];
       groupUsersSnapshot.forEach((userDoc) => {
         usersToDelete.push(deleteUserHelper(userDoc));
       });

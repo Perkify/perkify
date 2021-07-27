@@ -42,13 +42,33 @@ export const registerUser = async (req, res) => {
     const email = req.user.email;
 
     // TODO: get field directly
-    const userSnap = await db.collection('users').doc(email).get();
-    const businessID = userSnap.data().businessID;
-    const businessSnap = await db
-      .collection('businesses')
-      .doc(businessID)
-      .get();
-    const billingAddress = businessSnap.data().billingAddress;
+    const userData = (await db.collection('users').doc(email).get()).data();
+
+    if (!userData) {
+      const error = {
+        status: 500,
+        reason: 'Missing user document',
+        reason_detail: `User documents missing from firestore`,
+      };
+      throw error;
+    }
+
+    const businessID = userData.businessID;
+
+    const businessData = (
+      await db.collection('businesses').doc(businessID).get()
+    ).data();
+
+    if (!businessData) {
+      const error = {
+        status: 500,
+        reason: 'Missing business document',
+        reason_detail: `Business documents missing from firestore`,
+      };
+      throw error;
+    }
+
+    const billingAddress = businessData.billingAddress;
     const cardholder = await stripe.issuing.cardholders.create({
       type: 'individual',
       name: `${firstName} ${lastName}`,

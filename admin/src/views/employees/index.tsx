@@ -36,7 +36,7 @@ export default function ManagePeople(props) {
   const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
   const [emails, setEmails] = useState('');
   const [emailsError, setEmailsError] = useState('');
-  const [selectedPerksError, setSelectedPerksError] = useState('');
+  const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
 
   const handleOk = () => {
     setIsRemoveModalVisible(false);
@@ -110,7 +110,7 @@ export default function ManagePeople(props) {
       error = true;
     }
     if (selectedPerkGroup.length == 0) {
-      setSelectedPerksError('Select perks');
+      setSelectedPerkGroupError('Select perks');
       error = true;
     }
     if (!error) {
@@ -202,10 +202,10 @@ export default function ManagePeople(props) {
             value={selectedPerkGroup}
             fullWidth
             onChange={(event) => {
-              setSelectedPerksError('');
+              setSelectedPerkGroupError('');
               setSelectedPerkGroup(event.target.value as string[]);
             }}
-            error={selectedPerksError != ''}
+            error={selectedPerkGroupError != ''}
           >
             <MenuItem value="" disabled>
               Select Perk Group
