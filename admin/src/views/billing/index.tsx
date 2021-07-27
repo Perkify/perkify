@@ -4,8 +4,10 @@ import { functions } from 'firebaseApp';
 import React, { useContext, useEffect } from 'react';
 
 const Billing = () => {
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } = useContext(LoadingContext);
 
+
+  setFreezeNav(true)
   useEffect(() => {
     (async () => {
       setDashboardLoading(true);
@@ -16,6 +18,7 @@ const Billing = () => {
         returnUrl: window.location.origin,
       });
       console.log(data);
+      setFreezeNav(false)
       window.location.assign(data.url);
     })();
   }, []);
