@@ -189,7 +189,8 @@ export default function ManageGroups(props) {
             rows={groupPerks}
             height={600}
             columns={perkColumns}
-            setSelected={setSelectedPerks}
+            selectedRows={selectedPerks}
+            setSelectedRows={setSelectedPerks}
             onClickAdd={() => {
               setIsAddPerksModalVisible(true);
             }}
@@ -205,7 +206,8 @@ export default function ManageGroups(props) {
             height={600}
             rows={groupEmails}
             columns={columns}
-            setSelected={setSelectedEmployees}
+            selectedRows={selectedEmployees}
+            setSelectedRows={setSelectedEmployees}
             onClickAdd={() => {
               setIsAddEmployeesModalVisible(true);
             }}

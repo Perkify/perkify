@@ -153,7 +153,8 @@ export default function ManagePeople(props) {
       <AddRemoveTable
         rows={peopleData}
         columns={columns}
-        setSelected={setSelection}
+        selectedRows={selectedUsers}
+        setSelectedRows={setSelection}
         height={500}
         onClickAdd={() => setIsAddModalVisible(true)}
         onClickDelete={() => {

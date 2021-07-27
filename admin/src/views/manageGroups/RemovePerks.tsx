@@ -29,13 +29,12 @@ const RemovePerks = ({
       (async () => {
         const bearerToken = await currentUser.getIdToken();
 
-        const afterPerks = groupPerks.filter((perkObj) =>
-          selectedPerks.some((selectedPerk) => selectedPerk === perkObj.id)
+        // get all perks that are not selected
+        // by removing all perks that were selected
+        const afterPerks = groupPerks.filter(
+          (perkObj, index) => selectedPerks.indexOf(index) == -1
         );
         const afterPerksNames = afterPerks.map((perkObj) => perkObj.Name);
-
-        // setSelectedPerks(afterPerks)
-
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',
           JSON.stringify({
@@ -51,6 +50,7 @@ const RemovePerks = ({
           }
         );
         setIsRemovePerksModalVisible(false);
+        setSelectedPerks([]);
       })();
     }
   };

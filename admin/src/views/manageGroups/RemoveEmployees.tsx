@@ -30,11 +30,10 @@ const RemoveEmployees = ({
       (async () => {
         const bearerToken = await currentUser.getIdToken();
         // get all employees that are not selected
-        const afterEmployees = employees.filter((employee) => {
-          return selectedEmployees.some(
-            (selectedEmployee) => selectedEmployee === employee.id
-          );
-        });
+        // by removing all employees that were selected
+        const afterEmployees = employees.filter(
+          (employee, index) => selectedEmployees.indexOf(index) == -1
+        );
         const afterEmails = afterEmployees.map((employee) => employee.email);
 
         await PerkifyApi.put(
@@ -51,8 +50,8 @@ const RemoveEmployees = ({
             },
           }
         );
-        setSelectedEmployees(afterEmails);
         setIsRemoveEmployeesModalVisible(false);
+        setSelectedEmployees([]);
       })();
     }
   };
