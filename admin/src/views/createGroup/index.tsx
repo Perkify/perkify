@@ -79,7 +79,6 @@ const CreateGroup = ({ history }) => {
   };
 
   const createPerkGroup = (e) => {
-    setDashboardLoading(true);
     e.preventDefault();
     let error = false;
 
@@ -102,6 +101,7 @@ const CreateGroup = ({ history }) => {
     }
 
     if (!error) {
+      setDashboardLoading(true);
       const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();

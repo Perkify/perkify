@@ -13,10 +13,12 @@ import GeneralDashboard from './GeneralDashboard';
 const Dashboard = () => {
   const { path, url } = useRouteMatch();
 
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav} = useContext(LoadingContext);
 
   return (
-    <>
+    <div
+      style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}
+    >
       <LinearProgress
         hidden={!dashboardLoading}
         style={{
@@ -25,6 +27,7 @@ const Dashboard = () => {
           width: '100%',
           position: 'absolute',
         }}
+        
       />
       <VerticalNav>
         <Switch>
@@ -36,7 +39,7 @@ const Dashboard = () => {
           <Route path={`${path}/billing`} component={Billing} />
         </Switch>
       </VerticalNav>
-    </>
+    </div>
   );
 };
 
