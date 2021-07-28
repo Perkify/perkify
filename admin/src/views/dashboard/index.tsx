@@ -13,21 +13,20 @@ import GeneralDashboard from './GeneralDashboard';
 const Dashboard = () => {
   const { path, url } = useRouteMatch();
 
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav} = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
+  console.log(freezeNav);
 
   return (
-    <div
-      style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}
-    >
+    <div style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}>
       <LinearProgress
         hidden={!dashboardLoading}
         style={{
           zIndex: 10000,
           height: '6px',
           width: '100%',
-          position: 'absolute',
+          position: 'fixed',
         }}
-        
       />
       <VerticalNav>
         <Switch>

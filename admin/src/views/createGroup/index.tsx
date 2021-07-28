@@ -17,7 +17,8 @@ const CreateGroup = ({ history }) => {
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
@@ -102,6 +103,7 @@ const CreateGroup = ({ history }) => {
 
     if (!error) {
       setDashboardLoading(true);
+      setFreezeNav(true);
       const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();
@@ -123,6 +125,7 @@ const CreateGroup = ({ history }) => {
         )
           .then(() => {
             setDashboardLoading(false);
+            setFreezeNav(false);
             history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {

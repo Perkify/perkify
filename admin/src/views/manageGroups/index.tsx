@@ -88,30 +88,34 @@ export default function ManageGroups(props) {
     },
   ];
 
-  const deletePerkGroup = () => {
-    (async () => {
-      const bearerToken = await currentUser.getIdToken();
+  const deletePerkGroup = async () => {
+    const bearerToken = await currentUser.getIdToken();
+    setDashboardLoading(true);
+    setFreezeNav(true);
 
-      await PerkifyApi.post(
-        'user/auth/deletePerkGroup',
-        JSON.stringify({
-          group: id,
-        }),
-        {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+    await PerkifyApi.post(
+      'user/auth/deletePerkGroup',
+      JSON.stringify({
+        group: id,
+      }),
+      {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-      history.push('/dashboard');
-    })();
+    setDashboardLoading(false);
+    setFreezeNav(false);
+
+    history.push('/dashboard');
   };
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   useEffect(() => {
     if (Object.keys(admin).length != 0) {

@@ -30,8 +30,8 @@ const ConfirmationModal = ({
           No
         </Button>
         <Button
-          onClick={() => {
-            onConfirmation();
+          onClick={async () => {
+            await onConfirmation();
             setIsModalVisible(false);
           }}
           color="primary"
