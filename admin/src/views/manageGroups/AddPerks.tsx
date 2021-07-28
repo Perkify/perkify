@@ -31,7 +31,7 @@ const AddPerks = ({
       allPerks
         .map((perkObj) => perkObj.Name)
         .filter((perk) => {
-          return !selectedPerks.some((perkObj) => perkObj.name == perk);
+          return !selectedPerks.some((perkObj) => perkObj.Name == perk);
         })
     );
   }, [selectedPerks]);

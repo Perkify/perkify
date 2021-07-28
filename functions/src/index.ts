@@ -1,7 +1,6 @@
 // import axios from 'axios';
 import * as cors from 'cors';
 import * as express from 'express';
-import { validateFirebaseIdToken } from './utils';
 import { functions } from './models';
 import {
   createGroup,
@@ -16,6 +15,7 @@ import {
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './routes';
+import { validateFirebaseIdToken } from './utils';
 
 // express endpoint
 
