@@ -186,9 +186,9 @@ const GeneralDashboard = () => {
     <div>
       <Header title="Dashboard" crumbs={['General dashboard']} />
 
-      {loadingAuthState ? (
+      {loadingAuthState || hasPaymentMethods == null ? (
         <p>Loading</p>
-      ) : !hasPaymentMethods ? (
+      ) : !(hasPaymentMethods == true) ? (
         <WelcomeCards />
       ) : business['groups'] == null ||
         Object.keys(business['groups']).length == 0 ? (

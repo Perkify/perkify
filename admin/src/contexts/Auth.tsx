@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState({});
   const location = useLocation();
   const history = useHistory();
-  const [hasPaymentMethods, setHasPaymentMethods] = useState(false);
+  const [hasPaymentMethods, setHasPaymentMethods] = useState(null);
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
