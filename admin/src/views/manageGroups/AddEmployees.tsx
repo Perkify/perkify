@@ -18,7 +18,7 @@ const AddEmployees = ({
   setIsAddEmployeesModalVisible,
   employees,
   group,
-  selectedPerks,
+  groupPerks,
 }) => {
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
@@ -56,7 +56,7 @@ const AddEmployees = ({
           'user/auth/updatePerkGroup',
           JSON.stringify({
             group,
-            perks: selectedPerks.map((perkObj) => perkObj.Name),
+            perks: groupPerks.map((perkObj) => perkObj.Name),
             emails: afterEmployees,
           }),
           {

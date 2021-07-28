@@ -17,12 +17,12 @@ import { allPerks } from '../../constants';
 const AddPerks = ({
   isAddPerksModalVisible,
   setIsAddPerksModalVisible,
-  selectedPerks,
+  groupPerks,
   group,
   emails,
 }) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
-  const [selectedPerksError, setSelectedPerksError] = useState('');
+  const [groupPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState([]);
   const { currentUser } = useContext(AuthContext);
 
@@ -31,10 +31,10 @@ const AddPerks = ({
       allPerks
         .map((perkObj) => perkObj.Name)
         .filter((perk) => {
-          return !selectedPerks.some((perkObj) => perkObj.Name == perk);
+          return !groupPerks.some((perkObj) => perkObj.Name == perk);
         })
     );
-  }, [selectedPerks]);
+  }, [groupPerks]);
 
   const addPerksToPerkGroup = (event) => {
     event.preventDefault();
@@ -51,7 +51,7 @@ const AddPerks = ({
         const bearerToken = await currentUser.getIdToken();
 
         const afterPerks = perksToAdd.concat(
-          selectedPerks.map((perkObj) => perkObj.Name)
+          groupPerks.map((perkObj) => perkObj.Name)
         );
 
         await PerkifyApi.put(
@@ -105,7 +105,7 @@ const AddPerks = ({
           onChange={(event) => {
             setPerksToAdd(event.target.value as string[]);
           }}
-          error={selectedPerksError != ''}
+          error={groupPerksError != ''}
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>

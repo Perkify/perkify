@@ -230,7 +230,7 @@ export default function ManageGroups(props) {
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
         group={id}
         employees={groupEmails}
-        selectedPerks={groupPerks}
+        groupPerks={groupPerks}
       />
       <RemoveEmployees
         isRemoveEmployeesModalVisible={isRemoveEmployeesModalVisible}
@@ -244,7 +244,7 @@ export default function ManageGroups(props) {
       <AddPerks
         isAddPerksModalVisible={isAddPerksModalVisible}
         setIsAddPerksModalVisible={setIsAddPerksModalVisible}
-        selectedPerks={groupPerks}
+        groupPerks={groupPerks}
         group={id}
         emails={groupEmails}
       />
@@ -253,7 +253,7 @@ export default function ManageGroups(props) {
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
-        groupPerks={selectedPerks}
+        groupPerks={groupPerks}
         group={id}
         emails={groupEmails}
       />

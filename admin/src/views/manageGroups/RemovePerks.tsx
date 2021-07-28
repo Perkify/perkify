@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 import { AuthContext } from 'contexts';
 import React, { useContext } from 'react';
-import { PerkifyApi } from 'services';
 
 const RemovePerks = ({
   isRemovePerksModalVisible,
@@ -34,21 +33,24 @@ const RemovePerks = ({
         const afterPerks = groupPerks.filter(
           (perkObj, index) => selectedPerks.indexOf(index) == -1
         );
+        console.log(groupPerks);
+        console.log(afterPerks);
         const afterPerksNames = afterPerks.map((perkObj) => perkObj.Name);
-        await PerkifyApi.put(
-          'user/auth/updatePerkGroup',
-          JSON.stringify({
-            group,
-            emails: emails.map((emailObj) => emailObj.email),
-            perks: afterPerksNames,
-          }),
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        console.log(afterPerksNames);
+        // await PerkifyApi.put(
+        //   'user/auth/updatePerkGroup',
+        //   JSON.stringify({
+        //     group,
+        //     emails: emails.map((emailObj) => emailObj.email),
+        //     perks: afterPerksNames,
+        //   }),
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${bearerToken}`,
+        //       'Content-Type': 'application/json',
+        //     },
+        //   }
+        // );
         setIsRemovePerksModalVisible(false);
         setSelectedPerks([]);
       })();
