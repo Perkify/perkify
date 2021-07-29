@@ -6,7 +6,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
 
@@ -21,12 +21,17 @@ const RemovePerks = ({
 }) => {
   const { currentUser } = useContext(AuthContext);
 
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
+
   const removePerksFromPerkGroup = (event) => {
     let error = false;
 
     event.preventDefault();
     if (!error) {
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
         // get all perks that are not selected
@@ -53,6 +58,8 @@ const RemovePerks = ({
             },
           }
         );
+        setDashboardLoading(false);
+        setFreezeNav(false);
         setIsRemovePerksModalVisible(false);
         setSelectedPerks([]);
       })();

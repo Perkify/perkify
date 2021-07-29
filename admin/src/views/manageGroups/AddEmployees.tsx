@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts/Auth';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
@@ -22,6 +22,9 @@ const AddEmployees = ({
 }) => {
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
+
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {
@@ -44,6 +47,8 @@ const AddEmployees = ({
     }
     if (!error) {
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
@@ -67,6 +72,8 @@ const AddEmployees = ({
           }
         )
           .then(() => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
           })
           .catch((e) => {

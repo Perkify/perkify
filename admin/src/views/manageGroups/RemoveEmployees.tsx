@@ -6,7 +6,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
 
@@ -19,6 +19,8 @@ const RemoveEmployees = ({
   employees,
 }) => {
   const { currentUser } = useContext(AuthContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const removeUsers = (event) => {
     let error = false;
@@ -26,6 +28,8 @@ const RemoveEmployees = ({
     event.preventDefault();
     if (!error) {
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
         // get all employees that are not selected
         // by removing all employees that were selected
@@ -53,6 +57,8 @@ const RemoveEmployees = ({
             },
           }
         );
+        setDashboardLoading(false);
+        setFreezeNav(false);
         setIsRemoveEmployeesModalVisible(false);
         setSelectedEmployees([]);
       })();

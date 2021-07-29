@@ -189,7 +189,7 @@ const GeneralDashboard = () => {
 
   return (
     <div>
-      <Header title="Dashboard" crumbs={['General dashboard']} />
+      <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
 
       {loadingAuthState || hasPaymentMethods == null ? (
         <p>Loading</p>

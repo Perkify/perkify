@@ -9,7 +9,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts/Auth';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { allPerks } from '../../constants';
@@ -24,7 +24,10 @@ const AddPerks = ({
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [groupPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState([]);
+
   const { currentUser } = useContext(AuthContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   React.useEffect(() => {
     setAvailablePerks(
@@ -45,9 +48,9 @@ const AddPerks = ({
     }
 
     if (!error) {
-      setIsAddPerksModalVisible(false);
-
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
         const afterPerks = perksToAdd.concat(
@@ -68,6 +71,10 @@ const AddPerks = ({
             },
           }
         );
+
+        setFreezeNav(false);
+        setDashboardLoading(false);
+        setIsAddPerksModalVisible(false);
       })();
     }
   };
