@@ -25,8 +25,6 @@ const RemoveEmployees = ({
 
     event.preventDefault();
     if (!error) {
-      setIsRemoveEmployeesModalVisible(false);
-
       (async () => {
         const bearerToken = await currentUser.getIdToken();
         // get all employees that are not selected
