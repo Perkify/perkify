@@ -15,7 +15,6 @@ const Dashboard = () => {
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
-  console.log(freezeNav);
 
   return (
     <div style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}>

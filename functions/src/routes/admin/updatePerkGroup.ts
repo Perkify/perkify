@@ -92,7 +92,6 @@ export const updatePerkGroup = async (req, res, next) => {
         return next(error);
       }
     }
-    console.log(deleteUsers);
 
     // TODO: move this to a function as well and create multiple files
     const usersToCreate = addUserEmails.map((email) =>
