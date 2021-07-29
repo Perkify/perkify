@@ -39,11 +39,13 @@ export const allPerks = [
     Name: 'Audible Plus',
     Cost: 7.95,
     Period: 'Monthly',
+    Img: 'audible.png',
   },
   {
     Name: 'Audible Premium Plus',
     Cost: 14.95,
     Period: 'Monthly',
+    Img: 'audible.png',
   },
   {
     Name: 'Masterclass',
@@ -54,6 +56,7 @@ export const allPerks = [
     Name: 'Disney+',
     Cost: 7.99,
     Period: 'Monthly',
+    Img: 'disneyplus.webp',
   },
   {
     Name: 'People Magazine',
@@ -74,6 +77,7 @@ export const allPerks = [
     Name: 'Headspace',
     Cost: 12.99,
     Period: 'Monthly',
+    Img: 'headspace.png',
   },
   {
     Name: 'The Economist Digital',
@@ -154,16 +158,19 @@ export const allPerks = [
     Name: 'Spotify Individual',
     Cost: 9.99,
     Period: 'Monthly',
+    Img: 'spotify.jpg',
   },
   {
     Name: 'Spotify Duo; For 2 People Living Together',
     Cost: 12.99,
     Period: 'Monthly',
+    Img: 'spotify.jpg',
   },
   {
     Name: 'Spotify Family; Up to 6 Accounts',
     Cost: 15.99,
     Period: 'Monthly',
+    Img: 'spotify.jpg',
   },
   {
     Name: 'Spotify Student; Incluldes Hulu (with Ads) and SHOWTIME',
