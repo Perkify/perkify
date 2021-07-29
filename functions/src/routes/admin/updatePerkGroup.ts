@@ -4,6 +4,7 @@ import {
   createUserHelper,
   deleteUserHelper,
   sanitizeEmails,
+  syncStripeSubscriptionsWithFirestorePerks,
   validateEmails,
 } from '../../utils';
 
@@ -102,6 +103,12 @@ export const updatePerkGroup = async (req, res, next) => {
     // TODO: move this to a function as well and create multiple files
     const usersToDelete = deleteUsers.map((user) => deleteUserHelper(user));
     await Promise.all(usersToDelete);
+
+    try {
+      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+    } catch (e) {
+      return next(e);
+    }
 
     res.status(200).end();
   } catch (err) {

@@ -1,6 +1,9 @@
 import { body, validationResult } from 'express-validator';
 import admin, { db } from '../../models';
-import { deleteUserHelper } from '../../utils';
+import {
+  deleteUserHelper,
+  syncStripeSubscriptionsWithFirestorePerks,
+} from '../../utils';
 
 export const deletePerkGroupValidators = [body('group').not().isEmpty()];
 
@@ -35,14 +38,6 @@ export const deletePerkGroup = async (req, res, next) => {
     }
     const businessID = adminData.companyID;
 
-    // TOOD: create helper function to get business info from logged in admin
-    // //const businessSnap = await db
-    //     .collection("businesses")
-    //     .doc(businessID)
-    //     .get();
-
-    // const walletID = businessSnap.data().walletID;
-
     const usersRef = db.collection('users');
     const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
 
@@ -62,6 +57,13 @@ export const deletePerkGroup = async (req, res, next) => {
         [`groups.${group}`]: admin.firestore.FieldValue.delete(),
       });
 
+    try {
+      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+    } catch (e) {
+      next(e);
+    }
+
+    // sync stripe subscriptions with perks
     res.status(200).end();
   } catch (err) {
     res.status(500).end();

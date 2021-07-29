@@ -1,10 +1,10 @@
 import { body, validationResult } from 'express-validator';
-import { allPerks } from '../../../shared';
-import { db, stripe } from '../../models';
+import { db } from '../../models';
 import {
   createUserHelper,
   handleError,
   sanitizeEmails,
+  syncStripeSubscriptionsWithFirestorePerks,
   validateEmails,
   validatePerks,
 } from '../../utils';
@@ -63,6 +63,7 @@ export const createGroup = async (req, res, next) => {
     const adminData = (
       await db.collection('admins').doc(req.user.uid).get()
     ).data();
+
     const customerData = (
       await db.collection('customers').doc(req.user.uid).get()
     ).data();
@@ -77,30 +78,7 @@ export const createGroup = async (req, res, next) => {
     }
 
     const businessID = adminData.companyID;
-    const stripeCustomerId = customerData.stripeId;
 
-    // charge wallet for price*perks*employees
-    // TODO: setup monthly charges
-    // TODO: charge via rapyd collect
-    const perkGroupPerks = allPerks.filter((perk) => perks.includes(perk.Name));
-    // const price =
-    //   emails.length *
-    //   perkGroupPerks.reduce(
-    //     (accumulator, currentValue) => accumulator + currentValue.Cost,
-    //     0
-    //   );
-
-    await Promise.all(
-      perkGroupPerks.map(async (perkObj) => {
-        await stripe.subscriptions.create({
-          customer: stripeCustomerId,
-          items: [{ price: perkObj.stripePriceId }],
-        });
-      })
-    );
-
-    // add group and perks to db
-    // TODO: reuse businessSnap
     await db
       .collection('businesses')
       .doc(businessID)
@@ -112,6 +90,12 @@ export const createGroup = async (req, res, next) => {
       createUserHelper(email, businessID, group, perks)
     );
     await Promise.all(usersToCreate);
+
+    try {
+      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+    } catch (e) {
+      return next(e);
+    }
 
     res.status(200).end();
   } catch (err) {
