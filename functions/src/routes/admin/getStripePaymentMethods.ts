@@ -1,6 +1,6 @@
 import { db, stripe } from '../../models';
 
-export const getStripePaymentMethods = async (req, res) => {
+export const getStripePaymentMethods = async (req, res, next) => {
   const customerDoc = await db.collection('customers').doc(req.user.uid).get();
   const customerData = customerDoc.data();
 
@@ -10,7 +10,7 @@ export const getStripePaymentMethods = async (req, res) => {
       reason: 'Missing stripeId',
       reason_detail: `Document missing stripeId in firestore`,
     };
-    throw error;
+    return next(error);
   }
 
   const paymentMethods = await stripe.paymentMethods.list({

@@ -15,7 +15,7 @@ export const createGroupValidators = [
   body('perks').custom(validatePerks),
 ];
 
-export const createGroup = async (req, res) => {
+export const createGroup = async (req, res, next) => {
   const {
     group, // TODO: make this param
     emails,
@@ -31,7 +31,7 @@ export const createGroup = async (req, res) => {
         reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     if (Object.keys(rest).length > 0) {
@@ -40,7 +40,7 @@ export const createGroup = async (req, res) => {
         reason: 'extraneous parameters',
         reason_detail: Object.keys(rest).join(','),
       };
-      throw error;
+      return next(error);
     }
 
     // make sure all emails are good
@@ -55,7 +55,7 @@ export const createGroup = async (req, res) => {
           reason: 'Bad Request',
           reason_detail: `added email ${email} that is already in another group`,
         };
-        throw error;
+        return next(error);
       }
     }
 
@@ -73,7 +73,7 @@ export const createGroup = async (req, res) => {
         reason: 'Missing documents',
         reason_detail: `Documents missing from firestore`,
       };
-      throw error;
+      return next(error);
     }
 
     const businessID = adminData.companyID;

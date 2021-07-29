@@ -12,7 +12,7 @@ export const updatePerkGroupValidators = [
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
 ];
 
-export const updatePerkGroup = async (req, res) => {
+export const updatePerkGroup = async (req, res, next) => {
   const {
     group, // TODO: make this param
     emails,
@@ -27,7 +27,7 @@ export const updatePerkGroup = async (req, res) => {
         reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     console.log('Starting update perk group');
@@ -43,7 +43,7 @@ export const updatePerkGroup = async (req, res) => {
         reason: 'Missing documents',
         reason_detail: `Documents missing from firestore`,
       };
-      throw error;
+      return next(error);
     }
 
     const businessID = adminData.companyID;
@@ -89,7 +89,7 @@ export const updatePerkGroup = async (req, res) => {
           reason: 'Bad Request',
           reason_detail: `added email ${email} that is already in another group`,
         };
-        throw error;
+        return next(error);
       }
     }
     console.log(deleteUsers);

@@ -6,7 +6,7 @@ export const registerUserValidators = [
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
 ];
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   const { firstName, lastName, ...rest } = req.body;
 
   try {
@@ -19,7 +19,7 @@ export const registerUser = async (req, res) => {
         reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     if (Object.keys(rest).length > 0) {
@@ -28,7 +28,7 @@ export const registerUser = async (req, res) => {
         reason: 'extraneous parameters',
         reason_detail: Object.keys(rest).join(','),
       };
-      throw error;
+      return next(error);
     }
 
     const email = req.user.email;
@@ -42,7 +42,7 @@ export const registerUser = async (req, res) => {
         reason: 'Missing user document',
         reason_detail: `User documents missing from firestore`,
       };
-      throw error;
+      return next(error);
     }
 
     const businessID = userData.businessID;
@@ -57,7 +57,7 @@ export const registerUser = async (req, res) => {
         reason: 'Missing business document',
         reason_detail: `Business documents missing from firestore`,
       };
-      throw error;
+      return next(error);
     }
 
     const billingAddress = businessData.billingAddress;

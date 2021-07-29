@@ -4,7 +4,7 @@ import { deleteUserHelper } from '../../utils';
 
 export const deletePerkGroupValidators = [body('group').not().isEmpty()];
 
-export const deletePerkGroup = async (req, res) => {
+export const deletePerkGroup = async (req, res, next) => {
   const {
     group, // TODO: make this param
   } = req.body;
@@ -17,7 +17,7 @@ export const deletePerkGroup = async (req, res) => {
         reason: 'Bad Request',
         reason_detail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     // get admins business
@@ -31,7 +31,7 @@ export const deletePerkGroup = async (req, res) => {
         reason: 'Missing documents',
         reason_detail: `Documents missing from firestore`,
       };
-      throw error;
+      return next(error);
     }
     const businessID = adminData.companyID;
 

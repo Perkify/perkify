@@ -52,7 +52,7 @@ const AddEmployees = ({
           employees.map((employeeObj) => employeeObj.email)
         );
 
-        await PerkifyApi.put(
+        PerkifyApi.put(
           'user/auth/updatePerkGroup',
           JSON.stringify({
             group,
@@ -65,8 +65,16 @@ const AddEmployees = ({
               'Content-Type': 'application/json',
             },
           }
-        );
-        setIsAddEmployeesModalVisible(false);
+        )
+          .then(() => {
+            setIsAddEmployeesModalVisible(false);
+          })
+          .catch((e) => {
+            console.log(e.response);
+            alert(
+              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reason_detail}`
+            );
+          });
       })();
     }
   };

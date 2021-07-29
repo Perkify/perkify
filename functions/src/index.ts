@@ -48,5 +48,18 @@ app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 
 // TODO move this to part of firestore with stripe webhook
 app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  if (!(err.status && err.reason && err.reason_detail)) {
+    return next(err);
+  }
+
+  const { status, reason, reason_detail } = err;
+
+  res.status(status).send({ reason, reason_detail }).end();
+});
 
 exports.user = functions.https.onRequest(app);
