@@ -168,7 +168,6 @@ const GeneralDashboard = () => {
             perks: doc.data()['perks'],
           }));
           setEmployees(people);
-          setDashboardLoading(false);
         })
         .catch((error) => {
           alert(error);
@@ -177,6 +176,12 @@ const GeneralDashboard = () => {
       console.info('No such document!');
     }
   }, [currentUser, admin, business]);
+
+  useEffect(() => {
+    if (hasPaymentMethods != null) {
+      setDashboardLoading(false);
+    }
+  }, [hasPaymentMethods]);
 
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
