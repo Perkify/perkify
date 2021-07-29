@@ -35,6 +35,10 @@ const RemovePerks = ({
           (perkObj, index) => selectedPerks.indexOf(index) == -1
         );
         const afterPerksNames = afterPerks.map((perkObj) => perkObj.Name);
+        if (afterPerksNames.length == 0) {
+          alert('Error: cannot remove all perks from a perk group');
+          return;
+        }
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',
           JSON.stringify({
