@@ -65,15 +65,19 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     .collection('subscriptions')
     .get();
 
-  const subscriptionItems = subscriptionsSnapshot.docs.map((doc) => ({
-    subscription_id: doc.data().subscription,
-    name: doc.data().items[0].price.name,
-  }));
+  const subscriptionItems = subscriptionsSnapshot.docs
+    .filter((doc) => doc.data().canceled_at == null)
+    .map((doc) => {
+      return {
+        subscription_id: doc.data().items[0].subscription,
+        name: doc.data().items[0].price.product.name,
+      };
+    });
 
   // get the subscriptions that exist but do not exist in the active perks
   // TODO: handle case where subscription is canceled
-  const subscriptionsToCancel = subscriptionItems.filter((subObj) =>
-    perkSet.has(subObj.name)
+  const subscriptionsToCancel = subscriptionItems.filter(
+    (subObj) => !perkSet.has(subObj.name)
   );
 
   // get the perks that exist but for which there aren't any subscriptions
@@ -85,11 +89,16 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     perkNamesToCreate.includes(perk.Name)
   );
 
-  await Promise.all(
-    subscriptionsToCancel.map(async (subObj) => {
-      await stripe.subscriptions.del(subObj.subscription_id);
-    })
-  );
+  try {
+    await Promise.all(
+      subscriptionsToCancel.map(async (subObj) => {
+        await stripe.subscriptions.del(subObj.subscription_id);
+      })
+    );
+  } catch (e) {
+    console.log('Problem with deleting subscriptions');
+    console.log(e);
+  }
 
   const customerData = (
     await db.collection('customers').doc(userUid).get()
@@ -104,12 +113,17 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     throw error;
   }
 
-  await Promise.all(
-    perkObjectsToCreate.map(async (perkObj) => {
-      await stripe.subscriptions.create({
-        customer: customerData.stripeCustomerId,
-        items: [{ price: perkObj.stripePriceId }],
-      });
-    })
-  );
+  try {
+    await Promise.all(
+      perkObjectsToCreate.map(async (perkObj) => {
+        await stripe.subscriptions.create({
+          customer: customerData.stripeId,
+          items: [{ price: perkObj.stripePriceId }],
+        });
+      })
+    );
+  } catch (e) {
+    console.log('Problem with creating subscriptions');
+    console.log(e);
+  }
 };
