@@ -75,6 +75,7 @@ const AddEmployees = ({
             setDashboardLoading(false);
             setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
+            setEmailsToAdd('');
           })
           .catch((e) => {
             console.log(e.response);
@@ -84,6 +85,7 @@ const AddEmployees = ({
 
             setDashboardLoading(false);
             setFreezeNav(false);
+            setEmailsToAdd('');
           });
       })();
     }

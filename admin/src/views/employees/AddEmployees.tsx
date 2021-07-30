@@ -22,7 +22,7 @@ const AddEmployees = ({
   groupData,
 }) => {
   // selected perk group from dropdown and respective error
-  const [selectedPerkGroup, setSelectedPerkGroup] = useState([]);
+  const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
   const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
 
   // emails entered into form and respective error
@@ -55,7 +55,7 @@ const AddEmployees = ({
       error = true;
     }
     if (selectedPerkGroup.length == 0) {
-      setSelectedPerkGroupError('Select perks');
+      setSelectedPerkGroupError('Select perk group');
       error = true;
     }
     if (!error) {
@@ -88,6 +88,8 @@ const AddEmployees = ({
             setDashboardLoading(false);
             setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
+            setEmailsToAdd('');
+            setSelectedPerkGroup('');
           })
           .catch((e) => {
             console.log(e.response);
@@ -96,58 +98,12 @@ const AddEmployees = ({
             );
             setDashboardLoading(false);
             setFreezeNav(false);
+            setEmailsToAdd('');
+            setSelectedPerkGroup('');
           });
       })();
     }
   };
-
-  //   const addEmployeesToPerkGroup = (event) => {
-  //     event.preventDefault();
-  //     let error = false;
-  //     if (emailsToAdd == '') {
-  //       setEmailsError('Enter emails');
-  //       error = true;
-  //     }
-  //     if (!error) {
-  //       (async () => {
-  //         setDashboardLoading(true);
-  //         setFreezeNav(true);
-  //         const bearerToken = await currentUser.getIdToken();
-
-  //         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
-
-  //         const afterEmployees = emailList.concat(
-  //           peopleData.map((employeeObj) => employeeObj.email)
-  //         );
-
-  //         PerkifyApi.put(
-  //           'user/auth/updatePerkGroup',
-  //           JSON.stringify({
-  //             group,
-  //             perks: groupPerks.map((perkObj) => perkObj.Name),
-  //             emails: afterEmployees,
-  //           }),
-  //           {
-  //             headers: {
-  //               Authorization: `Bearer ${bearerToken}`,
-  //               'Content-Type': 'application/json',
-  //             },
-  //           }
-  //         )
-  //   .then(() => {
-  //     setDashboardLoading(false);
-  //     setFreezeNav(false);
-  //     setIsAddEmployeesModalVisible(false);
-  //   })
-  //   .catch((e) => {
-  //     console.log(e.response);
-  //     alert(
-  //       `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reason_detail}`
-  //     );
-  //   });
-  //       })();
-  //     }
-  //   };
 
   return (
     <Dialog
@@ -190,7 +146,7 @@ const AddEmployees = ({
           fullWidth
           onChange={(event) => {
             setSelectedPerkGroupError('');
-            setSelectedPerkGroup(event.target.value as string[]);
+            setSelectedPerkGroup(event.target.value as string);
           }}
           error={selectedPerkGroupError != ''}
         >

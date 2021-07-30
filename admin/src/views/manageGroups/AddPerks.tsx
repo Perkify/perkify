@@ -75,6 +75,7 @@ const AddPerks = ({
         setFreezeNav(false);
         setDashboardLoading(false);
         setIsAddPerksModalVisible(false);
+        setPerksToAdd([]);
       })();
     }
   };
