@@ -179,6 +179,7 @@ const GeneralDashboard = () => {
 
   useEffect(() => {
     if (hasPaymentMethods != null) {
+      console.log('SET TO FALSE!');
       setDashboardLoading(false);
     }
   }, [hasPaymentMethods]);

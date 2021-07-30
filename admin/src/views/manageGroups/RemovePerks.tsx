@@ -42,6 +42,10 @@ const RemovePerks = ({
         const afterPerksNames = afterPerks.map((perkObj) => perkObj.Name);
         if (afterPerksNames.length == 0) {
           alert('Error: cannot remove all perks from a perk group');
+          setDashboardLoading(false);
+          setFreezeNav(false);
+          setIsRemovePerksModalVisible(false);
+          setSelectedPerks([]);
           return;
         }
         await PerkifyApi.put(

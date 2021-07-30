@@ -94,6 +94,11 @@ export default function ManagePeople(props) {
           {}
         );
 
+        // this is not an extensive check.
+        if (afterEmployees.length === 0) {
+          alert('Error: cannot remove all perks from a perk group');
+        }
+
         await Promise.all(
           Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
             const afterEmails = perkGroupToAfterEmails[perkGroup];

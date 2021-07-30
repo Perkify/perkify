@@ -70,7 +70,7 @@ const AddEmployees = ({
           'user/auth/updatePerkGroup',
           JSON.stringify({
             group: selectedPerkGroup,
-            perks: [],
+            perks: undefined,
             emails: emailList.concat(
               peopleData
                 .filter((employeeObj) => employeeObj.group == selectedPerkGroup)

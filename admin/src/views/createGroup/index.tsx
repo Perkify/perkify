@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 import Header from 'components/Header';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
@@ -153,7 +154,7 @@ const CreateGroup = ({ history }) => {
           id="group_name"
           variant="outlined"
           label="Group Name"
-          placeholder="Cole's Group"
+          placeholder="Managers"
           value={groupName}
           onChange={(event) => {
             setGroupName(event.target.value);
@@ -214,14 +215,23 @@ const CreateGroup = ({ history }) => {
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Estimated Cost: ${totalCost}
         </Typography>
-        <Button
-          onClick={createPerkGroup}
-          variant="contained"
-          color="primary"
-          disabled={!hasPaymentMethods}
+        <Tooltip
+          disableFocusListener={hasPaymentMethods}
+          disableHoverListener={hasPaymentMethods}
+          title="Please add billing information before creating a group"
+          placement="bottom-start"
         >
-          Create Perk Group
-        </Button>
+          <span>
+            <Button
+              onClick={createPerkGroup}
+              variant="contained"
+              color="primary"
+              disabled={!hasPaymentMethods}
+            >
+              Create Perk Group
+            </Button>
+          </span>
+        </Tooltip>
       </Card>
     </div>
   );
