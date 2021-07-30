@@ -1,39 +1,33 @@
-export const allPerks = [
+export const allPossiblePerks = [
   {
     Name: 'Netflix Basic',
     Cost: 8.99,
     Period: 'Monthly',
-    Img: 'netflix.jpeg',
   },
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
     Period: 'Monthly',
-    Img: 'netflix.jpeg',
   },
   {
     Name: 'Netflix Premium',
     Cost: 17.99,
     Period: 'Monthly',
-    Img: 'netflix.jpeg',
   },
   {
     Name: 'Hulu (No Ads)',
     Cost: 11.99,
     Period: 'Monthly',
-    Img: 'hulu.png',
   },
   {
     Name: 'Hulu (Standard)',
     Cost: 5.99,
     Period: 'Monthly',
-    Img: 'hulu.png',
   },
   {
     Name: 'Hulu + Live TV',
     Cost: 64.99,
     Period: 'Monthly',
-    Img: 'hulu.png',
   },
   {
     Name: 'Audible Plus',
@@ -222,13 +216,12 @@ export const allPerks = [
   },
 ];
 
-export const allPerksDict = allPerks.reduce(
+export const allPossiblePerksDict = allPossiblePerks.reduce(
   (map, perk) => (
     (map[perk.Name] = {
       Cost: perk['Cost'],
       Period: perk['Period'],
       Name: perk.Name,
-      Img: perk['Img'],
     }),
     map
   ),

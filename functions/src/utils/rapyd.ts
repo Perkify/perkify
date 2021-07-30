@@ -51,7 +51,6 @@ export const createWallet = async (
   } else if (phone.length == 11) {
     phone = '+' + phone;
   }
-  console.log(phone);
 
   const body = {
     first_name: businessName,
@@ -174,8 +173,6 @@ export const createWallet = async (
     });
     const walletID = walletResp.data.data.id;
     const contactID = walletResp.data.data.contacts.data[0].id;
-    console.log(walletID);
-    console.log(contactID);
     return { walletID, contactID };
   } catch (e) {
     console.error(e);

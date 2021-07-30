@@ -7,16 +7,19 @@ import {
   Typography,
 } from '@material-ui/core';
 import Header from 'components/Header';
-import { AuthContext } from 'contexts';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
+import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
-import { allPerks, allPerksDict } from '../../constants';
 
 const CreateGroup = ({ history }) => {
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
+
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
@@ -99,11 +102,11 @@ const CreateGroup = ({ history }) => {
     }
 
     if (!error) {
-      console.log('No errors');
+      setDashboardLoading(true);
+      setFreezeNav(true);
       const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
         const bearerToken = await currentUser.getIdToken();
-        console.log(bearerToken);
         // call the api to create the group
         PerkifyApi.post(
           'user/auth/createGroup',
@@ -121,17 +124,21 @@ const CreateGroup = ({ history }) => {
           }
         )
           .then(() => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
             history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
           });
       })();
     }
   };
 
   return (
-    <>
+    <div
+      style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}
+    >
       <Header
         title="Create Group"
         crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
@@ -216,7 +223,7 @@ const CreateGroup = ({ history }) => {
           Create Perk Group
         </Button>
       </Card>
-    </>
+    </div>
   );
 };
 

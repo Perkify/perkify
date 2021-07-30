@@ -1,15 +1,28 @@
 import Header from 'components/Header';
-import { AuthContext } from 'contexts';
+import { LoadingContext } from 'contexts';
+import { functions } from 'firebaseApp';
 import React, { useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Billing = () => {
-  const { customerPortalUrl } = useContext(AuthContext);
+  const history = useHistory();
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
+  setFreezeNav(true);
   useEffect(() => {
-    if (customerPortalUrl != '') {
-      window.location.assign(customerPortalUrl);
-    }
-  }, [customerPortalUrl]);
+    (async () => {
+      setDashboardLoading(true);
+      const functionRef = functions.httpsCallable(
+        'ext-firestore-stripe-subscriptions-createPortalLink'
+      );
+      const { data } = await functionRef({
+        returnUrl: window.location.origin,
+      });
+      history.push('/dashboard');
+      window.location.assign(data.url);
+    })();
+  }, []);
   return (
     <div>
       <Header title="Billing" crumbs={['Dashboard', 'Account', 'Billing']} />

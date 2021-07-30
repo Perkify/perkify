@@ -2,7 +2,7 @@ import firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { PerkifyApi } from 'services';
-import app, { auth, db, functions } from '../firebaseApp';
+import app, { auth, db } from '../firebaseApp';
 
 type ContextProps = {
   currentUser: firebase.User | null;
@@ -13,7 +13,6 @@ type ContextProps = {
   setAdmin: any;
   hasPaymentMethods: boolean;
   setHasPaymentMethods: any;
-  customerPortalUrl: string;
 };
 
 export const AuthContext = React.createContext<Partial<ContextProps>>({});
@@ -24,8 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState({});
   const location = useLocation();
   const history = useHistory();
-  const [hasPaymentMethods, setHasPaymentMethods] = useState(false);
-  const [customerPortalUrl, setCustomerPortalUrl] = useState('');
+  const [hasPaymentMethods, setHasPaymentMethods] = useState(null);
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
@@ -51,17 +49,7 @@ export const AuthProvider = ({ children }) => {
           if (cardPaymentMethods.data.data.length > 0) {
             setHasPaymentMethods(true);
           }
-          (async () => {
-            const functionRef = functions.httpsCallable(
-              'ext-firestore-stripe-subscriptions-createPortalLink'
-            );
-            const { data } = await functionRef({
-              returnUrl: window.location.origin,
-            });
-            setCustomerPortalUrl(data.url);
-          })();
 
-          setLoadingAuthState(false);
           if (!location.pathname.includes('dashboard')) {
             history.push('/dashboard');
           }
@@ -70,6 +58,7 @@ export const AuthProvider = ({ children }) => {
           alert('You do not have a registered admin account');
         }
       }
+      setLoadingAuthState(false);
     });
   }, []);
 
@@ -84,7 +73,6 @@ export const AuthProvider = ({ children }) => {
         setAdmin,
         hasPaymentMethods,
         setHasPaymentMethods,
-        customerPortalUrl,
       }}
     >
       {children}

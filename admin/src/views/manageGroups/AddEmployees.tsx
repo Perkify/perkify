@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts/Auth';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
@@ -18,10 +18,13 @@ const AddEmployees = ({
   setIsAddEmployeesModalVisible,
   employees,
   group,
-  selectedPerks,
+  groupPerks,
 }) => {
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
+
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {
@@ -43,8 +46,9 @@ const AddEmployees = ({
       error = true;
     }
     if (!error) {
-      setIsAddEmployeesModalVisible(false);
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
@@ -53,22 +57,36 @@ const AddEmployees = ({
           employees.map((employeeObj) => employeeObj.email)
         );
 
-        console.log(afterEmployees);
-
-        await PerkifyApi.put(
+        PerkifyApi.put(
           'user/auth/updatePerkGroup',
-          JSON.stringify({
+          {
             group,
-            perks: selectedPerks.map((perkObj) => perkObj.Name),
+            perks: groupPerks.map((perkObj) => perkObj.Name),
             emails: afterEmployees,
-          }),
+          },
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
               'Content-Type': 'application/json',
             },
           }
-        );
+        )
+          .then(() => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setIsAddEmployeesModalVisible(false);
+            setEmailsToAdd('');
+          })
+          .catch((e) => {
+            console.log(e.response);
+            alert(
+              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+            );
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setEmailsToAdd('');
+          });
       })();
     }
   };

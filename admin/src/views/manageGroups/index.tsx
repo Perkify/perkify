@@ -8,7 +8,7 @@ import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { PerkifyApi } from 'services';
-import { allPerksDict } from '../../constants';
+import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
 import RemoveEmployees from './RemoveEmployees';
@@ -47,17 +47,13 @@ const perkColumns = [
 export default function ManageGroups(props) {
   let { id } = useParams();
 
-  const [
-    isRemoveEmployeesModalVisible,
-    setIsRemoveEmployeesModalVisible,
-  ] = useState(false);
-  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] = useState(
-    false
-  );
+  const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
+    useState(false);
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
+    useState(false);
 
-  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] = useState(
-    false
-  );
+  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] =
+    useState(false);
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
   const [groupNotFound, setGroupNotFound] = useState(false);
 
@@ -65,10 +61,8 @@ export default function ManageGroups(props) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const [
-    isDeletePerkGroupModalVisible,
-    setIsDeletePerkGroupModalVisible,
-  ] = useState(false);
+  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
+    useState(false);
 
   const { business } = useContext(BusinessContext);
 
@@ -94,30 +88,34 @@ export default function ManageGroups(props) {
     },
   ];
 
-  const deletePerkGroup = () => {
-    (async () => {
-      const bearerToken = await currentUser.getIdToken();
+  const deletePerkGroup = async () => {
+    const bearerToken = await currentUser.getIdToken();
+    setDashboardLoading(true);
+    setFreezeNav(true);
 
-      await PerkifyApi.post(
-        'user/auth/deletePerkGroup',
-        JSON.stringify({
-          group: id,
-        }),
-        {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+    await PerkifyApi.post(
+      'user/auth/deletePerkGroup',
+      JSON.stringify({
+        group: id,
+      }),
+      {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-      history.push('/dashboard');
-    })();
+    setDashboardLoading(false);
+    setFreezeNav(false);
+
+    history.push('/dashboard');
   };
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   useEffect(() => {
     if (Object.keys(admin).length != 0) {
@@ -126,19 +124,20 @@ export default function ManageGroups(props) {
       db.collection('users')
         .where('businessID', '==', admin.companyID)
         .where('group', '==', id)
-        .get()
-        .then((querySnapshot) => {
-          setEmails(
-            querySnapshot.docs.map((doc, index) => ({
-              email: doc.id,
-              id: index,
-            }))
-          );
-          setDashboardLoading(false);
-        })
-        .catch((error) => {
-          console.log('Error getting documents: ', error);
-        });
+        .onSnapshot(
+          (querySnapshot) => {
+            setEmails(
+              querySnapshot.docs.map((doc, index) => ({
+                email: doc.id,
+                id: index,
+              }))
+            );
+            setDashboardLoading(false);
+          },
+          (error) => {
+            console.error('Error getting documents: ', error);
+          }
+        );
     }
   }, [admin, id]);
 
@@ -195,7 +194,8 @@ export default function ManageGroups(props) {
             rows={groupPerks}
             height={600}
             columns={perkColumns}
-            setSelected={setSelectedPerks}
+            selectedRows={selectedPerks}
+            setSelectedRows={setSelectedPerks}
             onClickAdd={() => {
               setIsAddPerksModalVisible(true);
             }}
@@ -204,6 +204,7 @@ export default function ManageGroups(props) {
             }}
             tableName="Group Perks"
             addButtonText="Add Group Perk"
+            loading={dashboardLoading}
           />
         </Grid>
         <Grid item md={6} sm={12}>
@@ -211,7 +212,8 @@ export default function ManageGroups(props) {
             height={600}
             rows={groupEmails}
             columns={columns}
-            setSelected={setSelectedEmployees}
+            selectedRows={selectedEmployees}
+            setSelectedRows={setSelectedEmployees}
             onClickAdd={() => {
               setIsAddEmployeesModalVisible(true);
             }}
@@ -220,6 +222,7 @@ export default function ManageGroups(props) {
             }}
             tableName="Group Employees"
             addButtonText="Add Employees"
+            loading={dashboardLoading}
           />
         </Grid>
       </Grid>
@@ -229,19 +232,21 @@ export default function ManageGroups(props) {
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
         group={id}
         employees={groupEmails}
-        selectedPerks={groupPerks}
+        groupPerks={groupPerks}
       />
       <RemoveEmployees
         isRemoveEmployeesModalVisible={isRemoveEmployeesModalVisible}
         setIsRemoveEmployeesModalVisible={setIsRemoveEmployeesModalVisible}
         selectedEmployees={selectedEmployees}
         setSelectedEmployees={setSelectedEmployees}
+        group={id}
+        employees={groupEmails}
       />
 
       <AddPerks
         isAddPerksModalVisible={isAddPerksModalVisible}
         setIsAddPerksModalVisible={setIsAddPerksModalVisible}
-        selectedPerks={groupPerks}
+        groupPerks={groupPerks}
         group={id}
         emails={groupEmails}
       />
@@ -250,6 +255,9 @@ export default function ManageGroups(props) {
         setIsRemovePerksModalVisible={setIsRemovePerksModalVisible}
         selectedPerks={selectedPerks}
         setSelectedPerks={setSelectedPerks}
+        groupPerks={groupPerks}
+        group={id}
+        emails={groupEmails}
       />
       <ConfirmationModal
         isModalVisible={isDeletePerkGroupModalVisible}

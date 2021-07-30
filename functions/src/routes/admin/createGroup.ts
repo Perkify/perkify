@@ -1,10 +1,10 @@
 import { body, validationResult } from 'express-validator';
-import { allPerks } from '../../../shared';
-import { db, stripe } from '../../models';
+import { db } from '../../models';
 import {
   createUserHelper,
   handleError,
   sanitizeEmails,
+  syncStripeSubscriptionsWithFirestorePerks,
   validateEmails,
   validatePerks,
 } from '../../utils';
@@ -15,7 +15,7 @@ export const createGroupValidators = [
   body('perks').custom(validatePerks),
 ];
 
-export const createGroup = async (req, res) => {
+export const createGroup = async (req, res, next) => {
   const {
     group, // TODO: make this param
     emails,
@@ -29,18 +29,18 @@ export const createGroup = async (req, res) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
         reason: 'extraneous parameters',
-        reason_detail: Object.keys(rest).join(','),
+        reasonDetail: Object.keys(rest).join(','),
       };
-      throw error;
+      return next(error);
     }
 
     // make sure all emails are good
@@ -49,47 +49,36 @@ export const createGroup = async (req, res) => {
       const docRef = db.collection('users').doc(email);
 
       const docSnapshot = await docRef.get();
-      if (docSnapshot.exists && docSnapshot.data().businessID) {
+      if (docSnapshot.exists && docSnapshot.data()?.businessID) {
         const error = {
           status: 400,
           reason: 'Bad Request',
-          reason_detail: `added email ${email} that is already in another group`,
+          reasonDetail: `added email ${email} that is already in another group`,
         };
-        throw error;
+        return next(error);
       }
     }
 
     // get admins business
-    const adminSnap = await db.collection('admins').doc(req.user.uid).get();
-    const businessID = adminSnap.data().companyID;
-    const customerDoc = await db
-      .collection('customers')
-      .doc(req.user.uid)
-      .get();
-    const stripeCustomerId = customerDoc.data().stripeId;
+    const adminData = (
+      await db.collection('admins').doc(req.user.uid).get()
+    ).data();
 
-    // charge wallet for price*perks*employees
-    // TODO: setup monthly charges
-    // TODO: charge via rapyd collect
-    const perkGroupPerks = allPerks.filter((perk) => perks.includes(perk.Name));
-    // const price =
-    //   emails.length *
-    //   perkGroupPerks.reduce(
-    //     (accumulator, currentValue) => accumulator + currentValue.Cost,
-    //     0
-    //   );
+    const customerData = (
+      await db.collection('customers').doc(req.user.uid).get()
+    ).data();
 
-    await Promise.all(
-      perkGroupPerks.map(async (perkObj) => {
-        await stripe.subscriptions.create({
-          customer: stripeCustomerId,
-          items: [{ price: perkObj.stripePriceId }],
-        });
-      })
-    );
+    if (adminData == null || customerData == null) {
+      const error = {
+        status: 500,
+        reason: 'Missing documents',
+        reasonDetail: `Documents missing from firestore`,
+      };
+      return next(error);
+    }
 
-    // add group and perks to db
-    // TODO: reuse businessSnap
+    const businessID = adminData.companyID;
+
     await db
       .collection('businesses')
       .doc(businessID)
@@ -101,6 +90,12 @@ export const createGroup = async (req, res) => {
       createUserHelper(email, businessID, group, perks)
     );
     await Promise.all(usersToCreate);
+
+    try {
+      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+    } catch (e) {
+      return next(e);
+    }
 
     res.status(200).end();
   } catch (err) {

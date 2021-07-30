@@ -78,7 +78,7 @@ export default function SignInSide(props) {
   const [openSuccess, setOpenSuccess] = React.useState(false);
 
   const errorAlert = (error) => {
-    console.log(error);
+    console.error(error);
     setErrorMessage(error);
     setOpenError(true);
   };
@@ -86,7 +86,6 @@ export default function SignInSide(props) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log('Loading set to true');
     try {
       const userDoc = await db.collection('users').doc(email).get();
       if (!userDoc) {
@@ -95,7 +94,7 @@ export default function SignInSide(props) {
       await app.auth().sendSignInLinkToEmail(email, {
         url: `${
           process.env.NODE_ENV == 'development'
-            ? 'http://localhost:3000'
+            ? 'http://localhost:3001'
             : 'https://app.getperkify.com'
         }`,
         handleCodeInApp: true,

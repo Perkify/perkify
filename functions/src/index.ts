@@ -2,7 +2,7 @@
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
-import { auth, functions } from './models';
+import { functions } from './models';
 import {
   createGroup,
   createGroupValidators,
@@ -43,15 +43,27 @@ app.post(
   registerAdminAndBusiness
 );
 
-app.post('/registerUser', registerUserValidators, registerUser);
-
 app.use('/auth', validateFirebaseIdToken);
+app.post('/auth/registerUser', registerUserValidators, registerUser);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
 
 // TODO move this to part of firestore with stripe webhook
 app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  if (!(err.status && err.reason && err.reasonDetail)) {
+    return next(err);
+  }
+
+  const { status, reason, reasonDetail } = err;
+
+  res.status(status).send({ reason, reasonDetail }).end();
+});
 
 exports.user = functions.https.onRequest(app);
 
@@ -62,11 +74,3 @@ stripeWebhooksApp.post(
   stripeWebhooks
 );
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);
-
-exports.deleteUsers = functions.https.onRequest(
-  async (req, res): Promise<any> => {
-    const allUsers = await auth.listUsers();
-    const allUsersUID = allUsers.users.map((user) => user.uid);
-    return auth.deleteUsers(allUsersUID).then(() => res.send('deleted'));
-  }
-);

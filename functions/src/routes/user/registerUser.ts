@@ -1,54 +1,71 @@
 import { body, validationResult } from 'express-validator';
 import { db, stripe } from '../../models';
-import {
-  emailNormalizationOptions,
-  handleError,
-  validateUserEmail,
-} from '../../utils';
+import { handleError } from '.././../utils';
 
 export const registerUserValidators = [
-  body('email')
-    .isEmail()
-    .normalizeEmail(emailNormalizationOptions)
-    .custom(validateUserEmail),
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
-  body('dob').isDate(),
 ];
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   const { firstName, lastName, ...rest } = req.body;
 
   try {
     // check for validation errors
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     if (Object.keys(rest).length > 0) {
       const error = {
         status: 400,
         reason: 'extraneous parameters',
-        reason_detail: Object.keys(rest).join(','),
+        reasonDetail: Object.keys(rest).join(','),
       };
-      throw error;
+      return next(error);
     }
 
     const email = req.user.email;
 
     // TODO: get field directly
-    const userSnap = await db.collection('users').doc(email).get();
-    const businessID = userSnap.data().businessID;
-    const businessSnap = await db
-      .collection('businesses')
-      .doc(businessID)
-      .get();
-    const billingAddress = businessSnap.data().billingAddress;
+    const userData = (await db.collection('users').doc(email).get()).data();
+
+    if (!userData) {
+      const error = {
+        status: 500,
+        reason: 'Missing user document',
+        reasonDetail: `User documents missing from firestore`,
+      };
+      return next(error);
+    }
+
+    const businessID = userData.businessID;
+
+    const businessData = (
+      await db.collection('businesses').doc(businessID).get()
+    ).data();
+
+    if (!businessData) {
+      const error = {
+        status: 500,
+        reason: 'Missing business document',
+        reasonDetail: `Business documents missing from firestore`,
+      };
+      return next(error);
+    }
+
+    const billingAddress = businessData.billingAddress;
+
+    if (billingAddress && billingAddress?.line2 == '') {
+      delete billingAddress['line2'];
+    }
+
     const cardholder = await stripe.issuing.cardholders.create({
       type: 'individual',
       name: `${firstName} ${lastName}`,

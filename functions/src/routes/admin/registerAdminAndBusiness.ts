@@ -14,7 +14,7 @@ export const registerAdminAndBusinessValidators = [
   body('postalCode').not().isEmpty(),
 ];
 
-export const registerAdminAndBusiness = async (req, res) => {
+export const registerAdminAndBusiness = async (req, res, next) => {
   const {
     firstName,
     lastName,
@@ -35,18 +35,18 @@ export const registerAdminAndBusiness = async (req, res) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
-      throw error;
+      return next(error);
     }
 
     // if (Object.keys(rest).length > 0) {
     //   const error = {
     //     status: 400,
     //     reason: 'extraneous parameters',
-    //     reason_detail: Object.keys(rest).join(','),
+    //     reasonDetail: Object.keys(rest).join(','),
     //   };
-    //   throw error;
+    //   return next(error);
     // }
 
     // create firebase user

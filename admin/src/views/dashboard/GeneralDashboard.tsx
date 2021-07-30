@@ -3,7 +3,7 @@ import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { allPerksDict } from '../../constants';
+import { allPerksDict } from 'shared';
 import BChart from './BarChart';
 import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
@@ -11,39 +11,43 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const {
-    currentUser,
-    admin,
-    hasPaymentMethods,
-    loadingAuthState,
-  } = useContext(AuthContext);
+  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
+    useContext(AuthContext);
   const { business } = useContext(BusinessContext);
-
-  const [employees, setEmployees] = useState([]);
-  const [groups, setGroups] = useState({});
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
-  const [selectedGroup, setSelectedGroup] = useState('All Groups');
+
+  var [employees, setEmployees] = useState([]);
+  var [selectedGroup, setSelectedGroup] = useState('All Groups');
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
   }
 
   function convertGroups() {
-    let retArr = Object.keys(groups);
+    if (dashboardLoading) {
+      return [];
+    }
+    let retArr = Object.keys(business.groups);
     retArr.push('All Groups');
     return retArr;
   }
 
   function calculatePieData() {
     // Returns pie chart data
+    if (dashboardLoading) {
+      return [];
+    }
     let tempDict = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['group'];
-      if (groups === undefined || groups[group] === undefined) {
+      if (
+        business.groups === undefined ||
+        business.groups[group] === undefined
+      ) {
         return 0;
       }
-      groups[group].forEach((perk) => {
+      business.groups[group].forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -71,37 +75,53 @@ const GeneralDashboard = () => {
   }
 
   function calculateTotalCost() {
+    if (dashboardLoading) {
+      return 0;
+    }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
-
+    if (business.groups === undefined) {
+      return 0;
+    }
+    let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
       let group = employee['group'];
-      if (groups[group] === undefined) {
+      if (business.groups[group] === undefined) {
         return 0;
       }
-      groups[group].forEach((perk) => {
+      business.groups[group].forEach((perk) => {
         cost += allPerksDict[perk].Cost;
       });
       totalCost += cost;
     });
-    return totalCost;
+    return totalCost / employees.length;
   }
 
   function calculatePerksOffered() {
+    if (dashboardLoading) {
+      return 0;
+    }
     //returns num of perks offered
     let perks = new Set([]);
-    Object.keys(groups).forEach((group) => {
-      groups[group].forEach((perk) => {
+    Object.keys(business.groups).forEach((group) => {
+      business.groups[group].forEach((perk) => {
         perks.add(perk);
       });
     });
     return perks.size;
   }
 
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
   function calculateBarGraphData() {
     //returns bar graph data in array form
     let retData = [];
+    if (dashboardLoading) {
+      return retData;
+    }
     let tempDict = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
@@ -112,10 +132,10 @@ const GeneralDashboard = () => {
           return 0;
         }
       }
-      if (groups[group] === undefined) {
+      if (business.groups[group] === undefined) {
         return 0;
       }
-      groups[group].forEach((perk) => {
+      business.groups[group].forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -125,7 +145,7 @@ const GeneralDashboard = () => {
     });
     Object.keys(tempDict).forEach((perk) => {
       //TODO: Calculate amount spent in comparison to amount not spent
-      let newRow = { name: perk, unspent: tempDict[perk], spent: 0 };
+      let newRow = { name: perk, spent: getRandomInt(100), total: 100 };
       retData.push(newRow);
     });
 
@@ -133,7 +153,6 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    console.log(business);
     setDashboardLoading(true);
     if (Object.keys(admin).length != 0 && business) {
       const businessId = admin['companyID'];
@@ -149,18 +168,20 @@ const GeneralDashboard = () => {
             perks: doc.data()['perks'],
           }));
           setEmployees(people);
-
-          console.log(business);
-          setGroups(business.groups);
-          setDashboardLoading(false);
         })
         .catch((error) => {
           alert(error);
         });
     } else {
-      console.log('No such document!');
+      console.info('No such document!');
     }
   }, [currentUser, admin, business]);
+
+  useEffect(() => {
+    if (hasPaymentMethods != null) {
+      setDashboardLoading(false);
+    }
+  }, [hasPaymentMethods]);
 
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
@@ -168,11 +189,11 @@ const GeneralDashboard = () => {
 
   return (
     <div>
-      <Header title="Dashboard" crumbs={['General dashboard']} />
+      <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
 
-      {loadingAuthState ? (
+      {loadingAuthState || hasPaymentMethods == null ? (
         <p>Loading</p>
-      ) : !hasPaymentMethods ? (
+      ) : !(hasPaymentMethods == true) ? (
         <WelcomeCards />
       ) : business['groups'] == null ||
         Object.keys(business['groups']).length == 0 ? (
@@ -182,9 +203,7 @@ const GeneralDashboard = () => {
           <Grid item xs={4}>
             <MetricCard
               title={'Cost Per Employee'}
-              number={
-                '$' + roundNumber(calculateTotalCost() / employees.length)
-              }
+              number={'$' + roundNumber(calculateTotalCost())}
               icon={
                 <img
                   src="/images/undraw_Investing.svg"

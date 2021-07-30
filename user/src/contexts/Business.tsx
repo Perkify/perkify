@@ -21,7 +21,7 @@ export const BusinessProvider = ({ children }) => {
             }
           },
           (error) => {
-            console.log('Snapshot permissions error');
+            console.info('Snapshot permissions error');
           }
         );
     }

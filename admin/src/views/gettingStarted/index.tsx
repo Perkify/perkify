@@ -11,8 +11,8 @@ import Header from 'components/Header';
 import { AuthContext } from 'contexts/Auth';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
+import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
-import { allPerks, allPerksDict } from '../../constants';
 
 const CreateGroup = ({ history }) => {
   const [availablePerks, setAvailablePerks] = useState(

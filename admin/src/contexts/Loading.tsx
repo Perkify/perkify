@@ -4,14 +4,15 @@ export const LoadingContext = React.createContext<any>({});
 
 export const LoadingProvider = ({ children }) => {
   const [dashboardLoading, setDashboardLoading] = useState(false);
-
-  console.log(dashboardLoading);
+  const [freezeNav, setFreezeNav] = useState(false);
 
   return (
     <LoadingContext.Provider
       value={{
         dashboardLoading,
         setDashboardLoading,
+        freezeNav,
+        setFreezeNav
       }}
     >
       {children}

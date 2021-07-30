@@ -7,8 +7,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 export const WelcomeCards = () => {
+  const history = useHistory();
   return (
     <div>
       <Grid container spacing={4}>
@@ -29,7 +31,8 @@ export const WelcomeCards = () => {
                 </Typography>
                 <Typography gutterBottom variant="h5" component="h3">
                   Take a few seconds to set up billing so that you can start
-                  distributing perks to your employees :)
+                  distributing perks to your employees. Just go to the billing
+                  page, add a payment method, and you are good to go.
                 </Typography>
                 <Button
                   variant="contained"
@@ -39,6 +42,9 @@ export const WelcomeCards = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                  }}
+                  onClick={() => {
+                    history.push('/dashboard/billing');
                   }}
                 >
                   Set up billing

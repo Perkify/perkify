@@ -6,11 +6,12 @@ import { green, orange } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { AuthContext, BusinessContext } from 'contexts';
 import React, { useContext } from 'react';
-import { allPerksDict } from '../../constants';
+import { allPerksDict } from 'shared';
 
 const useStyles = makeStyles((theme) => ({
   root: { minHeight: '100vh' },
@@ -31,8 +32,38 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    cursor: 'pointer',
+    transition: theme.transitions.create(['box-shadow'], {
+      duration: theme.transitions.duration.complex,
+    }),
+    '&:hover': {
+      boxShadow: '0px 18px 90px 1px rgba(0,0,0,0.2)',
+    },
   },
 }));
+
+const PerkCard = withStyles((theme) => ({
+  root: {
+    margin: theme.spacing(4),
+    width: '200px',
+    height: '200px',
+    boxShadow: '0px 9px 45px 1px rgba(0,0,0,0.1)',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    transform: 'scale(1) !important',
+    transition: `${theme.transitions.create(['box-shadow', 'transform'], {
+      duration: theme.transitions.duration.complex,
+    })} !important`,
+    '&:hover': {
+      boxShadow: '0px 12px 60px 1px rgba(0,0,0,0.2)',
+      transform: 'scale(1.05) !important',
+    },
+  },
+}))(Paper);
 
 const GeneralDashboard = () => {
   const { currentUser, employee, loadingAuthState } = useContext(AuthContext);
@@ -62,13 +93,13 @@ const GeneralDashboard = () => {
     console.log(business);
     if (business.groups) {
       return business.groups[employee.group].map((perk) => {
+        increasingDelay += 300;
         const perkUses = employee.perks[perk];
-        increasingDelay += 500;
         // TODO: this is preferred:
-        // console.log(require(`images/perkLogos/${allPerksDict[perk].Img}`));
+        // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
         return (
           <Grow in={true} timeout={increasingDelay}>
-            <Paper className={classes.perkCard}>
+            <PerkCard>
               {perkUses.length === 0 ||
               perkUses[perkUses.length - 1].seconds + billingCycle <
                 new Date('2012.08.10').getTime() / 1000 ? (
@@ -104,7 +135,7 @@ const GeneralDashboard = () => {
                   {perk}
                 </Box>
               </Typography>
-            </Paper>
+            </PerkCard>
           </Grow>
         );
       });

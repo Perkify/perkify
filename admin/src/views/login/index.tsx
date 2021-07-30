@@ -16,7 +16,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -82,7 +82,7 @@ export default function SignInSide(props) {
   const history = useHistory();
 
   const errorAlert = (error) => {
-    console.log(error);
+    console.error(error);
     setErrorMessage(error);
     setOpen(true);
   };
@@ -90,7 +90,6 @@ export default function SignInSide(props) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log('Loading set to true');
     try {
       await app.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
@@ -100,21 +99,6 @@ export default function SignInSide(props) {
       setLoading(false);
       errorAlert(error.message);
     }
-
-    //     axios
-    //       .post("/get_user_data", {
-    //         email: email,
-    //         password: password,
-    //       })
-    //       .then((data) => {
-    //         setUser(data.data);
-    //         setLoading(false);
-    //       })
-    //       .catch((e) => {
-    //         console.log("Error");
-    //         setLoading(false);
-    //         setOpen(true);
-    //       });
   };
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -243,20 +227,19 @@ export default function SignInSide(props) {
                     Sign In
                   </Button>
                   <Grid container>
-                    <Grid item xs>
+                    {/* <Grid item xs>
                       <Link
                         href="https://www.mcgill.ca/it/stay-safe-online/pw-reset"
                         variant="body2"
                       >
                         Forgot password?
                       </Link>
-                    </Grid>
-                    {/* <Grid item>
-                      <Link href="#" variant="body2">
+                    </Grid> */}
+                    <Grid item>
+                      <Link to="/signup" variant="body2" component={RouterLink}>
                         {"Don't have an account? Sign Up"}
                       </Link>
-
-                    </Grid> */}
+                    </Grid>
                     {/* <Grid item>
                       <Link href="https://github.com/Ruborcalor/onecard_dashboard">
                         <GitHubIcon style={{ fontSize: "12px" }} />

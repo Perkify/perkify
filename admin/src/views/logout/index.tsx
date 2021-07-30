@@ -8,7 +8,7 @@ const GeneralDashboard = () => {
   useEffect(() => {
     auth.signOut().then(
       () => {
-        history.push('/login');
+        window.location.assign('/login');
       },
       (error) => {
         console.error('Sign out error');

@@ -9,24 +9,35 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import { AuthContext } from 'contexts/Auth';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from '../../constants';
+import { allPerks } from 'shared';
 
 const AddPerks = ({
   isAddPerksModalVisible,
   setIsAddPerksModalVisible,
-  selectedPerks,
+  groupPerks,
   group,
   emails,
 }) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
-  const [selectedPerksError, setSelectedPerksError] = useState('');
-  const [availablePerks, setAvailablePerks] = useState(
-    allPerks.map((perkObj) => perkObj.Name)
-  );
+  const [groupPerksError, setSelectedPerksError] = useState('');
+  const [availablePerks, setAvailablePerks] = useState([]);
+
   const { currentUser } = useContext(AuthContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
+
+  React.useEffect(() => {
+    setAvailablePerks(
+      allPerks
+        .map((perkObj) => perkObj.Name)
+        .filter((perk) => {
+          return !groupPerks.some((perkObj) => perkObj.Name == perk);
+        })
+    );
+  }, [groupPerks]);
 
   const addPerksToPerkGroup = (event) => {
     event.preventDefault();
@@ -37,15 +48,14 @@ const AddPerks = ({
     }
 
     if (!error) {
-      setIsAddPerksModalVisible(false);
-
       (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
         const afterPerks = perksToAdd.concat(
-          selectedPerks.map((perkObj) => perkObj.Name)
+          groupPerks.map((perkObj) => perkObj.Name)
         );
-        console.log(afterPerks);
 
         await PerkifyApi.put(
           'user/auth/updatePerkGroup',
@@ -61,6 +71,11 @@ const AddPerks = ({
             },
           }
         );
+
+        setFreezeNav(false);
+        setDashboardLoading(false);
+        setIsAddPerksModalVisible(false);
+        setPerksToAdd([]);
       })();
     }
   };
@@ -98,7 +113,7 @@ const AddPerks = ({
           onChange={(event) => {
             setPerksToAdd(event.target.value as string[]);
           }}
-          error={selectedPerksError != ''}
+          error={groupPerksError != ''}
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
