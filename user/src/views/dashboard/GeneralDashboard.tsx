@@ -2,12 +2,13 @@ import { Box, Grid, Typography } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Card from '@material-ui/core/Card';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { green } from '@material-ui/core/colors';
+import { green, orange } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { AuthContext, BusinessContext } from 'contexts';
 import React, { useContext } from 'react';
 import { allPerksDict } from 'shared';
@@ -87,24 +88,43 @@ const GeneralDashboard = () => {
 
   const perksList = () => {
     let increasingDelay = 0;
+    const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
+
+    console.log(business);
     if (business.groups) {
       return business.groups[employee.group].map((perk) => {
         increasingDelay += 300;
+        const perkUses = employee.perks[perk];
         // TODO: this is preferred:
         // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
         return (
           <Grow in={true} timeout={increasingDelay}>
             <PerkCard>
-              <CheckCircleOutlineIcon
-                style={{
-                  fontSize: 32,
-                  color: green[400],
-                  position: 'absolute',
-                  right: '0',
-                  top: '0',
-                  margin: '18px',
-                }}
-              />
+              {perkUses.length === 0 ||
+              perkUses[perkUses.length - 1].seconds + billingCycle <
+                new Date('2012.08.10').getTime() / 1000 ? (
+                <RadioButtonUncheckedIcon
+                  style={{
+                    fontSize: 32,
+                    color: orange[400],
+                    position: 'absolute',
+                    right: '0',
+                    top: '0',
+                    margin: '18px',
+                  }}
+                />
+              ) : (
+                <CheckCircleOutlineIcon
+                  style={{
+                    fontSize: 32,
+                    color: green[400],
+                    position: 'absolute',
+                    right: '0',
+                    top: '0',
+                    margin: '18px',
+                  }}
+                />
+              )}
               <Avatar
                 src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perk].Img}`}
                 alt={perk}

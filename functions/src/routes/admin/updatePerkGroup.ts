@@ -77,9 +77,22 @@ export const updatePerkGroup = async (req, res, next) => {
     const oldUserEmails: any[] = [];
 
     // partition existing emails into those to delete and those not to delete
-    groupUsersSnapshot.forEach((userDoc) => {
+    groupUsersSnapshot.forEach(async (userDoc) => {
       if (emails.includes(userDoc.id)) {
         oldUserEmails.push(userDoc.id);
+        const oldUserPerks = userDoc.data().perks;
+        const oldUserNewPerks = perks.reduce((acc, perk) => {
+          if (perk in oldUserPerks) {
+            acc[perk] = oldUserPerks[perk];
+          } else {
+            acc[perk] = [];
+          }
+          return acc;
+        }, {});
+        await db
+          .collection('users')
+          .doc(userDoc.id)
+          .update({ perks: oldUserNewPerks });
       } else {
         deleteUsers.push(userDoc);
       }

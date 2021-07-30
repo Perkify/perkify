@@ -10,3 +10,5 @@ export const rapydBaseURL = 'https://sandboxapi.rapyd.net';
 // STRIPE
 export const privateStripeKey =
   'sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu';
+
+export const stripeWebhookSecret = 'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP';
