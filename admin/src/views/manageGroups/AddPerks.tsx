@@ -12,7 +12,7 @@ import {
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from '../../constants';
+import { allPerks } from 'shared';
 
 const AddPerks = ({
   isAddPerksModalVisible,

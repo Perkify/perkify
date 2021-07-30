@@ -10,7 +10,7 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { AuthContext, BusinessContext } from 'contexts';
 import React, { useContext } from 'react';
-import { allPerksDict } from '../../constants';
+import { allPerksDict } from 'shared';
 
 const useStyles = makeStyles((theme) => ({
   root: { minHeight: '100vh' },

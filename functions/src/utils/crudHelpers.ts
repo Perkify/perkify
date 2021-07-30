@@ -1,5 +1,4 @@
-import { allPerks } from '../../shared';
-import { newUserTemplateGenerator } from '../../shared/email_templates/new_user';
+import { allPerks, newUserTemplateGenerator } from '../../shared';
 import admin, { db, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
