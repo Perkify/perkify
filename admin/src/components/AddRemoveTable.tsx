@@ -71,6 +71,7 @@ export const AddRemoveTable = ({
   tableName,
   addButtonText,
   height,
+  ...rest
 }) => {
   const dataGridClasses = useDataGridStyles();
 
@@ -141,6 +142,7 @@ export const AddRemoveTable = ({
         components={{
           Toolbar: CustomToolbar,
         }}
+        loading={rest.loading && rest.loading == true ? true : false}
       />
     </Card>
   );

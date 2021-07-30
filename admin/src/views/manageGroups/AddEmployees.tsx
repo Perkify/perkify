@@ -81,6 +81,9 @@ const AddEmployees = ({
             alert(
               `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reason_detail}`
             );
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
           });
       })();
     }

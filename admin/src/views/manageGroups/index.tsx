@@ -204,6 +204,7 @@ export default function ManageGroups(props) {
             }}
             tableName="Group Perks"
             addButtonText="Add Group Perk"
+            loading={dashboardLoading}
           />
         </Grid>
         <Grid item md={6} sm={12}>
@@ -221,6 +222,7 @@ export default function ManageGroups(props) {
             }}
             tableName="Group Employees"
             addButtonText="Add Employees"
+            loading={dashboardLoading}
           />
         </Grid>
       </Grid>
