@@ -18,7 +18,7 @@ export const deletePerkGroup = async (req, res, next) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
       return next(error);
     }
@@ -32,7 +32,7 @@ export const deletePerkGroup = async (req, res, next) => {
       const error = {
         status: 500,
         reason: 'Missing documents',
-        reason_detail: `Documents missing from firestore`,
+        reasonDetail: `Documents missing from firestore`,
       };
       return next(error);
     }

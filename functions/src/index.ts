@@ -53,13 +53,13 @@ app.use((err, req, res, next) => {
     return next(err);
   }
 
-  if (!(err.status && err.reason && err.reason_detail)) {
+  if (!(err.status && err.reason && err.reasonDetail)) {
     return next(err);
   }
 
-  const { status, reason, reason_detail } = err;
+  const { status, reason, reasonDetail } = err;
 
-  res.status(status).send({ reason, reason_detail }).end();
+  res.status(status).send({ reason, reasonDetail }).end();
 });
 
 exports.user = functions.https.onRequest(app);

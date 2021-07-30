@@ -6,7 +6,7 @@ export const handleError = (err, res) => {
     err = {
       status: 500,
       reason: 'INTERNAL_SERVER_ERROR',
-      reason_detail: err ? err.toString() : undefined,
+      reasonDetail: err ? err.toString() : undefined,
     };
   }
 
@@ -27,7 +27,7 @@ export const validateFirebaseIdToken = async (req, res, next) => {
     const err = {
       status: 403,
       reason: 'Unauthorized',
-      reason_detail:
+      reasonDetail:
         'No Firebase ID token was passed as a Bearer token in the Authorization header or as cookie',
     };
     handleError(err, res);

@@ -35,7 +35,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
       return next(error);
     }
@@ -44,7 +44,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
     //   const error = {
     //     status: 400,
     //     reason: 'extraneous parameters',
-    //     reason_detail: Object.keys(rest).join(','),
+    //     reasonDetail: Object.keys(rest).join(','),
     //   };
     //   return next(error);
     // }

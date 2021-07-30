@@ -17,7 +17,7 @@ export const registerUser = async (req, res, next) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reason_detail: JSON.stringify(errors.array()),
+        reasonDetail: JSON.stringify(errors.array()),
       };
       return next(error);
     }
@@ -26,7 +26,7 @@ export const registerUser = async (req, res, next) => {
       const error = {
         status: 400,
         reason: 'extraneous parameters',
-        reason_detail: Object.keys(rest).join(','),
+        reasonDetail: Object.keys(rest).join(','),
       };
       return next(error);
     }
@@ -40,7 +40,7 @@ export const registerUser = async (req, res, next) => {
       const error = {
         status: 500,
         reason: 'Missing user document',
-        reason_detail: `User documents missing from firestore`,
+        reasonDetail: `User documents missing from firestore`,
       };
       return next(error);
     }
@@ -55,7 +55,7 @@ export const registerUser = async (req, res, next) => {
       const error = {
         status: 500,
         reason: 'Missing business document',
-        reason_detail: `Business documents missing from firestore`,
+        reasonDetail: `Business documents missing from firestore`,
       };
       return next(error);
     }

@@ -80,7 +80,7 @@ const AddEmployees = ({
           .catch((e) => {
             console.log(e.response);
             alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reason_detail}`
+              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
             );
 
             setDashboardLoading(false);

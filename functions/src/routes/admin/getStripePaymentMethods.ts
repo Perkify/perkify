@@ -8,7 +8,7 @@ export const getStripePaymentMethods = async (req, res, next) => {
     const error = {
       status: 500,
       reason: 'Missing stripeId',
-      reason_detail: `Document missing stripeId in firestore`,
+      reasonDetail: `Document missing stripeId in firestore`,
     };
     return next(error);
   }

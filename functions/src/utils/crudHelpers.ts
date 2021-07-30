@@ -44,7 +44,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     const error = {
       status: 500,
       reason: 'Missing document',
-      reason_detail: 'Could not find business data document',
+      reasonDetail: 'Could not find business data document',
     };
     throw error;
   }
@@ -52,9 +52,11 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
   // get list of perks that business has
   const perkSet = new Set();
   for (const perkGroupName in businessData.groups) {
-    businessData.groups[perkGroupName].forEach((perkName) =>
-      perkSet.add(perkName)
-    );
+    if (businessData.groups.hasOwnProperty(perkGroupName)) {
+      businessData.groups[perkGroupName].forEach((perkName) =>
+        perkSet.add(perkName)
+      );
+    }
   }
 
   // compare the list of perks to the list of subscriptions, and cancel any subscriptions for which no perks are being offered
@@ -107,7 +109,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     const error = {
       status: 500,
       reason: 'Missing documents',
-      reason_detail: `Documents missing from firestore`,
+      reasonDetail: `Documents missing from firestore`,
     };
     throw error;
   }
