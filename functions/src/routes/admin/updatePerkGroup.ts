@@ -31,6 +31,16 @@ export const updatePerkGroup = async (req, res, next) => {
       return next(error);
     }
 
+    // prevent from duplicate perks being passed at once
+    if (perks && new Set(perks).size !== perks.length) {
+      const error = {
+        status: 400,
+        reason: 'Bad Request',
+        reason_detail: JSON.stringify(errors.array()),
+      };
+      return next(error);
+    }
+
     console.log('Starting update perk group');
 
     // get admins business
