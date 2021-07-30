@@ -99,7 +99,7 @@ export default function ClippedDrawer({ children }) {
 
   const accountNav: [string, string, any][] = [
     // ['Settings', '/settings', <SettingsIcon />],
-    ['Logout', '/logout', <ExitToAppIcon />],
+    ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
   const navSections: [string, [string, string, any][]][] = [
@@ -239,6 +239,10 @@ export default function ClippedDrawer({ children }) {
         </Hidden>
       </nav>
       {children}
+
+      {/* <main className={classes.content}>
+        <Box margin="60px 20px 20px 20px">{children}</Box>
+      </main> */}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export const createUserHelper = async (email, businessID, group, perks) => {
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
     url:
       process.env.NODE_ENV == 'development'
-        ? 'http://localhost:3000/dashboard'
+        ? 'http://localhost:3001/dashboard'
         : 'https://app.getperkify.com/', // I don't think you're supposed to do it this way. Maybe less secure
   });
 
