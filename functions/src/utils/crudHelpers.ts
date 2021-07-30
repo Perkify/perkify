@@ -1,4 +1,5 @@
 import { allPerks } from '../../shared';
+import { newUserTemplateGenerator } from '../../shared/email_templates/new_user';
 import admin, { db, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
@@ -19,12 +20,7 @@ export const createUserHelper = async (email, businessID, group, perks) => {
     to: email,
     message: {
       subject: 'Your employer has signed you up for Perkify!',
-      text: `
-        Your employer purchased these Perks for you:\n
-        ${perks} 
-        
-        Use this link to sign into your account and redeem your Perks: ${signInLink}.\n 
-        `,
+      html: newUserTemplateGenerator({ signInLink }),
     },
   });
 };
