@@ -1,4 +1,5 @@
 import Header from 'components/Header';
+import { auth } from 'firebaseApp';
 import React, { useEffect } from 'react';
 
 const Login = () => {
