@@ -129,7 +129,7 @@ const SignUpBusinessWebflow = () => {
             .signInWithEmailAndPassword(email, password);
           setNewUser(result.user);
           await result?.user?.sendEmailVerification({
-            url: 'https://app.getperkify.com/login',
+            url: 'https://admin.getperkify.com/login',
           });
           setDashboardLoading(false);
           return true;

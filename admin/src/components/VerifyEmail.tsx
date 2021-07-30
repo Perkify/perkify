@@ -6,7 +6,7 @@ const VerifyEmail = ({ email, newUser }) => {
   const resendVerificationEmail = async () => {
     try {
       await newUser.sendEmailVerification({
-        url: 'https://app.getperkify.com/login',
+        url: 'https://admin.getperkify.com/login',
       });
     } catch (e) {
       alert(e);
