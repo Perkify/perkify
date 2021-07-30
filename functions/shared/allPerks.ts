@@ -5,6 +5,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInq1KuQQHSHZsmq9prpaUr',
     Img: 'netflix.jpg',
+    Product: 'prod_JwhE2ADq37oUrZ',
+    NetworkId: '123',
+    PaymentName: 'Netflix Standard',
   },
   {
     Name: 'Hulu',
@@ -12,6 +15,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInpWKuQQHSHZsmOtbkmnD6',
     Img: 'hulu.png',
+    Product: 'prod_JwhD1f77sqFDSI',
+    NetworkId: '123',
+    PaymentName: 'Hulu',
   },
   {
     Name: 'Audible Plus',
@@ -19,6 +25,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInpEKuQQHSHZsmZRfkYK13',
     Img: 'audible.png',
+    Product: 'prod_JwhDvuPn93HnCv',
+    NetworkId: '123',
+    PaymentName: 'Audible Plus',
   },
   {
     Name: 'Disney Plus',
@@ -26,6 +35,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInoaKuQQHSHZsmN9CMDEEu',
     Img: 'disneyplus.png',
+    Product: 'prod_JwhDWSPG0Ydeua',
+    NetworkId: '123',
+    PaymentName: 'Disney Plus',
   },
   {
     Name: 'Headspace',
@@ -33,6 +45,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInnAKuQQHSHZsm22WmEyqN',
     Img: 'headspace.png',
+    Product: 'prod_JwhBWFAWY4QwSw',
+    NetworkId: '123',
+    PaymentName: 'Headspace',
   },
   {
     Name: 'Spotify Individual',
@@ -40,6 +55,9 @@ export const allPerks = [
     Period: 'Monthly',
     stripePriceId: 'price_1JInl6KuQQHSHZsmwMGzzFUE',
     Img: 'spotify.jpg',
+    Product: 'prod_Jwh9zvjiY3Ou0n',
+    NetworkId: '123',
+    PaymentName: 'Spotify Individual',
   },
 ];
 
@@ -49,6 +67,10 @@ export const allPerksDict = allPerks.reduce(
       Cost: perk['Cost'],
       Period: perk['Period'],
       Name: perk.Name,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
     }),
     map
   ),
