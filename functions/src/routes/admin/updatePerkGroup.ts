@@ -22,6 +22,7 @@ export const updatePerkGroup = async (req, res, next) => {
 
   try {
     const errors = validationResult(req);
+    console.log(errors, errors.isEmpty());
     if (!errors.isEmpty()) {
       const error = {
         status: 400,
@@ -36,7 +37,7 @@ export const updatePerkGroup = async (req, res, next) => {
       const error = {
         status: 400,
         reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
+        reasonDetail: 'Trying to add duplicate perks',
       };
       return next(error);
     }

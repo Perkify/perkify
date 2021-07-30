@@ -59,11 +59,11 @@ const AddEmployees = ({
 
         PerkifyApi.put(
           'user/auth/updatePerkGroup',
-          JSON.stringify({
+          {
             group,
             perks: groupPerks.map((perkObj) => perkObj.Name),
             emails: afterEmployees,
-          }),
+          },
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
