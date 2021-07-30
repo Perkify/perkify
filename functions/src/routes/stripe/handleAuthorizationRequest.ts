@@ -1,17 +1,19 @@
 import { allPerks } from '../../../shared';
 import admin, { db, stripe } from '../../models';
 
-const verifyRequest = (perkInfo, userPerks) => {
+const verifyRequest = (perkInfo, userPerks, amount) => {
   // if we offer perk and the user has been granted the perk
   if (perkInfo && perkInfo.Name in userPerks) {
     // get list of last authorized transactions of perk
     const userPerkUses = userPerks[perkInfo.Name];
     const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
-    // if perk hasn't been used or hasn't been used in last 28 days
+    const taxPercent = 1.1;
+    // if perk hasn't been used or hasn't been used in last 28 days and is less than the price
     return (
-      userPerkUses.length === 0 ||
-      userPerkUses[userPerkUses.length - 1].seconds + billingCycle <
-        admin.firestore.Timestamp.now().seconds
+      (userPerkUses.length === 0 ||
+        userPerkUses[userPerkUses.length - 1].seconds + billingCycle <
+          admin.firestore.Timestamp.now().seconds) &&
+      amount < perkInfo.Cost * taxPercent
     );
   } else return false;
 };
@@ -19,6 +21,7 @@ const verifyRequest = (perkInfo, userPerks) => {
 export const handleAuthorizationRequest = async (auth) => {
   // Authorize the transaction.
   auth = {
+    amount: 6.99,
     card: {
       cardholder: {
         email: 'prateek@humane.com',
@@ -44,7 +47,7 @@ export const handleAuthorizationRequest = async (auth) => {
         auth.merchant_data.network_id === perk.NetworkId
     );
 
-    if (verifyRequest(perkInfo, userPerks)) {
+    if (verifyRequest(perkInfo, userPerks, auth.amount)) {
       console.log('verified');
       // if verified approve it
       // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
