@@ -8,7 +8,7 @@ import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { PerkifyApi } from 'services';
-import { allPerksDict } from '../../constants';
+import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
 import RemoveEmployees from './RemoveEmployees';
