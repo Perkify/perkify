@@ -33,59 +33,72 @@ export const handleAuthorizationRequest = async (auth) => {
     },
   };
 
-  try {
-    // email of card holder
-    const email = auth.card.cardholder.email;
-    const userRef = db.collection('users').doc(email);
-    const userDoc = await userRef.get();
-    // get perks usage associated with the user who made purchase
-    const userPerks = userDoc.data().perks;
-    // check if the transaction was using a perk that we offer (and get info on that perk)
-    const perkInfo = allPerks.find(
-      (perk) =>
-        auth.merchant_data.name === perk.PaymentName &&
-        auth.merchant_data.network_id === perk.NetworkId
-    );
-
-    if (verifyRequest(perkInfo, userPerks, auth.amount)) {
-      console.log('verified');
-      // if verified approve it
-      // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
-      // await stripe.issuing.authorizations.approve(auth['id']);
-
-      const timestamp = admin.firestore.Timestamp.now();
-      // note the timestamp it was used so it can't be for the next 28 days
-      await userRef.update({
-        [`perks.${perkInfo.Name}`]:
-          admin.firestore.FieldValue.arrayUnion(timestamp),
-      });
-
-      const businessDoc = await db
-        .collection('businesses')
-        .doc(userDoc.data().businessID)
-        .get();
-      const adminID = businessDoc.data().admins[0];
-
-      const productRef = db.collection('products').doc(perkInfo.Product);
-      // get the subscription associated with the perk that was purchased from customer associated with admin
-      const perkSubscriptions = await db
-        .collection('customers')
-        .doc(adminID)
-        .collection('subscriptions')
-        .where('product', '==', productRef)
-        .where('status', '==', 'active')
-        .limit(1)
-        .get();
-
-      const perkSubscriptionId = perkSubscriptions.docs[0].data().items[0].id;
-      // add one use of the perk to perks subscription
-      await stripe.subscriptionItems.createUsageRecord(perkSubscriptionId, {
-        quantity: 1,
-        timestamp: timestamp.seconds,
-        action: 'increment',
-      });
-    } else await stripe.issuing.authorizations.decline(auth['id']);
-  } catch (err) {
-    console.error(err);
+  // email of card holder
+  const email = auth.card.cardholder.email;
+  const userRef = db.collection('users').doc(email);
+  const userData = (await userRef.get()).data();
+  if (!userData) {
+    const error = {
+      status: 500,
+      reason: 'Missing documents',
+      reasonDetail: `Documents missing from firestore: ${email}`,
+    };
+    throw error;
   }
+  // get perks usage associated with the user who made purchase
+  const userPerks = userData.perks;
+  // check if the transaction was using a perk that we offer (and get info on that perk)
+  const perkInfo = allPerks.find(
+    (perk) =>
+      auth.merchant_data.name === perk.PaymentName &&
+      auth.merchant_data.network_id === perk.NetworkId
+  );
+
+  if (perkInfo && verifyRequest(perkInfo, userPerks, auth.amount)) {
+    console.log('verified');
+    // if verified approve it
+    // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
+    // await stripe.issuing.authorizations.approve(auth['id']);
+
+    const timestamp = admin.firestore.Timestamp.now();
+    // note the timestamp it was used so it can't be for the next 28 days
+    await userRef.update({
+      [`perks.${perkInfo.Name}`]:
+        admin.firestore.FieldValue.arrayUnion(timestamp),
+    });
+
+    const businessData = (
+      await db.collection('businesses').doc(userData.businessID).get()
+    ).data();
+
+    if (!businessData) {
+      const error = {
+        status: 500,
+        reason: 'Missing documents',
+        reasonDetail: `Documents missing from firestore: ${userData.businessID}`,
+      };
+      throw error;
+    }
+
+    const adminID = businessData.admins[0];
+
+    const productRef = db.collection('products').doc(perkInfo.Product);
+    // get the subscription associated with the perk that was purchased from customer associated with admin
+    const perkSubscriptions = await db
+      .collection('customers')
+      .doc(adminID)
+      .collection('subscriptions')
+      .where('product', '==', productRef)
+      .where('status', '==', 'active')
+      .limit(1)
+      .get();
+
+    const perkSubscriptionId = perkSubscriptions.docs[0].data().items[0].id;
+    // add one use of the perk to perks subscription
+    await stripe.subscriptionItems.createUsageRecord(perkSubscriptionId, {
+      quantity: 1,
+      timestamp: timestamp.seconds,
+      action: 'increment',
+    });
+  } else await stripe.issuing.authorizations.decline(auth['id']);
 };
