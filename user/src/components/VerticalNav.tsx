@@ -18,7 +18,6 @@ import {
 import Typography from '@material-ui/core/Typography';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import SettingsIcon from '@material-ui/icons/Settings';
 import { AuthContext } from 'contexts';
 import logo from 'images/logo.png';
 import React, { useContext } from 'react';
@@ -99,7 +98,7 @@ export default function ClippedDrawer({ children }) {
   ];
 
   const accountNav: [string, string, any][] = [
-    ['Settings', '/settings', <SettingsIcon />],
+    // ['Settings', '/settings', <SettingsIcon />],
     ['Logout', '/logout', <ExitToAppIcon />],
   ];
 
