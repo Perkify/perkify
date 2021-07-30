@@ -69,11 +69,13 @@ const GeneralDashboard = () => {
         return (
           <Grow in={true} timeout={increasingDelay}>
             <Paper className={classes.perkCard}>
-              {perkUses.length === 0 || perkUses[perkUses.length - 1] ? (
-                <CheckCircleOutlineIcon
+              {perkUses.length === 0 ||
+              perkUses[perkUses.length - 1].seconds + billingCycle <
+                new Date('2012.08.10').getTime() / 1000 ? (
+                <RadioButtonUncheckedIcon
                   style={{
                     fontSize: 32,
-                    color: green[400],
+                    color: orange[400],
                     position: 'absolute',
                     right: '0',
                     top: '0',
@@ -81,10 +83,10 @@ const GeneralDashboard = () => {
                   }}
                 />
               ) : (
-                <RadioButtonUncheckedIcon
+                <CheckCircleOutlineIcon
                   style={{
                     fontSize: 32,
-                    color: orange[400],
+                    color: green[400],
                     position: 'absolute',
                     right: '0',
                     top: '0',

@@ -19,7 +19,6 @@ export const stripeWebhooks = async (request, response) => {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  console.log(event);
   if (event.type === 'issuing_authorization.request') {
     const auth = event.data.object;
     await handleAuthorizationRequest(auth);
