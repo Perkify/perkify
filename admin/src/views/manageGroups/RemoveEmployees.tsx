@@ -41,8 +41,6 @@ const RemoveEmployees = ({
         if (afterEmails.length == 0) {
           setDashboardLoading(false);
           setFreezeNav(false);
-          setIsRemoveEmployeesModalVisible(false);
-          setSelectedEmployees([]);
           alert('Error: cannot remove all employees from a perk group');
           return;
         }
