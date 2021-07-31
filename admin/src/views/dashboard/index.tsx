@@ -1,4 +1,3 @@
-import LinearProgress from '@material-ui/core/LinearProgress';
 import VerticalNav from 'components/VerticalNav';
 import { LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
@@ -18,15 +17,6 @@ const Dashboard = () => {
 
   return (
     <div style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}>
-      <LinearProgress
-        hidden={!dashboardLoading}
-        style={{
-          zIndex: 10000,
-          height: '6px',
-          width: '100%',
-          position: 'fixed',
-        }}
-      />
       <VerticalNav>
         <Switch>
           <Route exact path={path} component={GeneralDashboard} />
