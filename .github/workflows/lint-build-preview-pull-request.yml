@@ -4,10 +4,12 @@
 name: Check Lint and Build on PR
 "on": pull_request
 jobs:
-  check_if_functions_changed:
-    name: Check if functions changed
+  check_which_projects_changed:
+    name: Check which projects changed out of functions, admin, and user
     outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
+      run_job_functions: ${{ steps.check_files.outputs.run_job_functions }}
+      run_job_admin: ${{ steps.check_files.outputs.run_job_admin }}
+      run_job_user: ${{ steps.check_files.outputs.run_job_user }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,99 +29,34 @@ jobs:
           do
             echo $file
             if [[ $file == functions/* ]]; then
-              echo "This modified file is under the 'functions' folder."
-              echo "::set-output name=run_job::true"
-              break
-            else
-              echo "::set-output name=run_job::false"
-            fi
-          done < files.txt
-
-  check_if_admin_changed:
-    name: Check if admin changed
-    outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-
-      - name: check modified files
-        id: check_files
-        run: |
-          echo "=============== list modified files ==============="
-          git diff --name-only HEAD^ HEAD
-
-          echo "========== check paths of modified files =========="
-          git diff --name-only HEAD^ HEAD > files.txt
-          while IFS= read -r file
-          do
-            echo $file
-            if [[ $file == admin/* ]]; then
-              echo "This modified file is under the 'admin' folder."
-              echo "::set-output name=run_job::true"
-              break
-            else
-              echo "::set-output name=run_job::false"
-            fi
-          done < files.txt
-
-  check_if_user_changed:
-    name: Check if user changed
-    outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-
-      - name: check modified files
-        id: check_files
-        run: |
-          echo "=============== list modified files ==============="
-          git diff --name-only HEAD^ HEAD
-
-          echo "========== check paths of modified files =========="
-          git diff --name-only HEAD^ HEAD > files.txt
-          while IFS= read -r file
-          do
-            echo $file
-            if [[ $file == user/* ]]; then
-              echo "This modified file is under the 'user' folder."
-              echo "::set-output name=run_job::true"
-              break
-            else
-              echo "::set-output name=run_job::false"
+              echo "::set-output name=run_job_functions::true"
+            elif [[ $file == admin/* ]]; then
+              echo "::set-output name=run_job_admin::true"
+            elif [[ $file == user/* ]]; then
+              echo "::set-output name=run_job_user::true"
             fi
           done < files.txt
 
   build_functions:
     name: "Verify that the functions folder builds"
-    needs: check_if_functions_changed
-    if: needs.check_if_functions_changed.outputs.run_job == 'true'
+    needs: check_which_projects_changed
+    if: needs.check_if_functions_changed.outputs.run_job_functions == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Lint and build functions
-        run: cd functions && npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERKIFY_5790B }}"
-          projectId: perkify-5790b
+      - name: Install node modules, lint, and build
+        run: npm ci && npm run lint && npm run build
+        working-directory: functions
 
   build_and_preview_admin:
-    needs: check_if_admin_changed
-    if: needs.check_if_admin_changed.outputs.run_job == 'true'
+    needs: check_which_projects_changed
+    if: needs.check_if_admin_changed.outputs.run_job_admin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Lint and build admin
-        run: cd admin && npm ci && npm run build
+        run: npm ci && npm run lint && npm run build
+        working-directory: admin
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
@@ -129,13 +66,14 @@ jobs:
           expires: 2d
 
   build_and_preview_user:
-    needs: check_if_user_changed
-    if: needs.check_if_user_changed.outputs.run_job == 'true'
+    needs: check_which_projects_changed
+    if: needs.check_if_user_changed.outputs.run_job_user == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Lint and build user
-        run: cd user && npm ci && npm run build
+        run: npm ci && npm run lint && npm run build
+        working-directory: user
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
