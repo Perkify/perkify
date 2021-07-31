@@ -1,13 +1,11 @@
 import { Grid, Typography } from '@material-ui/core';
 import { AddRemoveTable } from 'components/AddRemoveTable';
-import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { BusinessContext, LoadingContext } from 'contexts';
 import { AuthContext } from 'contexts/Auth';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { PerkifyApi } from 'services';
 import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
@@ -61,9 +59,6 @@ export default function ManageGroups(props) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
-    useState(false);
-
   const { business } = useContext(BusinessContext);
 
   const history = useHistory();
@@ -87,30 +82,6 @@ export default function ManageGroups(props) {
       id: 'abc133',
     },
   ];
-
-  const deletePerkGroup = async () => {
-    const bearerToken = await currentUser.getIdToken();
-    setDashboardLoading(true);
-    setFreezeNav(true);
-
-    await PerkifyApi.post(
-      'user/auth/deletePerkGroup',
-      JSON.stringify({
-        group: id,
-      }),
-      {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    setDashboardLoading(false);
-    setFreezeNav(false);
-
-    history.push('/dashboard');
-  };
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
@@ -180,12 +151,12 @@ export default function ManageGroups(props) {
       <Header
         title={`Manage ${id} Group`}
         crumbs={['Dashboard', 'Perk Groups', id]}
-        button={{
-          type: 'delete',
-          onClick: () => {
-            setIsDeletePerkGroupModalVisible(true);
-          },
-        }}
+        // button={{
+        //   type: 'delete',
+        //   onClick: () => {
+        //     setIsDeletePerkGroupModalVisible(true);
+        //   },
+        // }}
       />
 
       <Grid container spacing={5}>
@@ -258,13 +229,6 @@ export default function ManageGroups(props) {
         groupPerks={groupPerks}
         group={id}
         emails={groupEmails}
-      />
-      <ConfirmationModal
-        isModalVisible={isDeletePerkGroupModalVisible}
-        setIsModalVisible={setIsDeletePerkGroupModalVisible}
-        title="Delete Perk Group"
-        description="Are you sure you want to delete this perk group and all of its employees? This cannot be undone."
-        onConfirmation={deletePerkGroup}
       />
     </>
   );
