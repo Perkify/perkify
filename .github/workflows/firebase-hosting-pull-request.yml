@@ -5,7 +5,7 @@ name: Check Lint and Build on PR
 "on": pull_request
 jobs:
   check_if_functions_changed:
-    name: Check files
+    name: Check if functions changed
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
           done < files.txt
 
   check_if_admin_changed:
-    name: Check files
+    name: Check if admin changed
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
           done < files.txt
 
   check_if_user_changed:
-    name: Check files
+    name: Check if user changed
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
