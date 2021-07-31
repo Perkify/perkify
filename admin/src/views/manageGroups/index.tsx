@@ -161,7 +161,7 @@ export default function ManageGroups(props) {
     return (
       <>
         <Header
-          title="Manage Perk Groups"
+          title={`Manage ${id} Group`}
           crumbs={['Dashboard', 'Perk Groups', id]}
         />
         <div style={{ width: '50%', marginTop: '100px' }}>
@@ -178,7 +178,7 @@ export default function ManageGroups(props) {
   return (
     <>
       <Header
-        title="Manage Perk Groups"
+        title={`Manage ${id} Group`}
         crumbs={['Dashboard', 'Perk Groups', id]}
         button={{
           type: 'delete',
