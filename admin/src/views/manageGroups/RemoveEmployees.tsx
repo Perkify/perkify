@@ -39,6 +39,8 @@ const RemoveEmployees = ({
         const afterEmails = afterEmployees.map((employee) => employee.email);
 
         if (afterEmails.length == 0) {
+          setDashboardLoading(false);
+          setFreezeNav(false);
           alert('Error: cannot remove all employees from a perk group');
           return;
         }

@@ -46,13 +46,7 @@ export const AuthProvider = ({ children }) => {
               },
             }
           );
-          if (cardPaymentMethods.data.data.length > 0) {
-            setHasPaymentMethods(true);
-          }
-
-          if (!location.pathname.includes('dashboard')) {
-            history.push('/dashboard');
-          }
+          setHasPaymentMethods(cardPaymentMethods.data.data.length > 0);
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');

@@ -14,11 +14,8 @@ export const updatePerkGroupValidators = [
 ];
 
 export const updatePerkGroup = async (req, res, next) => {
-  const {
-    group, // TODO: make this param
-    emails,
-    perks,
-  } = req.body;
+  const { group, emails } = req.body;
+  let { perks } = req.body;
 
   try {
     const errors = validationResult(req);
@@ -68,6 +65,11 @@ export const updatePerkGroup = async (req, res, next) => {
         .update({
           [`groups.${group}`]: perks,
         });
+    } else if (!perks) {
+      const businessData = (
+        await db.collection('businesses').doc(businessID).get()
+      ).data();
+      perks = businessData?.groups[group];
     }
 
     const usersRef = db.collection('users');
@@ -81,18 +83,20 @@ export const updatePerkGroup = async (req, res, next) => {
       if (emails.includes(userDoc.id)) {
         oldUserEmails.push(userDoc.id);
         const oldUserPerks = userDoc.data().perks;
-        const oldUserNewPerks = perks.reduce((acc, perk) => {
-          if (perk in oldUserPerks) {
-            acc[perk] = oldUserPerks[perk];
-          } else {
-            acc[perk] = [];
-          }
-          return acc;
-        }, {});
-        await db
-          .collection('users')
-          .doc(userDoc.id)
-          .update({ perks: oldUserNewPerks });
+        if (perks !== oldUserPerks) {
+          const oldUserNewPerks = perks.reduce((acc, perk) => {
+            if (perk in oldUserPerks) {
+              acc[perk] = oldUserPerks[perk];
+            } else {
+              acc[perk] = [];
+            }
+            return acc;
+          }, {});
+          await db
+            .collection('users')
+            .doc(userDoc.id)
+            .update({ perks: oldUserNewPerks });
+        }
       } else {
         deleteUsers.push(userDoc);
       }

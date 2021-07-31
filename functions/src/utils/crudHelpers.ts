@@ -28,9 +28,10 @@ export const createUserHelper = async (email, businessID, group, perks) => {
 };
 
 export const deleteUserHelper = async (userDoc) => {
-  await stripe.issuing.cards.update(userDoc.data().card.id, {
-    status: 'canceled',
-  });
+  if (userDoc.data().card)
+    await stripe.issuing.cards.update(userDoc.data().card.id, {
+      status: 'canceled',
+    });
   await db.collection('users').doc(userDoc.id).delete();
 };
 
