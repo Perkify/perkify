@@ -6,6 +6,10 @@
 
 - Fixes #
 
+### Screenshots
+
+- Paste any relevant screenshots
+
 ### What to review:
 
 - List things you'd like a reviewer to check for
