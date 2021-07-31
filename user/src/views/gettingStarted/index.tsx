@@ -6,6 +6,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { AuthContext } from 'contexts/Auth';
+import { LoadingContext } from '../../contexts';
 import { ReactComponent as GettingStartedImage } from 'images/gettingStarted.svg';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
@@ -49,9 +50,11 @@ const GettingStarted = () => {
   const [lastName, setLastName] = React.useState('');
   const [invalidStep, setInvalidStep] = React.useState(false);
   const { currentUser, setEmployee } = useContext(AuthContext);
+  const {dashboardLoading, setDashboardLoading} = useContext(LoadingContext)
   const formFields = { firstName, lastName };
 
   const submitGetCard = async () => {
+    setDashboardLoading(true)
     try {
       if (Object.values(formFields).some((fieldprop) => fieldprop === '')) {
         setInvalidStep(true);
@@ -71,6 +74,7 @@ const GettingStarted = () => {
         }
       );
       if (response.status != 200) {
+        setDashboardLoading(false)
         throw {
           status: response.status,
           reason: response.statusText,
@@ -81,7 +85,9 @@ const GettingStarted = () => {
       const userDoc = await db.collection('users').doc(currentUser.email).get();
       const employeeData = userDoc.data();
       setEmployee(employeeData);
+      setDashboardLoading(false)
     } catch (e) {
+      setDashboardLoading(false)
       alert(JSON.stringify(e));
     }
   };

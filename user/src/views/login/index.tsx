@@ -16,6 +16,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
 import app, { db } from 'firebaseApp';
 import React, { useState } from 'react';
+import { LoadingContext } from 'contexts';
+
 
 function Copyright() {
   return (
