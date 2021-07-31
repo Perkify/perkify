@@ -125,6 +125,7 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERKIFY_5790B }}"
           projectId: perkify-5790b
+          target: admin
 
   build_and_preview_user:
     needs: check_if_user_changed
@@ -139,6 +140,7 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERKIFY_5790B }}"
           projectId: perkify-5790b
+          target: user
 
   # build_and_preview:
   #   if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
