@@ -40,7 +40,7 @@ jobs:
   build_functions:
     name: "Verify that the functions folder builds"
     needs: check_which_projects_changed
-    if: needs.check_if_functions_changed.outputs.run_job_functions == 'true'
+    if: needs.check_which_projects_changed.outputs.run_job_functions == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -50,7 +50,7 @@ jobs:
 
   build_and_preview_admin:
     needs: check_which_projects_changed
-    if: needs.check_if_admin_changed.outputs.run_job_admin == 'true'
+    if: needs.check_which_projects_changed.outputs.run_job_admin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
 
   build_and_preview_user:
     needs: check_which_projects_changed
-    if: needs.check_if_user_changed.outputs.run_job_user == 'true'
+    if: needs.check_which_projects_changed.outputs.run_job_user == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
