@@ -26,12 +26,12 @@ jobs:
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != functions/* ]]; then
-              echo "This modified file is not under the 'functions' folder."
-              echo "::set-output name=run_job::false"
+            if [[ $file == functions/* ]]; then
+              echo "This modified file is under the 'functions' folder."
+              echo "::set-output name=run_job::true"
               break
             else
-              echo "::set-output name=run_job::true"
+              echo "::set-output name=run_job::false"
             fi
           done < files.txt
 
@@ -57,12 +57,12 @@ jobs:
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != admin/* ]]; then
-              echo "This modified file is not under the 'admin' folder."
-              echo "::set-output name=run_job::false"
+            if [[ $file == admin/* ]]; then
+              echo "This modified file is under the 'admin' folder."
+              echo "::set-output name=run_job::true"
               break
             else
-              echo "::set-output name=run_job::true"
+              echo "::set-output name=run_job::false"
             fi
           done < files.txt
 
@@ -88,12 +88,12 @@ jobs:
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != user/* ]]; then
-              echo "This modified file is not under the 'user' folder."
-              echo "::set-output name=run_job::false"
+            if [[ $file == user/* ]]; then
+              echo "This modified file is under the 'user' folder."
+              echo "::set-output name=run_job::true"
               break
             else
-              echo "::set-output name=run_job::true"
+              echo "::set-output name=run_job::false"
             fi
           done < files.txt
 
