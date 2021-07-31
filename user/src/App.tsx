@@ -1,6 +1,6 @@
 import PrivateRoute from 'components/PrivateRoute';
 import PublicRoute from 'components/PublicRoute';
-import { AuthProvider, BusinessProvider } from 'contexts';
+import { AuthProvider, BusinessProvider, LoadingProvider } from 'contexts';
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -15,6 +15,7 @@ import Login from 'views/login';
 function App() {
   return (
     <Router>
+      <LoadingProvider> 
       <AuthProvider>
         <BusinessProvider>
           <Switch>
@@ -31,6 +32,7 @@ function App() {
           </Switch>
         </BusinessProvider>
       </AuthProvider>
+      </LoadingProvider>
     </Router>
   );
 }
