@@ -241,12 +241,12 @@ const SignUpBusinessWebflow = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            // backgroundColor: '#F5FAFF',
-            backgroundColor: '#5289f2',
+            backgroundColor: '#F5FAFF',
+            // backgroundColor: '#5289f2',
           }}
         >
           <img
-            src="/images/undraw_Credit_card_payment.svg"
+            src="/images/undraw_online_payments.svg"
             style={{
               display: 'block',
               width: '100%',
