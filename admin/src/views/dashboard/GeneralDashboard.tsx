@@ -204,48 +204,18 @@ const GeneralDashboard = () => {
             <MetricCard
               title={'Cost Per Employee'}
               number={'$' + roundNumber(calculateTotalCost())}
-              icon={
-                <img
-                  src="/images/undraw_Investing.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Number of Employees'}
               number={employees.length}
-              icon={
-                <img
-                  src="/images/undraw_Appreciation.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Total Perks Offered'}
               number={calculatePerksOffered()}
-              icon={
-                <img
-                  src="/images/undraw_Gifts.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             ></MetricCard>
           </Grid>
           <Grid item xs={4}>
@@ -263,7 +233,7 @@ const GeneralDashboard = () => {
                 variant="h6"
                 style={{ height: '80px', padding: '15px', fontWeight: 'bold' }}
               >
-                Perks Distribution
+                Total Perks Allocation
               </Typography>
               <div style={{ height: '400px' }}>
                 <PChart data={calculatePieData()} />
@@ -291,7 +261,7 @@ const GeneralDashboard = () => {
                       fontWeight: 'bold',
                     }}
                   >
-                    Perks Spending
+                    Percentage of Perks Claimed
                   </Typography>
 
                   <div style={{ marginLeft: 'auto' }}>
