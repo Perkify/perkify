@@ -138,6 +138,7 @@ export default function ManageGroups(props) {
             console.error('Error getting documents: ', error);
           }
         );
+      return () => setDashboardLoading(false);
     }
   }, [admin, id]);
 

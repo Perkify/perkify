@@ -62,10 +62,8 @@ export default function ManagePeople(props) {
             console.error(error);
           }
         );
-      // .catch((error) => {
-      //   console.error(error);
-      // });
     }
+    return () => setDashboardLoading(false);
   }, [admin]);
 
   const removeUsers = async () => {

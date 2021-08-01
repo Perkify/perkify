@@ -208,6 +208,7 @@ const GeneralDashboard = () => {
     } else {
       console.info('No such document!');
     }
+    return () => setDashboardLoading(false);
   }, [currentUser, admin, business]);
 
   useEffect(() => {
