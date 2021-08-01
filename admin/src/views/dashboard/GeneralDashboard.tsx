@@ -144,12 +144,42 @@ const GeneralDashboard = () => {
       });
     });
     Object.keys(tempDict).forEach((perk) => {
-      //TODO: Calculate amount spent in comparison to amount not spent
-      let newRow = { name: perk, spent: getRandomInt(100), total: 100 };
+      let newRow = { name: perk, spent: calculateAmountSpentPerPerk(perk), total: 100 };
       retData.push(newRow);
     });
 
     return retData;
+  }
+
+  function calculateAmountSpentPerPerk(perk){
+    let totalPossibleCost = 0 
+    let moneySpent = 0
+    console.log(employees)
+    employees.forEach((employee) =>{
+      if (employee.perks[perk]){
+        console.log("changing")
+        totalPossibleCost += allPerksDict[perk].Cost
+        if (didSpendPerkLastMonth(employee.perks[perk])){
+          moneySpent += allPerksDict[perk].Cost
+        }
+        
+      }
+    })
+
+    return Math.round(moneySpent / totalPossibleCost)
+  }
+
+  function didSpendPerkLastMonth(employeeArray){
+    if (employeeArray.length == 0){
+      return false 
+    }
+    let today = new Date();
+    today.setMonth(today.getMonth() - 3);
+    employeeArray.sort((a, b) => b.date - a.date)
+    if (employeeArray[employeeArray.length - 1].date > today.getDate()){
+      return true 
+    }
+    return false 
   }
 
   useEffect(() => {

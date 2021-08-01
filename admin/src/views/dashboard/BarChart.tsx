@@ -55,7 +55,7 @@ const BChart = (props) => {
       <BarChart data={props.data}>
         <XAxis dataKey="name" />
         <YAxis height={100} unit="%" domain={[0, 100]} />
-        <Tooltip formatter={(label) => label + ' %'} cursor={false} />
+        <Tooltip formatter={(label) => label + ' %'} cursor={false}/>
         <Bar
           dataKey="spent"
           name="Spent"
