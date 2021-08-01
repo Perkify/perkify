@@ -1,7 +1,9 @@
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { AuthProvider, BusinessProvider, LoadingProvider } from 'contexts';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import 'typeface-roboto';
 import App from './App';
 import './index.css';
@@ -60,8 +62,16 @@ const theme = createTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <App />
+      <Router>
+        <LoadingProvider>
+          <AuthProvider>
+            <BusinessProvider>
+              <CssBaseline />
+              <App />
+            </BusinessProvider>
+          </AuthProvider>
+        </LoadingProvider>
+      </Router>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

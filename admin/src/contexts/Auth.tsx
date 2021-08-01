@@ -1,5 +1,6 @@
+import { LoadingContext } from 'contexts';
 import firebase from 'firebase/app';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import app, { auth, db } from '../firebaseApp';
@@ -25,8 +26,11 @@ export const AuthProvider = ({ children }) => {
   const history = useHistory();
   const [hasPaymentMethods, setHasPaymentMethods] = useState(null);
 
+  const { setDashboardLoading } = useContext(LoadingContext);
+
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
+      setDashboardLoading(true);
       if (user) {
         const userDoc = await db.collection('admins').doc(user.uid).get();
         if (userDoc) {
@@ -37,22 +41,21 @@ export const AuthProvider = ({ children }) => {
           const bearerToken = await user.getIdToken();
 
           // check if customer has payment methods
-          const cardPaymentMethods = await PerkifyApi.get(
-            '/user/auth/stripePaymentMethods',
-            {
-              headers: {
-                Authorization: `Bearer ${bearerToken}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          setHasPaymentMethods(cardPaymentMethods.data.data.length > 0);
+          PerkifyApi.get('/user/auth/stripePaymentMethods', {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          })
+            .then((res) => {
+              setHasPaymentMethods(res.data.data.length > 0);
+            })
+            .catch(() => {});
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');
         }
       }
-      setLoadingAuthState(false);
     });
   }, []);
 
