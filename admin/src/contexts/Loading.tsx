@@ -12,7 +12,7 @@ export const LoadingProvider = ({ children }) => {
         dashboardLoading,
         setDashboardLoading,
         freezeNav,
-        setFreezeNav
+        setFreezeNav,
       }}
     >
       {children}
