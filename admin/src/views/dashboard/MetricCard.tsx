@@ -2,7 +2,7 @@ import { Box, Card, Typography } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
-const MetricCard = ({ title, number }) => {
+const MetricCard = ({ title, number, icon }) => {
   return (
     <div>
       <Card style={{ padding: 30 }} elevation={4}>
@@ -13,15 +13,16 @@ const MetricCard = ({ title, number }) => {
           alignItems="center"
           justifyContent="center"
         >
-          <Grid item xs={12} justifyContent="center" alignItems="center" style={{display: "flex"}}> 
-            <div>
-            <b style={{ fontSize: 16, marginBottom: '20px', display: 'block' }}>
+          <Grid item xs={6}>
+            <b style={{ fontSize: 14, marginBottom: '20px', display: 'block' }}>
               {title}
             </b>
             <Typography variant="h4">
-              <Box fontWeight={800} style={{display: "flex", justifyContent: "center"}}>{number}</Box>
+              <Box fontWeight={800}>{number}</Box>
             </Typography>
-            </div>   
+          </Grid>
+          <Grid item xs={6}>
+            {icon}
           </Grid>
         </Grid>
       </Card>
