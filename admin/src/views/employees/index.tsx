@@ -139,7 +139,7 @@ export default function ManagePeople(props) {
         columns={columns}
         selectedRows={selectedUsers}
         setSelectedRows={setSelection}
-        height={500}
+        height={600}
         onClickAdd={() => setIsAddEmployeesModalVisible(true)}
         onClickDelete={() => {
           setIsRemoveModalVisible(true);
