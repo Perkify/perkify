@@ -1,6 +1,5 @@
-import { LoadingContext } from 'contexts';
 import firebase from 'firebase/app';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import app, { auth, db } from '../firebaseApp';
@@ -26,11 +25,8 @@ export const AuthProvider = ({ children }) => {
   const history = useHistory();
   const [hasPaymentMethods, setHasPaymentMethods] = useState(null);
 
-  const { setDashboardLoading } = useContext(LoadingContext);
-
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
-      setDashboardLoading(true);
       if (user) {
         const userDoc = await db.collection('admins').doc(user.uid).get();
         if (userDoc) {
