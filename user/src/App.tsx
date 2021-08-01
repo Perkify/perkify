@@ -16,22 +16,22 @@ function App() {
   return (
     <Router>
       <LoadingProvider>
-      <AuthProvider>
-        <BusinessProvider>
-          <Switch>
-            <Route exact path="/">
-              <Redirect to="/dashboard" />
-            </Route>
-            <PrivateRoute path="/dashboard" component={Dashboard} />
-            <PrivateRoute
-              exact
-              path="/gettingStarted"
-              component={GettingStarted}
-            />
-            <PublicRoute exact path="/login" component={Login} />
-          </Switch>
-        </BusinessProvider>
-      </AuthProvider>
+        <AuthProvider>
+          <BusinessProvider>
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="/dashboard" />
+              </Route>
+              <PrivateRoute path="/dashboard" component={Dashboard} />
+              <PrivateRoute
+                exact
+                path="/gettingStarted"
+                component={GettingStarted}
+              />
+              <PublicRoute exact path="/login" component={Login} />
+            </Switch>
+          </BusinessProvider>
+        </AuthProvider>
       </LoadingProvider>
     </Router>
   );
