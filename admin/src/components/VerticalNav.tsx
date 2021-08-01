@@ -257,6 +257,15 @@ export default function ClippedDrawer({ children }) {
                           keepMounted
                           anchorEl={anchorEl}
                           onClose={() => setAnchorEl(null)}
+                          elevation={4}
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                          }}
+                          transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }}
                         >
                           <MenuItem
                             onClick={(event) => {
