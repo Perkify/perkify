@@ -144,42 +144,45 @@ const GeneralDashboard = () => {
       });
     });
     Object.keys(tempDict).forEach((perk) => {
-      let newRow = { name: perk, spent: calculateAmountSpentPerPerk(perk), total: 100 };
+      let newRow = {
+        name: perk,
+        spent: calculateAmountSpentPerPerk(perk),
+        total: 100,
+      };
       retData.push(newRow);
     });
 
     return retData;
   }
 
-  function calculateAmountSpentPerPerk(perk){
-    let totalPossibleCost = 0 
-    let moneySpent = 0
-    console.log(employees)
-    employees.forEach((employee) =>{
-      if (employee.perks[perk]){
-        console.log("changing")
-        totalPossibleCost += allPerksDict[perk].Cost
-        if (didSpendPerkLastMonth(employee.perks[perk])){
-          moneySpent += allPerksDict[perk].Cost
+  function calculateAmountSpentPerPerk(perk) {
+    let totalPossibleCost = 0;
+    let moneySpent = 0;
+    console.log(employees);
+    employees.forEach((employee) => {
+      if (employee.perks[perk]) {
+        console.log('changing');
+        totalPossibleCost += allPerksDict[perk].Cost;
+        if (didSpendPerkLastMonth(employee.perks[perk])) {
+          moneySpent += allPerksDict[perk].Cost;
         }
-        
       }
-    })
+    });
 
-    return Math.round(moneySpent / totalPossibleCost)
+    return Math.round(moneySpent / totalPossibleCost);
   }
 
-  function didSpendPerkLastMonth(employeeArray){
-    if (employeeArray.length == 0){
-      return false 
+  function didSpendPerkLastMonth(employeeArray) {
+    if (employeeArray.length == 0) {
+      return false;
     }
     let today = new Date();
     today.setMonth(today.getMonth() - 3);
-    employeeArray.sort((a, b) => b.date - a.date)
-    if (employeeArray[employeeArray.length - 1].date > today.getDate()){
-      return true 
+    employeeArray.sort((a, b) => b.date - a.date);
+    if (employeeArray[employeeArray.length - 1].date > today.getDate()) {
+      return true;
     }
-    return false 
+    return false;
   }
 
   useEffect(() => {
