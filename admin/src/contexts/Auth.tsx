@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
           alert('You do not have a registered admin account');
         }
       }
+      setLoadingAuthState(false);
     });
   }, []);
 
