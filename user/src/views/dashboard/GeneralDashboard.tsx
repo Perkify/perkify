@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
-import { AuthContext, BusinessContext } from 'contexts';
+import { AuthContext, BusinessContext} from 'contexts';
 import React, { useContext } from 'react';
 import { allPerksDict } from 'shared';
 
