@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: 'blue',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -110,7 +110,7 @@ export default function SignInSide(props) {
   };
 
   return (
-    <>
+    <div style={{ background: '#FFFFFF' }}>
       {/* <Particles height="100vh" width="100vw" className={classes.particles} /> */}
       <Snackbar
         open={open}
@@ -170,10 +170,10 @@ export default function SignInSide(props) {
                   <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                  Perkify Dashboard Login
+                  Perkify Admin Login
                 </Typography>
                 <Typography component="h3" variant="caption">
-                  Enter perkify credentials to login
+                  Enter Perkify credentials to login
                 </Typography>
                 <form
                   className={classes.form}
@@ -253,6 +253,6 @@ export default function SignInSide(props) {
           </Grid>
         </Card>
       </div>
-    </>
+    </div>
   );
 }

@@ -13,14 +13,8 @@
     {
       "target": "admin",
       "public": "admin/build",
-      "predeploy": [
-        "npm --prefix \"$PROJECT_DIR/admin\" run build"
-      ],
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
+      "predeploy": ["npm --prefix \"$PROJECT_DIR/admin\" run build"],
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
           "source": "**",
@@ -31,14 +25,8 @@
     {
       "target": "user",
       "public": "user/build",
-      "predeploy": [
-        "npm --prefix \"$PROJECT_DIR/user\" run build"
-      ],
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
+      "predeploy": ["npm --prefix \"$PROJECT_DIR/user\" run build"],
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
           "source": "**",
