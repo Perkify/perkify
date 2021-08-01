@@ -205,7 +205,7 @@ const SignUpBusinessWebflow = () => {
           md={6}
           className={classes.content}
         >
-          <a href="/" className={classes.logo}>
+          <a href="https://getperkify.com" className={classes.logo}>
             <img src={logo} style={{ width: '100%' }} />
           </a>
           <Grid
@@ -241,6 +241,7 @@ const SignUpBusinessWebflow = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            // backgroundColor: '#F5FAFF',
             backgroundColor: '#5289f2',
           }}
         >
@@ -249,6 +250,7 @@ const SignUpBusinessWebflow = () => {
             style={{
               display: 'block',
               width: '100%',
+              padding: '100px',
             }}
           />
         </Grid>
