@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
   const { setDashboardLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    setDashboardLoading(true);
     app.auth().onAuthStateChanged(async (user) => {
       setDashboardLoading(true);
       if (user) {
@@ -40,8 +39,6 @@ export const AuthProvider = ({ children }) => {
           setAdmin(adminData);
 
           const bearerToken = await user.getIdToken();
-
-          setDashboardLoading(false);
 
           // check if customer has payment methods
           PerkifyApi.get('/user/auth/stripePaymentMethods', {
@@ -59,7 +56,6 @@ export const AuthProvider = ({ children }) => {
           alert('You do not have a registered admin account');
         }
       }
-      setLoadingAuthState(false);
     });
   }, []);
 
