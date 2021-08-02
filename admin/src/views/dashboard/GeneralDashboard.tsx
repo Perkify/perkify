@@ -30,6 +30,10 @@ const GeneralDashboard = () => {
     return Math.round(10 * num) / 10;
   }
 
+  function roundNumberHundredth(num) {
+    return Math.round(100 * num) / 100;
+  }
+
   function convertGroups() {
     if (dashboardLoading) {
       return [];
@@ -175,7 +179,7 @@ const GeneralDashboard = () => {
         }
       }
     });
-
+    moneySpent *= 100;
     return Math.round(moneySpent / totalPossibleCost);
   }
 
@@ -184,23 +188,67 @@ const GeneralDashboard = () => {
       return false;
     }
     let today = new Date();
-    today.setMonth(today.getMonth() - 3);
-    employeeArray.sort((a, b) => b.date - a.date);
-    if (employeeArray[employeeArray.length - 1].date > today.getDate()) {
+    today.setMonth(today.getMonth() - 1);
+    employeeArray.sort((a, b) => a.toDate().getTime() - b.toDate().getTime());
+    if (
+      employeeArray[employeeArray.length - 1].toDate().getTime() >
+      today.getTime()
+    ) {
       return true;
     }
     return false;
   }
 
   function generateCSV() {
-    var arrayContent = [['Séjour 1, é,í,ú,ü,ű'], ['Séjour 2, é,í,ú,ü,ű']];
+    let d = new Date();
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    var arrayContent = [
+      [
+        'Employee',
+        'Total in ' + monthNames[d.getMonth()],
+        'Total in ' + d.getFullYear(),
+      ],
+    ];
+    employees.forEach((employee) => {
+      let monthlyCost = 0;
+      let yearlyCost = 0;
+      Object.keys(employee['perks']).forEach((perk) => {
+        employee['perks'][perk].forEach((date) => {
+          if (d.getFullYear() === date.toDate().getFullYear()) {
+            yearlyCost += allPerksDict[perk].Cost;
+          }
+          if (d.getMonth() === date.toDate().getMonth()) {
+            monthlyCost += allPerksDict[perk].Cost;
+          }
+        });
+      });
+      let newRow = [
+        employee.email,
+        roundNumberHundredth(monthlyCost),
+        roundNumberHundredth(yearlyCost),
+      ];
+      arrayContent.push(newRow);
+    });
     var csvContent = arrayContent.join('\n');
     var link = window.document.createElement('a');
     link.setAttribute(
       'href',
       'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURI(csvContent)
     );
-    link.setAttribute('download', 'upload_data.csv');
+    link.setAttribute('download', 'employee_spending.csv');
     link.click();
   }
 
@@ -248,7 +296,7 @@ const GeneralDashboard = () => {
         </Grid>
         <Grid item xs={2}>
           <Button variant="contained" color="primary" onClick={generateCSV}>
-            Download Employee Data
+            Download Financial Records
           </Button>
         </Grid>
       </Grid>
