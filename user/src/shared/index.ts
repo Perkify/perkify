@@ -124,7 +124,7 @@ export const allDevelopmentPerks = [
   },
 ];
 
-const allPerks =
+export const allPerks =
   process.env.FIREBASE_STRIPE_ENVIRONMENT == 'production'
     ? allProductionPerks
     : allDevelopmentPerks;
