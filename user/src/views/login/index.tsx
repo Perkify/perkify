@@ -95,6 +95,8 @@ export default function SignInSide(props) {
         url: `${
           process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
             ? 'https://app.getperkify.com'
+            : process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'staging'
+            ? 'https://app.dev.getperkify.com'
             : 'http://localhost:3001'
         }`,
         handleCodeInApp: true,

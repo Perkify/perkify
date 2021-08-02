@@ -12,8 +12,10 @@ export const createUserHelper = async (email, businessID, group, perks) => {
 
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
     url:
-      process.env.NODE_ENV == 'production'
+      process.env.FIREBASE_ENVIRONMENT == 'production'
         ? 'https://app.getperkify.com/'
+        : process.env.FIREBASE_ENVIRONMENT == 'staging'
+        ? 'https://app.dev.getperkify.com/'
         : 'http://localhost:3001/', // I don't think you're supposed to do it this way. Maybe less secure
   });
 
