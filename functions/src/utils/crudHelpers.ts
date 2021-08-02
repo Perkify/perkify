@@ -10,13 +10,14 @@ export const createUserHelper = async (email, businessID, group, perks) => {
     perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
   });
 
+  console.log(process.env.NODE_ENV);
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
     url:
       process.env.FIREBASE_ENVIRONMENT == 'production'
-        ? 'https://app.getperkify.com/'
+        ? 'https://app.getperkify.com/dashboard'
         : process.env.FIREBASE_ENVIRONMENT == 'staging'
-        ? 'https://app.dev.getperkify.com/'
-        : 'http://localhost:3001/', // I don't think you're supposed to do it this way. Maybe less secure
+        ? 'https://app.dev.getperkify.com/dashboard'
+        : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
   });
 
   // send email
