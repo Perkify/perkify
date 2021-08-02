@@ -26,7 +26,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ConfirmationModal from 'components/ConfirmationModal';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import logo from 'images/logo.png';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { MouseEvent, useContext, useEffect, useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 
@@ -247,7 +247,6 @@ export default function ClippedDrawer({ children }) {
                           onClick={(event) => {
                             event.preventDefault();
                             event.stopPropagation();
-                            console.log(event.isPropagationStopped);
                             setAnchorEl(event.currentTarget);
                           }}
                         >
@@ -258,22 +257,31 @@ export default function ClippedDrawer({ children }) {
                           open={Boolean(anchorEl)}
                           keepMounted
                           anchorEl={anchorEl}
-                          onClose={(event) => {
+                          onClose={(
+                            event: React.MouseEvent<
+                              HTMLButtonElement,
+                              MouseEvent
+                            >
+                          ) => {
+                            event.stopPropagation();
+                            event.preventDefault();
                             setAnchorEl(null);
                           }}
                           elevation={4}
                           anchorOrigin={{
-                            vertical: 'bottom',
+                            vertical: 'center',
                             horizontal: 'right',
                           }}
                           transformOrigin={{
-                            vertical: 'top',
+                            vertical: 'center',
                             horizontal: 'left',
                           }}
+                          getContentAnchorEl={null}
                         >
                           <MenuItem
                             onClick={(event) => {
                               event.preventDefault();
+                              event.stopPropagation();
                               setAnchorEl(null);
                               setIsDeletePerkGroupModalVisible(name);
                             }}
