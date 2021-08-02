@@ -218,8 +218,8 @@ const GeneralDashboard = () => {
     var arrayContent = [
       [
         'Employee',
-        'Total in ' + monthNames[d.getMonth()],
-        'Total in ' + d.getFullYear(),
+        'Total spent in ' + monthNames[d.getMonth()],
+        'Total spent in ' + d.getFullYear(),
       ],
     ];
     employees.forEach((employee) => {
