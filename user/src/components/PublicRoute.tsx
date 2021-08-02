@@ -10,7 +10,7 @@ const PublicRoute = ({ component: RouteComponent, ...rest }) => {
       {...rest}
       render={(routeProps) =>
         currentUser && !loadingAuthState ? (
-          <Redirect to={'/'} />
+          <Redirect to={'/dashboard'} />
         ) : (
           <RouteComponent {...routeProps} />
         )

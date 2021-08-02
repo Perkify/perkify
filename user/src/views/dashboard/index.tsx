@@ -1,6 +1,6 @@
 import VerticalNav from 'components/VerticalNav';
 import React from 'react';
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
 import Logout from 'views/logout';
 import GeneralDashboard from './GeneralDashboard';
 
@@ -10,7 +10,10 @@ const Dashboard = () => {
   return (
     <VerticalNav>
       <Switch>
-        <Route exact path={path} component={GeneralDashboard} />
+        <Route exact path={path}>
+          <Redirect to={`${path}/perks`} />
+        </Route>
+        <Route path={`${path}/perks`} component={GeneralDashboard} />
         <Route exact path={`${path}/logout`} component={Logout} />
       </Switch>
     </VerticalNav>

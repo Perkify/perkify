@@ -1,6 +1,8 @@
 {
   "projects": {
-    "default": "perkify-5790b"
+    "default": "perkify-5790b",
+    "production": "perkify-prod",
+    "staging": "perkify-5790b"
   },
   "targets": {
     "perkify-5790b": {
@@ -10,6 +12,16 @@
         ],
         "user": [
           "perkify-user"
+        ]
+      }
+    },
+    "perkify-prod": {
+      "hosting": {
+        "admin": [
+          "perkify-prod"
+        ],
+        "user": [
+          "perkify-prod-app"
         ]
       }
     }

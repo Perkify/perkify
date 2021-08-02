@@ -1,11 +1,23 @@
 import { AuthContext } from 'contexts/Auth';
+import firebase from 'firebase';
 import { auth, db } from 'firebaseApp';
-import React, { useContext, useEffect } from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import React, { useContext, useEffect, useRef } from 'react';
+import { Route, useHistory, useLocation } from 'react-router-dom';
 import GettingStarted from '../views/gettingStarted';
 
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
   const { currentUser, loadingAuthState, employee } = useContext(AuthContext);
+  const redirectLoginTimer = useRef(null);
+  const history = useHistory();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!firebase.auth().isSignInWithEmailLink(location.search)) {
+      redirectLoginTimer.current = setTimeout(() => {
+        history.push('/login');
+      }, 2000);
+    }
+  }, []);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -27,17 +39,25 @@ const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
     checkUser();
   }, [currentUser]);
 
+  useEffect(() => {
+    if (!loadingAuthState && currentUser && employee) {
+      clearTimeout(redirectLoginTimer.current);
+    }
+  }, [loadingAuthState, currentUser, employee]);
+
   return (
     <Route
       {...rest}
       render={(routeProps) => {
-        if (!currentUser && !loadingAuthState) {
-          return <Redirect to={'/login'} />;
-        } else if (!loadingAuthState && !employee?.card) {
-          // could also put this in the dashboard view. Put it in here in case in future there are other private routes
-          return <GettingStarted />;
+        if (!loadingAuthState && currentUser && employee) {
+          if (!employee?.card) {
+            // could also put this in the dashboard view. Put it in here in case in future there are other private routes
+            return <GettingStarted />;
+          } else {
+            return <RouteComponent {...routeProps} />;
+          }
         } else {
-          return <RouteComponent {...routeProps} />;
+          // TODO: show the loading screen here
         }
       }}
     />

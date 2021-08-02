@@ -1,4 +1,4 @@
-import { Paper } from '@material-ui/core';
+import { IconButton, Menu, MenuItem, Paper } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
@@ -20,12 +20,15 @@ import AddIcon from '@material-ui/icons/Add';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import GroupIcon from '@material-ui/icons/Group';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PersonIcon from '@material-ui/icons/Person';
 import SettingsIcon from '@material-ui/icons/Settings';
-import { AuthContext, BusinessContext } from 'contexts';
+import ConfirmationModal from 'components/ConfirmationModal';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import logo from 'images/logo.png';
-import React, { useContext, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { MouseEvent, useContext, useEffect, useState } from 'react';
+import { Link, useHistory, useLocation } from 'react-router-dom';
+import { PerkifyApi } from 'services';
 
 const drawerWidth = 280;
 
@@ -88,14 +91,46 @@ export default function ClippedDrawer({ children }) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const history = useHistory();
+
+  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
+    useState('');
 
   const { currentUser } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
+
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const location = useLocation();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const deletePerkGroup = async () => {
+    const bearerToken = await currentUser.getIdToken();
+    setDashboardLoading(true);
+    setFreezeNav(true);
+
+    await PerkifyApi.post(
+      'user/auth/deletePerkGroup',
+      JSON.stringify({
+        group: isDeletePerkGroupModalVisible,
+      }),
+      {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    setDashboardLoading(false);
+    setFreezeNav(false);
+    setIsDeletePerkGroupModalVisible('');
+    history.push('/dashboard');
   };
 
   const generalNav: [string, string, any][] = [
@@ -184,9 +219,11 @@ export default function ClippedDrawer({ children }) {
                       color:
                         location.pathname == route &&
                         theme.palette.primary.main,
-                      borderRight:
-                        location.pathname == route &&
-                        `3px solid ${theme.palette.primary.main}`,
+                      borderRight: `3px solid ${
+                        location.pathname == route
+                          ? theme.palette.primary.main
+                          : 'transparent'
+                      }`,
                       paddingLeft: '30px',
                     }}
                   >
@@ -200,10 +237,60 @@ export default function ClippedDrawer({ children }) {
                     >
                       {e}
                     </ListItemIcon>
-                    <ListItemText
-                      primary={name}
-                      classes={{ primary: classes.listItem }}
-                    />
+                    <ListItemText classes={{ primary: classes.listItem }}>
+                      {name}
+                    </ListItemText>
+                    {sectionName == 'Perk Groups' && name != 'Add New Group' && (
+                      <>
+                        <IconButton
+                          style={{ padding: 0 }}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setAnchorEl(event.currentTarget);
+                          }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          id={`${name} simple menu`}
+                          open={Boolean(anchorEl)}
+                          keepMounted
+                          anchorEl={anchorEl}
+                          onClose={(
+                            event: React.MouseEvent<
+                              HTMLButtonElement,
+                              MouseEvent
+                            >
+                          ) => {
+                            event.stopPropagation();
+                            event.preventDefault();
+                            setAnchorEl(null);
+                          }}
+                          elevation={4}
+                          anchorOrigin={{
+                            vertical: 'center',
+                            horizontal: 'right',
+                          }}
+                          transformOrigin={{
+                            vertical: 'center',
+                            horizontal: 'left',
+                          }}
+                          getContentAnchorEl={null}
+                        >
+                          <MenuItem
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setAnchorEl(null);
+                              setIsDeletePerkGroupModalVisible(name);
+                            }}
+                          >
+                            Delete Perk Group
+                          </MenuItem>
+                        </Menu>
+                      </>
+                    )}
                   </ListItem>
                 ))}
               </List>
@@ -269,6 +356,15 @@ export default function ClippedDrawer({ children }) {
       <main className={classes.content}>
         <Box margin="60px 20px 20px 20px">{children}</Box>
       </main>
+      <ConfirmationModal
+        isModalVisible={isDeletePerkGroupModalVisible != ''}
+        setIsModalVisible={() => {
+          setIsDeletePerkGroupModalVisible('');
+        }}
+        title="Delete Perk Group"
+        description="Are you sure you want to delete this perk group and all of its employees? This cannot be undone."
+        onConfirmation={deletePerkGroup}
+      />
     </div>
   );
 }

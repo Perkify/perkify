@@ -83,9 +83,11 @@ export default function SignInSide(props) {
       }
       await app.auth().sendSignInLinkToEmail(email, {
         url: `${
-          process.env.NODE_ENV == 'development'
-            ? 'http://localhost:3001'
-            : 'https://app.getperkify.com'
+          process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
+            ? 'https://app.getperkify.com/dashboard'
+            : process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'staging'
+            ? 'https://app.dev.getperkify.com/dashboard'
+            : 'http://localhost:3001/dashboard'
         }`,
         handleCodeInApp: true,
       });

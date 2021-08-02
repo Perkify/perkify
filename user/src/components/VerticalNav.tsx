@@ -16,9 +16,10 @@ import {
   useTheme,
 } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import { AuthContext } from 'contexts';
+import { AuthContext, BusinessContext } from 'contexts';
 import logo from 'images/logo.png';
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -86,6 +87,7 @@ export default function ClippedDrawer({ children }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const { employee, currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
 
   const location = useLocation();
 
@@ -94,11 +96,12 @@ export default function ClippedDrawer({ children }) {
   };
 
   const generalNav: [string, string, any][] = [
-    ['Dashboard', '/dashboard', <DashboardIcon />],
+    ['Dashboard', '/dashboard/perks', <DashboardIcon />],
   ];
 
   const accountNav: [string, string, any][] = [
     // ['Settings', '/settings', <SettingsIcon />],
+    ['Support', 'mailto: abc@example.com', <ContactSupportIcon />],
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
@@ -106,6 +109,25 @@ export default function ClippedDrawer({ children }) {
     ['General', generalNav],
     ['Account', accountNav],
   ];
+
+  const ListItemLink = (props) => {
+    const newProps = Object.keys(props).reduce((acc: object, prop: string) => {
+      if (prop == 'route') {
+        if (props.route.includes(':')) {
+          acc['component'] = 'a';
+          acc['href'] = props.route;
+        } else {
+          acc['component'] = Link;
+          acc['to'] = props.route;
+        }
+      } else {
+        acc[prop] = props[prop];
+      }
+      return acc;
+    }, {});
+
+    return <ListItem {...newProps} />;
+  };
 
   const drawer = (
     <div>
@@ -127,7 +149,7 @@ export default function ClippedDrawer({ children }) {
             {
               // TODO: cut off names if they're too long
             }
-            <Typography variant="caption">{employee?.group}</Typography>
+            <Typography variant="caption">{business?.name}</Typography>
           </span>
         </Paper>
         <div style={{ padding: '10px 0' }}>
@@ -146,9 +168,10 @@ export default function ClippedDrawer({ children }) {
               </Typography>
               <List>
                 {section.map(([name, route, e], index) => (
-                  <ListItem
+                  <ListItemLink
                     button
                     component={Link}
+                    route={route}
                     to={route}
                     key={name}
                     style={{
@@ -176,7 +199,7 @@ export default function ClippedDrawer({ children }) {
                       primary={name}
                       classes={{ primary: classes.listItem }}
                     />
-                  </ListItem>
+                  </ListItemLink>
                 ))}
               </List>
             </div>
