@@ -144,12 +144,45 @@ const GeneralDashboard = () => {
       });
     });
     Object.keys(tempDict).forEach((perk) => {
-      //TODO: Calculate amount spent in comparison to amount not spent
-      let newRow = { name: perk, spent: getRandomInt(100), total: 100 };
+      let newRow = {
+        name: perk,
+        spent: calculateAmountSpentPerPerk(perk),
+        total: 100,
+      };
       retData.push(newRow);
     });
 
     return retData;
+  }
+
+  function calculateAmountSpentPerPerk(perk) {
+    let totalPossibleCost = 0;
+    let moneySpent = 0;
+    console.log(employees);
+    employees.forEach((employee) => {
+      if (employee.perks[perk]) {
+        console.log('changing');
+        totalPossibleCost += allPerksDict[perk].Cost;
+        if (didSpendPerkLastMonth(employee.perks[perk])) {
+          moneySpent += allPerksDict[perk].Cost;
+        }
+      }
+    });
+
+    return Math.round(moneySpent / totalPossibleCost);
+  }
+
+  function didSpendPerkLastMonth(employeeArray) {
+    if (employeeArray.length == 0) {
+      return false;
+    }
+    let today = new Date();
+    today.setMonth(today.getMonth() - 3);
+    employeeArray.sort((a, b) => b.date - a.date);
+    if (employeeArray[employeeArray.length - 1].date > today.getDate()) {
+      return true;
+    }
+    return false;
   }
 
   useEffect(() => {
@@ -175,6 +208,7 @@ const GeneralDashboard = () => {
     } else {
       console.info('No such document!');
     }
+    return () => setDashboardLoading(false);
   }, [currentUser, admin, business]);
 
   useEffect(() => {
@@ -204,48 +238,18 @@ const GeneralDashboard = () => {
             <MetricCard
               title={'Cost Per Employee'}
               number={'$' + roundNumber(calculateTotalCost())}
-              icon={
-                <img
-                  src="/images/undraw_Investing.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Number of Employees'}
               number={employees.length}
-              icon={
-                <img
-                  src="/images/undraw_Appreciation.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Total Perks Offered'}
               number={calculatePerksOffered()}
-              icon={
-                <img
-                  src="/images/undraw_Gifts.svg"
-                  style={{
-                    height: '70px',
-                    marginLeft: 'auto',
-                    display: 'block',
-                  }}
-                />
-              }
             ></MetricCard>
           </Grid>
           <Grid item xs={4}>
@@ -263,7 +267,7 @@ const GeneralDashboard = () => {
                 variant="h6"
                 style={{ height: '80px', padding: '15px', fontWeight: 'bold' }}
               >
-                Perks Distribution
+                Total Perks Allocation
               </Typography>
               <div style={{ height: '400px' }}>
                 <PChart data={calculatePieData()} />
@@ -291,7 +295,7 @@ const GeneralDashboard = () => {
                       fontWeight: 'bold',
                     }}
                   >
-                    Perks Spending
+                    Percentage of Perks Claimed
                   </Typography>
 
                   <div style={{ marginLeft: 'auto' }}>

@@ -1,6 +1,6 @@
 import PrivateRoute from 'components/PrivateRoute';
 import PublicRoute from 'components/PublicRoute';
-import { AuthProvider, BusinessProvider } from 'contexts';
+import { AuthProvider, BusinessProvider, LoadingProvider } from 'contexts';
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -14,17 +14,19 @@ import Login from 'views/login';
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <BusinessProvider>
-          <Switch>
-            <Route exact path="/">
-              <Redirect to="/login" />
-            </Route>
-            <PrivateRoute path="/dashboard" component={Dashboard} />
-            <PublicRoute exact path="/login" component={Login} />
-          </Switch>
-        </BusinessProvider>
-      </AuthProvider>
+      <LoadingProvider>
+        <AuthProvider>
+          <BusinessProvider>
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="/login" />
+              </Route>
+              <PrivateRoute path="/dashboard" component={Dashboard} />
+              <PublicRoute exact path="/login" component={Login} />
+            </Switch>
+          </BusinessProvider>
+        </AuthProvider>
+      </LoadingProvider>
     </Router>
   );
 }

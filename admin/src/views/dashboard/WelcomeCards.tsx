@@ -31,8 +31,7 @@ export const WelcomeCards = () => {
                 </Typography>
                 <Typography gutterBottom variant="h5" component="h3">
                   Take a few seconds to set up billing so that you can start
-                  distributing perks to your employees. Just go to the billing
-                  page, add a payment method, and you are good to go.
+                  distributing perks to your employees.
                 </Typography>
                 <Button
                   variant="contained"

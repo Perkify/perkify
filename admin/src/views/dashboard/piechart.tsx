@@ -70,7 +70,14 @@ const renderActiveShape = (props) => {
 
 const PChart = (props) => {
   var [activeIndex, setIndex] = React.useState(0);
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#FF7F7F',
+    '#CBC3E3',
+  ];
 
   const onPieEnter = (value) => {
     const isIndex = (element) => element.name === value.name;

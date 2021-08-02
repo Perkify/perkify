@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Bar,
   BarChart,
+  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -47,6 +48,15 @@ const data = [
 ];
 
 const BChart = (props) => {
+  const COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#FF7F7F',
+    '#CBC3E3',
+  ];
+
   return (
     <ResponsiveContainer width="100%" height="80%">
       <BarChart data={props.data}>
@@ -59,7 +69,11 @@ const BChart = (props) => {
           stackId="a"
           fill="#00C49F"
           maxBarSize={100}
-        />
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % 20]} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );

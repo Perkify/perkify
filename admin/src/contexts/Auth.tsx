@@ -37,16 +37,16 @@ export const AuthProvider = ({ children }) => {
           const bearerToken = await user.getIdToken();
 
           // check if customer has payment methods
-          const cardPaymentMethods = await PerkifyApi.get(
-            '/user/auth/stripePaymentMethods',
-            {
-              headers: {
-                Authorization: `Bearer ${bearerToken}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          setHasPaymentMethods(cardPaymentMethods.data.data.length > 0);
+          PerkifyApi.get('/user/auth/stripePaymentMethods', {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          })
+            .then((res) => {
+              setHasPaymentMethods(res.data.data.length > 0);
+            })
+            .catch(() => {});
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');
