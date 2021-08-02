@@ -26,7 +26,11 @@
   },
   "scripts": {
     "start": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "start:development": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "start:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export PORT=3001 && react-scripts start",
+    "start:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export PORT=3001 && react-scripts start",
     "build": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
+    "build:development": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export CI='' && react-scripts build",
     "build:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
     "build:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export CI='' && react-scripts build",
     "test": "react-scripts test",
