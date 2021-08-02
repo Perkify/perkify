@@ -34,6 +34,10 @@ const CreateGroup = ({ history }) => {
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
 
+  function roundNumber(num) {
+    return Math.round(100 * num) / 100;
+  }
+
   const handlePerkChange = (event) => {
     // update the controlled form
     const perks = event.target.value as string[];
@@ -47,7 +51,7 @@ const CreateGroup = ({ history }) => {
       cost += allPerksDict[perk]['Cost'];
     });
     setCostPerPerson(cost);
-    setTotalCost(cost * numPeople);
+    setTotalCost(roundNumber(cost * numPeople * 1.1 + 4 * numPeople));
   };
 
   const handleEmailError = (event) => {
@@ -77,7 +81,9 @@ const CreateGroup = ({ history }) => {
     }
     // update the number of people and total cost
     setNumPeople(tmpNumPeople);
-    setTotalCost(tmpNumPeople * costPerPerson);
+    setTotalCost(
+      roundNumber(tmpNumPeople * costPerPerson * 1.1 + tmpNumPeople * 4)
+    );
   };
 
   const createPerkGroup = (e) => {
@@ -204,7 +210,11 @@ const CreateGroup = ({ history }) => {
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
-              {name}
+              {name +
+                ' | ' +
+                allPerksDict[name].Period +
+                ' | ' +
+                allPerksDict[name].Cost}
             </MenuItem>
           ))}
         </Select>
@@ -213,7 +223,7 @@ const CreateGroup = ({ history }) => {
         )} */}
 
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
-          Estimated Cost: ${totalCost}
+          Estimated Cost (Fees Included): ${totalCost}
         </Typography>
         <Tooltip
           disableFocusListener={hasPaymentMethods}
