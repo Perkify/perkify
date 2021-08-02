@@ -11,26 +11,11 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import GitHubIcon from '@material-ui/icons/GitHub';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      <Link
-        color="inherit"
-        href="https://github.com/Ruborcalor/onecard_dashboard"
-      >
-        <GitHubIcon />
-        Github Repository
-      </Link>{' '}
-    </Typography>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -40,16 +25,16 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     position: 'absolute',
   },
-  image: {
-    backgroundImage: 'url(/SignUpGraphic.png)',
-    backgroundRepeat: 'no-repeat',
-    backgroundColor:
-      theme.palette.type === 'light'
-        ? theme.palette.grey[50]
-        : theme.palette.grey[900],
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  },
+  // image: {
+  //   backgroundImage: 'url(/undraw_online_payments.svg)',
+  //   backgroundRepeat: 'no-repeat',
+  //   backgroundColor:
+  //     theme.palette.type === 'light'
+  //       ? theme.palette.grey[50]
+  //       : theme.palette.grey[900],
+  //   backgroundSize: 'cover',
+  //   backgroundPosition: 'center',
+  // },
   paper: {
     margin: theme.spacing(8, 4),
     display: 'flex',
@@ -93,8 +78,6 @@ export default function SignInSide(props) {
     try {
       await app.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
-      // setUser(data.data)
-      // history.push("/");
     } catch (error) {
       setLoading(false);
       errorAlert(error.message);
@@ -110,8 +93,7 @@ export default function SignInSide(props) {
   };
 
   return (
-    <div style={{ background: '#FFFFFF' }}>
-      {/* <Particles height="100vh" width="100vw" className={classes.particles} /> */}
+    <div style={{ background: '#5289f2' }}>
       <Snackbar
         open={open}
         autoHideDuration={4000}
@@ -155,7 +137,27 @@ export default function SignInSide(props) {
         >
           <Grid container component="main" className={classes.loginRoot}>
             <CssBaseline />
-            <Grid item xs={false} sm={4} md={7} className={classes.image} />
+            <Grid
+              container
+              item
+              xs={false}
+              sm={4}
+              md={7}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <img
+                src="/images/undraw_online_payments.svg"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '100px',
+                }}
+              />
+            </Grid>
             <Grid
               item
               xs={12}
