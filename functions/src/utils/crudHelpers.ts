@@ -1,5 +1,5 @@
 import { allPerks, newUserTemplateGenerator } from '../../shared';
-import admin, { db, stripe } from '../models';
+import admin, { db, functions, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
   const docRef = db.collection('users').doc(email);
@@ -10,12 +10,11 @@ export const createUserHelper = async (email, businessID, group, perks) => {
     perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
   });
 
-  console.log(process.env.NODE_ENV);
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
     url:
-      process.env.FIREBASE_ENVIRONMENT == 'production'
+      functions.config()['stripe-firebase'].environment == 'production'
         ? 'https://app.getperkify.com/dashboard'
-        : process.env.FIREBASE_ENVIRONMENT == 'staging'
+        : functions.config()['stripe-firebase'].environment == 'staging'
         ? 'https://app.dev.getperkify.com/dashboard'
         : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
   });
