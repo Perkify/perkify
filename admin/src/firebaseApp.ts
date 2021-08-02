@@ -24,7 +24,9 @@ const devFirebaseConfig = {
 };
 
 const app = firebase.initializeApp(
-  process.env.NODE_ENV == 'production' ? prodFirebaseConfig : devFirebaseConfig
+  process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
+    ? prodFirebaseConfig
+    : devFirebaseConfig
 );
 
 const db = app.firestore();
