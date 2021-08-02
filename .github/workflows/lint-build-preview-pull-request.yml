@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install node modules, lint, and build
-        run: npm ci && npm run lint && npm run build
+        run: npm ci && npm run lint && npm run build:staging
         working-directory: functions
 
   build_and_preview_admin:
@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Lint and build admin
-        run: npm ci && npm run lint && npm run build
+        run: npm ci && npm run lint && npm run build:staging
         working-directory: admin
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Lint and build user
-        run: npm ci && npm run lint && npm run build
+        run: npm ci && npm run lint && npm run build:staging
         working-directory: user
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

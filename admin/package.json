@@ -31,8 +31,10 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "export CI='' && react-scripts build",
+    "start": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "build": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
+    "build:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
+    "build:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export CI='' && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ."
