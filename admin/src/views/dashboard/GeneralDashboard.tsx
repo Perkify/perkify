@@ -1,4 +1,11 @@
-import { Card, Grid, MenuItem, Select, Typography } from '@material-ui/core';
+import {
+  Button,
+  Card,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import { db } from 'firebaseApp';
@@ -185,6 +192,18 @@ const GeneralDashboard = () => {
     return false;
   }
 
+  function generateCSV() {
+    var arrayContent = [['Séjour 1, é,í,ú,ü,ű'], ['Séjour 2, é,í,ú,ü,ű']];
+    var csvContent = arrayContent.join('\n');
+    var link = window.document.createElement('a');
+    link.setAttribute(
+      'href',
+      'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURI(csvContent)
+    );
+    link.setAttribute('download', 'upload_data.csv');
+    link.click();
+  }
+
   useEffect(() => {
     setDashboardLoading(true);
     if (Object.keys(admin).length != 0 && business) {
@@ -223,8 +242,16 @@ const GeneralDashboard = () => {
 
   return (
     <div>
-      <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
-
+      <Grid container spacing={0}>
+        <Grid item xs={10}>
+          <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
+        </Grid>
+        <Grid item xs={2}>
+          <Button variant="contained" color="primary" onClick={generateCSV}>
+            Download Employee Data
+          </Button>
+        </Grid>
+      </Grid>
       {loadingAuthState || hasPaymentMethods == null ? (
         <p>Loading</p>
       ) : !(hasPaymentMethods == true) ? (
