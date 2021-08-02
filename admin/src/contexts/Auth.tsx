@@ -44,7 +44,8 @@ export const AuthProvider = ({ children }) => {
             },
           })
             .then((res) => {
-              setHasPaymentMethods(res.data.data.length > 0);
+              setHasPaymentMethods(true);
+              // setHasPaymentMethods(res.data.data.length > 0);
             })
             .catch(() => {});
         } else {
