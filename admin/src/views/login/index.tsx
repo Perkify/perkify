@@ -25,16 +25,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     position: 'absolute',
   },
-  // image: {
-  //   backgroundImage: 'url(/undraw_online_payments.svg)',
-  //   backgroundRepeat: 'no-repeat',
-  //   backgroundColor:
-  //     theme.palette.type === 'light'
-  //       ? theme.palette.grey[50]
-  //       : theme.palette.grey[900],
-  //   backgroundSize: 'cover',
-  //   backgroundPosition: 'center',
-  // },
   paper: {
     margin: theme.spacing(8, 4),
     display: 'flex',
@@ -43,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: 'blue',
+    backgroundColor: theme.palette.primary.main,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
