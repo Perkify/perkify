@@ -10,8 +10,9 @@ const Dashboard = () => {
   return (
     <VerticalNav>
       <Switch>
-        <Route exact path={path} component={GeneralDashboard} />
+        <Route path={`${path}/perks`} component={GeneralDashboard} />
         <Route exact path={`${path}/logout`} component={Logout} />
+        <Route exact path={[path]} component={GeneralDashboard} />
       </Switch>
     </VerticalNav>
   );

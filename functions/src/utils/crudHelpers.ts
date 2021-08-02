@@ -10,11 +10,12 @@ export const createUserHelper = async (email, businessID, group, perks) => {
     perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
   });
 
+  console.log(process.env.NODE_ENV);
   const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
     url:
       process.env.NODE_ENV == 'development'
         ? 'http://localhost:3001/dashboard'
-        : 'https://app.getperkify.com/', // I don't think you're supposed to do it this way. Maybe less secure
+        : 'https://app.getperkify.com/dashboard',
   });
 
   // send email

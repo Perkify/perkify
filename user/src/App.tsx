@@ -19,7 +19,7 @@ function App() {
         <BusinessProvider>
           <Switch>
             <Route exact path="/">
-              <Redirect to="/dashboard" />
+              <Redirect to="/login" />
             </Route>
             <PrivateRoute path="/dashboard" component={Dashboard} />
             <PrivateRoute

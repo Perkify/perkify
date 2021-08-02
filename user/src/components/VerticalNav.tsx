@@ -18,7 +18,7 @@ import {
 import Typography from '@material-ui/core/Typography';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import { AuthContext } from 'contexts';
+import { AuthContext, BusinessContext } from 'contexts';
 import logo from 'images/logo.png';
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -86,6 +86,7 @@ export default function ClippedDrawer({ children }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const { employee, currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
 
   const location = useLocation();
 
@@ -127,7 +128,7 @@ export default function ClippedDrawer({ children }) {
             {
               // TODO: cut off names if they're too long
             }
-            <Typography variant="caption">{employee?.group}</Typography>
+            <Typography variant="caption">{business?.name}</Typography>
           </span>
         </Paper>
         <div style={{ padding: '10px 0' }}>

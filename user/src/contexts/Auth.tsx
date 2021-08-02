@@ -1,7 +1,7 @@
 import firebase from 'firebase/app';
 import app, { auth, db } from 'firebaseApp';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 type ContextProps = {
   currentUser: firebase.User | null;
@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [employee, setEmployee] = useState({});
   const [loadingAuthState, setLoadingAuthState] = useState(true);
   const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
     if (firebase.auth().isSignInWithEmailLink(location.search)) {
@@ -40,13 +41,17 @@ export const AuthProvider = ({ children }) => {
         })
         .catch((error) => {
           console.error(error);
-          alert('an error occurred');
+          if (error.code === 'auth/invalid-action-code') {
+            alert('This sign in link has expired or been used');
+            history.push('/login');
+          } else alert('an error occurred');
         });
     }
   }, [location]);
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
+      setLoadingAuthState(true);
       if (user) {
         const userDoc = await db.collection('users').doc(user.email).get();
         if (userDoc.exists) {
