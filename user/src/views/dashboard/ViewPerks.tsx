@@ -9,7 +9,6 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { allPerksDict } from '../../shared';
 
 const useStyles = makeStyles((theme) => ({
@@ -62,48 +61,52 @@ const ViewPerks = ({ employee, business }) => {
         // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
         return (
           <Grow in={true} timeout={increasingDelay}>
+            {/* ADD this in to open up the instructions for the perk
             <Link
               style={{ textDecoration: 'none' }}
               to={`/dashboard/perks/${perk}`}
             >
-              <PerkCard>
-                {perkUses.length === 0 ||
-                perkUses[perkUses.length - 1].seconds + billingCycle <
-                  new Date('2012.08.10').getTime() / 1000 ? (
-                  <InfoOutlinedIcon
-                    style={{
-                      fontSize: 32,
-                      color: orange[400],
-                      position: 'absolute',
-                      right: '0',
-                      top: '0',
-                      margin: '18px',
-                    }}
-                  />
-                ) : (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 32,
-                      color: green[400],
-                      position: 'absolute',
-                      right: '0',
-                      top: '0',
-                      margin: '18px',
-                    }}
-                  />
-                )}
-                <Avatar
-                  src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perk].Img}`}
-                  alt={perk}
-                  style={{ height: '70px', width: '70px' }}
+            */}
+            <PerkCard>
+              {perkUses.length === 0 ||
+              perkUses[perkUses.length - 1].seconds + billingCycle <
+                new Date('2012.08.10').getTime() / 1000 ? (
+                <InfoOutlinedIcon
+                  style={{
+                    fontSize: 32,
+                    color: orange[400],
+                    position: 'absolute',
+                    right: '0',
+                    top: '0',
+                    margin: '18px',
+                  }}
                 />
-                <Typography variant="body1">
-                  <Box fontWeight={600} mt={2}>
-                    {perk}
-                  </Box>
-                </Typography>
-              </PerkCard>
+              ) : (
+                <CheckCircleOutlineIcon
+                  style={{
+                    fontSize: 32,
+                    color: green[400],
+                    position: 'absolute',
+                    right: '0',
+                    top: '0',
+                    margin: '18px',
+                  }}
+                />
+              )}
+              <Avatar
+                src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perk].Img}`}
+                alt={perk}
+                style={{ height: '70px', width: '70px' }}
+              />
+              <Typography variant="body1">
+                <Box fontWeight={600} mt={2}>
+                  {perk}
+                </Box>
+              </Typography>
+            </PerkCard>
+            {/*
             </Link>
+            */}
           </Grow>
         );
       });

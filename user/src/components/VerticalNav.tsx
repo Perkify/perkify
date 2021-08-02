@@ -96,7 +96,7 @@ export default function ClippedDrawer({ children }) {
   };
 
   const generalNav: [string, string, any][] = [
-    ['Dashboard', '/dashboard', <DashboardIcon />],
+    ['Dashboard', '/dashboard/perks', <DashboardIcon />],
   ];
 
   const accountNav: [string, string, any][] = [

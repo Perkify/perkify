@@ -95,7 +95,7 @@ export default function SignInSide(props) {
         url: `${
           process.env.NODE_ENV == 'development'
             ? 'http://localhost:3001/dashboard'
-            : 'https://app.getperkify.com'
+            : 'https://app.getperkify.com/dashboard'
         }`,
         handleCodeInApp: true,
       });
