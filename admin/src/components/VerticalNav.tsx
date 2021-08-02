@@ -245,9 +245,10 @@ export default function ClippedDrawer({ children }) {
                         <IconButton
                           style={{ padding: 0 }}
                           onClick={(event) => {
-                            setAnchorEl(event.currentTarget);
-                            event.stopPropagation();
                             event.preventDefault();
+                            event.stopPropagation();
+                            console.log(event.isPropagationStopped);
+                            setAnchorEl(event.currentTarget);
                           }}
                         >
                           <MoreVertIcon />
