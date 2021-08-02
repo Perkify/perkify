@@ -3,27 +3,15 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Stepper from '@material-ui/core/Stepper';
-import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import AdminSignUpForm from 'components/AdminSignUpForm';
 import BusinessSignUpForm from 'components/BusinessSignUpForm';
 import VerifyEmail from 'components/VerifyEmail';
 import firebase from 'firebase/app';
 import app from 'firebaseApp';
 import logo from 'images/logo.png';
-import SignUpGraphic from 'images/SignUpGraphic.png';
 import React from 'react';
 import { PerkifyApi } from 'services';
-
-const crypto = require('crypto');
-
-const BootstrapInput = withStyles((theme) => ({
-  root: {
-    'label + &': {
-      marginTop: theme.spacing(2),
-    },
-  },
-}))(TextField);
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -32,13 +20,13 @@ const useStyles = makeStyles((theme) =>
       fontFamily: 'Plusjakartadisplay',
       backgroundColor: 'white',
     },
-    image: {
-      backgroundImage: `url(${SignUpGraphic})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundColor: '#5289f2',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    },
+    // image: {
+    //   backgroundImage: `url(/images/Credit_card_payment.svg)`,
+    //   backgroundRepeat: 'no-repeat',
+    //   backgroundColor: '#5289f2',
+    //   backgroundSize: 'cover',
+    //   backgroundPosition: 'center',
+    // },
     content: {
       width: '100%',
       padding: '3% 5%',
@@ -217,7 +205,7 @@ const SignUpBusinessWebflow = () => {
           md={6}
           className={classes.content}
         >
-          <a href="/" className={classes.logo}>
+          <a href="https://getperkify.com" className={classes.logo}>
             <img src={logo} style={{ width: '100%' }} />
           </a>
           <Grid
@@ -249,8 +237,23 @@ const SignUpBusinessWebflow = () => {
           xs={false}
           sm={false}
           md={6}
-          className={classes.image}
-        ></Grid>
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#F5FAFF',
+            // backgroundColor: '#5289f2',
+          }}
+        >
+          <img
+            src="/images/undraw_online_payments.svg"
+            style={{
+              display: 'block',
+              width: '100%',
+              padding: '100px',
+            }}
+          />
+        </Grid>
       </Grid>
     </div>
   );
