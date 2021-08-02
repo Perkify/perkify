@@ -245,8 +245,9 @@ export default function ClippedDrawer({ children }) {
                         <IconButton
                           style={{ padding: 0 }}
                           onClick={(event) => {
-                            event.preventDefault();
                             setAnchorEl(event.currentTarget);
+                            event.stopPropagation();
+                            event.preventDefault();
                           }}
                         >
                           <MoreVertIcon />
@@ -256,7 +257,9 @@ export default function ClippedDrawer({ children }) {
                           open={Boolean(anchorEl)}
                           keepMounted
                           anchorEl={anchorEl}
-                          onClose={() => setAnchorEl(null)}
+                          onClose={(event) => {
+                            setAnchorEl(null);
+                          }}
                           elevation={4}
                           anchorOrigin={{
                             vertical: 'bottom',
