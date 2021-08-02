@@ -94,8 +94,8 @@ export default function SignInSide(props) {
       await app.auth().sendSignInLinkToEmail(email, {
         url: `${
           process.env.NODE_ENV == 'development'
-            ? 'http://localhost:3001'
-            : 'https://app.getperkify.com'
+            ? 'http://localhost:3001/dashboard'
+            : 'https://app.getperkify.com/dashboard'
         }`,
         handleCodeInApp: true,
       });
