@@ -1,4 +1,5 @@
 // RAPYD
+import { functions } from '../models';
 
 // rapyd credentials
 export const rapydSecretKey =
@@ -9,6 +10,11 @@ export const rapydBaseURL = 'https://sandboxapi.rapyd.net';
 
 // STRIPE
 export const privateStripeKey =
-  'sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu';
+  functions.config()['stripe-firebase'].environment == 'production'
+    ? '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'
+    : 'sk_test_51JBSAtKuQQHSHZsmj9v16Z0VqTxLfK0O9KGzcDNq0meNrEZsY4sEN29QVZ213I5kyo0ssNwwTFmnC0LHgVurSnEn00Gn0CjfBu';
 
-export const stripeWebhookSecret = 'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP';
+export const stripeWebhookSecret =
+  functions.config()['stripe-firebase'].environment == 'production'
+    ? 'whsec_QJxtG8dhmlGsnsu1YkayYj3BuP7xtJxo'
+    : 'whsec_sipiyvURbVzUUdNKhc36vJG4gmodcAHM';

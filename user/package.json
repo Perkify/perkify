@@ -16,6 +16,7 @@
     "axios": "^0.21.1",
     "firebase": "^8.7.1",
     "react": "^17.0.2",
+    "react-credit-cards": "^0.8.3",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
@@ -25,8 +26,14 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "export PORT=3001 && react-scripts start",
-    "build": "export CI='' && react-scripts build",
+    "start": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "start:development": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "start:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export PORT=3001 && react-scripts start",
+    "start:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export PORT=3001 && react-scripts start",
+    "build": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
+    "build:development": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export CI='' && react-scripts build",
+    "build:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export CI='' && react-scripts build",
+    "build:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export CI='' && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ."
