@@ -30,8 +30,8 @@ export const WelcomeCards = () => {
                   <Box fontWeight="bold">Welcome to Perkify!</Box>
                 </Typography>
                 <Typography gutterBottom variant="h5" component="h3">
-                  Take a few seconds to set up billing so that you can start
-                  distributing perks to your employees.
+                  Connect a payment method to start creating live benefits for
+                  your employees.
                 </Typography>
                 <Button
                   variant="contained"
