@@ -89,8 +89,8 @@ const AddPerks = ({
       <DialogTitle id="form-dialog-title">Add Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          To add users to this organization, please enter their email addresses
-          below and select a group from the dropdown.
+          To add perks to this perk group, please select them from the dropdown
+          below
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
