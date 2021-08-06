@@ -7,14 +7,86 @@ name: Deploy to Firebase Hosting on merge
     branches:
       - master
 jobs:
-  build_and_deploy:
+  check_which_projects_changed:
+    name: Check which projects changed out of functions, admin, and user
+    outputs:
+      run_job_functions: ${{ steps.check_files.outputs.run_job_functions }}
+      run_job_admin: ${{ steps.check_files.outputs.run_job_admin }}
+      run_job_user: ${{ steps.check_files.outputs.run_job_user }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: check modified files
+        id: check_files
+        run: |
+          echo "=============== list modified files ==============="
+          git diff --name-only HEAD^ HEAD
+
+          echo "========== check paths of modified files =========="
+          git diff --name-only HEAD^ HEAD > files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file == functions/* ]]; then
+              echo "::set-output name=run_job_functions::true"
+            elif [[ $file == admin/* ]]; then
+              echo "::set-output name=run_job_admin::true"
+            elif [[ $file == user/* ]]; then
+              echo "::set-output name=run_job_user::true"
+            fi
+          done < files.txt
+
+  build_and_deploy_functions:
+    name: "Verify that the functions folder builds"
+    needs: check_which_projects_changed
+    if: needs.check_which_projects_changed.outputs.run_job_functions == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm ci && npm run build
+      - name: Install node modules, lint, and build
+        run: npm ci && npm run lint && npm run build
+        working-directory: functions
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FUNCTIONS }}
+
+  build_and_deploy_admin:
+    needs: check_which_projects_changed
+    if: needs.check_which_projects_changed.outputs.run_job_admin == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint and build admin
+        run: npm ci && npm run lint && npm run build:staging
+        working-directory: admin
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERKIFY_5790B }}"
           channelId: live
           projectId: perkify-5790b
+          target: admin
+
+  build_and_deploy_user:
+    needs: check_which_projects_changed
+    if: needs.check_which_projects_changed.outputs.run_job_user == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint and build user
+        run: npm ci && npm run lint && npm run build:staging
+        working-directory: user
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERKIFY_5790B }}"
+          channelId: live
+          projectId: perkify-5790b
+          target: user
