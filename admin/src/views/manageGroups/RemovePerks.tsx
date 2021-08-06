@@ -76,7 +76,7 @@ const RemovePerks = ({
       onClose={() => setIsRemovePerksModalVisible(false)}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Delete Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Are you sure you want to remove these perks?
