@@ -1,5 +1,5 @@
 {
   "stripe-firebase": {
-    "environment": "production"
+    "environment": "staging"
   }
 }
