@@ -1,5 +1,5 @@
 import { stripeWebhookSecret } from '../../configs';
-import { stripe } from '../../models';
+import { functions, stripe } from '../../models';
 import { handleError } from '../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
 
@@ -20,6 +20,7 @@ export const stripeWebhooks = async (request, response) => {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  functions.logger.log('Event log:', JSON.stringify(event));
   try {
     if (event.type === 'issuing_authorization.request') {
       const auth = event.data.object;

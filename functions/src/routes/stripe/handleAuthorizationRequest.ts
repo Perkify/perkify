@@ -1,5 +1,5 @@
 import { allPerks } from '../../../shared';
-import admin, { db, stripe } from '../../models';
+import admin, { db, functions, stripe } from '../../models';
 
 const verifyRequest = (perkInfo, userPerks, amount) => {
   // if we offer perk and the user has been granted the perk
@@ -20,18 +20,8 @@ const verifyRequest = (perkInfo, userPerks, amount) => {
 
 export const handleAuthorizationRequest = async (auth) => {
   // Authorize the transaction.
-  auth = {
-    amount: 6.99,
-    card: {
-      cardholder: {
-        email: 'prateek@humane.com',
-      },
-    },
-    merchant_data: {
-      name: 'Netflix',
-      network_id: '12345',
-    },
-  };
+  functions.logger.log('authorization data:', JSON.stringify(auth));
+  functions.logger.log('merchant data:', JSON.stringify(auth.merchant_data));
 
   // email of card holder
   const email = auth.card.cardholder.email;
