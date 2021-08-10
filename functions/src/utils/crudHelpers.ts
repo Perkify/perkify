@@ -80,7 +80,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     (accumulator, employeeDoc) => {
       const employee = employeeDoc.data();
 
-      employee.perks.forEach((perk) => {
+      Object.keys(employee.perks).forEach((perk) => {
         if (accumulator[perk]) {
           accumulator[perk] += 1;
         } else {
@@ -107,24 +107,32 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     .collection('subscriptions')
     .get();
 
-  const subscriptionItem = subscriptionsSnapshot.docs
-    .filter((doc) => doc.data().canceled_at == null)
-    .map((doc) => doc.id);
+  const subscriptionItem = subscriptionsSnapshot.docs.filter(
+    (doc) => doc.data().canceled_at == null
+  );
 
   if (subscriptionItem.length == 0) {
     // the admin doesn't have any subscriptions
     // create a subscription for them
-
-    const subscription = await stripe.subscriptions.create({
+    await stripe.subscriptions.create({
       customer: customerData.stripeId,
       items: newSubscriptionItemsList,
     });
   } else {
     // the admin is already subscribed
     // update the subscription to reflect the new item quantities
-    const subscription = await stripe.subscriptions.update(
-      subscriptionItem[0],
-      { items: newSubscriptionItemsList }
-    );
+
+    // add item ids to existing subscriptions prices
+    for (let i = 0; i < newSubscriptionItemsList.length; i++) {
+      newSubscriptionItemsList[i]['id'] = subscriptionItem[0]
+        .data()
+        .items.filter(
+          (item) => item.price.id == newSubscriptionItemsList[i].price
+        )?.[0].id;
+    }
+
+    await stripe.subscriptions.update(subscriptionItem[0].id, {
+      items: newSubscriptionItemsList,
+    });
   }
 };
