@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
+import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -22,6 +23,8 @@ const AddEmployees = ({
 }) => {
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
@@ -91,7 +94,41 @@ const AddEmployees = ({
     }
   };
 
-  return (
+  function setVisible() {
+    let error = false;
+    if (emailsError != '') {
+      return;
+    }
+    if (emailsToAdd == '') {
+      setEmailsError('Enter emails');
+      return;
+    }
+    setConfirmationModalVisible(true);
+  }
+
+  function generatePerks() {
+    let retVal = [];
+    groupPerks.forEach((perk) => {
+      retVal.push(perk.Name);
+    });
+    return retVal;
+  }
+
+  return isConfirmationModalVisible ? (
+    <PurchaseConfirmation
+      isAddPerksModalVisible={isAddEmployeesModalVisible}
+      setIsAddPerksModalVisible={setIsAddEmployeesModalVisible}
+      title={'Add Perks'}
+      text={
+        'Are you sure you want to add these employees for a total cost of $'
+      }
+      onConfirmation={addEmployeesToPerkGroup}
+      setConfirmationModalVisible={setConfirmationModalVisible}
+      perks={generatePerks()}
+      numPeople={emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/).length}
+      creatingGroup={true}
+    />
+  ) : (
     <Dialog
       open={isAddEmployeesModalVisible}
       onClose={() => setIsAddEmployeesModalVisible(false)}
@@ -127,7 +164,7 @@ const AddEmployees = ({
           >
             Cancel
           </Button>
-          <Button onClick={addEmployeesToPerkGroup} color="primary">
+          <Button onClick={setVisible} color="primary">
             Add Users
           </Button>
         </DialogActions>

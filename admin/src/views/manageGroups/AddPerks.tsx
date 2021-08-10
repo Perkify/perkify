@@ -9,6 +9,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
+import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -24,6 +25,8 @@ const AddPerks = ({
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [groupPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState([]);
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
@@ -49,6 +52,8 @@ const AddPerks = ({
 
     if (!error) {
       (async () => {
+        setConfirmationModalVisible(false);
+        setIsAddPerksModalVisible(false);
         setDashboardLoading(true);
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
@@ -74,13 +79,36 @@ const AddPerks = ({
 
         setFreezeNav(false);
         setDashboardLoading(false);
-        setIsAddPerksModalVisible(false);
         setPerksToAdd([]);
       })();
     }
   };
 
-  return (
+  function setVisible() {
+    let error = false;
+    if (perksToAdd.length == 0) {
+      setSelectedPerksError('Select perks');
+      error = true;
+    }
+    if (error) {
+      return;
+    }
+    setConfirmationModalVisible(true);
+  }
+
+  return isConfirmationModalVisible ? (
+    <PurchaseConfirmation
+      isAddPerksModalVisible={isAddPerksModalVisible}
+      setIsAddPerksModalVisible={setIsAddPerksModalVisible}
+      title={'Add Perks'}
+      text={'Are you sure you want to add these perks for a total cost of $'}
+      onConfirmation={addPerksToPerkGroup}
+      setConfirmationModalVisible={setConfirmationModalVisible}
+      perks={perksToAdd}
+      numPeople={emails.length}
+      creatingGroup={false}
+    />
+  ) : (
     <Dialog
       open={isAddPerksModalVisible}
       onClose={() => setIsAddPerksModalVisible(false)}
@@ -89,8 +117,7 @@ const AddPerks = ({
       <DialogTitle id="form-dialog-title">Add Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          To add users to this organization, please enter their email addresses
-          below and select a group from the dropdown.
+          To add perks to this group, please select them from the dropbox below.
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
@@ -129,7 +156,7 @@ const AddPerks = ({
         >
           Cancel
         </Button>
-        <Button onClick={addPerksToPerkGroup} color="primary">
+        <Button onClick={setVisible} color="primary">
           Add Perks
         </Button>
       </DialogActions>
