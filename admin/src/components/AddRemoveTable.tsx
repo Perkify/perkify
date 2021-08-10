@@ -128,7 +128,9 @@ export const AddRemoveTable = ({
   return (
     <Card style={{ height, border: 0 }} elevation={4}>
       <DataGrid
-        classes={{ root: dataGridClasses.root }}
+        classes={{
+          root: dataGridClasses.root,
+        }}
         rows={rows}
         columns={columns}
         pageSize={10}

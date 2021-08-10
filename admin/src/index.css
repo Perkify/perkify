@@ -19,3 +19,7 @@ code {
   font-style: normal;
   font-display: swap;
 }
+
+.MuiDataGrid-columnHeaderWrapper {
+  background-color: #f9f9fb;
+}

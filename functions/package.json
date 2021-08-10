@@ -2,11 +2,9 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "export FIREBASE_STRIPE_ENVIRONMENT='staging' && tsc",
-    "build:staging": "export FIREBASE_STRIPE_ENVIRONMENT='staging' && tsc",
-    "build:production": "export FIREBASE_STRIPE_ENVIRONMENT='production' && tsc",
-    "start": "npm run build:staging && concurrently \"tsc -w\" \"firebase emulators:start --only functions\"",
-    "shell": "npm run build:staging && firebase functions:shell",
+    "build": "tsc",
+    "start": "npm run build && concurrently \"tsc -w\" \"firebase emulators:start --only functions\"",
+    "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },

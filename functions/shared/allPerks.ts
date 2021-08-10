@@ -1,3 +1,4 @@
+import { functions } from '../src/models';
 export const allProductionPerks = [
   {
     Name: 'Netflix Standard',
@@ -125,7 +126,7 @@ export const allDevelopmentPerks = [
 ];
 
 export const allPerks =
-  process.env.FIREBASE_STRIPE_ENVIRONMENT == 'production'
+  functions.config()['stripe-firebase'].environment == 'production'
     ? allProductionPerks
     : allDevelopmentPerks;
 

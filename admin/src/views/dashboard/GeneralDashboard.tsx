@@ -1,4 +1,11 @@
-import { Card, Grid, MenuItem, Select, Typography } from '@material-ui/core';
+import {
+  Button,
+  Card,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import { db } from 'firebaseApp';
@@ -21,6 +28,10 @@ const GeneralDashboard = () => {
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
+  }
+
+  function roundNumberHundredth(num) {
+    return Math.round(100 * num) / 100;
   }
 
   function convertGroups() {
@@ -168,7 +179,7 @@ const GeneralDashboard = () => {
         }
       }
     });
-
+    moneySpent *= 100;
     return Math.round(moneySpent / totalPossibleCost);
   }
 
@@ -177,12 +188,68 @@ const GeneralDashboard = () => {
       return false;
     }
     let today = new Date();
-    today.setMonth(today.getMonth() - 3);
-    employeeArray.sort((a, b) => b.date - a.date);
-    if (employeeArray[employeeArray.length - 1].date > today.getDate()) {
+    today.setMonth(today.getMonth() - 1);
+    employeeArray.sort((a, b) => a.toDate().getTime() - b.toDate().getTime());
+    if (
+      employeeArray[employeeArray.length - 1].toDate().getTime() >
+      today.getTime()
+    ) {
       return true;
     }
     return false;
+  }
+
+  function generateCSV() {
+    let d = new Date();
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    var arrayContent = [
+      [
+        'Employee',
+        'Total spent in ' + monthNames[d.getMonth()],
+        'Total spent in ' + d.getFullYear(),
+      ],
+    ];
+    employees.forEach((employee) => {
+      let monthlyCost = 0;
+      let yearlyCost = 0;
+      Object.keys(employee['perks']).forEach((perk) => {
+        employee['perks'][perk].forEach((date) => {
+          if (d.getFullYear() === date.toDate().getFullYear()) {
+            yearlyCost += allPerksDict[perk].Cost;
+          }
+          if (d.getMonth() === date.toDate().getMonth()) {
+            monthlyCost += allPerksDict[perk].Cost;
+          }
+        });
+      });
+      let newRow = [
+        employee.email,
+        roundNumberHundredth(monthlyCost),
+        roundNumberHundredth(yearlyCost),
+      ];
+      arrayContent.push(newRow);
+    });
+    var csvContent = arrayContent.join('\n');
+    var link = window.document.createElement('a');
+    link.setAttribute(
+      'href',
+      'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURI(csvContent)
+    );
+    link.setAttribute('download', 'employee_spending.csv');
+    link.click();
   }
 
   useEffect(() => {
@@ -223,8 +290,16 @@ const GeneralDashboard = () => {
 
   return (
     <div>
-      <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
-
+      <Grid container spacing={0}>
+        <Grid item xs={10}>
+          <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
+        </Grid>
+        <Grid item xs={2}>
+          <Button variant="contained" color="primary" onClick={generateCSV}>
+            Download Financial Records
+          </Button>
+        </Grid>
+      </Grid>
       {loadingAuthState || hasPaymentMethods == null ? (
         <p>Loading</p>
       ) : !(hasPaymentMethods == true) ? (

@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install node modules, lint, and build
-        run: npm ci && npm run lint && npm run build:staging
+        run: npm ci && npm run lint && npm run build
         working-directory: functions
 
   build_and_preview_admin:

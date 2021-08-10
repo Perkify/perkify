@@ -30,6 +30,7 @@ app.use(
       /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
       /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
+      /^https?:\/\/(.+\.)?perkify-5790b.*\.web\.app$/,
     ],
     credentials: true,
   })
