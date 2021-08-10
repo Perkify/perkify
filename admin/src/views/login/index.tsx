@@ -1,4 +1,11 @@
-import { Snackbar } from '@material-ui/core';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+} from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -48,6 +55,7 @@ export default function SignInSide(props) {
   const classes = useStyles();
 
   const [email, setEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,6 +63,8 @@ export default function SignInSide(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const { user, setUser } = props;
   const history = useHistory();
+  const [isForgotPasswordModalVisible, setForgotPasswordModalVisible] =
+    useState(false);
 
   const errorAlert = (error) => {
     console.error(error);
@@ -81,6 +91,24 @@ export default function SignInSide(props) {
 
     setOpen(false);
   };
+
+  function resetPass() {
+    app
+      .auth()
+      .sendPasswordResetEmail(resetEmail)
+      .then(() => {
+        console.log('SENT');
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        // ..
+      });
+  }
 
   return (
     <div style={{ background: '#5289f2' }}>
@@ -218,7 +246,7 @@ export default function SignInSide(props) {
                   >
                     Sign In
                   </Button>
-                  <Grid container>
+                  <Grid container spacing={0}>
                     {/* <Grid item xs>
                       <Link
                         href="https://www.mcgill.ca/it/stay-safe-online/pw-reset"
@@ -227,10 +255,23 @@ export default function SignInSide(props) {
                         Forgot password?
                       </Link>
                     </Grid> */}
-                    <Grid item>
+                    <Grid item xs={6}>
                       <Link to="/signup" variant="body2" component={RouterLink}>
                         {"Don't have an account? Sign Up"}
                       </Link>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={6}
+                      style={{ textAlign: 'right', float: 'right' }}
+                    >
+                      <Button
+                        onClick={() => setForgotPasswordModalVisible(true)}
+                        style={{ textTransform: 'none' }}
+                        color="primary"
+                      >
+                        Forgot Your Password?
+                      </Button>
                     </Grid>
                     {/* <Grid item>
                       <Link href="https://github.com/Ruborcalor/onecard_dashboard">
@@ -244,6 +285,43 @@ export default function SignInSide(props) {
             </Grid>
           </Grid>
         </Card>
+        <Dialog
+          open={isForgotPasswordModalVisible}
+          onClose={() => setForgotPasswordModalVisible(false)}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">{'Reset Password'}</DialogTitle>
+          <DialogContent style={{ width: '400px' }}>
+            <DialogContentText>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+              />
+            </DialogContentText>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setForgotPasswordModalVisible(false);
+                }}
+                color="primary"
+              >
+                Cancel
+              </Button>
+              <Button onClick={resetPass} color="primary">
+                Reset Password
+              </Button>
+            </DialogActions>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
