@@ -8,6 +8,11 @@ export const stripeWebhooks = async (request, response) => {
 
   let event;
 
+  // functions.logger.warn('IN PRODUCTION');
+  // functions.logger.log('req body', request.rawBody);
+  functions.logger.log('ENV', process.env.FIREBASE_STRIPE_ENVIRONMENT);
+  functions.logger.log('sig', sig);
+  functions.logger.log('webhook', stripeWebhookSecret);
   // Verify webhook signature and extract the event.
   try {
     event = stripe.webhooks.constructEvent(

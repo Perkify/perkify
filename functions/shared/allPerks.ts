@@ -69,8 +69,8 @@ export const allDevelopmentPerks = [
     stripePriceId: 'price_1JInq1KuQQHSHZsmq9prpaUr',
     Img: 'netflix.jpg',
     Product: 'prod_JwhE2ADq37oUrZ',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
+    NetworkId: '395707213988',
+    PaymentName: 'Netflix.com',
   },
   {
     Name: 'Hulu',
