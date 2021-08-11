@@ -76,15 +76,27 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     .get();
 
   // count how many of each perk the business has registered employees for
-  const perkCountsByName = businessEmployees.docs.reduce(
+  const perkGroupEmployeeCounts = businessEmployees.docs.reduce(
     (accumulator, employeeDoc) => {
       const employee = employeeDoc.data();
 
-      Object.keys(employee.perks).forEach((perk) => {
-        if (accumulator[perk]) {
-          accumulator[perk] += 1;
+      if (accumulator[employee.group]) {
+        accumulator[employee.group] += 1;
+      } else {
+        accumulator[employee.group] = 1;
+      }
+      return accumulator;
+    },
+    {}
+  );
+
+  const perkCountsByName = Object.keys(perkGroupEmployeeCounts).reduce(
+    (accumulator, perkGroup) => {
+      businessData.groups[perkGroup].forEach((perkName) => {
+        if (accumulator[perkName]) {
+          accumulator[perkName] += perkGroupEmployeeCounts[perkGroup];
         } else {
-          accumulator[perk] = 1;
+          accumulator[perkName] = perkGroupEmployeeCounts[perkGroup];
         }
       });
       return accumulator;
