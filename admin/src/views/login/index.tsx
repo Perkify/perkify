@@ -60,6 +60,7 @@ export default function SignInSide(props) {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [didResetPass, setDidResetPass] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { user, setUser } = props;
   const history = useHistory();
@@ -98,6 +99,7 @@ export default function SignInSide(props) {
       .sendPasswordResetEmail(resetEmail)
       .then(() => {
         console.log('SENT');
+        setDidResetPass(true);
         // Password reset email sent!
         // ..
       })
@@ -255,23 +257,30 @@ export default function SignInSide(props) {
                         Forgot password?
                       </Link>
                     </Grid> */}
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Link to="/signup" variant="body2" component={RouterLink}>
                         {"Don't have an account? Sign Up"}
                       </Link>
                     </Grid>
+                  </Grid>
+                  <Grid container spacing={0}>
                     <Grid
                       item
-                      xs={6}
-                      style={{ textAlign: 'right', float: 'right' }}
+                      xs={12}
+                      style={{ textAlign: 'left', float: 'right' }}
                     >
-                      <Button
+                      <Link
+                        component="button"
                         onClick={() => setForgotPasswordModalVisible(true)}
-                        style={{ textTransform: 'none' }}
+                        style={{
+                          textTransform: 'none',
+                          paddingTop: '20px',
+                          fontSize: '14px',
+                        }}
                         color="primary"
                       >
                         Forgot Your Password?
-                      </Button>
+                      </Link>
                     </Grid>
                     {/* <Grid item>
                       <Link href="https://github.com/Ruborcalor/onecard_dashboard">
@@ -293,32 +302,54 @@ export default function SignInSide(props) {
           <DialogTitle id="form-dialog-title">{'Reset Password'}</DialogTitle>
           <DialogContent style={{ width: '400px' }}>
             <DialogContentText>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-              />
+              {didResetPass ? (
+                <div>
+                  {'We sent an email to ' +
+                    resetEmail +
+                    '. Click on the link to reset your password.'}
+                </div>
+              ) : (
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                />
+              )}
             </DialogContentText>
             <DialogActions>
-              <Button
-                onClick={() => {
-                  setForgotPasswordModalVisible(false);
-                }}
-                color="primary"
-              >
-                Cancel
-              </Button>
-              <Button onClick={resetPass} color="primary">
-                Reset Password
-              </Button>
+              {didResetPass ? (
+                <Button
+                  onClick={() => {
+                    setForgotPasswordModalVisible(false);
+                    setDidResetPass(false);
+                  }}
+                  color="primary"
+                >
+                  Done
+                </Button>
+              ) : (
+                <div>
+                  <Button
+                    onClick={() => {
+                      setForgotPasswordModalVisible(false);
+                    }}
+                    color="primary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={resetPass} color="primary">
+                    Reset Password
+                  </Button>
+                </div>
+              )}
             </DialogActions>
           </DialogContent>
         </Dialog>
