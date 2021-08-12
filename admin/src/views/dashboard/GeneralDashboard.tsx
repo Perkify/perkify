@@ -311,7 +311,7 @@ const GeneralDashboard = () => {
         <Grid container spacing={4}>
           <Grid item xs={4}>
             <MetricCard
-              title={'Cost Per Employee'}
+              title={'Average Cost Per Employee'}
               number={'$' + roundNumber(calculateTotalCost())}
             />
           </Grid>

@@ -2,7 +2,7 @@ export const allProductionPerks = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqw9KuQQHSHZsm71r4kkhd',
     Img: 'netflix.jpeg',
     Product: 'prod_JxmVIY3P8jV19L',
@@ -12,7 +12,7 @@ export const allProductionPerks = [
   {
     Name: 'Hulu',
     Cost: 5.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqwcKuQQHSHZsmQ2JFPQwp',
     Img: 'hulu.png',
     Product: 'prod_JxmV7NAPQLFyOl',
@@ -22,7 +22,7 @@ export const allProductionPerks = [
   {
     Name: 'Audible Plus',
     Cost: 7.95,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqwxKuQQHSHZsmosyOePOl',
     Img: 'audible.png',
     Product: 'prod_JxmVInB54WZwQp',
@@ -32,7 +32,7 @@ export const allProductionPerks = [
   {
     Name: 'Disney Plus',
     Cost: 7.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqpKKuQQHSHZsmZugC5Zxi',
     Img: 'disneyplus.png',
     Product: 'prod_JxmO9TVTtcHLd9',
@@ -42,7 +42,7 @@ export const allProductionPerks = [
   {
     Name: 'Headspace',
     Cost: 12.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqrcKuQQHSHZsmPSI9mrP0',
     Img: 'headspace.png',
     Product: 'prod_JxmQHmjecXibCK',
@@ -52,7 +52,7 @@ export const allProductionPerks = [
   {
     Name: 'Spotify Individual',
     Cost: 9.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JJqs2KuQQHSHZsmfzgIOrJ3',
     Img: 'spotify.jpg',
     Product: 'prod_JxmQVILWLae2ZZ',
@@ -65,7 +65,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInq1KuQQHSHZsmq9prpaUr',
     Img: 'netflix.jpg',
     Product: 'prod_JwhE2ADq37oUrZ',
@@ -75,7 +75,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Hulu',
     Cost: 5.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInpWKuQQHSHZsmOtbkmnD6',
     Img: 'hulu.png',
     Product: 'prod_JwhD1f77sqFDSI',
@@ -85,7 +85,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Audible Plus',
     Cost: 7.95,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInpEKuQQHSHZsmZRfkYK13',
     Img: 'audible.png',
     Product: 'prod_JwhDvuPn93HnCv',
@@ -95,7 +95,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Disney Plus',
     Cost: 7.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInoaKuQQHSHZsmN9CMDEEu',
     Img: 'disneyplus.png',
     Product: 'prod_JwhDWSPG0Ydeua',
@@ -105,7 +105,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Headspace',
     Cost: 12.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInnAKuQQHSHZsm22WmEyqN',
     Img: 'headspace.png',
     Product: 'prod_JwhBWFAWY4QwSw',
@@ -115,7 +115,7 @@ export const allDevelopmentPerks = [
   {
     Name: 'Spotify Individual',
     Cost: 9.99,
-    Period: 'Monthly',
+    Period: 'Month',
     stripePriceId: 'price_1JInl6KuQQHSHZsmwMGzzFUE',
     Img: 'spotify.jpg',
     Product: 'prod_Jwh9zvjiY3Ou0n',
