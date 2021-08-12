@@ -75,6 +75,9 @@ export default function SignInSide(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isForgotPasswordModalVisible) {
+      return;
+    }
     setLoading(true);
     try {
       await app.auth().signInWithEmailAndPassword(email, password);
