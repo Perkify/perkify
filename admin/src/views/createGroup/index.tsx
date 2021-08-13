@@ -253,10 +253,11 @@ const CreateGroup = ({ history }) => {
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
               {name +
-                ' | ' +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
                 allPerksDict[name].Period +
-                ' | ' +
-                allPerksDict[name].Cost}
+                ')'}
             </MenuItem>
           ))}
         </Select>
