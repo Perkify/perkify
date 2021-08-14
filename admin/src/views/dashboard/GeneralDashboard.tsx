@@ -295,9 +295,11 @@ const GeneralDashboard = () => {
           <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
         </Grid>
         <Grid item xs={2}>
-          <Button variant="contained" color="primary" onClick={generateCSV}>
-            Download Financial Records
-          </Button>
+          {hasPaymentMethods == true && (
+            <Button color="primary" onClick={generateCSV}>
+              Download Financial Records
+            </Button>
+          )}
         </Grid>
       </Grid>
       {loadingAuthState || hasPaymentMethods == null ? (

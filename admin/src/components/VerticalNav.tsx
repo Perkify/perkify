@@ -97,7 +97,7 @@ export default function ClippedDrawer({ children }) {
   const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
     useState('');
 
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
@@ -166,12 +166,19 @@ export default function ClippedDrawer({ children }) {
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
-  const navSections: [string, [string, string, any][]][] = [
+  let navSections: [string, [string, string, any][]][] = [
     ['General', generalNav],
     ['People', peopleNav],
     ['Perk Groups', infoNav],
     ['Account', accountNav],
   ];
+
+  if (hasPaymentMethods == false) {
+    navSections = [
+      ['General', generalNav],
+      ['Account', accountNav],
+    ];
+  }
 
   const drawer = (
     <div>
