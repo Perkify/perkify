@@ -1,7 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import { db } from '../../models';
 import {
-  createUserHelper,
   handleError,
   sanitizeEmails,
   syncStripeSubscriptionsWithFirestorePerks,
@@ -24,6 +23,7 @@ export const createGroup = async (req, res, next) => {
   } = req.body;
 
   try {
+    // request validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const error = {
@@ -44,7 +44,6 @@ export const createGroup = async (req, res, next) => {
     }
 
     // make sure all emails are good
-    // TODO: we shouldn't use array.filter and still add those right?
     for (const email of emails) {
       const docRef = db.collection('users').doc(email);
 
@@ -79,6 +78,7 @@ export const createGroup = async (req, res, next) => {
 
     const businessID = adminData.companyID;
 
+    // update the business document to reflect the group of perks
     await db
       .collection('businesses')
       .doc(businessID)
@@ -86,13 +86,12 @@ export const createGroup = async (req, res, next) => {
         [`groups.${group}`]: perks,
       });
 
-    const usersToCreate = emails.map((email) =>
-      createUserHelper(email, businessID, group, perks)
-    );
-    await Promise.all(usersToCreate);
-
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+      await syncStripeSubscriptionsWithFirestorePerks(
+        req.user.uid,
+        businessID,
+        group
+      );
     } catch (e) {
       return next(e);
     }

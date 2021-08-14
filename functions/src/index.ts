@@ -16,6 +16,7 @@ import {
   stripeWebhooks,
   updatePerkGroup,
   updatePerkGroupValidators,
+  listBalanceTransactions,
 } from './routes';
 import { validateFirebaseIdToken } from './utils';
 
@@ -74,4 +75,5 @@ stripeWebhooksApp.post(
   bodyParser.raw({ type: 'application/json' }),
   stripeWebhooks
 );
+stripeWebhooksApp.get('/listBalanceTransactions', listBalanceTransactions);
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);

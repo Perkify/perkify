@@ -133,7 +133,11 @@ export const updatePerkGroup = async (req, res, next) => {
     await Promise.all(usersToDelete);
 
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+      await syncStripeSubscriptionsWithFirestorePerks(
+        req.user.uid,
+        businessID,
+        group
+      );
     } catch (e) {
       return next(e);
     }

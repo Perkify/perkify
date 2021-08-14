@@ -58,7 +58,11 @@ export const deletePerkGroup = async (req, res, next) => {
       });
 
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
+      await syncStripeSubscriptionsWithFirestorePerks(
+        req.user.uid,
+        businessID,
+        group
+      );
     } catch (e) {
       next(e);
     }
