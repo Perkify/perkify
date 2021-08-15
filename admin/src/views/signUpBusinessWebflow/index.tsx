@@ -117,7 +117,12 @@ const SignUpBusinessWebflow = () => {
             .signInWithEmailAndPassword(email, password);
           setNewUser(result.user);
           await result?.user?.sendEmailVerification({
-            url: 'https://admin.getperkify.com/login',
+            url:
+              process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
+                ? 'https://admin.getperkify.com/login'
+                : process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'staging'
+                ? 'https://admin.dev.getperkify.com/login'
+                : 'http://localhost:3000/login',
           });
           setDashboardLoading(false);
           return true;

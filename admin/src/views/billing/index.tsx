@@ -17,7 +17,7 @@ const Billing = () => {
         'ext-firestore-stripe-subscriptions-createPortalLink'
       );
       const { data } = await functionRef({
-        returnUrl: window.location.origin,
+        returnUrl: window.location.origin + '/dashboard',
       });
       history.push('/dashboard');
       window.location.assign(data.url);

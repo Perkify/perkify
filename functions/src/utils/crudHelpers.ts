@@ -1,4 +1,4 @@
-import { allPerks, newUserTemplateGenerator } from '../../shared';
+import { allPerksDict, newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
@@ -41,6 +41,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
   userUid,
   businessID
 ) => {
+  // get business data
   const businessData = (
     await db.collection('businesses').doc(businessID).get()
   ).data();
@@ -54,56 +55,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     throw error;
   }
 
-  // get list of perks that business has
-  const perkSet = new Set();
-  Object.keys(businessData.groups).forEach((perkGroupName) => {
-    businessData.groups[perkGroupName].forEach((perkName) =>
-      perkSet.add(perkName)
-    );
-  });
-
-  // compare the list of perks to the list of subscriptions, and cancel any subscriptions for which no perks are being offered
-  const subscriptionsSnapshot = await db
-    .collection('customers')
-    .doc(userUid)
-    .collection('subscriptions')
-    .get();
-
-  const subscriptionItems = subscriptionsSnapshot.docs
-    .filter((doc) => doc.data().canceled_at == null)
-    .map((doc) => {
-      return {
-        subscription_id: doc.data().items[0].subscription,
-        name: doc.data().items[0].price.product.name,
-      };
-    });
-
-  // get the subscriptions that exist but do not exist in the active perks
-  // TODO: handle case where subscription is canceled
-  const subscriptionsToCancel = subscriptionItems.filter(
-    (subObj) => !perkSet.has(subObj.name)
-  );
-
-  // get the perks that exist but for which there aren't any subscriptions
-  const perkNamesToCreate = Array.from(perkSet).filter(
-    (perkName) =>
-      !subscriptionItems.map((subObj) => subObj.name).includes(perkName)
-  );
-  const perkObjectsToCreate = allPerks.filter((perk) =>
-    perkNamesToCreate.includes(perk.Name)
-  );
-
-  try {
-    await Promise.all(
-      subscriptionsToCancel.map(async (subObj) => {
-        await stripe.subscriptions.del(subObj.subscription_id);
-      })
-    );
-  } catch (e) {
-    console.log('Problem with deleting subscriptions');
-    console.log(e);
-  }
-
+  // get customer data
   const customerData = (
     await db.collection('customers').doc(userUid).get()
   ).data();
@@ -117,17 +69,82 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     throw error;
   }
 
-  try {
-    await Promise.all(
-      perkObjectsToCreate.map(async (perkObj) => {
-        await stripe.subscriptions.create({
-          customer: customerData.stripeId,
-          items: [{ price: perkObj.stripePriceId }],
-        });
-      })
-    );
-  } catch (e) {
-    console.log('Problem with creating subscriptions');
-    console.log(e);
+  // get the business employees
+  const businessEmployees = await db
+    .collection('users')
+    .where('businessID', '==', businessID)
+    .get();
+
+  // count how many of each perk the business has registered employees for
+  const perkGroupEmployeeCounts = businessEmployees.docs.reduce(
+    (accumulator, employeeDoc) => {
+      const employee = employeeDoc.data();
+
+      if (accumulator[employee.group]) {
+        accumulator[employee.group] += 1;
+      } else {
+        accumulator[employee.group] = 1;
+      }
+      return accumulator;
+    },
+    {}
+  );
+
+  const perkCountsByName = Object.keys(perkGroupEmployeeCounts).reduce(
+    (accumulator, perkGroup) => {
+      businessData.groups[perkGroup].forEach((perkName) => {
+        if (accumulator[perkName]) {
+          accumulator[perkName] += perkGroupEmployeeCounts[perkGroup];
+        } else {
+          accumulator[perkName] = perkGroupEmployeeCounts[perkGroup];
+        }
+      });
+      return accumulator;
+    },
+    {}
+  );
+
+  // convert the count of each perk to a list of items
+  const newSubscriptionItemsList = Object.keys(perkCountsByName).map(
+    (perkName) => ({
+      price: allPerksDict[perkName].stripePriceId,
+      quantity: perkCountsByName[perkName],
+    })
+  );
+
+  // check if the customer has an existing active subscriptions
+  const subscriptionsSnapshot = await db
+    .collection('customers')
+    .doc(userUid)
+    .collection('subscriptions')
+    .get();
+
+  const subscriptionItem = subscriptionsSnapshot.docs.filter(
+    (doc) => doc.data().canceled_at == null
+  );
+
+  if (subscriptionItem.length == 0) {
+    // the admin doesn't have any subscriptions
+    // create a subscription for them
+    await stripe.subscriptions.create({
+      customer: customerData.stripeId,
+      items: newSubscriptionItemsList,
+    });
+  } else {
+    // the admin is already subscribed
+    // update the subscription to reflect the new item quantities
+
+    // add item ids to existing subscriptions prices
+    for (let i = 0; i < newSubscriptionItemsList.length; i++) {
+      newSubscriptionItemsList[i]['id'] = subscriptionItem[0]
+        .data()
+        .items.filter(
+          (item) => item.price.id == newSubscriptionItemsList[i].price
+        )?.[0].id;
+    }
+
+    await stripe.subscriptions.update(subscriptionItem[0].id, {
+      items: newSubscriptionItemsList,
+    });
   }
 };
