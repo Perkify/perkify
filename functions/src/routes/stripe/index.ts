@@ -99,10 +99,9 @@ export const stripeWebhooks = async (request, response, next) => {
           // renewal so don't do anything
           const perkGroupNames = Object.keys(businessData.groups);
           if (perkGroupNames.length != 1) {
-            throw {
-              error:
-                'Expected perk group names length to be 1 upon creation of subscription',
-            };
+            throw new Error(
+              'Expected perk group names length to be 1 upon creation of subscription'
+            );
           }
 
           const perkGroupName = perkGroupNames[0];

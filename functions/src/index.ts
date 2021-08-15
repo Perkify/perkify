@@ -9,6 +9,7 @@ import {
   deletePerkGroup,
   deletePerkGroupValidators,
   getStripePaymentMethods,
+  listBalanceTransactions,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
   registerUser,
@@ -16,10 +17,9 @@ import {
   stripeWebhooks,
   updatePerkGroup,
   updatePerkGroupValidators,
-  listBalanceTransactions,
 } from './routes';
-import { syncUsersWithBusinessDocumentPerkGroup } from './utils/crudHelpers';
 import { validateFirebaseIdToken } from './utils';
+import { syncUsersWithBusinessDocumentPerkGroup } from './utils/crudHelpers';
 export * from './firestore-stripe-subscriptions';
 
 // express endpoint

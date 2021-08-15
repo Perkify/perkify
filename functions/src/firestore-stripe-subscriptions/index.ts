@@ -252,7 +252,7 @@ exports.createPortalLink = functions.https.onCall(async (data, context) => {
 /**
  * Prefix Stripe metadata keys with `stripe_metadata_` to be spread onto Product and Price docs in Cloud Firestore.
  */
-const prefixMetadata = (metadata: object) =>
+const prefixMetadata = (metadata: Record<string, string>) =>
   Object.keys(metadata).reduce((prefixedMetadata, key) => {
     prefixedMetadata[`stripe_metadata_${key}`] = metadata[key];
     return prefixedMetadata;
@@ -623,7 +623,7 @@ export const handleWebhookEvents = functions.https.onRequest(
             break;
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
-          case 'customer.subscription.deleted':
+          case 'customer.subscription.deleted': {
             const subscription = event.data.object as Stripe.Subscription;
             await manageSubscriptionStatusChange(
               subscription.id,
@@ -631,7 +631,8 @@ export const handleWebhookEvents = functions.https.onRequest(
               event.type === 'customer.subscription.created'
             );
             break;
-          case 'checkout.session.completed':
+          }
+          case 'checkout.session.completed': {
             const checkoutSession = event.data
               .object as Stripe.Checkout.Session;
             if (checkoutSession.mode === 'subscription') {
@@ -662,22 +663,25 @@ export const handleWebhookEvents = functions.https.onRequest(
               }
             }
             break;
+          }
           case 'invoice.paid':
           case 'invoice.payment_succeeded':
           case 'invoice.payment_failed':
           case 'invoice.upcoming':
           case 'invoice.marked_uncollectible':
-          case 'invoice.payment_action_required':
+          case 'invoice.payment_action_required': {
             const invoice = event.data.object as Stripe.Invoice;
             await insertInvoiceRecord(invoice);
             break;
+          }
           case 'payment_intent.processing':
           case 'payment_intent.succeeded':
           case 'payment_intent.canceled':
-          case 'payment_intent.payment_failed':
+          case 'payment_intent.payment_failed': {
             const paymentIntent = event.data.object as Stripe.PaymentIntent;
             await insertPaymentRecord(paymentIntent);
             break;
+          }
           default:
             logs.webhookHandlerError(
               new Error('Unhandled relevant event!'),

@@ -28,7 +28,7 @@ export const syncUsersWithBusinessDocumentPerkGroupDelayed = async (
 
   const task = {
     httpRequest: {
-      httpMethod: 'POST' as 'POST',
+      httpMethod: 'POST' as const,
       url,
       body: Buffer.from(JSON.stringify(payload)).toString('base64'),
       headers: {
