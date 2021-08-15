@@ -13,9 +13,7 @@ const Billing = () => {
   useEffect(() => {
     (async () => {
       setDashboardLoading(true);
-      const functionRef = functions.httpsCallable(
-        'ext-firestore-stripe-subscriptions-createPortalLink'
-      );
+      const functionRef = functions.httpsCallable('createPortalLink');
       const { data } = await functionRef({
         returnUrl: window.location.origin + '/dashboard',
       });

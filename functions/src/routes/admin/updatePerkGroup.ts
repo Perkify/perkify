@@ -1,8 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import { db } from '../../models';
 import {
-  createUserHelper,
-  deleteUserHelper,
   sanitizeEmails,
   syncStripeSubscriptionsWithFirestorePerks,
   validateEmails,
@@ -63,7 +61,7 @@ export const updatePerkGroup = async (req, res, next) => {
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`groups.${group}`]: perks,
+          [`groups.${group}`]: { perks, employees: emails } as PerkGroup,
         });
     } else if (!perks) {
       const businessData = (
@@ -71,66 +69,6 @@ export const updatePerkGroup = async (req, res, next) => {
       ).data();
       perks = businessData?.groups[group];
     }
-
-    const usersRef = db.collection('users');
-    const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
-
-    const deleteUsers: any[] = [];
-    const oldUserEmails: any[] = [];
-
-    // partition existing emails into those to delete and those not to delete
-    groupUsersSnapshot.forEach(async (userDoc) => {
-      if (emails.includes(userDoc.id)) {
-        oldUserEmails.push(userDoc.id);
-        const oldUserPerks = userDoc.data().perks;
-        if (perks !== oldUserPerks) {
-          const oldUserNewPerks = perks.reduce((acc, perk) => {
-            if (perk in oldUserPerks) {
-              acc[perk] = oldUserPerks[perk];
-            } else {
-              acc[perk] = [];
-            }
-            return acc;
-          }, {});
-          await db
-            .collection('users')
-            .doc(userDoc.id)
-            .update({ perks: oldUserNewPerks });
-        }
-      } else {
-        deleteUsers.push(userDoc);
-      }
-    });
-
-    // get emails that weren't already added
-    const addUserEmails = emails.filter(
-      (email) => !oldUserEmails.includes(email)
-    );
-
-    // move this to a function
-    for (const email of addUserEmails) {
-      const docRef = db.collection('users').doc(email);
-
-      const docSnapshot = await docRef.get();
-      if (docSnapshot.exists) {
-        const error = {
-          status: 400,
-          reason: 'Bad Request',
-          reasonDetail: `added email ${email} that is already in another group`,
-        };
-        return next(error);
-      }
-    }
-
-    // TODO: move this to a function as well and create multiple files
-    const usersToCreate = addUserEmails.map((email) =>
-      createUserHelper(email, businessID, group, perks)
-    );
-    await Promise.all(usersToCreate);
-
-    // TODO: move this to a function as well and create multiple files
-    const usersToDelete = deleteUsers.map((user) => deleteUserHelper(user));
-    await Promise.all(usersToDelete);
 
     try {
       await syncStripeSubscriptionsWithFirestorePerks(

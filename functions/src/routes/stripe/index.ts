@@ -33,8 +33,6 @@ export const stripeWebhooks = async (request, response, next) => {
       // get the invoice object
       const invoice = event.data.object as Stripe.Invoice;
 
-      console.log(invoice);
-
       // get the expanded invoice object
       const expandedInvoice = await stripe.invoices.retrieve(invoice.id, {
         expand: ['payment_intent', 'subscription', 'customer'],
@@ -42,9 +40,6 @@ export const stripeWebhooks = async (request, response, next) => {
       const paymentIntent =
         expandedInvoice.payment_intent as Stripe.PaymentIntent;
       const subscription = expandedInvoice.subscription as Stripe.Subscription;
-
-      console.log(paymentIntent);
-      console.log(subscription);
 
       if (
         !paymentIntent ||
@@ -62,7 +57,6 @@ export const stripeWebhooks = async (request, response, next) => {
       );
 
       // get the time that the money will be available!
-      console.log(balanceTransaction);
 
       const expirationAtSeconds = balanceTransaction.available_on;
 
@@ -77,8 +71,7 @@ export const stripeWebhooks = async (request, response, next) => {
       ).data() as Business;
 
       if (invoice.metadata) {
-        console.log('Subscription was updated');
-        const perkGroupName = subscription.metadata['perkGroupName'];
+        const perkGroupName = invoice.metadata['perkGroupName'];
 
         // create task in queue
         await syncUsersWithBusinessDocumentPerkGroupDelayed(
@@ -90,8 +83,6 @@ export const stripeWebhooks = async (request, response, next) => {
           expirationAtSeconds
         );
       } else {
-        console.log('Subscription was created / renewed');
-
         const subscriptionCreatedDate = new Date(subscription.created * 1000);
         const presentDate = new Date();
 

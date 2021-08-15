@@ -92,15 +92,17 @@ export default function ManageGroups(props) {
       if (Object.keys(business.groups).includes(id)) {
         // set perk group data
         setPerksData(
-          business.groups[id].perks.map((perkGroupName) => ({
+          business.groups[id].perks.map((perkGroupName, index) => ({
             ...allPerksDict[perkGroupName],
+            id: index,
           }))
         );
 
         // set email data
         setEmails(
-          business.groups[id].employees.map((employeeEmail) => ({
+          business.groups[id].employees.map((employeeEmail, index) => ({
             email: employeeEmail,
+            id: index,
           }))
         );
         setGroupNotFound(false);

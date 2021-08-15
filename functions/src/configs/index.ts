@@ -17,4 +17,7 @@ export const privateStripeKey =
 export const stripeWebhookSecret =
   functions.config()['stripe-firebase'].environment == 'production'
     ? 'whsec_QJxtG8dhmlGsnsu1YkayYj3BuP7xtJxo'
-    : 'whsec_sipiyvURbVzUUdNKhc36vJG4gmodcAHM';
+    : functions.config()['stripe-firebase'].environment == 'staging'
+    ? 'whsec_sipiyvURbVzUUdNKhc36vJG4gmodcAHM'
+    : // webhook secret for stripe cli --forward
+      'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP';

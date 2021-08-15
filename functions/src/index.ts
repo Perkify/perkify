@@ -19,6 +19,7 @@ import {
   listBalanceTransactions,
 } from './routes';
 import { validateFirebaseIdToken } from './utils';
+export * from './firestore-stripe-subscriptions';
 
 // express endpoint
 
@@ -77,3 +78,6 @@ stripeWebhooksApp.post(
 );
 stripeWebhooksApp.get('/listBalanceTransactions', listBalanceTransactions);
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);
+
+exports.syncUsersWithBusinessDocumentPerkGroup =
+  functions.https.HttpsError.onRequest(syncUsersWithBusinessDocumentPerkGroup);

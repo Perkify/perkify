@@ -79,11 +79,12 @@ export const createGroup = async (req, res, next) => {
     const businessID = adminData.companyID;
 
     // update the business document to reflect the group of perks
+
     await db
       .collection('businesses')
       .doc(businessID)
       .update({
-        [`groups.${group}`]: perks,
+        [`groups.${group}`]: { perks, employees: emails } as PerkGroup,
       });
 
     try {

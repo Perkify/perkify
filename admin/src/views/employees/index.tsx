@@ -43,6 +43,7 @@ export default function ManagePeople(props) {
             business.groups[perkGroupName].employees.map((employeeEmail) => ({
               email: employeeEmail,
               group: perkGroupName,
+              id: employeeEmail,
             }))
           )
         )

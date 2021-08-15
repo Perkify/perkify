@@ -22,7 +22,7 @@ export const syncUsersWithBusinessDocumentPerkGroupDelayed = async (
   expirationAtSeconds
 ) => {
   // problem with holidays and stuff
-  const url = firebaseFunctionsUrl + '/firestoreTtlCallback';
+  const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
 
   const task = {
     httpRequest: {
@@ -238,14 +238,13 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
   } else {
     // the admin is already subscribed
     // update the subscription to reflect the new item quantities
-
     // add item ids to existing subscriptions prices
     for (let i = 0; i < newSubscriptionItemsList.length; i++) {
       newSubscriptionItemsList[i]['id'] = subscriptionItem[0]
         .data()
         .items.filter(
           (item) => item.price.id == newSubscriptionItemsList[i].price
-        )?.[0].id;
+        )?.[0]?.id;
     }
 
     await stripe.subscriptions.update(subscriptionItem[0].id, {
@@ -253,12 +252,22 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     });
 
     // create an invoice to charge the difference of the subscription
-    await stripe.invoices.create({
+    const createdInvoice = await stripe.invoices.create({
       customer: customerData.stripeId,
-      auto_advance: true,
+      // auto_advance: true,
       collection_method: 'charge_automatically',
       subscription: subscriptionItem[0].id,
       metadata: { businessID, perkGroupName },
+    });
+
+    // finalize the invoice
+    await stripe.invoices.finalizeInvoice(createdInvoice.id, {
+      // auto_advance: true,
+    });
+
+    // pay the invoice
+    await stripe.invoices.pay(createdInvoice.id, {
+      // auto_advance: true,
     });
   }
 };
@@ -266,11 +275,9 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
 // takes a snapshot of the business document,
 // and makes the relevant changes to the users collection
 // call from snapshot
-export const syncUsersWithBusinessDocumentPerkGroup = async (
-  businessID,
-  perkGroup: string,
-  perkGroupData: PerkGroup
-) => {
+export const syncUsersWithBusinessDocumentPerkGroup = async (req, res) => {
+  const { businessID, perkGroup, perkGroupData } = req.body;
+
   const newPerkGroupData = (
     (await db.collection('businesses').doc(businessID).get()).data() as Business
   ).groups[perkGroup];
@@ -399,4 +406,6 @@ export const syncUsersWithBusinessDocumentPerkGroup = async (
       );
     })
   );
+
+  res.json({ received: true });
 };
