@@ -2,7 +2,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import PrivateRoute from 'components/PrivateRoute';
 import PublicRoute from 'components/PublicRoute';
 import { LoadingContext } from 'contexts';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from 'views/dashboard';
 import GettingStarted from 'views/gettingStarted';
@@ -11,6 +11,10 @@ import SignUpBusinessWebflow from 'views/signUpBusinessWebflow';
 
 function App() {
   const { dashboardLoading } = useContext(LoadingContext);
+
+  useEffect(() => {
+    console.log(dashboardLoading);
+  }, [dashboardLoading]);
 
   return (
     <>

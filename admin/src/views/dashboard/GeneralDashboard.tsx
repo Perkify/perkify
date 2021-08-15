@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
 import BChart from './BarChart';
@@ -58,7 +57,7 @@ const GeneralDashboard = () => {
       ) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.groups[group].perks.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -101,7 +100,7 @@ const GeneralDashboard = () => {
       if (business.groups[group] === undefined) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.groups[group].perks.forEach((perk) => {
         cost += allPerksDict[perk].Cost;
       });
       totalCost += cost;
@@ -116,10 +115,11 @@ const GeneralDashboard = () => {
     //returns num of perks offered
     let perks = new Set([]);
     Object.keys(business.groups).forEach((group) => {
-      business.groups[group].forEach((perk) => {
+      business.groups[group].perks.forEach((perk) => {
         perks.add(perk);
       });
     });
+
     return perks.size;
   }
 
@@ -146,7 +146,7 @@ const GeneralDashboard = () => {
       if (business.groups[group] === undefined) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.groups[group].perks.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -253,30 +253,20 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    setDashboardLoading(true);
-    if (Object.keys(admin).length != 0 && business) {
-      const businessId = admin['companyID'];
-
-      db.collection('users')
-        .where('businessID', '==', businessId)
-        .get()
-        .then((querySnapshot) => {
-          const people = querySnapshot.docs.map((doc, index) => ({
-            email: doc.id,
-            id: index,
-            group: doc.data()['group'],
-            perks: doc.data()['perks'],
-          }));
-          setEmployees(people);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    } else {
-      console.info('No such document!');
+    if (business && business['groups']) {
+      setEmployees(
+        [].concat(
+          ...Object.keys(business.groups).map((perkGroupName) =>
+            business.groups[perkGroupName].employees.map((employeeEmail) => ({
+              email: employeeEmail,
+              group: perkGroupName,
+              perks: business.groups[perkGroupName].perks,
+            }))
+          )
+        )
+      );
     }
-    return () => setDashboardLoading(false);
-  }, [currentUser, admin, business]);
+  }, [business]);
 
   useEffect(() => {
     if (hasPaymentMethods != null) {
@@ -300,7 +290,7 @@ const GeneralDashboard = () => {
           </Button>
         </Grid>
       </Grid>
-      {loadingAuthState || hasPaymentMethods == null ? (
+      {loadingAuthState || hasPaymentMethods == null || !business ? (
         <p>Loading</p>
       ) : !(hasPaymentMethods == true) ? (
         <WelcomeCards />

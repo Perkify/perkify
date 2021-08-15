@@ -3,7 +3,6 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import Header from 'components/Header';
 import { BusinessContext, LoadingContext } from 'contexts';
 import { AuthContext } from 'contexts/Auth';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { allPerksDict } from 'shared';
@@ -89,37 +88,19 @@ export default function ManageGroups(props) {
     useContext(LoadingContext);
 
   useEffect(() => {
-    if (Object.keys(admin).length != 0) {
-      setDashboardLoading(true);
-      // get list of emails that belong to the perk group
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .where('group', '==', id)
-        .onSnapshot(
-          (querySnapshot) => {
-            setEmails(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error('Error getting documents: ', error);
-          }
-        );
-      return () => setDashboardLoading(false);
-    }
-  }, [admin, id]);
-
-  useEffect(() => {
-    if (Object.keys(business).length != 0) {
+    if (business) {
       if (Object.keys(business.groups).includes(id)) {
+        // set perk group data
         setPerksData(
-          business.groups[id].map((perk, index) => ({
-            id: index,
-            ...allPerksDict[perk],
+          business.groups[id].perks.map((perkGroupName) => ({
+            ...allPerksDict[perkGroupName],
+          }))
+        );
+
+        // set email data
+        setEmails(
+          business.groups[id].employees.map((employeeEmail) => ({
+            email: employeeEmail,
           }))
         );
         setGroupNotFound(false);

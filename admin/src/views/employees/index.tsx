@@ -2,7 +2,6 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { PerkifyApi } from 'services';
 import AddEmployees from './AddEmployees';
@@ -36,35 +35,20 @@ export default function ManagePeople(props) {
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
-    if (business && business['groups']) {
+    if (business) {
       setGroupData(Object.keys(business['groups']).sort());
+      setPeopleData(
+        [].concat(
+          ...Object.keys(business.groups).map((perkGroupName) =>
+            business.groups[perkGroupName].employees.map((employeeEmail) => ({
+              email: employeeEmail,
+              group: perkGroupName,
+            }))
+          )
+        )
+      );
     }
   }, [business]);
-
-  useEffect(() => {
-    setDashboardLoading(true);
-    // get list of employees that belong to the business
-    if (Object.keys(admin).length != 0) {
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .onSnapshot(
-          (querySnapshot) => {
-            setPeopleData(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()['group'],
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
-    }
-    return () => setDashboardLoading(false);
-  }, [admin]);
 
   const removeUsers = async () => {
     let error = false;

@@ -46,7 +46,9 @@ export const AuthProvider = ({ children }) => {
             .then((res) => {
               setHasPaymentMethods(res.data.data.length > 0);
             })
-            .catch(() => {});
+            .catch(() => {
+              console.error("Couldn't reach stripe payments api");
+            });
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');
