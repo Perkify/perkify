@@ -1,5 +1,5 @@
 import { stripeWebhookSecret } from '../../configs';
-import { functions, stripe } from '../../models';
+import { stripe } from '../../models';
 import { handleError } from '../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
 
@@ -10,9 +10,8 @@ export const stripeWebhooks = async (request, response) => {
 
   // functions.logger.warn('IN PRODUCTION');
   // functions.logger.log('req body', request.rawBody);
-  functions.logger.log('ENV', process.env.FIREBASE_STRIPE_ENVIRONMENT);
-  functions.logger.log('sig', sig);
-  functions.logger.log('webhook', stripeWebhookSecret);
+  // functions.logger.log('sig', sig);
+  // functions.logger.log('webhook', stripeWebhookSecret);
   // Verify webhook signature and extract the event.
   try {
     event = stripe.webhooks.constructEvent(
@@ -25,15 +24,15 @@ export const stripeWebhooks = async (request, response) => {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  functions.logger.log('Event log:', JSON.stringify(event));
+  // functions.logger.log('Event log:', JSON.stringify(event));
   try {
     if (event.type === 'issuing_authorization.request') {
       const auth = event.data.object;
-      await handleAuthorizationRequest(auth);
+      await handleAuthorizationRequest(auth, response);
     }
   } catch (err) {
     handleError(err, response);
   }
 
-  response.json({ received: true });
+  // response.json({ received: true });
 };

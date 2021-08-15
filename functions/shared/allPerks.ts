@@ -1,5 +1,18 @@
 import { functions } from '../src/models';
-export const allProductionPerks = [
+interface PerkInfo {
+  Name: string;
+  Cost: number;
+  Period: string;
+  stripePriceId: string;
+  Img: string;
+  Product: string;
+  NetworkId: string;
+  // PaymentName: 'Netflix.com',
+  PaymentName: string;
+  AuthorizationHoldFields?: any;
+}
+
+export const allProductionPerks: PerkInfo[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
@@ -7,8 +20,23 @@ export const allProductionPerks = [
     stripePriceId: 'price_1JJqw9KuQQHSHZsm71r4kkhd',
     Img: 'netflix.jpeg',
     Product: 'prod_JxmVIY3P8jV19L',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
+    NetworkId: '395707213988',
+    // PaymentName: 'Netflix.com',
+    PaymentName: 'netflix',
+    AuthorizationHoldFields: [
+      {
+        keyPath: ['merchant_data', 'network_id'],
+        acceptedValues: ['420429000201413', '686030000557165'],
+      },
+      // {
+      //   keyPath: ['amount'],
+      //   values: [13.99 + 6],
+      // },
+      // {
+      //   keyPath: ['merchant_data', 'name'],
+      //   values: ['Netflix.com', 'NETFLIX.COM'],
+      // },
+    ],
   },
   {
     Name: 'Hulu',
@@ -17,8 +45,15 @@ export const allProductionPerks = [
     stripePriceId: 'price_1JJqwcKuQQHSHZsmQ2JFPQwp',
     Img: 'hulu.png',
     Product: 'prod_JxmV7NAPQLFyOl',
-    NetworkId: '123',
-    PaymentName: 'Hulu',
+    NetworkId: '395709102324',
+    // PaymentName: 'HLU*Hulu 2047849714872-U',
+    PaymentName: 'hulu',
+    AuthorizationHoldFields: [
+      {
+        keyPath: ['pending_request', 'amount'],
+        acceptedValues: [100],
+      },
+    ],
   },
   {
     Name: 'Audible Plus',
@@ -28,7 +63,8 @@ export const allProductionPerks = [
     Img: 'audible.png',
     Product: 'prod_JxmVInB54WZwQp',
     NetworkId: '123',
-    PaymentName: 'Audible Plus',
+    // PaymentName: 'Audible Plus',
+    PaymentName: 'audible',
   },
   {
     Name: 'Disney Plus',
@@ -37,8 +73,9 @@ export const allProductionPerks = [
     stripePriceId: 'price_1JJqpKKuQQHSHZsmZugC5Zxi',
     Img: 'disneyplus.png',
     Product: 'prod_JxmO9TVTtcHLd9',
-    NetworkId: '123',
-    PaymentName: 'Disney Plus',
+    NetworkId: '395704333146',
+    // PaymentName: 'DisneyPLUS',
+    PaymentName: 'disney',
   },
   {
     Name: 'Headspace',
@@ -48,7 +85,8 @@ export const allProductionPerks = [
     Img: 'headspace.png',
     Product: 'prod_JxmQHmjecXibCK',
     NetworkId: '123',
-    PaymentName: 'Headspace',
+    // PaymentName: 'Headspace',
+    PaymentName: 'headspace',
   },
   {
     Name: 'Spotify Individual',
@@ -58,11 +96,12 @@ export const allProductionPerks = [
     Img: 'spotify.jpg',
     Product: 'prod_JxmQVILWLae2ZZ',
     NetworkId: '123',
-    PaymentName: 'Spotify Individual',
+    // PaymentName: 'Spotify Individual',
+    PaymentName: 'spotify',
   },
 ];
 
-export const allDevelopmentPerks = [
+export const allDevelopmentPerks: PerkInfo[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
