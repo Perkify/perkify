@@ -9,7 +9,6 @@ import {
   deletePerkGroup,
   deletePerkGroupValidators,
   getStripePaymentMethods,
-  listBalanceTransactions,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
   registerUser,
@@ -77,7 +76,6 @@ stripeWebhooksApp.post(
   bodyParser.raw({ type: 'application/json' }),
   stripeWebhooks
 );
-stripeWebhooksApp.get('/listBalanceTransactions', listBalanceTransactions);
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);
 
 exports.syncUsersWithBusinessDocumentPerkGroup = functions.https.onRequest(

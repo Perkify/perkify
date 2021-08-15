@@ -54,3 +54,39 @@ export const validatePerks = async (perks) => {
   }
   return Promise.resolve();
 };
+
+export const checkIfAnyEmailsAreClaimed = async (emails) => {
+  // check if user exists in another business
+  // realizing that this check is being made 2 days later, can throw an error at that point...
+  // that complicates things a bit
+  // so one option is to read all business documents and check if any of them have the user
+
+  // we need to read users from all of the business documents. Ideally we would use an index for this, not a long term solution
+  // better solution is to support employees in multiple businesses, or use another collection for keeping track of "claimedEmails"
+  const businessesSnapshot = await db.collection('businesses').get();
+
+  const allEmployeesAcrossBusinesses: string[] = [];
+  businessesSnapshot.forEach((businessDoc) => {
+    allEmployeesAcrossBusinesses.concat(
+      ...Object.values((businessDoc.data() as Business).groups).map(
+        (perkGroup) => perkGroup.employees
+      )
+    );
+  });
+
+  // check if any of the emails to create exist across all businesses
+  const emailThatExistsInAnotherBusiness = emails.find((email) =>
+    allEmployeesAcrossBusinesses.includes(email)
+  );
+
+  if (emailThatExistsInAnotherBusiness) {
+    const error = {
+      status: 400,
+      reason: 'Bad Request',
+      reasonDetail: `added email ${emailThatExistsInAnotherBusiness} that is already in another group`,
+    };
+    // throwing error so that it can get caught
+    // by the caller which will then call next(error)
+    throw error;
+  }
+};

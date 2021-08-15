@@ -6,7 +6,6 @@ import {
   syncUsersWithBusinessDocumentPerkGroupDelayed,
 } from '../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
-export * from './listBalanceTransactions';
 
 export const stripeWebhooks = async (request, response, next) => {
   const sig = request.headers['stripe-signature'];

@@ -1,6 +1,7 @@
 import { body, validationResult } from 'express-validator';
 import { db } from '../../models';
 import {
+  checkIfAnyEmailsAreClaimed,
   handleError,
   sanitizeEmails,
   syncStripeSubscriptionsWithFirestorePerks,
@@ -43,20 +44,21 @@ export const createGroup = async (req, res, next) => {
       return next(error);
     }
 
-    // make sure all emails are good
-    for (const email of emails) {
-      const docRef = db.collection('users').doc(email);
+    await checkIfAnyEmailsAreClaimed(emails);
+    // // make sure all emails are good
+    // for (const email of emails) {
+    //   const docRef = db.collection('users').doc(email);
 
-      const docSnapshot = await docRef.get();
-      if (docSnapshot.exists && docSnapshot.data()?.businessID) {
-        const error = {
-          status: 400,
-          reason: 'Bad Request',
-          reasonDetail: `added email ${email} that is already in another group`,
-        };
-        return next(error);
-      }
-    }
+    //   const docSnapshot = await docRef.get();
+    //   if (docSnapshot.exists && docSnapshot.data()?.businessID) {
+    //     const error = {
+    //       status: 400,
+    //       reason: 'Bad Request',
+    //       reasonDetail: `added email ${email} that is already in another group`,
+    //     };
+    //     return next(error);
+    //   }
+    // }
 
     // get admins business
     const adminData = (

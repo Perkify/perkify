@@ -1,9 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import admin, { db } from '../../models';
-import {
-  deleteUserHelper,
-  syncStripeSubscriptionsWithFirestorePerks,
-} from '../../utils';
+import { syncStripeSubscriptionsWithFirestorePerks } from '../../utils';
 
 export const deletePerkGroupValidators = [body('group').not().isEmpty()];
 
@@ -37,17 +34,6 @@ export const deletePerkGroup = async (req, res, next) => {
       return next(error);
     }
     const businessID = adminData.companyID;
-
-    const usersRef = db.collection('users');
-    const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
-
-    if (!groupUsersSnapshot.empty) {
-      const usersToDelete: any[] = [];
-      groupUsersSnapshot.forEach((userDoc) => {
-        usersToDelete.push(deleteUserHelper(userDoc));
-      });
-      await Promise.all(usersToDelete);
-    }
 
     // delete group from businesss' groups
     await db
