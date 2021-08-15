@@ -10,7 +10,8 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { AuthContext, LoadingContext } from 'contexts';
+import PurchaseConfirmation from 'components/PurchaseConfirmation';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
@@ -24,6 +25,8 @@ const AddEmployees = ({
   // selected perk group from dropdown and respective error
   const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
   const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   // emails entered into form and respective error
   const [emailsToAdd, setEmailsToAdd] = useState('');
@@ -105,7 +108,43 @@ const AddEmployees = ({
     }
   };
 
-  return (
+  const { business } = useContext(BusinessContext);
+
+  function generatePerks() {
+    return business['groups'][selectedPerkGroup];
+  }
+
+  function setVisible() {
+    let error = false;
+    if (emailsToAdd == '') {
+      setEmailsError('Enter emails');
+      error = true;
+    }
+    if (selectedPerkGroup.length == 0) {
+      setSelectedPerkGroupError('Select perk group');
+      error = true;
+    }
+    if (error || emailsError != '') {
+      return;
+    }
+    setConfirmationModalVisible(true);
+  }
+
+  return isConfirmationModalVisible ? (
+    <PurchaseConfirmation
+      isAddPerksModalVisible={isAddEmployeesModalVisible}
+      setIsAddPerksModalVisible={setIsAddEmployeesModalVisible}
+      title={'Add Employees'}
+      text={
+        'Are you sure you want to add these employees for a total cost of $'
+      }
+      onConfirmation={addToPerkGroup}
+      setConfirmationModalVisible={setConfirmationModalVisible}
+      perks={generatePerks()}
+      numPeople={emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/).length}
+      creatingGroup={true}
+    />
+  ) : (
     <Dialog
       open={isAddEmployeesModalVisible}
       onClose={() => setIsAddEmployeesModalVisible(false)}
@@ -167,7 +206,7 @@ const AddEmployees = ({
         >
           Cancel
         </Button>
-        <Button onClick={addToPerkGroup} color="primary">
+        <Button onClick={setVisible} color="primary">
           Add Users
         </Button>
       </DialogActions>

@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 import Tooltip from '@material-ui/core/Tooltip';
 import Header from 'components/Header';
+import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -33,6 +34,9 @@ const CreateGroup = ({ history }) => {
   const [groupNameError, setGroupNameError] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
+
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   function roundNumber(num) {
     return Math.round(100 * num) / 100;
@@ -142,10 +146,48 @@ const CreateGroup = ({ history }) => {
     }
   };
 
+  function setVisible() {
+    let error = false;
+    if (groupName == '') {
+      setGroupNameError('Enter a group name');
+      error = true;
+    }
+
+    if (emails == '') {
+      setEmailsError('Please input at least one email');
+      error = true;
+    } else if (!validateEmails(emails)) {
+      setEmailsError('Please input proper emails');
+      error = true;
+    }
+
+    if (selectedPerks.length == 0) {
+      setSelectedPerksError('Select perks');
+      error = true;
+    }
+    if (error) {
+      return;
+    }
+    setConfirmationModalVisible(true);
+  }
+
   return (
     <div
       style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}
     >
+      <PurchaseConfirmation
+        isAddPerksModalVisible={isConfirmationModalVisible}
+        setIsAddPerksModalVisible={setConfirmationModalVisible}
+        title={'Create Group'}
+        text={
+          'Are you sure you want to create this group for a total cost of $'
+        }
+        onConfirmation={createPerkGroup}
+        setConfirmationModalVisible={setConfirmationModalVisible}
+        perks={selectedPerks}
+        numPeople={numPeople}
+        creatingGroup={true}
+      />
       <Header
         title="Create Group"
         crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
@@ -211,10 +253,11 @@ const CreateGroup = ({ history }) => {
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
               {name +
-                ' | ' +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
                 allPerksDict[name].Period +
-                ' | ' +
-                allPerksDict[name].Cost}
+                ')'}
             </MenuItem>
           ))}
         </Select>
@@ -233,7 +276,7 @@ const CreateGroup = ({ history }) => {
         >
           <span>
             <Button
-              onClick={createPerkGroup}
+              onClick={setVisible}
               variant="contained"
               color="primary"
               disabled={!hasPaymentMethods}
