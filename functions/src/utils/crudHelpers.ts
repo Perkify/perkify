@@ -13,13 +13,15 @@ import admin, {
   tasksClient,
 } from '../models';
 
+interface syncUsersWithBusinessDocumentPerkGroupPayload {
+  businessID: string;
+  perkGroupName: string;
+  perkGroupData: PerkGroup;
+}
+
 export const syncUsersWithBusinessDocumentPerkGroupDelayed = async (
-  payload: {
-    businessID: string;
-    perkGroupName: string;
-    perkGroupData: PerkGroup;
-  },
-  expirationAtSeconds
+  payload: syncUsersWithBusinessDocumentPerkGroupPayload,
+  expirationAtSeconds: number
 ) => {
   // problem with holidays and stuff
   const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
@@ -276,15 +278,18 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
 // and makes the relevant changes to the users collection
 // call from snapshot
 export const syncUsersWithBusinessDocumentPerkGroup = async (req, res) => {
-  const { businessID, perkGroup, perkGroupData } = req.body;
+  const { businessID, perkGroupName, perkGroupData } =
+    req.body as syncUsersWithBusinessDocumentPerkGroupPayload;
+
+  console.log(req.body);
 
   const newPerkGroupData = (
     (await db.collection('businesses').doc(businessID).get()).data() as Business
-  ).groups[perkGroup];
+  ).groups[perkGroupName];
 
   const intersectedPerkGroupData = {
-    perks: newPerkGroupData.perks.filter((perkGroup) =>
-      perkGroupData.perks.includes(perkGroup)
+    perks: newPerkGroupData.perks.filter((perkName) =>
+      perkGroupData.perks.includes(perkName)
     ),
     employees: newPerkGroupData.employees.filter((employee) =>
       perkGroupData.employees.includes(employee)
@@ -301,7 +306,7 @@ export const syncUsersWithBusinessDocumentPerkGroup = async (req, res) => {
   // it doesn't create them a user when the signup?
   // i guess not
   const existingUsersSnapshot = await businessUsersRef
-    .where('group', '==', perkGroup)
+    .where('group', '==', perkGroupName)
     .get();
 
   // you want to set it to be whatever is in intersectedPerkGroupData
@@ -385,7 +390,7 @@ export const syncUsersWithBusinessDocumentPerkGroup = async (req, res) => {
       createUserHelper(
         email,
         businessID,
-        perkGroup,
+        perkGroupName,
         intersectedPerkGroupData.perks
       )
     )
@@ -400,7 +405,7 @@ export const syncUsersWithBusinessDocumentPerkGroup = async (req, res) => {
       updateUserHelper(
         email,
         businessID,
-        perkGroup,
+        perkGroupName,
         oldPerks,
         intersectedPerkGroupData.perks
       );

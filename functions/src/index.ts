@@ -18,6 +18,7 @@ import {
   updatePerkGroupValidators,
   listBalanceTransactions,
 } from './routes';
+import { syncUsersWithBusinessDocumentPerkGroup } from './utils/crudHelpers';
 import { validateFirebaseIdToken } from './utils';
 export * from './firestore-stripe-subscriptions';
 
@@ -79,5 +80,6 @@ stripeWebhooksApp.post(
 stripeWebhooksApp.get('/listBalanceTransactions', listBalanceTransactions);
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);
 
-exports.syncUsersWithBusinessDocumentPerkGroup =
-  functions.https.HttpsError.onRequest(syncUsersWithBusinessDocumentPerkGroup);
+exports.syncUsersWithBusinessDocumentPerkGroup = functions.https.onRequest(
+  syncUsersWithBusinessDocumentPerkGroup
+);
