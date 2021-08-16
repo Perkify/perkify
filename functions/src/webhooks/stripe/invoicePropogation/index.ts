@@ -10,7 +10,7 @@ import {
 } from '../../../models';
 import { handleError } from '../../../utils';
 
-const addTaskToQueue = async (payload, expirationAtSeconds) => {
+const addTaskToExpandUsersQueue = async (payload, expirationAtSeconds) => {
   // get the webhook endpoint to call
   const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
 
@@ -75,7 +75,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
     const payload = { business };
 
     // create task in queue
-    await addTaskToQueue(payload, expirationAtSeconds);
+    await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
   } else {
     // this is not a subscription because the invoice does not have metadata
 
@@ -102,7 +102,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
       const payload = { business };
 
       // create task in queue
-      await addTaskToQueue(payload, expirationAtSeconds);
+      await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
     } else {
       // created over a day ago
       // so corresponds to a subscription renewal

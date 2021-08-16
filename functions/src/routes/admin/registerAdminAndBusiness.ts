@@ -66,7 +66,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
       email,
       firstName,
       lastName,
-      companyID: businessRef.id,
+      businessID: businessRef.id,
     });
 
     // create stripe customer associated with the business

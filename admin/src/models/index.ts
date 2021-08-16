@@ -18,7 +18,7 @@ export interface SimpleCardPaymentMethod {
 }
 
 export interface Admin {
-  companyID: string;
+  businessID: string;
   email: string;
   firstName: string;
   lastName: string;
