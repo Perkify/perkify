@@ -70,14 +70,11 @@ export const stripeWebhooks = async (request, response, next) => {
       ).data() as Business;
 
       if (invoice.metadata) {
-        const perkGroupName = invoice.metadata['perkGroupName'];
-
         // create task in queue
         await syncUsersWithBusinessDocumentPerkGroupDelayed(
           {
             businessID,
-            perkGroupName: perkGroupName,
-            perkGroupData: businessData.groups[perkGroupName],
+            businessData,
           },
           expirationAtSeconds
         );
@@ -103,14 +100,11 @@ export const stripeWebhooks = async (request, response, next) => {
             );
           }
 
-          const perkGroupName = perkGroupNames[0];
-
           // create task in queue
           await syncUsersWithBusinessDocumentPerkGroupDelayed(
             {
               businessID,
-              perkGroupName: perkGroupName,
-              perkGroupData: businessData.groups[perkGroupName],
+              businessData,
             },
             expirationAtSeconds
           );
