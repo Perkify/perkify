@@ -2,7 +2,7 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import { functions } from '../models';
-import { validateFirebaseIdToken } from '../utils';
+import { errorHandler, validateFirebaseIdToken } from '../utils';
 import {
   createGroup,
   createGroupValidators,
@@ -33,34 +33,40 @@ app.use(
 
 // --------------- Express Routes --------------- //
 
+// register an admin with a business
 app.post(
-  '/registerAdminAndBusiness',
-  registerAdminAndBusinessValidators,
+  '/admin',
+  [...registerAdminAndBusinessValidators],
   registerAdminAndBusiness
 );
 
-app.use('/auth', validateFirebaseIdToken);
-app.post('/auth/registerUser', registerUserValidators, registerUser);
+// regiser a user
+app.post('/user', [...registerUserValidators], registerUser);
+
+// create a portal link for a user
 app.post(
-  '/auth/createPortalLink',
-  createPortalLinkValidators,
+  '/portalLink',
+  [validateFirebaseIdToken, ...createPortalLinkValidators],
   createPortalLink
 );
-app.post('/auth/createGroup', createGroupValidators, createGroup);
-app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
-app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
-app.use((err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
-  }
 
-  if (!(err.status && err.reason && err.reasonDetail)) {
-    return next(err);
-  }
+// perk group crud
+app.post(
+  '/perkGroup',
+  [validateFirebaseIdToken, ...createGroupValidators],
+  createGroup
+);
+app.put(
+  '/perkGroup/:id',
+  [validateFirebaseIdToken, ...updatePerkGroupValidators],
+  updatePerkGroup
+);
+app.delete(
+  '/perkGroup/:id',
+  [validateFirebaseIdToken, ...deletePerkGroupValidators],
+  deletePerkGroup
+);
 
-  const { status, reason, reasonDetail } = err;
-
-  res.status(status).send({ reason, reasonDetail }).end();
-});
+app.use(errorHandler);
 
 export const restApi = functions.https.onRequest(app);

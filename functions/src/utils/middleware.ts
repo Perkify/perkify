@@ -1,5 +1,19 @@
 import admin from '../models';
+
 // --------------- Middleware/Helpers --------------- //
+export const errorHandler = async (err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  if (!(err.status && err.reason && err.reasonDetail)) {
+    return next(err);
+  }
+
+  const { status, reason, reasonDetail } = err;
+
+  res.status(status).send({ reason, reasonDetail }).end();
+};
 
 export const handleError = (err, res) => {
   if (typeof err !== 'object' || typeof err.status !== 'number') {
