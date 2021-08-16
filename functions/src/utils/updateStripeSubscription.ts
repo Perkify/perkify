@@ -1,5 +1,6 @@
 import { allPerksDict } from '../../shared';
 import { db, stripe } from '../models';
+import { shrinkUsers } from './shrinkUsers';
 
 // takes an admin id and business id
 // updates the stripe subscription to match the perks and employees in the business document
@@ -9,13 +10,13 @@ import { db, stripe } from '../models';
 // we want to call this anytime we modify a stripe subscription
 
 // update stripe subscription with business perks
-export const updateStripeSubscription = async (businessID) => {
+export const updateStripeSubscription = async (businessID: string) => {
   // get business data
-  const businessData = (
+  const business = (
     await db.collection('businesses').doc(businessID).get()
   ).data() as Business;
 
-  if (!businessData) {
+  if (!business) {
     const error = {
       status: 500,
       reason: 'Missing document',
@@ -24,18 +25,18 @@ export const updateStripeSubscription = async (businessID) => {
     throw error;
   }
 
-  // // remove stuff that shouldn't exist from 'users'
-  // await syncBusinessDocRemovalsToUserDocuments(businessID);
+  // remove stuff that shouldn't exist from 'users'
+  await shrinkUsers(business);
 
-  const perkCountsByName = Object.keys(businessData.groups).reduce(
+  const perkCountsByName = Object.keys(business.groups).reduce(
     (accumulator, perkGroupName) => {
-      businessData.groups[perkGroupName].perks.forEach((perkName) => {
+      business.groups[perkGroupName].perks.forEach((perkName) => {
         if (accumulator[perkName]) {
           accumulator[perkName] +=
-            businessData.groups[perkGroupName].employees.length;
+            business.groups[perkGroupName].employees.length;
         } else {
           accumulator[perkName] =
-            businessData.groups[perkGroupName].employees.length;
+            business.groups[perkGroupName].employees.length;
         }
       });
       return accumulator;
@@ -79,7 +80,7 @@ export const updateStripeSubscription = async (businessID) => {
     // okay but so how to handle specifying the perkGroup that has been changed?
     // in the metadata of the invoice!
     await stripe.subscriptions.create({
-      customer: businessData.stripeId,
+      customer: business.stripeId,
       items: newSubscriptionItemsList,
       metadata: { businessID },
     });
@@ -101,7 +102,7 @@ export const updateStripeSubscription = async (businessID) => {
 
     // create an invoice to charge the difference of the subscription
     const createdInvoice = await stripe.invoices.create({
-      customer: businessData.stripeId,
+      customer: business.stripeId,
       // auto_advance: true,
       collection_method: 'charge_automatically',
       subscription: subscriptionItem[0].id,

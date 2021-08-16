@@ -71,6 +71,7 @@ export const updatePerkGroup = async (req, res, next) => {
     }
 
     try {
+      // update stripe subscription
       await updateStripeSubscription(businessID);
     } catch (e) {
       return next(e);

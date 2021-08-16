@@ -1,11 +1,7 @@
 import { db } from '../models';
 import { deleteUserHelper, updateUserHelper } from './crudHelpers';
 
-export const shrinkUsers = async (businessID) => {
-  const newBusinessData = (
-    await db.collection('businesses').doc(businessID).get()
-  ).data() as Business;
-
+export const shrinkUsers = async (newBusiness: Business) => {
   const usersToCreate: {
     email: string;
     newPerks: string[];
@@ -20,14 +16,14 @@ export const shrinkUsers = async (businessID) => {
   const usersToDelete: string[] = [];
 
   // process each perk group separately
-  Object.keys(newBusinessData.groups).forEach(async (perkGroupName) => {
+  Object.keys(newBusiness.groups).forEach(async (perkGroupName) => {
     // TODO: improve this so that we can instantly tell if a perkGroup has changed
     // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
     // get existing users
     const businessUsersRef = await db
       .collection('users')
-      .where('businessID', '==', businessID);
+      .where('businessID', '==', newBusiness.id);
 
     // we just keep track of their email address
     // it doesn't create them a user when the signup?
@@ -48,10 +44,10 @@ export const shrinkUsers = async (businessID) => {
     const userEmails = existingUsersSnapshot.docs.map((userDoc) => userDoc.id);
 
     const intersectedPerkGroupData = {
-      perks: newBusinessData.groups[perkGroupName].perks.filter((perkName) =>
+      perks: newBusiness.groups[perkGroupName].perks.filter((perkName) =>
         userPerks.includes(perkName)
       ),
-      employees: newBusinessData.groups[perkGroupName].employees.filter(
+      employees: newBusiness.groups[perkGroupName].employees.filter(
         (employee) => userEmails.includes(employee)
       ),
     };
@@ -111,7 +107,13 @@ export const shrinkUsers = async (businessID) => {
   // update users
   await Promise.all(
     usersToUpdate.map(({ email, oldPerks, newPerks, perkGroupName }) => {
-      updateUserHelper(email, businessID, perkGroupName, oldPerks, newPerks);
+      updateUserHelper(
+        email,
+        newBusiness.id,
+        perkGroupName,
+        oldPerks,
+        newPerks
+      );
     })
   );
 
