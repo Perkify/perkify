@@ -122,7 +122,7 @@ const CreateGroup = ({ history }) => {
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
         PerkifyApi.post(
-          'rest/auth/createGroup',
+          'rest/perkGroup',
           {
             group: groupName,
             emails: emailList,

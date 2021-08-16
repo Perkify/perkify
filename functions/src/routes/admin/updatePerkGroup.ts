@@ -7,12 +7,12 @@ import {
 } from '../../utils';
 
 export const updatePerkGroupValidators = [
-  body('perkGroupName').not().isEmpty(),
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
 ];
 
 export const updatePerkGroup = async (req, res, next) => {
-  const { perkGroupName, emails } = req.body;
+  const perkGroupName = req.params.perkGroupName;
+  const { emails } = req.body;
   let { perks } = req.body;
 
   try {

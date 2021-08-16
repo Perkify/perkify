@@ -63,9 +63,8 @@ const AddPerks = ({
         );
 
         await PerkifyApi.put(
-          'rest/auth/updatePerkGroup',
+          `rest/perkGroup/${group}`,
           JSON.stringify({
-            group,
             emails: emails.map((emailObj) => emailObj.email),
             perks: afterPerks,
           }),

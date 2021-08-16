@@ -1,15 +1,11 @@
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import admin, { db } from '../../models';
 import { updateStripeSubscription } from '../../utils';
 
-export const deletePerkGroupValidators = [
-  body('perkGroupName').not().isEmpty(),
-];
+export const deletePerkGroupValidators = [];
 
 export const deletePerkGroup = async (req, res, next) => {
-  const {
-    perkGroupName, // TODO: make this param
-  } = req.body;
+  const perkGroupName = req.params.perkGroupName;
 
   try {
     const errors = validationResult(req);

@@ -9,7 +9,7 @@ const Console = () => {
   const addGroup = async () => {
     const bearerToken = await currentUser.getIdToken();
     await PerkifyApi.post(
-      'rest/auth/createGroup',
+      'rest/perkGroup',
       JSON.stringify({
         group: 'A',
         emails: ['prateek@humane.com', 'prateek.humane@gmail.com'],

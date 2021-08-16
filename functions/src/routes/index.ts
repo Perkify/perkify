@@ -57,12 +57,12 @@ app.post(
   createGroup
 );
 app.put(
-  '/perkGroup/:id',
+  '/perkGroup/:perkGroupName',
   [validateFirebaseIdToken, ...updatePerkGroupValidators],
   updatePerkGroup
 );
 app.delete(
-  '/perkGroup/:id',
+  '/perkGroup/:perkGroupName',
   [validateFirebaseIdToken, ...deletePerkGroupValidators],
   deletePerkGroup
 );

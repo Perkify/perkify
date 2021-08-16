@@ -114,18 +114,12 @@ export default function ClippedDrawer({ children }) {
     setDashboardLoading(true);
     setFreezeNav(true);
 
-    await PerkifyApi.post(
-      'rest/auth/deletePerkGroup',
-      JSON.stringify({
-        group: isDeletePerkGroupModalVisible,
-      }),
-      {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await PerkifyApi.delete(`rest/perkGroup/${isDeletePerkGroupModalVisible}`, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     setDashboardLoading(false);
     setFreezeNav(false);

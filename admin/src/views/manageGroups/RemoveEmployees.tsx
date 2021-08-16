@@ -46,9 +46,8 @@ const RemoveEmployees = ({
         }
 
         await PerkifyApi.put(
-          'rest/auth/updatePerkGroup',
+          `rest/perkGroup/${group}`,
           JSON.stringify({
-            group,
             emails: afterEmails,
             perks: undefined,
           }),
