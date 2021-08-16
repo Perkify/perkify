@@ -8,6 +8,15 @@
 // users
 // don't store everything in a business document. Instead use another subcollection that is a duplicate0
 
+export interface SimpleCardPaymentMethod {
+  brand: string;
+  country: string;
+  expMonth: number;
+  expYear: number;
+  funding: string;
+  last4: string;
+}
+
 export interface Admin {
   companyID: string;
   email: string;
@@ -35,20 +44,17 @@ export interface Business {
     state: string;
   };
 
+  // stripe info
+  stripeId: string;
+  stripeLink: string;
+
+  cardPaymentMethods: SimpleCardPaymentMethod[];
   // group names with their perks and employees
   // this will have scaling problems if there are lots of employees
   // but the number of employees shouldn't be too high
   groups: {
     [key: string]: PerkGroup;
   };
-}
-
-// ideally we get rid of this customer export interface
-// for that we need to self host the stripe firebase plugin so that we can make relevant changes
-export interface Customer {
-  email: string;
-  stripeId: string;
-  stripeLink: string;
 }
 
 export interface User {

@@ -8,7 +8,6 @@ import {
   createGroupValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
-  getStripePaymentMethods,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
   registerUser,
@@ -51,9 +50,6 @@ app.post('/auth/registerUser', registerUserValidators, registerUser);
 app.post('/auth/createGroup', createGroupValidators, createGroup);
 app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
 app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
-
-// TODO move this to part of firestore with stripe webhook
-app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
 app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);

@@ -17,8 +17,7 @@ import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
 const GeneralDashboard = () => {
-  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
-    useContext(AuthContext);
+  const { currentUser, admin, loadingAuthState } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
@@ -268,12 +267,6 @@ const GeneralDashboard = () => {
     }
   }, [business]);
 
-  useEffect(() => {
-    if (hasPaymentMethods != null) {
-      setDashboardLoading(false);
-    }
-  }, [hasPaymentMethods]);
-
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
   }
@@ -290,9 +283,9 @@ const GeneralDashboard = () => {
           </Button>
         </Grid>
       </Grid>
-      {loadingAuthState || hasPaymentMethods == null || !business ? (
+      {loadingAuthState || !business ? (
         <p>Loading</p>
-      ) : !(hasPaymentMethods == true) ? (
+      ) : !(business.cardPaymentMethods.length == 0) ? (
         <WelcomeCards />
       ) : business['groups'] == null ||
         Object.keys(business['groups']).length == 0 ? (
