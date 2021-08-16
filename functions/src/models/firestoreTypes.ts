@@ -8,6 +8,15 @@
 // users
 // don't store everything in a business document. Instead use another subcollection that is a duplicate0
 
+interface SimpleCardPaymentMethod {
+  brand: string;
+  country: string;
+  expMonth: number;
+  expYear: number;
+  funding: string;
+  last4: string;
+}
+
 interface Admin {
   companyID: string;
   email: string;
@@ -39,6 +48,7 @@ interface Business {
   stripeId: string;
   stripeLink: string;
 
+  cardPaymentMethods: SimpleCardPaymentMethod[];
   // group names with their perks and employees
   // this will have scaling problems if there are lots of employees
   // but the number of employees shouldn't be too high

@@ -17,10 +17,8 @@
 export default {
   stripeSecretKey:
     'rk_test_51JBSAtKuQQHSHZsmYNQCwDnIx3ATUt3gWWj8IeUE3sJW9rvgdptTtFQXPrU0Kmuf35Xef5FfGcnwwfnCEOkSiGnk00iOZLZXY3',
-  // stripeWebhookSecret: 'whsec_QL85oNjF7Aa1xklO1FLRjvLPRiT3m7Gm',
-  stripeWebhookSecret: 'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP',
+  stripeWebhookSecret: 'whsec_QL85oNjF7Aa1xklO1FLRjvLPRiT3m7Gm',
+  // stripeWebhookSecret: 'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP',
   productsCollectionPath: 'products',
-  customersCollectionPath: 'customers',
-  syncUsersOnCreate: true,
-  autoDeleteUsers: false,
+  customersCollectionPath: 'businesses',
 };

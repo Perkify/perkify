@@ -138,6 +138,49 @@ const insertPriceRecord = async (price: Stripe.Price): Promise<void> => {
   logs.firestoreDocCreated('prices', price.id);
 };
 
+const insertPaymentMethod = async (
+  paymentMethod: Stripe.PaymentMethod
+): Promise<void> => {
+  // get the business reference
+  const docRef = db
+    .collection('businesses')
+    .doc(paymentMethod.customer as string);
+
+  if (paymentMethod.card) {
+    // only support card payment methods for now
+    const card = paymentMethod.card;
+    await docRef.update(`cardPaymentMethods.${card.fingerprint}`, {
+      brand: card.brand,
+      country: card.country,
+      expMonth: card.exp_month,
+      expYear: card.exp_year,
+      funding: card.funding,
+      last4: card.last4,
+    } as SimpleCardPaymentMethod);
+  } else {
+    console.error('Payment method added that is not a card');
+  }
+};
+
+const deletePaymentMethod = async (paymentMethod: Stripe.PaymentMethod) => {
+  const docRef = db
+    .collection('businesses')
+    .doc(paymentMethod.customer as string);
+
+  if (paymentMethod.card) {
+    // only support card payment methods for now
+    const card = paymentMethod.card;
+
+    // delete the payment method from the business doc
+    docRef.update({
+      [`cardPaymentMethods.${card.fingerprint}`]:
+        admin.firestore.FieldValue.delete(),
+    });
+  } else {
+    console.error('Payment method deleted that is not a card');
+  }
+};
+
 /**
  * Insert tax rates into the products collection in Cloud Firestore.
  */
@@ -379,6 +422,10 @@ export const handleWebhookEvents = functions.https.onRequest(
       'price.created',
       'price.updated',
       'price.deleted',
+      'payment_method.attached',
+      'payment_method.automatically_updated',
+      'payment_method.detached',
+      'payment_method.updated',
       'checkout.session.completed',
       'customer.subscription.created',
       'customer.subscription.updated',
@@ -438,6 +485,17 @@ export const handleWebhookEvents = functions.https.onRequest(
           case 'price.deleted':
             await deleteProductOrPrice(event.data.object as Stripe.Price);
             break;
+          case 'payment_method.attached':
+          case 'payment_method.updated':
+          case 'payment_method.updated':
+            await insertPaymentMethod(
+              event.data.object as Stripe.PaymentMethod
+            );
+            break;
+          case 'payment_method.detached':
+            await deletePaymentMethod(
+              event.data.object as Stripe.PaymentMethod
+            );
           case 'tax_rate.created':
           case 'tax_rate.updated':
             await insertTaxRateRecord(event.data.object as Stripe.TaxRate);

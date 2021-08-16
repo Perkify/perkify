@@ -59,19 +59,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
     });
 
     // create business entity
-    const businessRef = await db.collection('businesses').add({
-      name: businessName,
-      billingAddress: {
-        city,
-        country: 'US',
-        line1,
-        line2,
-        postal_code: postalCode,
-        state,
-      },
-      admins: [newUser.uid],
-      groups: {},
-    });
+    const businessRef = db.collection('businesses').doc();
 
     // create admin document to link user to business
     await db.collection('admins').doc(newUser.uid).set({
@@ -89,17 +77,24 @@ export const registerAdminAndBusiness = async (req, res, next) => {
     };
     const customer = await stripe.customers.create(stripeBusinessMetadata);
 
-    // update business doc with stripe customer info
-    const stripeBusinessRecord = {
+    // set the business document
+    businessRef.set({
+      name: businessName,
+      billingAddress: {
+        city,
+        country: 'US',
+        line1,
+        line2,
+        postal_code: postalCode,
+        state,
+      },
+      admins: [newUser.uid],
+      groups: {},
       stripeId: customer.id,
       stripeLink: `https://dashboard.stripe.com${
         customer.livemode ? '' : '/test'
       }/customers/${customer.id}`,
-    };
-    await db
-      .collection('businesses')
-      .doc(businessRef.id)
-      .set(stripeBusinessRecord, { merge: true });
+    } as Business);
 
     res.status(200).end();
   } catch (err) {
