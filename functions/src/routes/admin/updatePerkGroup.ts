@@ -2,7 +2,7 @@ import { body, validationResult } from 'express-validator';
 import { db } from '../../models';
 import {
   sanitizeEmails,
-  syncStripeSubscriptionsWithFirestorePerks,
+  updateStripeSubscription,
   validateEmails,
 } from '../../utils';
 
@@ -71,11 +71,7 @@ export const updatePerkGroup = async (req, res, next) => {
     }
 
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(
-        req.user.uid,
-        businessID,
-        group
-      );
+      await updateStripeSubscription(businessID);
     } catch (e) {
       return next(e);
     }

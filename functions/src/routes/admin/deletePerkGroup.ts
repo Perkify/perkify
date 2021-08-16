@@ -1,6 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import admin, { db } from '../../models';
-import { syncStripeSubscriptionsWithFirestorePerks } from '../../utils';
+import { updateStripeSubscription } from '../../utils';
 
 export const deletePerkGroupValidators = [body('group').not().isEmpty()];
 
@@ -44,11 +44,7 @@ export const deletePerkGroup = async (req, res, next) => {
       });
 
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(
-        req.user.uid,
-        businessID,
-        group
-      );
+      await updateStripeSubscription(businessID);
     } catch (e) {
       next(e);
     }

@@ -17,7 +17,7 @@ import {
   updatePerkGroupValidators,
 } from './routes';
 import { validateFirebaseIdToken } from './utils';
-import { syncUsersWithBusinessDocumentPerkGroup } from './utils/crudHelpers';
+import { expandUsers } from './utils';
 export * from './firestore-stripe-subscriptions';
 
 // express endpoint
@@ -74,6 +74,5 @@ stripeWebhooksApp.post(
 );
 exports.stripe = functions.https.onRequest(stripeWebhooksApp);
 
-exports.syncUsersWithBusinessDocumentPerkGroup = functions.https.onRequest(
-  syncUsersWithBusinessDocumentPerkGroup
-);
+exports.syncUsersWithBusinessDocumentPerkGroup =
+  functions.https.onRequest(expandUsers);

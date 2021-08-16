@@ -73,8 +73,7 @@ export const stripeWebhooks = async (request, response, next) => {
         // create task in queue
         await syncUsersWithBusinessDocumentPerkGroupDelayed(
           {
-            businessID,
-            businessData,
+            business: businessData,
           },
           expirationAtSeconds
         );
@@ -103,8 +102,7 @@ export const stripeWebhooks = async (request, response, next) => {
           // create task in queue
           await syncUsersWithBusinessDocumentPerkGroupDelayed(
             {
-              businessID,
-              businessData,
+              business: businessData,
             },
             expirationAtSeconds
           );

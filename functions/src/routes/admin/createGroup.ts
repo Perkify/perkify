@@ -4,7 +4,7 @@ import {
   checkIfAnyEmailsAreClaimed,
   handleError,
   sanitizeEmails,
-  syncStripeSubscriptionsWithFirestorePerks,
+  updateStripeSubscription,
   validateEmails,
   validatePerks,
 } from '../../utils';
@@ -86,11 +86,7 @@ export const createGroup = async (req, res, next) => {
       });
 
     try {
-      await syncStripeSubscriptionsWithFirestorePerks(
-        req.user.uid,
-        businessID,
-        group
-      );
+      await updateStripeSubscription(businessID);
     } catch (e) {
       return next(e);
     }
