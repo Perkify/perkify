@@ -16,7 +16,7 @@ export const shrinkUsers = async (newBusiness: Business) => {
   const usersToDelete: string[] = [];
 
   // process each perk group separately
-  Object.keys(newBusiness.groups).forEach(async (perkGroupName) => {
+  Object.keys(newBusiness.perkGroups).forEach(async (perkGroupName) => {
     // TODO: improve this so that we can instantly tell if a perkGroup has changed
     // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
@@ -44,10 +44,10 @@ export const shrinkUsers = async (newBusiness: Business) => {
     const userEmails = existingUsersSnapshot.docs.map((userDoc) => userDoc.id);
 
     const intersectedPerkGroupData = {
-      perks: newBusiness.groups[perkGroupName].perks.filter((perkName) =>
+      perks: newBusiness.perkGroups[perkGroupName].perks.filter((perkName) =>
         userPerks.includes(perkName)
       ),
-      employees: newBusiness.groups[perkGroupName].employees.filter(
+      employees: newBusiness.perkGroups[perkGroupName].employees.filter(
         (employee) => userEmails.includes(employee)
       ),
     };

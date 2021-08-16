@@ -70,7 +70,7 @@ export const updatePerkGroup = async (req, res, next) => {
       const businessData = (
         await db.collection('businesses').doc(businessID).get()
       ).data();
-      perks = businessData?.groups[group];
+      perks = businessData?.perkGroups[perkGroupName];
     }
 
     try {

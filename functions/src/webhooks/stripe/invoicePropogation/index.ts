@@ -91,7 +91,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
       // created less than a day ago
       // so this corresponds to a subscription creation
 
-      const perkGroupNames = Object.keys(business.groups);
+      const perkGroupNames = Object.keys(business.perkGroups);
       if (perkGroupNames.length != 1) {
         throw new Error(
           'Expected perk group names length to be 1 upon creation of subscription'

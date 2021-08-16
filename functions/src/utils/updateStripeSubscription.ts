@@ -28,15 +28,15 @@ export const updateStripeSubscription = async (businessID: string) => {
   // remove stuff that shouldn't exist from 'users'
   await shrinkUsers(business);
 
-  const perkCountsByName = Object.keys(business.groups).reduce(
+  const perkCountsByName = Object.keys(business.perkGroups).reduce(
     (accumulator, perkGroupName) => {
-      business.groups[perkGroupName].perks.forEach((perkName) => {
+      business.perkGroups[perkGroupName].perks.forEach((perkName) => {
         if (accumulator[perkName]) {
           accumulator[perkName] +=
-            business.groups[perkGroupName].employees.length;
+            business.perkGroups[perkGroupName].employees.length;
         } else {
           accumulator[perkName] =
-            business.groups[perkGroupName].employees.length;
+            business.perkGroups[perkGroupName].employees.length;
         }
       });
       return accumulator;

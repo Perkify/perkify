@@ -146,7 +146,7 @@ export default function ClippedDrawer({ children }) {
 
   useEffect(() => {
     if (business) {
-      const tmpGroupViews = Object.keys(business.groups)
+      const tmpGroupViews = Object.keys(business.perkGroups)
         .sort()
         .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
 

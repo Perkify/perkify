@@ -39,12 +39,14 @@ export default function ManagePeople(props) {
       setGroupData(Object.keys(business['groups']).sort());
       setPeopleData(
         [].concat(
-          ...Object.keys(business.groups).map((perkGroupName) =>
-            business.groups[perkGroupName].employees.map((employeeEmail) => ({
-              email: employeeEmail,
-              group: perkGroupName,
-              id: employeeEmail,
-            }))
+          ...Object.keys(business.perkGroups).map((perkGroupName) =>
+            business.perkGroups[perkGroupName].employees.map(
+              (employeeEmail) => ({
+                email: employeeEmail,
+                group: perkGroupName,
+                id: employeeEmail,
+              })
+            )
           )
         )
       );

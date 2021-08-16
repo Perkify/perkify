@@ -38,17 +38,18 @@ export const expandUsers = async (oldBusiness) => {
   const usersToDelete: string[] = [];
 
   // process each perk group separately
-  Object.keys(oldBusiness.groups).forEach(async (perkGroupName) => {
+  Object.keys(oldBusiness.perkGroups).forEach(async (perkGroupName) => {
     // TODO: improve this so that we can instantly tell if a perkGroup has changed
     // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
     const intersectedPerkGroupData = {
-      perks: newBusinessData.groups[perkGroupName].perks.filter((perkName) =>
-        oldBusiness.groups[perkGroupName].perks.includes(perkName)
+      perks: newBusinessData.perkGroups[perkGroupName].perks.filter(
+        (perkName) =>
+          oldBusiness.perkGroups[perkGroupName].perks.includes(perkName)
       ),
-      employees: newBusinessData.groups[perkGroupName].employees.filter(
+      employees: newBusinessData.perkGroups[perkGroupName].employees.filter(
         (employee) =>
-          oldBusiness.groups[perkGroupName].employees.includes(employee)
+          oldBusiness.perkGroups[perkGroupName].employees.includes(employee)
       ),
     };
 

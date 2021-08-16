@@ -90,7 +90,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
         state,
       },
       admins: [newUser.uid],
-      groups: {},
+      perkGroups: {},
       stripeId: customer.id,
       stripeLink: `https://dashboard.stripe.com${
         customer.livemode ? '' : '/test'

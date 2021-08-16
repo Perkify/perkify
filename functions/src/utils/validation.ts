@@ -68,7 +68,7 @@ export const checkIfAnyEmailsAreClaimed = async (emails) => {
   const allEmployeesAcrossBusinesses: string[] = [];
   businessesSnapshot.forEach((businessDoc) => {
     allEmployeesAcrossBusinesses.concat(
-      ...Object.values((businessDoc.data() as Business).groups).map(
+      ...Object.values((businessDoc.data() as Business).perkGroups).map(
         (perkGroup) => perkGroup.employees
       )
     );

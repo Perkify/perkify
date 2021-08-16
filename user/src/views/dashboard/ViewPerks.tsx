@@ -53,8 +53,8 @@ const ViewPerks = ({ employee, business }) => {
     const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
 
     console.log(business);
-    if (business.groups) {
-      return business.groups[employee.group].map((perk) => {
+    if (business.perkGroups) {
+      return business.perkGroups[employee.group].map((perk) => {
         increasingDelay += 300;
         const perkUses = employee.perks[perk];
         // TODO: this is preferred:

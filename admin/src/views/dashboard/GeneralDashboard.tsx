@@ -36,7 +36,7 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let retArr = Object.keys(business.groups);
+    let retArr = Object.keys(business.perkGroups);
     retArr.push('All Perk Groups');
     return retArr;
   }
@@ -51,12 +51,12 @@ const GeneralDashboard = () => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['perkGroup'];
       if (
-        business.groups === undefined ||
-        business.groups[group] === undefined
+        business.perkGroups === undefined ||
+        business.perkGroups[group] === undefined
       ) {
         return 0;
       }
-      business.groups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perks.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -89,17 +89,17 @@ const GeneralDashboard = () => {
     }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
-    if (business.groups === undefined) {
+    if (business.perkGroups === undefined) {
       return 0;
     }
     let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
       let group = employee['perkGroup'];
-      if (business.groups[group] === undefined) {
+      if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.groups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perks.forEach((perk) => {
         cost += allPerksDict[perk].Cost;
       });
       totalCost += cost;
@@ -113,8 +113,8 @@ const GeneralDashboard = () => {
     }
     //returns num of perks offered
     let perks = new Set([]);
-    Object.keys(business.groups).forEach((group) => {
-      business.groups[group].perks.forEach((perk) => {
+    Object.keys(business.perkGroups).forEach((group) => {
+      business.perkGroups[group].perks.forEach((perk) => {
         perks.add(perk);
       });
     });
@@ -142,10 +142,10 @@ const GeneralDashboard = () => {
           return 0;
         }
       }
-      if (business.groups[group] === undefined) {
+      if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.groups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perks.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -255,12 +255,14 @@ const GeneralDashboard = () => {
     if (business && business['groups']) {
       setEmployees(
         [].concat(
-          ...Object.keys(business.groups).map((perkGroupName) =>
-            business.groups[perkGroupName].employees.map((employeeEmail) => ({
-              email: employeeEmail,
-              group: perkGroupName,
-              perks: business.groups[perkGroupName].perks,
-            }))
+          ...Object.keys(business.perkGroups).map((perkGroupName) =>
+            business.perkGroups[perkGroupName].employees.map(
+              (employeeEmail) => ({
+                email: employeeEmail,
+                group: perkGroupName,
+                perks: business.perkGroups[perkGroupName].perks,
+              })
+            )
           )
         )
       );

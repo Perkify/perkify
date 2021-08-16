@@ -89,10 +89,10 @@ export default function ManageGroups(props) {
 
   useEffect(() => {
     if (business) {
-      if (Object.keys(business.groups).includes(id)) {
+      if (Object.keys(business.perkGroups).includes(id)) {
         // set perk group data
         setPerksData(
-          business.groups[id].perks.map((perkGroupName, index) => ({
+          business.perkGroups[id].perks.map((perkGroupName, index) => ({
             ...allPerksDict[perkGroupName],
             id: index,
           }))
@@ -100,7 +100,7 @@ export default function ManageGroups(props) {
 
         // set email data
         setEmails(
-          business.groups[id].employees.map((employeeEmail, index) => ({
+          business.perkGroups[id].employees.map((employeeEmail, index) => ({
             email: employeeEmail,
             id: index,
           }))
