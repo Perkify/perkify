@@ -432,7 +432,7 @@ export const syncToFirestoreWebhookHandler = functions.https.onRequest(
             break;
           case 'payment_method.attached':
           case 'payment_method.updated':
-          case 'payment_method.updated':
+          case 'payment_method.automatically_updated':
             await insertPaymentMethod(
               event.data.object as Stripe.PaymentMethod
             );
@@ -441,6 +441,7 @@ export const syncToFirestoreWebhookHandler = functions.https.onRequest(
             await deletePaymentMethod(
               event.data.object as Stripe.PaymentMethod
             );
+            break;
           case 'tax_rate.created':
           case 'tax_rate.updated':
             await insertTaxRateRecord(event.data.object as Stripe.TaxRate);

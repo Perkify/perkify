@@ -1,5 +1,3 @@
-
-
 # Functions
 
 Backend hosted on firebase functions

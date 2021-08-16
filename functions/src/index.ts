@@ -1,8 +1,8 @@
 import { restApi } from './routes';
 import {
   expandUsersWebhookHandler,
-  issuingAuthorizationRequestWebhookHandler,
   invoicePaidWebhookHandler,
+  issuingAuthorizationRequestWebhookHandler,
   syncToFirestoreWebhookHandler,
 } from './webhooks';
 
