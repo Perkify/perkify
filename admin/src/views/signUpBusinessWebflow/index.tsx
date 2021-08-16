@@ -107,7 +107,7 @@ const SignUpBusinessWebflow = () => {
       case 1:
         try {
           setDashboardLoading(true);
-          await PerkifyApi.post('user/registerAdminAndBusiness', {
+          await PerkifyApi.post('rest/registerAdminAndBusiness', {
             ...AdminFormProps,
             ...BusinessFormProps,
             line2: '',

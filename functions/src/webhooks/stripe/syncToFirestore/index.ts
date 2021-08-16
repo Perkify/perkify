@@ -1,23 +1,5 @@
-/*
- * Copyright 2020 Stripe, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// import * as admin from 'firebase-admin';
-// import * as functions from 'firebase-functions';
 import Stripe from 'stripe';
-import admin, { db, functions } from '../models';
+import admin, { db, functions } from '../../../models';
 import config from './config';
 import { Price, Product, Subscription, TaxRate } from './interfaces';
 import * as logs from './logs';
@@ -30,44 +12,6 @@ const stripe = new Stripe(config.stripeSecretKey, {
     name: 'Firebase firestore-stripe-subscriptions',
     version: '0.1.14',
   },
-});
-
-/**
- * Create a billing portal link
- */
-exports.createPortalLink = functions.https.onCall(async (data, context) => {
-  // Checking that the user is authenticated.
-  if (!context.auth) {
-    // Throwing an HttpsError so that the client gets the error details.
-    throw new functions.https.HttpsError(
-      'failed-precondition',
-      'The function must be called while authenticated!'
-    );
-  }
-  const uid = context.auth.uid;
-  try {
-    if (!uid) throw new Error('Not authenticated!');
-    const return_url = data.returnUrl;
-
-    // get admin
-    const admin = (
-      await db.collection('admins').doc(uid).get()
-    ).data() as Admin;
-
-    // get stripe customer id
-    const business = (
-      await db.collection('businesses').doc(admin.companyID).get()
-    ).data()?.stripeId;
-    const session = await stripe.billingPortal.sessions.create({
-      customer: business,
-      return_url,
-    });
-    logs.createdBillingPortalLink(uid);
-    return session;
-  } catch (error) {
-    logs.billingPortalLinkCreationError(uid, error);
-    throw new functions.https.HttpsError('internal', error.message);
-  }
 });
 
 /**
@@ -413,7 +357,7 @@ const insertPaymentRecord = async (
 /**
  * A webhook handler function for the relevant Stripe events.
  */
-export const handleWebhookEvents = functions.https.onRequest(
+export const syncToFirestoreWebhookHandler = functions.https.onRequest(
   async (req, resp) => {
     const relevantEvents = new Set([
       'product.created',
@@ -448,6 +392,7 @@ export const handleWebhookEvents = functions.https.onRequest(
     const sig = req.headers['stripe-signature'];
 
     if (!sig) {
+      resp.status(400).send(`Stripe signature missing`);
       return;
     }
 

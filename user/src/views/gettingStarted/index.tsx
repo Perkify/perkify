@@ -64,7 +64,7 @@ const GettingStarted = () => {
 
       const bearerToken = await currentUser.getIdToken();
       const response = await PerkifyApi.post(
-        'user/auth/registerUser',
+        'rest/auth/registerUser',
         JSON.stringify(formFields),
         {
           headers: {

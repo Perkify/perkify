@@ -115,7 +115,7 @@ export default function ClippedDrawer({ children }) {
     setFreezeNav(true);
 
     await PerkifyApi.post(
-      'user/auth/deletePerkGroup',
+      'rest/auth/deletePerkGroup',
       JSON.stringify({
         group: isDeletePerkGroupModalVisible,
       }),

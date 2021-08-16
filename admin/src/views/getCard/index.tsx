@@ -53,7 +53,7 @@ const GetCard = () => {
 
       let dobFormatted = new Date(new Date(dob)).toLocaleDateString();
       const response = await PerkifyApi.post(
-        'user/registerUser',
+        'rest/registerUser',
         JSON.stringify({
           email,
           firstName,

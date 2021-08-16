@@ -8,9 +8,7 @@ import { createUserHelper, updateUserHelper } from './crudHelpers';
 // takes a snapshot of the business document,
 // and makes the relevant changes to the users collection
 // call from snapshot
-export const expandUsers = async (req, res) => {
-  const { business: oldBusiness } = req.body as { business };
-
+export const expandUsers = async (oldBusiness) => {
   const newBusinessData = (
     await db.collection('businesses').doc(oldBusiness.id).get()
   ).data() as Business;
@@ -132,6 +130,4 @@ export const expandUsers = async (req, res) => {
     );
     // await Promise.all(usersToDelete.map((email) => deleteUserHelper(email)));
   }
-
-  res.json({ received: true });
 };

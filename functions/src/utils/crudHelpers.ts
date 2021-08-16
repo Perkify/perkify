@@ -4,38 +4,7 @@
 // not going off of the subscription update
 
 import { newUserTemplateGenerator } from '../../shared';
-import admin, {
-  db,
-  firebaseFunctionsUrl,
-  functions,
-  queuePath,
-  stripe,
-  tasksClient,
-} from '../models';
-
-export const syncUsersWithBusinessDocumentPerkGroupDelayed = async (
-  payload: { business: Business },
-  expirationAtSeconds: number
-) => {
-  // problem with holidays and stuff
-  const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
-
-  const task = {
-    httpRequest: {
-      httpMethod: 'POST' as const,
-      url,
-      body: Buffer.from(JSON.stringify(payload)).toString('base64'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-    scheduleTime: {
-      seconds: expirationAtSeconds,
-    },
-  };
-
-  await tasksClient.createTask({ parent: queuePath, task });
-};
+import admin, { db, functions, stripe } from '../models';
 
 export const createUserHelper = async (email, businessID, group, perks) => {
   const docRef = db.collection('users').doc(email);

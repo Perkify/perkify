@@ -61,7 +61,7 @@ const AddEmployees = ({
         );
 
         PerkifyApi.put(
-          'user/auth/updatePerkGroup',
+          'rest/auth/updatePerkGroup',
           {
             group,
             perks: groupPerks.map((perkObj) => perkObj.Name),

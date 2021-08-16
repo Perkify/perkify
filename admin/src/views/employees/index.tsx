@@ -87,7 +87,7 @@ export default function ManagePeople(props) {
             const afterEmails = perkGroupToAfterEmails[perkGroup];
 
             await PerkifyApi.put(
-              'user/auth/updatePerkGroup',
+              'rest/auth/updatePerkGroup',
               JSON.stringify({
                 group: perkGroup,
                 emails: afterEmails,

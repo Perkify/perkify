@@ -9,7 +9,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
@@ -22,10 +22,12 @@ const CreateGroup = ({ history }) => {
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
+  const { business } = useContext(BusinessContext);
+
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
-  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const [groupName, setGroupName] = useState('');
   const [emails, setEmails] = useState('');
@@ -120,13 +122,12 @@ const CreateGroup = ({ history }) => {
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
         PerkifyApi.post(
-          'user/auth/createGroup',
+          'rest/auth/createGroup',
           {
             group: groupName,
             emails: emailList,
             perks: selectedPerks,
           },
-
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
@@ -269,8 +270,12 @@ const CreateGroup = ({ history }) => {
           Estimated Cost (Fees Included): ${totalCost}
         </Typography>
         <Tooltip
-          disableFocusListener={hasPaymentMethods}
-          disableHoverListener={hasPaymentMethods}
+          disableFocusListener={
+            !business || business.cardPaymentMethods.length == 0
+          }
+          disableHoverListener={
+            !business || business.cardPaymentMethods.length == 0
+          }
           title="Please add billing information before creating a group"
           placement="bottom-start"
         >
@@ -279,7 +284,7 @@ const CreateGroup = ({ history }) => {
               onClick={setVisible}
               variant="contained"
               color="primary"
-              disabled={!hasPaymentMethods}
+              disabled={!(!business || business.cardPaymentMethods.length == 0)}
             >
               Create Perk Group
             </Button>

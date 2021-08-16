@@ -70,7 +70,7 @@ const AddEmployees = ({
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
 
         PerkifyApi.put(
-          'user/auth/updatePerkGroup',
+          'rest/auth/updatePerkGroup',
           JSON.stringify({
             group: selectedPerkGroup,
             perks: undefined,
