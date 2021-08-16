@@ -65,15 +65,11 @@ export const createGroup = async (req, res, next) => {
       await db.collection('admins').doc(req.user.uid).get()
     ).data();
 
-    const customerData = (
-      await db.collection('customers').doc(req.user.uid).get()
-    ).data();
-
-    if (adminData == null || customerData == null) {
+    if (adminData == null) {
       const error = {
         status: 500,
-        reason: 'Missing documents',
-        reasonDetail: `Documents missing from firestore`,
+        reason: 'Missing admin document',
+        reasonDetail: `Documents admin document in firestore`,
       };
       return next(error);
     }

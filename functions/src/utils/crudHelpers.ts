@@ -145,20 +145,6 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     throw error;
   }
 
-  // get customer data
-  const customerData = (
-    await db.collection('customers').doc(userUid).get()
-  ).data();
-
-  if (customerData == null) {
-    const error = {
-      status: 500,
-      reason: 'Missing documents',
-      reasonDetail: `Documents missing from firestore`,
-    };
-    throw error;
-  }
-
   // remove stuff that shouldn't exist from 'users'
   await syncBusinessDocRemovalsToUserDocuments(businessID);
 
@@ -188,8 +174,8 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
 
   // check if the customer has an existing active subscriptions
   const subscriptionsSnapshot = await db
-    .collection('customers')
-    .doc(userUid)
+    .collection('businesses')
+    .doc(businessID)
     .collection('subscriptions')
     .get();
 
@@ -214,7 +200,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
     // okay but so how to handle specifying the perkGroup that has been changed?
     // in the metadata of the invoice!
     await stripe.subscriptions.create({
-      customer: customerData.stripeId,
+      customer: businessData.stripeId,
       items: newSubscriptionItemsList,
       metadata: { businessID },
     });
@@ -236,7 +222,7 @@ export const syncStripeSubscriptionsWithFirestorePerks = async (
 
     // create an invoice to charge the difference of the subscription
     const createdInvoice = await stripe.invoices.create({
-      customer: customerData.stripeId,
+      customer: businessData.stripeId,
       // auto_advance: true,
       collection_method: 'charge_automatically',
       subscription: subscriptionItem[0].id,

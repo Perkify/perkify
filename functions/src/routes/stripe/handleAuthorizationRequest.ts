@@ -80,13 +80,11 @@ export const handleAuthorizationRequest = async (auth) => {
       throw error;
     }
 
-    const adminID = businessData.admins[0];
-
     const productRef = db.collection('products').doc(perkInfo.Product);
     // get the subscription associated with the perk that was purchased from customer associated with admin
     const perkSubscriptions = await db
-      .collection('customers')
-      .doc(adminID)
+      .collection('businesses')
+      .doc(userData.businessID)
       .collection('subscriptions')
       .where('product', '==', productRef)
       .where('status', '==', 'active')

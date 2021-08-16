@@ -17,15 +17,9 @@
 // import * as admin from 'firebase-admin';
 // import * as functions from 'firebase-functions';
 import Stripe from 'stripe';
-import admin, { functions } from '../models';
+import admin, { db, functions } from '../models';
 import config from './config';
-import {
-  CustomerData,
-  Price,
-  Product,
-  Subscription,
-  TaxRate,
-} from './interfaces';
+import { Price, Product, Subscription, TaxRate } from './interfaces';
 import * as logs from './logs';
 
 const stripe = new Stripe(config.stripeSecretKey, {
@@ -37,181 +31,6 @@ const stripe = new Stripe(config.stripeSecretKey, {
     version: '0.1.14',
   },
 });
-
-/**
- * Create a customer object in Stripe when a user is created.
- */
-const createCustomerRecord = async ({
-  email,
-  uid,
-}: {
-  email?: string;
-  uid: string;
-}) => {
-  try {
-    logs.creatingCustomer(uid);
-    const customerData: CustomerData = {
-      metadata: {
-        firebaseUID: uid,
-      },
-    };
-    if (email) customerData.email = email;
-    const customer = await stripe.customers.create(customerData);
-    // Add a mapping record in Cloud Firestore.
-    const customerRecord = {
-      email: customer.email,
-      stripeId: customer.id,
-      stripeLink: `https://dashboard.stripe.com${
-        customer.livemode ? '' : '/test'
-      }/customers/${customer.id}`,
-    };
-    await admin
-      .firestore()
-      .collection(config.customersCollectionPath)
-      .doc(uid)
-      .set(customerRecord, { merge: true });
-    logs.customerCreated(customer.id, customer.livemode);
-    return customerRecord;
-  } catch (error) {
-    logs.customerCreationError(error, uid);
-    return null;
-  }
-};
-
-exports.createCustomer = functions.auth
-  .user()
-  .onCreate(async (user): Promise<void> => {
-    if (!config.syncUsersOnCreate) return;
-    const { email, uid } = user;
-    await createCustomerRecord({ email, uid });
-  });
-
-/**
- * Create a CheckoutSession for the customer so they can sign up for the subscription.
- */
-exports.createCheckoutSession = functions.firestore
-  .document(`/${config.customersCollectionPath}/{uid}/checkout_sessions/{id}`)
-  .onCreate(async (snap, context) => {
-    const {
-      mode = 'subscription',
-      price,
-      success_url,
-      cancel_url,
-      quantity = 1,
-      payment_method_types = ['card'],
-      metadata = {},
-      automatic_tax = false,
-      tax_rates = [],
-      tax_id_collection = false,
-      allow_promotion_codes = false,
-      trial_from_plan = true,
-      line_items,
-      billing_address_collection = 'required',
-      collect_shipping_address = false,
-      locale = 'auto',
-      promotion_code,
-      client_reference_id,
-    } = snap.data();
-    try {
-      logs.creatingCheckoutSession(context.params.id);
-      // Get stripe customer id
-      let customerRecord = (await snap.ref.parent.parent?.get())?.data();
-      if (!customerRecord?.stripeId) {
-        const { email } = await admin.auth().getUser(context.params.uid);
-        customerRecord = (await createCustomerRecord({
-          uid: context.params.uid,
-          email,
-        })) as FirebaseFirestore.DocumentData;
-      }
-      const customer = customerRecord.stripeId;
-      // Get shipping countries
-      const shippingCountries: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
-        collect_shipping_address
-          ? (
-              await admin
-                .firestore()
-                .collection(config.productsCollectionPath)
-                .doc('shipping_countries')
-                .get()
-            ).data()?.['allowed_countries'] ?? []
-          : [];
-      const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
-        billing_address_collection,
-        shipping_address_collection: { allowed_countries: shippingCountries },
-        payment_method_types,
-        customer,
-        line_items: line_items
-          ? line_items
-          : [
-              {
-                price,
-                quantity,
-              },
-            ],
-        mode,
-        success_url,
-        cancel_url,
-        locale,
-      };
-      if (mode === 'subscription') {
-        sessionCreateParams.subscription_data = {
-          trial_from_plan,
-          metadata,
-        };
-        if (!automatic_tax) {
-          sessionCreateParams.subscription_data.default_tax_rates = tax_rates;
-        }
-      } else if (mode === 'payment') {
-        sessionCreateParams.payment_intent_data = {
-          metadata,
-        };
-      }
-      if (automatic_tax) {
-        sessionCreateParams.automatic_tax = {
-          enabled: true,
-        };
-        sessionCreateParams.customer_update = {
-          name: 'auto',
-          address: 'auto',
-        };
-        if (shippingCountries.length) {
-          sessionCreateParams.customer_update.shipping = 'auto';
-        }
-      }
-      if (tax_id_collection) {
-        sessionCreateParams.tax_id_collection = {
-          enabled: true,
-        };
-      }
-      if (promotion_code) {
-        sessionCreateParams.discounts = [{ promotion_code }];
-      } else {
-        sessionCreateParams.allow_promotion_codes = allow_promotion_codes;
-      }
-      if (client_reference_id)
-        sessionCreateParams.client_reference_id = client_reference_id;
-      const session = await stripe.checkout.sessions.create(
-        sessionCreateParams,
-        { idempotencyKey: context.params.id }
-      );
-      await snap.ref.set(
-        {
-          sessionId: session.id,
-          url: session.url,
-          created: admin.firestore.Timestamp.now(),
-        },
-        { merge: true }
-      );
-      logs.checkoutSessionCreated(context.params.id);
-      return;
-    } catch (error) {
-      logs.checkoutSessionCreationError(context.params.id, error);
-      await snap.ref.set(
-        { error: { message: error.message } },
-        { merge: true }
-      );
-    }
-  });
 
 /**
  * Create a billing portal link
@@ -229,16 +48,18 @@ exports.createPortalLink = functions.https.onCall(async (data, context) => {
   try {
     if (!uid) throw new Error('Not authenticated!');
     const return_url = data.returnUrl;
-    // Get stripe customer id
-    const customer = (
-      await admin
-        .firestore()
-        .collection(config.customersCollectionPath)
-        .doc(uid)
-        .get()
+
+    // get admin
+    const admin = (
+      await db.collection('admins').doc(uid).get()
+    ).data() as Admin;
+
+    // get stripe customer id
+    const business = (
+      await db.collection('businesses').doc(admin.companyID).get()
     ).data()?.stripeId;
     const session = await stripe.billingPortal.sessions.create({
-      customer,
+      customer: business,
       return_url,
     });
     logs.createdBillingPortalLink(uid);
@@ -724,67 +545,3 @@ const deleteProductOrPrice = async (pr: Stripe.Product | Stripe.Price) => {
     logs.firestoreDocDeleted('prices', pr.id);
   }
 };
-
-const deleteStripeCustomer = async ({
-  uid,
-  stripeId,
-}: {
-  uid: string;
-  stripeId: string;
-}) => {
-  try {
-    // Delete their customer object.
-    // Deleting the customer object will immediately cancel all their active subscriptions.
-    await stripe.customers.del(stripeId);
-    logs.customerDeleted(stripeId);
-    // Mark all their subscriptions as cancelled in Firestore.
-    const update = {
-      status: 'canceled',
-      ended_at: admin.firestore.Timestamp.now(),
-    };
-    // Set all subscription records to canceled.
-    const subscriptionsSnap = await admin
-      .firestore()
-      .collection(config.customersCollectionPath)
-      .doc(uid)
-      .collection('subscriptions')
-      .where('status', 'in', ['trialing', 'active'])
-      .get();
-    subscriptionsSnap.forEach((doc) => {
-      doc.ref.set(update, { merge: true });
-    });
-  } catch (error) {
-    logs.customerDeletionError(error, uid);
-  }
-};
-
-/*
- * The `onUserDeleted` deletes their customer object in Stripe which immediately cancels all their subscriptions.
- */
-export const onUserDeleted = functions.auth.user().onDelete(async (user) => {
-  if (!config.autoDeleteUsers) return;
-  // Get the Stripe customer id.
-  const customer = (
-    await admin
-      .firestore()
-      .collection(config.customersCollectionPath)
-      .doc(user.uid)
-      .get()
-  ).data();
-  // If you use the `delete-user-data` extension it could be the case that the customer record is already deleted.
-  // In that case, the `onCustomerDataDeleted` function below takes care of deleting the Stripe customer object.
-  if (customer) {
-    await deleteStripeCustomer({ uid: user.uid, stripeId: customer.stripeId });
-  }
-});
-
-/*
- * The `onCustomerDataDeleted` deletes their customer object in Stripe which immediately cancels all their subscriptions.
- */
-export const onCustomerDataDeleted = functions.firestore
-  .document(`/${config.customersCollectionPath}/{uid}`)
-  .onDelete(async (snap, context) => {
-    if (!config.autoDeleteUsers) return;
-    const { stripeId } = snap.data();
-    await deleteStripeCustomer({ uid: context.params.uid, stripeId });
-  });

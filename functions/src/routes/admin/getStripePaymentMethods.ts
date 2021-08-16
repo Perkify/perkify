@@ -1,10 +1,14 @@
 import { db, stripe } from '../../models';
 
 export const getStripePaymentMethods = async (req, res, next) => {
-  const customerDoc = await db.collection('customers').doc(req.user.uid).get();
-  const customerData = customerDoc.data();
+  const adminData = (
+    await db.collection('admins').doc(req.user.uid).get()
+  ).data() as Admin;
+  const businessData = (
+    await db.collection('businesses').doc(adminData.companyID).get()
+  ).data();
 
-  if (!customerData || customerData.stripeId == undefined) {
+  if (!businessData || businessData.stripeId == undefined) {
     const error = {
       status: 500,
       reason: 'Missing stripeId',
@@ -14,7 +18,7 @@ export const getStripePaymentMethods = async (req, res, next) => {
   }
 
   const paymentMethods = await stripe.paymentMethods.list({
-    customer: customerData.stripeId,
+    customer: businessData.stripeId,
     type: 'card',
   });
 

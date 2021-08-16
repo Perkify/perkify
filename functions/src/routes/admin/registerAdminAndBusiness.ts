@@ -1,5 +1,5 @@
 import { body, validationResult } from 'express-validator';
-import admin, { db } from '../../models';
+import admin, { db, stripe } from '../../models';
 import { emailNormalizationOptions, handleError } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
@@ -80,6 +80,26 @@ export const registerAdminAndBusiness = async (req, res, next) => {
       lastName,
       companyID: businessRef.id,
     });
+
+    // create stripe customer associated with the business
+    const stripeBusinessMetadata = {
+      metadata: {
+        businessID: businessRef.id,
+      },
+    };
+    const customer = await stripe.customers.create(stripeBusinessMetadata);
+
+    // update business doc with stripe customer info
+    const stripeBusinessRecord = {
+      stripeId: customer.id,
+      stripeLink: `https://dashboard.stripe.com${
+        customer.livemode ? '' : '/test'
+      }/customers/${customer.id}`,
+    };
+    await db
+      .collection('businesses')
+      .doc(businessRef.id)
+      .set(stripeBusinessRecord, { merge: true });
 
     res.status(200).end();
   } catch (err) {
