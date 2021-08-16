@@ -53,7 +53,7 @@ export const updatePerkGroup = async (req, res, next) => {
       return next(error);
     }
 
-    const businessID = adminData.companyID;
+    const businessID = adminData.businessID;
 
     // if perks defined, reassign perks
     if (perks && perks.length != 0) {

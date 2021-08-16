@@ -74,7 +74,7 @@ export const createGroup = async (req, res, next) => {
       return next(error);
     }
 
-    const businessID = adminData.companyID;
+    const businessID = adminData.businessID;
 
     // update the business document to reflect the group of perks
 

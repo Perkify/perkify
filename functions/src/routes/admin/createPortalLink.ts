@@ -32,7 +32,7 @@ export const createPortalLink = async (req, res, next) => {
 
     // get stripe customer id
     const business = (
-      await db.collection('businesses').doc(admin.companyID).get()
+      await db.collection('businesses').doc(admin.businessID).get()
     ).data()?.stripeId;
     const session = await stripe.billingPortal.sessions.create({
       customer: business,

@@ -15,7 +15,7 @@ export const BusinessProvider = ({ children }) => {
 
   useEffect(() => {
     if (admin) {
-      const businessId = admin['companyID'];
+      const businessId = admin['businessID'];
       db.collection('businesses')
         .doc(businessId)
         .onSnapshot(

@@ -33,7 +33,7 @@ export const deletePerkGroup = async (req, res, next) => {
       };
       return next(error);
     }
-    const businessID = adminData.companyID;
+    const businessID = adminData.businessID;
 
     // delete group from businesss' groups
     await db
