@@ -10,18 +10,13 @@ import {
 } from '../../utils';
 
 export const createGroupValidators = [
-  body('perkGroup').not().isEmpty(),
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
   body('perks').custom(validatePerks),
 ];
 
 export const createGroup = async (req, res, next) => {
-  const {
-    perkGroupName, // TODO: make this param
-    emails,
-    perks,
-    ...rest
-  } = req.body;
+  const perkGroupName = req.params.perkGroupName;
+  const { emails, perks, ...rest } = req.body;
 
   try {
     // request validation

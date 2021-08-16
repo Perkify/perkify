@@ -52,7 +52,7 @@ app.post(
 
 // perk group crud
 app.post(
-  '/perkGroup',
+  '/perkGroup/:perkGroupName',
   [validateFirebaseIdToken, ...createGroupValidators],
   createGroup
 );
