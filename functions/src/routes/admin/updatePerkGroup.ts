@@ -7,12 +7,12 @@ import {
 } from '../../utils';
 
 export const updatePerkGroupValidators = [
-  body('group').not().isEmpty(),
+  body('perkGroupName').not().isEmpty(),
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
 ];
 
 export const updatePerkGroup = async (req, res, next) => {
-  const { group, emails } = req.body;
+  const { perkGroupName, emails } = req.body;
   let { perks } = req.body;
 
   try {
@@ -61,7 +61,10 @@ export const updatePerkGroup = async (req, res, next) => {
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`groups.${group}`]: { perks, employees: emails } as PerkGroup,
+          [`groups.${perkGroupName}`]: {
+            perks,
+            employees: emails,
+          } as PerkGroup,
         });
     } else if (!perks) {
       const businessData = (

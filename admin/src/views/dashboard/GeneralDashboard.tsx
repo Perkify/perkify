@@ -22,7 +22,7 @@ const GeneralDashboard = () => {
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
   var [employees, setEmployees] = useState([]);
-  var [selectedGroup, setSelectedGroup] = useState('All Groups');
+  var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
   function roundNumber(num) {
     return Math.round(10 * num) / 10;
@@ -37,7 +37,7 @@ const GeneralDashboard = () => {
       return [];
     }
     let retArr = Object.keys(business.groups);
-    retArr.push('All Groups');
+    retArr.push('All Perk Groups');
     return retArr;
   }
 
@@ -49,7 +49,7 @@ const GeneralDashboard = () => {
     let tempDict = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
-      let group = employee['group'];
+      let group = employee['perkGroup'];
       if (
         business.groups === undefined ||
         business.groups[group] === undefined
@@ -95,7 +95,7 @@ const GeneralDashboard = () => {
     let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
-      let group = employee['group'];
+      let group = employee['perkGroup'];
       if (business.groups[group] === undefined) {
         return 0;
       }
@@ -135,8 +135,8 @@ const GeneralDashboard = () => {
     let tempDict = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
-      let group = employee['group'];
-      if (selectedGroup != 'All Groups') {
+      let group = employee['perkGroup'];
+      if (selectedGroup != 'All Perk Groups') {
         //If group is selected only look at employees belonging to the selected group
         if (group !== selectedGroup) {
           return 0;

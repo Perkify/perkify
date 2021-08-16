@@ -10,14 +10,14 @@ import {
 } from '../../utils';
 
 export const createGroupValidators = [
-  body('group').not().isEmpty(),
+  body('perkGroup').not().isEmpty(),
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
   body('perks').custom(validatePerks),
 ];
 
 export const createGroup = async (req, res, next) => {
   const {
-    group, // TODO: make this param
+    perkGroupName, // TODO: make this param
     emails,
     perks,
     ...rest
@@ -44,7 +44,9 @@ export const createGroup = async (req, res, next) => {
       return next(error);
     }
 
+    // make sure all emails are good
     await checkIfAnyEmailsAreClaimed(emails);
+
     // // make sure all emails are good
     // for (const email of emails) {
     //   const docRef = db.collection('users').doc(email);
@@ -82,7 +84,7 @@ export const createGroup = async (req, res, next) => {
       .collection('businesses')
       .doc(businessID)
       .update({
-        [`groups.${group}`]: { perks, employees: emails } as PerkGroup,
+        [`groups.${perkGroupName}`]: { perks, employees: emails } as PerkGroup,
       });
 
     try {

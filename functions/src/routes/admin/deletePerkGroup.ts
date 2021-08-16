@@ -2,11 +2,13 @@ import { body, validationResult } from 'express-validator';
 import admin, { db } from '../../models';
 import { updateStripeSubscription } from '../../utils';
 
-export const deletePerkGroupValidators = [body('group').not().isEmpty()];
+export const deletePerkGroupValidators = [
+  body('perkGroupName').not().isEmpty(),
+];
 
 export const deletePerkGroup = async (req, res, next) => {
   const {
-    group, // TODO: make this param
+    perkGroupName, // TODO: make this param
   } = req.body;
 
   try {
@@ -40,7 +42,7 @@ export const deletePerkGroup = async (req, res, next) => {
       .collection('businesses')
       .doc(businessID)
       .update({
-        [`groups.${group}`]: admin.firestore.FieldValue.delete(),
+        [`groups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
       });
 
     try {

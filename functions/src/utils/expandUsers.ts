@@ -61,7 +61,7 @@ export const expandUsers = async (oldBusiness) => {
     // it doesn't create them a user when the signup?
     // i guess not
     const existingUsersSnapshot = await businessUsersRef
-      .where('group', '==', perkGroupName)
+      .where('perkGroup', '==', perkGroupName)
       .get();
 
     // you want to set it to be whatever is in intersectedPerkGroupData

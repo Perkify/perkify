@@ -54,14 +54,14 @@ interface Business {
   // group names with their perks and employees
   // this will have scaling problems if there are lots of employees
   // but the number of employees shouldn't be too high
-  groups: {
+  perkGroups: {
     [key: string]: PerkGroup;
   };
 }
 
 interface User {
   businessID: string;
-  group: string;
+  perkGroup: string;
   perks: {
     [key: string]: string[];
   };

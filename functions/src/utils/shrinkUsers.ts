@@ -29,7 +29,7 @@ export const shrinkUsers = async (newBusiness: Business) => {
     // it doesn't create them a user when the signup?
     // i guess not
     const existingUsersSnapshot = await businessUsersRef
-      .where('group', '==', perkGroupName)
+      .where('perkGroup', '==', perkGroupName)
       .get();
 
     // skip if there are no docs

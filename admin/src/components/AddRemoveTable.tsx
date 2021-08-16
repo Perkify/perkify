@@ -21,8 +21,8 @@ const columns = [
     editable: false,
   },
   {
-    field: 'group',
-    headerName: 'Group',
+    field: 'perkGroup',
+    headerName: 'Perk Group',
     width: 200,
     editable: false,
   },
