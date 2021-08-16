@@ -30,6 +30,8 @@ interface PerkGroup {
 }
 
 interface Business {
+  // business ref id
+  id: string;
   // business name
   name: string;
   // admin ids
