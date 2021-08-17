@@ -1,12 +1,8 @@
-// how do we image big companies using perkify?
-// big company signs up and pays for all of its subteams?
-// or subteams sign themselves up?
-
-// we don't want an email to have docs in multiple businesses,
-// because then how do we know where to look. How does that code work right now? I'll have to take a look
-
-// users
-// don't store everything in a business document. Instead use another subcollection that is a duplicate0
+export interface PerkifyError {
+  status: number;
+  reason: string;
+  reasonDetail: string;
+}
 
 export interface SimpleCardPaymentMethod {
   brand: string;
@@ -25,55 +21,122 @@ export interface Admin {
 }
 
 export interface PerkGroup {
-  perks: string[];
-  employees: string[];
+  perkNames: string[];
+  emails: string[];
+}
+
+export interface BillingAddress {
+  city: string;
+  country: string;
+  line1: string;
+  // can we make this non optional?
+  line2?: string;
+  postal_code: string;
+  state: string;
 }
 
 export interface Business {
   // business ref id
-  id: string;
+  businessID: string;
   // business name
   name: string;
   // admin ids
   admins: string[];
   // billing address
-  billingAddress: {
-    city: string;
-    country: string;
-    line1: string;
-    line2?: string;
-    postal_code: string;
-    state: string;
-  };
-
+  billingAddress: BillingAddress;
   // stripe info
   stripeId: string;
   stripeLink: string;
 
   cardPaymentMethods: SimpleCardPaymentMethod[];
-  // group names with their perks and employees
-  // this will have scaling problems if there are lots of employees
-  // but the number of employees shouldn't be too high
+  // perk group names with their perkNames and emails
+  // this will have scaling problems if there are lots of emails in a business
+  // but the number of emails shouldn't be too high
   perkGroups: {
     [key: string]: PerkGroup;
   };
 }
 
-export interface User {
+// FirebaseFirestore.Timestamp
+type PerkUses = any[];
+export interface PerkUsesDict {
+  [key: string]: PerkUses;
+}
+
+export interface SimpleUser {
   businessID: string;
-  perkGroup: string;
-  perks: {
-    [key: string]: string[];
+  perkGroupName: string;
+  perkUsesDict: PerkUsesDict;
+}
+
+export interface UserCard {
+  id: string;
+  cardholderID: string;
+  number: string;
+  cvc: string;
+  exp: {
+    month: number;
+    year: number;
+  };
+  billing: {
+    address: BillingAddress;
   };
 }
 
-// flow, whenever admin makes a change it instantly updates the business doc
-// for perk group deletion, employee removal, and perk removal, changes are instantly applied to the users
-// then once the payment goes through, possible actions are to:
-// - create a perk group. CREATE action
-// - add employees to an existing perk group with a specified set of perks, UPDATE action. Apply snapshot of a perk group
-// - add perks to an existing perk group, UPDATE action. Apply snapshot of a perk group.
+export interface User {
+  businessID: string;
+  perkGroupName: string;
+  perkUsesDict: PerkUsesDict;
+  firstName?: string;
+  lastName?: string;
+  card?: UserCard;
+}
 
-// should we move users to be a subcollection of a business? I think that makes sense
+export interface ActivatedUser {
+  businessID: string;
+  perkGroupName: string;
+  perkUsesDict: PerkUsesDict;
+  firstName: string;
+  lastName: string;
+  card: UserCard;
+}
 
-// there are some errors we just want to send to the client, and some that we want to log for our own debugging
+export interface UserToCreate {
+  email: string;
+  businessID: string;
+  perkGroupName: string;
+  newPerkNames: string[];
+}
+
+export interface UserToUpdate {
+  email: string;
+  newPerkNames: string[];
+  oldPerkUsesDict: {
+    [key: string]: PerkUses;
+  };
+}
+
+export interface UserToDelete {
+  email: string;
+  card?: UserCard;
+}
+
+// TODO camelCase keys
+export interface PerkDefinition {
+  Name: string;
+  Cost: number;
+  Period: string;
+  stripePriceId: string;
+  Img: string;
+  Product: string;
+  NetworkId: string;
+  PaymentName: string;
+}
+
+export interface PerkDefinitionsDict {
+  [key: string]: PerkDefinition;
+}
+
+export interface ExpandUsersPayload {
+  business: Business;
+}

@@ -1,15 +1,3 @@
-// import { Request } from "express"
-// import { auth } from "../models";
-// how do we image big companies using perkify?
-// big company signs up and pays for all of its subteams?
-// or subteams sign themselves up?
-
-// we don't want an email to have docs in multiple businesses,
-// because then how do we know where to look. How does that code work right now? I'll have to take a look
-
-// users
-// don't store everything in a business document. Instead use another subcollection that is a duplicate0
-
 interface PerkifyError {
   status: number;
   reason: string;
@@ -69,7 +57,8 @@ interface Business {
   };
 }
 
-type PerkUses = FirebaseFirestore.Timestamp[];
+// FirebaseFirestore.Timestamp
+type PerkUses = any[];
 interface PerkUsesDict {
   [key: string]: PerkUses;
 }
