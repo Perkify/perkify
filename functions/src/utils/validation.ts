@@ -50,20 +50,19 @@ export const sanitizeEmails = (emails: string[]) => {
   );
 };
 
-// TODO rename from Perks to PerkNames
-export const validatePerks = async (perks: string[]) => {
-  if (Array.isArray(perks) && perks.length > 0) {
-    for (const perk of perks) {
+export const validatePerkNames = async (perkNames: string[]) => {
+  if (Array.isArray(perkNames) && perkNames.length > 0) {
+    for (const perk of perkNames) {
       if (!allPerks.some((truePerk) => truePerk.Name === perk)) {
         return Promise.reject(new Error(`perk: ${perk} is not supported`));
       }
     }
 
-    if (new Set(perks).size !== perks.length) {
-      throw new Error('Trying to add duplicate perks');
+    if (new Set(perkNames).size !== perkNames.length) {
+      throw new Error('Trying to add duplicate perkNames');
     }
   } else {
-    return Promise.reject(new Error('send array of perks'));
+    return Promise.reject(new Error('send array of perkNames'));
   }
   return Promise.resolve();
 };
@@ -74,7 +73,11 @@ export const validateNewPerkGroupName = async (
 ) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
-    if (Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
+    if (
+      Object.keys(businessData.perkGroups[perkGroupName].perkNames).includes(
+        perkGroupName
+      )
+    ) {
       return new Error(
         'Trying to create a perk group with a name that already exists'
       );
@@ -91,7 +94,11 @@ export const validateExistingPerkGroupName = async (
 ) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
-    if (!Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
+    if (
+      !Object.keys(businessData.perkGroups[perkGroupName].perkNames).includes(
+        perkGroupName
+      )
+    ) {
       return new Error(
         "Trying to update a perk group with a name that doesn't exist"
       );

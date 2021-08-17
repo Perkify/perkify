@@ -5,7 +5,7 @@ import { shrinkUsers } from './crudHelpers';
 // we want to call this anytime we modify a stripe subscription
 // takes the business definition and updates the relevant stripe subscription
 
-// update stripe subscription with business perks
+// update stripe subscription with business perk groups
 export const updateStripeSubscription = async (updatedBusiness: Business) => {
   // get business data
   const businessID = updatedBusiness.businessID;
@@ -15,15 +15,17 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
 
   const perkCountsByName = Object.keys(updatedBusiness.perkGroups).reduce(
     (accumulator, perkGroupName) => {
-      updatedBusiness.perkGroups[perkGroupName].perks.forEach((perkName) => {
-        if (accumulator[perkName]) {
-          accumulator[perkName] +=
-            updatedBusiness.perkGroups[perkGroupName].emails.length;
-        } else {
-          accumulator[perkName] =
-            updatedBusiness.perkGroups[perkGroupName].emails.length;
+      updatedBusiness.perkGroups[perkGroupName].perkNames.forEach(
+        (perkName) => {
+          if (accumulator[perkName]) {
+            accumulator[perkName] +=
+              updatedBusiness.perkGroups[perkGroupName].emails.length;
+          } else {
+            accumulator[perkName] =
+              updatedBusiness.perkGroups[perkGroupName].emails.length;
+          }
         }
-      });
+      );
       return accumulator;
     },
     {} as { [key: string]: number }

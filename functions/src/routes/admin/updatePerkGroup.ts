@@ -12,11 +12,11 @@ import {
   validateEmails,
   validateExistingPerkGroupName,
   validateFirebaseIdToken,
-  validatePerks,
+  validatePerkNames,
 } from '../../utils';
 
 export interface UpdatePerkGroupPayload {
-  perks: string[];
+  perkNames: string[];
   emails: string[];
 }
 
@@ -29,14 +29,14 @@ export const updatePerkGroupValidators = [
     .custom(validateEmails)
     .customSanitizer(sanitizeEmails)
     .custom(checkIfAnyEmailsToAddAreClaimed),
-  body('perks').custom(validatePerks),
+  body('perkNames').custom(validatePerkNames),
   checkValidationResult,
 ];
 
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupName = req.params.perkGroupName;
-    const { emails, perks } = req.body as UpdatePerkGroupPayload;
+    const { emails, perkNames } = req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
@@ -48,7 +48,7 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
         .doc(businessID)
         .update({
           [`groups.${perkGroupName}`]: {
-            perks,
+            perkNames: perkNames,
             emails,
           } as PerkGroup,
         });

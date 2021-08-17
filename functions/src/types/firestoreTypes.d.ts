@@ -33,7 +33,7 @@ interface Admin {
 }
 
 interface PerkGroup {
-  perks: string[];
+  perkNames: string[];
   emails: string[];
 }
 
@@ -61,7 +61,7 @@ interface Business {
   stripeLink: string;
 
   cardPaymentMethods: SimpleCardPaymentMethod[];
-  // perk group names with their perks and emails
+  // perk group names with their perkNames and emails
   // this will have scaling problems if there are lots of emails in a business
   // but the number of emails shouldn't be too high
   perkGroups: {
@@ -77,7 +77,7 @@ interface PerkUsesDict {
 interface SimpleUser {
   businessID: string;
   perkGroupName: string;
-  perks: PerkUsesDict;
+  perkUsesDict: PerkUsesDict;
 }
 
 interface UserCard {
@@ -97,7 +97,7 @@ interface UserCard {
 interface User {
   businessID: string;
   perkGroupName: string;
-  perks: PerkUsesDict;
+  perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
@@ -106,22 +106,23 @@ interface User {
 interface ActivatedUser {
   businessID: string;
   perkGroupName: string;
-  perks: PerkUsesDict;
-  firstName?: string;
-  lastName?: string;
-  card?: UserCard;
+  perkUsesDict: PerkUsesDict;
+  firstName: string;
+  lastName: string;
+  card: UserCard;
 }
+
 interface UserToCreate {
   email: string;
   businessID: string;
   perkGroupName: string;
-  newPerks: string[];
+  newPerkNames: string[];
 }
 
 interface UserToUpdate {
   email: string;
-  newPerks: string[];
-  oldPerks: {
+  newPerkNames: string[];
+  oldPerkUsesDict: {
     [key: string]: PerkUses;
   };
 }
@@ -130,17 +131,6 @@ interface UserToDelete {
   email: string;
   card?: UserCard;
 }
-
-// flow, whenever admin makes a change it instantly updates the business doc
-// for perk group deletion, employee removal, and perk removal, changes are instantly applied to the users
-// then once the payment goes through, possible actions are to:
-// - create a perk group. CREATE action
-// - add employees to an existing perk group with a specified set of perks, UPDATE action. Apply snapshot of a perk group
-// - add perks to an existing perk group, UPDATE action. Apply snapshot of a perk group.
-
-// should we move users to be a subcollection of a business? I think that makes sense
-
-// there are some errors we just want to send to the client, and some that we want to log for our own debugging
 
 // TODO camelCase keys
 interface PerkDefinition {

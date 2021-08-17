@@ -44,8 +44,8 @@ export const applyChangesToLiveUsers = async (
     const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
     const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
     const livePerkGroup = {
-      perks: Object.keys(
-        (existingPerkUsersSnapshot.docs[0].data() as SimpleUser).perks
+      perkNames: Object.keys(
+        (existingPerkUsersSnapshot.docs[0].data() as SimpleUser).perkUsesDict
       ),
       emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
     } as PerkGroup;
@@ -87,7 +87,7 @@ export const applyChangesToLiveUsers = async (
     usersToCreate.push(
       ...emailsToCreate.map((email) => ({
         email,
-        newPerks: intersectedPerkGroupData.perks,
+        newPerkNames: intersectedPerkGroupData.perkNames,
         perkGroupName,
         businessID,
       }))
@@ -96,8 +96,8 @@ export const applyChangesToLiveUsers = async (
     usersToUpdate.push(
       ...emailsToUpdate.map((email) => ({
         email,
-        newPerks: intersectedPerkGroupData.perks,
-        oldPerks: existingPerkUsersDict[email].perks,
+        newPerkNames: intersectedPerkGroupData.perkNames,
+        oldPerkUsesDict: existingPerkUsersDict[email].perkUsesDict,
         perkGroupName,
       }))
     );

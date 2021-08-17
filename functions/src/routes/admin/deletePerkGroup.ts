@@ -32,7 +32,6 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
       // update the stripe subscription
       await updateStripeSubscription(req.businessData);
 
-      // sync stripe subscriptions with perks
       res.status(200).end();
     } catch (err) {
       next(err);

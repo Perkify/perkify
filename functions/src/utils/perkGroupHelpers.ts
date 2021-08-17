@@ -3,8 +3,8 @@ export const generatePerkGroupIntersection = (
   perkGroup2: PerkGroup
 ) =>
   ({
-    perks: perkGroup1.perks.filter((perkName) =>
-      perkGroup2.perks.includes(perkName)
+    perkNames: perkGroup1.perkNames.filter((perkName) =>
+      perkGroup2.perkNames.includes(perkName)
     ),
     emails: perkGroup1.emails.filter((email) =>
       perkGroup2.emails.includes(email)

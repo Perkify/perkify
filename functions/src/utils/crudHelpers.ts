@@ -13,7 +13,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
   await docRef.set({
     businessID: userToCreate.businessID,
     perkGroupName: userToCreate.perkGroupName,
-    perks: userToCreate.newPerks.reduce(
+    perkUsesDict: userToCreate.newPerkNames.reduce(
       (map, perk) => ((map[perk] = []), map),
       {} as { [key: string]: FirebaseFirestore.Timestamp[] }
     ),
@@ -43,9 +43,9 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
 export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
   const docRef = db.collection('users').doc(userToUpdate.email);
 
-  const oldUserNewPerks = userToUpdate.newPerks.reduce((acc, perk) => {
-    if (perk in userToUpdate.oldPerks) {
-      acc[perk] = userToUpdate.oldPerks[perk];
+  const updatedPerkUsesDict = userToUpdate.newPerkNames.reduce((acc, perk) => {
+    if (perk in userToUpdate.oldPerkUsesDict) {
+      acc[perk] = userToUpdate.oldPerkUsesDict[perk];
     } else {
       acc[perk] = [];
     }
@@ -53,8 +53,8 @@ export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
   }, {} as PerkUsesDict);
 
   await docRef.update({
-    perks: oldUserNewPerks,
-  });
+    perkUsesDict: updatedPerkUsesDict,
+  } as Partial<User>);
 
   // // does this create a user?
   // const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
