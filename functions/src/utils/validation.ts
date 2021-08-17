@@ -1,6 +1,6 @@
 import * as validator from 'validator';
 import { allPerks } from '../../shared';
-import { db } from '../models';
+import { auth, db } from '../models';
 // * Validation Helpers * //
 
 // gmail treats emails with and without dots as the same.
@@ -23,7 +23,7 @@ export const validateUserEmail = async (email) => {
   }
 };
 
-export const validateEmails = async (emails) => {
+export const validateEmails = async (emails, next) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {
       if (!validator.isEmail(email)) {
@@ -48,6 +48,10 @@ export const validatePerks = async (perks) => {
       if (!allPerks.some((truePerk) => truePerk.Name === perk)) {
         return Promise.reject(new Error(`perk: ${perk} is not supported`));
       }
+    }
+
+    if (new Set(perks).size !== perks.length) {
+      throw new Error('Trying to add duplicate perks');
     }
   } else {
     return Promise.reject(new Error('send array of perks'));
@@ -89,4 +93,92 @@ export const checkIfAnyEmailsAreClaimed = async (emails) => {
     // by the caller which will then call next(error)
     throw error;
   }
+};
+
+// Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
+// The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
+// `Authorization: Bearer <Firebase ID Token>`.
+// when decoded successfully, the ID Token content will be added as `req.user`.
+export const validateFirebaseIdToken = async (req, res, next) => {
+  if (
+    (!req.headers.authorization ||
+      !req.headers.authorization.startsWith('Bearer ')) &&
+    !(req.cookies && req.cookies.__session)
+  ) {
+    const err = {
+      status: 403,
+      reason: 'Unauthorized',
+      reasonDetail:
+        'No Firebase ID token was passed as a Bearer token in the Authorization header or as cookie',
+    };
+    return next(err);
+  }
+
+  let idToken;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer ')
+  ) {
+    // Read the ID Token from the Authorization header.
+    idToken = req.headers.authorization.split('Bearer ')[1];
+  } else if (req.cookies) {
+    // Read the ID Token from cookie.
+    idToken = req.cookies.__session;
+  } else {
+    // No cookie
+    const err = {
+      status: 403,
+      reason: 'Unauthorized',
+    };
+    return next(err);
+  }
+
+  try {
+    const decodedIdToken = await auth.verifyIdToken(idToken);
+    req.user = decodedIdToken;
+    return next();
+  } catch (error) {
+    console.error('Error while verifying Firebase ID token:', error);
+    const err = {
+      status: 403,
+      reason: 'Unauthorized',
+    };
+    return next(err);
+  }
+};
+
+export const validateAdminDoc = async (req, res, next) => {
+  const adminData = (
+    await db.collection('admins').doc(req.user.uid).get()
+  ).data();
+
+  if (adminData == null) {
+    const error = {
+      status: 500,
+      reason: 'Missing admin document',
+      reasonDetail: `Missing admin document in firestore`,
+    };
+    return next(error);
+  }
+
+  req.adminData = adminData;
+  return next();
+};
+
+export const validateBusinessDoc = async (req, res, next) => {
+  const businessData = (
+    await db.collection('businesses').doc(req.adminData.businessID).get()
+  ).data();
+
+  if (businessData == null) {
+    const error = {
+      status: 500,
+      reason: 'Missing business document',
+      reasonDetail: `Missing business document in firestore`,
+    };
+    return next(error);
+  }
+
+  req.businessData = businessData;
+  return next();
 };

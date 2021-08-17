@@ -1,6 +1,7 @@
 import { body } from 'express-validator';
 import { db } from '../../models';
 import {
+  checkIfAnyEmailsAreClaimed,
   checkValidationResult,
   sanitizeEmails,
   updateStripeSubscription,
@@ -10,40 +11,39 @@ import {
   validatePerks,
 } from '../../utils';
 
-export const updatePerkGroupValidators = [
+export const createPerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
-  body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
+  body('emails')
+    .custom(validateEmails)
+    .custom(checkIfAnyEmailsAreClaimed)
+    .customSanitizer(sanitizeEmails),
   body('perks').custom(validatePerks),
   checkValidationResult,
 ];
 
-export const updatePerkGroup = async (req, res, next) => {
+export const createPerkGroup = async (req, res, next) => {
+  // TODO validate that a group with that name doesn't already exist
+
   const perkGroupName = req.params.perkGroupName;
   const { emails, perks } = req.body;
   const adminData = req.adminData;
   const businessID = adminData.businessID;
 
-  // TODO validate that perkGroupName exists
-  // TODO validate that you aren't adding any duplicate emails
-
   try {
-    // update business doc
+    // update the business document to reflect the group of perks
     await db
       .collection('businesses')
       .doc(businessID)
       .update({
-        [`groups.${perkGroupName}`]: {
-          perks,
-          employees: emails,
-        } as PerkGroup,
+        [`groups.${perkGroupName}`]: { perks, employees: emails } as PerkGroup,
       });
 
-    // sync to stripe subscription
+    // update the stripe subscription
     await updateStripeSubscription(businessID);
 
     res.status(200).end();
-  } catch (error) {
-    res.status(500).end();
+  } catch (err) {
+    next(err);
   }
 };

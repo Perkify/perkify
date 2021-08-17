@@ -2,12 +2,11 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import { functions } from '../models';
-import { errorHandler, validateFirebaseIdToken } from '../utils';
+import { errorHandler } from '../utils';
 import {
-  createGroup,
-  createGroupValidators,
+  createPerkGroup,
+  createPerkGroupValidators,
   createPortalLink,
-  createPortalLinkValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
   registerAdminAndBusiness,
@@ -41,29 +40,25 @@ app.post(
 );
 
 // regiser a user
-app.post('/user', [...registerUserValidators], registerUser);
+app.post('/user', registerUserValidators, registerUser);
 
 // create a portal link for a user
-app.post(
-  '/portalLink',
-  [validateFirebaseIdToken, ...createPortalLinkValidators],
-  createPortalLink
-);
+app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 
 // perk group crud
 app.post(
   '/perkGroup/:perkGroupName',
-  [validateFirebaseIdToken, ...createGroupValidators],
-  createGroup
+  createPerkGroupValidators,
+  createPerkGroup
 );
 app.put(
   '/perkGroup/:perkGroupName',
-  [validateFirebaseIdToken, ...updatePerkGroupValidators],
+  updatePerkGroupValidators,
   updatePerkGroup
 );
 app.delete(
   '/perkGroup/:perkGroupName',
-  [validateFirebaseIdToken, ...deletePerkGroupValidators],
+  deletePerkGroupValidators,
   deletePerkGroup
 );
 

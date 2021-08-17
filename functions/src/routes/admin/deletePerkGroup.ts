@@ -1,38 +1,23 @@
-import { validationResult } from 'express-validator';
 import admin, { db } from '../../models';
-import { updateStripeSubscription } from '../../utils';
+import {
+  checkValidationResult,
+  updateStripeSubscription,
+  validateAdminDoc,
+  validateFirebaseIdToken,
+} from '../../utils';
 
-export const deletePerkGroupValidators = [];
+export const deletePerkGroupValidators = [
+  validateFirebaseIdToken,
+  validateAdminDoc,
+  checkValidationResult,
+];
 
 export const deletePerkGroup = async (req, res, next) => {
   const perkGroupName = req.params.perkGroupName;
+  const adminData = req.adminData;
+  const businessID = adminData.businessID;
 
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
-      };
-      return next(error);
-    }
-
-    // get admins business
-    const adminData = (
-      await db.collection('admins').doc(req.user.uid).get()
-    ).data();
-
-    if (adminData == null) {
-      const error = {
-        status: 500,
-        reason: 'Missing documents',
-        reasonDetail: `Documents missing from firestore`,
-      };
-      return next(error);
-    }
-    const businessID = adminData.businessID;
-
     // delete group from businesss' groups
     await db
       .collection('businesses')
@@ -41,15 +26,12 @@ export const deletePerkGroup = async (req, res, next) => {
         [`groups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
       });
 
-    try {
-      await updateStripeSubscription(businessID);
-    } catch (e) {
-      next(e);
-    }
+    // update the stripe subscription
+    await updateStripeSubscription(businessID);
 
     // sync stripe subscriptions with perks
     res.status(200).end();
   } catch (err) {
-    res.status(500).end();
+    next(err);
   }
 };

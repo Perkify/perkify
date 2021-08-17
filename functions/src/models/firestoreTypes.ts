@@ -8,6 +8,12 @@
 // users
 // don't store everything in a business document. Instead use another subcollection that is a duplicate0
 
+interface PerkifyError {
+  status: number;
+  reason: string;
+  reasonDetail: string;
+}
+
 interface SimpleCardPaymentMethod {
   brand: string;
   country: string;

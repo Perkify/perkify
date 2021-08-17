@@ -1,4 +1,4 @@
-export * from './createGroup';
+export * from './createPerkGroup';
 export * from './createPortalLink';
 export * from './deletePerkGroup';
 export * from './registerAdminAndBusiness';
