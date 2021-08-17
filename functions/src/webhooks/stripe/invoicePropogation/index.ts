@@ -8,7 +8,7 @@ import {
   stripe,
   tasksClient,
 } from '../../../models';
-import { handleError } from '../../../utils';
+import { errorHandler } from '../../../utils';
 
 const addTaskToExpandUsersQueue = async (payload, expirationAtSeconds) => {
   // get the webhook endpoint to call
@@ -144,7 +144,7 @@ export const invoicePaidWebhookHandler = functions.https.onRequest(
         await propogateInvoice(invoice);
       }
     } catch (err) {
-      handleError(err, response);
+      errorHandler(err, request, response);
     }
 
     response.json({ received: true });

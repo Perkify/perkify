@@ -5,7 +5,7 @@ const isInstanceOfPerkifyError = (object: any) => {
 };
 
 // --------------- Middleware/Helpers --------------- //
-export const errorHandler = async (err, req, res, next) => {
+export const errorHandler = async (err, req, res) => {
   // if response already sent, can't do anything
   if (res.headersSent) {
     return;

@@ -1,6 +1,5 @@
 import { body, validationResult } from 'express-validator';
 import { db, stripe } from '../../models';
-import { handleError } from '.././../utils';
 
 export const registerUserValidators = [
   body('firstName').not().isEmpty(),
@@ -114,6 +113,6 @@ export const registerUser = async (req, res, next) => {
 
     res.status(200).end();
   } catch (err) {
-    handleError(err, res);
+    next(err);
   }
 };

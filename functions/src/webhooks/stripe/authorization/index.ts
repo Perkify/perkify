@@ -1,6 +1,6 @@
 import { stripeWebhookSecret } from '../../../configs';
 import { functions, stripe } from '../../../models';
-import { handleError } from '../../../utils';
+import { errorHandler } from '../../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
 
 export const issuingAuthorizationRequestWebhookHandler =
@@ -33,7 +33,7 @@ export const issuingAuthorizationRequestWebhookHandler =
         await handleAuthorizationRequest(auth);
       }
     } catch (err) {
-      handleError(err, response);
+      errorHandler(err, request, response);
     }
 
     response.json({ received: true });
