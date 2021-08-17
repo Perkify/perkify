@@ -32,12 +32,12 @@ interface Admin {
 
 interface PerkGroup {
   perks: string[];
-  employees: string[];
+  emails: string[];
 }
 
 interface Business {
   // business ref id
-  id: string;
+  businessID: string;
   // business name
   name: string;
   // admin ids
@@ -57,20 +57,44 @@ interface Business {
   stripeLink: string;
 
   cardPaymentMethods: SimpleCardPaymentMethod[];
-  // group names with their perks and employees
-  // this will have scaling problems if there are lots of employees
-  // but the number of employees shouldn't be too high
+  // perk group names with their perks and emails
+  // this will have scaling problems if there are lots of emails in a business
+  // but the number of emails shouldn't be too high
   perkGroups: {
     [key: string]: PerkGroup;
   };
 }
 
+type PerkUses = string[];
+
 interface User {
   businessID: string;
+  // TODO update User to user perkGroupName instead of perkGroup
   perkGroup: string;
   perks: {
-    [key: string]: string[];
+    [key: string]: PerkUses;
   };
+  // TODO handle User has card
+  // card: string
+}
+
+interface UserToCreate {
+  email: string;
+  businessID: string;
+  perkGroupName: string;
+  newPerks: string[];
+}
+
+interface UserToUpdate {
+  email: string;
+  newPerks: string[];
+  oldPerks: {
+    [key: string]: PerkUses;
+  };
+}
+
+interface UserToDelete {
+  email: string;
 }
 
 // flow, whenever admin makes a change it instantly updates the business doc

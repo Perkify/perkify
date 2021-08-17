@@ -1,134 +1,108 @@
 import { db } from '../models';
+import {
+  generateDictFromSnapshot,
+  generateEmailsPatch,
+  generatePerkGroupIntersection,
+} from '../utils';
 import { createUserHelper, updateUserHelper } from './crudHelpers';
 
-// i'm doing intersection to avoid creating things that should not be created yet
-// but i want to do union to leave everything in the businessDoc alone and only add things
-// we aren't changing the businessDoc, we are changing the user docs!
+export const expandUsers = async (updatedBusiness: Business) => {
+  const businessID = updatedBusiness.businessID;
+  const usersToCreate: UserToCreate[] = [];
+  const usersToUpdate: UserToUpdate[] = [];
+  const usersToDelete: UserToDelete[] = [];
 
-// takes a snapshot of the business document,
-// and makes the relevant changes to the users collection
-// call from snapshot
-export const expandUsers = async (oldBusiness) => {
-  const newBusinessData = (
-    await db.collection('businesses').doc(oldBusiness.id).get()
+  // TODO what if pending business is not defined?
+  const pendingBusiness = (
+    await db.collection('businesses').doc(businessID).get()
   ).data() as Business;
 
-  // what about later when we want to handle moving users?
-  // it's just going to appear as a diff, we want to be able to catch that
-  // scope things outside, that should be chill
-
-  // how does this relate to deleting users?
-  // we are not changing the business doc
-
-  // what if a user exists that shouldn't exist?
-  // they should be deleted, but no such users should exist, because they should be deleted immediately
-  // same with removing perks. Should never be the case that you are removing perks
-
-  const usersToCreate: {
-    email: string;
-    newPerks: string[];
-    perkGroupName: string;
-  }[] = [];
-  const usersToUpdate: {
-    email: string;
-    oldPerks: { [key: string]: string[] };
-    newPerks: string[];
-    perkGroupName: string;
-  }[] = [];
-  const usersToDelete: string[] = [];
-
   // process each perk group separately
-  Object.keys(oldBusiness.perkGroups).forEach(async (perkGroupName) => {
+  Object.keys(updatedBusiness.perkGroups).forEach(async (perkGroupName) => {
     // TODO: improve this so that we can instantly tell if a perkGroup has changed
     // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
-    const intersectedPerkGroupData = {
-      perks: newBusinessData.perkGroups[perkGroupName].perks.filter(
-        (perkName) =>
-          oldBusiness.perkGroups[perkGroupName].perks.includes(perkName)
-      ),
-      employees: newBusinessData.perkGroups[perkGroupName].employees.filter(
-        (employee) =>
-          oldBusiness.perkGroups[perkGroupName].employees.includes(employee)
-      ),
-    };
+    // TODO what if a perk group has been deleted?
+    const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
+    const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
 
     // get existing users
-    const businessUsersRef = await db
+    const existingPerkUsersSnapshot = await db
       .collection('users')
-      .where('businessID', '==', oldBusiness);
-
-    // we just keep track of their email address
-    // it doesn't create them a user when the signup?
-    // i guess not
-    const existingUsersSnapshot = await businessUsersRef
+      .where('businessID', '==', updatedBusiness.businessID)
       .where('perkGroup', '==', perkGroupName)
       .get();
 
-    // you want to set it to be whatever is in intersectedPerkGroupData
-    const existingUsersDict = {};
-    existingUsersSnapshot.forEach((userDoc) => {
-      // build the existingUsersDict
-      existingUsersDict[userDoc.id] = userDoc.data();
+    // // skip if there are no docs. not for expand users
+    // if (existingPerkUsersSnapshot.docs.length == 0) {
+    //   return;
+    // }
 
-      if (!intersectedPerkGroupData.employees.includes(userDoc.id)) {
-        // user does exist but is not in the businessData doc
-        // delete the user
-        // this should never happen
-        usersToDelete.push(userDoc.id);
-      }
-    });
+    const existingPerkUsersDict = generateDictFromSnapshot(
+      existingPerkUsersSnapshot
+    ) as Record<string, User>;
 
-    // using create update
-    intersectedPerkGroupData.employees.map((employee) => {
-      // What emails do we want to send here?
-      // if the email doesn't exist, we send account creation email
-      // if it does exist, we send perk update email
+    // filter the perks available to employees
+    const livePerkGroup = {
+      perks: Object.keys(
+        (existingPerkUsersSnapshot.docs[0].data() as User).perks
+      ),
+      emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
+    } as PerkGroup;
 
-      // check if user exists
-      if (employee in existingUsersDict) {
-        // user exists
-        usersToUpdate.push({
-          email: employee,
-          oldPerks: existingUsersDict[employee].perks,
-          newPerks: intersectedPerkGroupData.perks,
-          perkGroupName,
-        });
-      } else {
-        usersToCreate.push({
-          email: employee,
-          newPerks: intersectedPerkGroupData.perks,
-          perkGroupName,
-        });
-      }
-    });
+    // get the intersection of the new business document with the old business document
+    // live users are a subset of the new business document
+    // so the intersection is a superset of the intersection of users with new business document
+    // therefore we are only going to be expanding the live users
+    // when we put the intersection on the live users
+    const intersectedPerkGroupData = generatePerkGroupIntersection(
+      pendingPerkGroup,
+      updatedPerkGroup
+    ) as PerkGroup;
+
+    // you want to apply the intersected perk group data to the live users
+    // get the emails patch
+    const { emailsToCreate, emailsToUpdate, emailsToDelete } =
+      generateEmailsPatch(
+        intersectedPerkGroupData.emails,
+        livePerkGroup.emails
+      );
+
+    usersToCreate.push(
+      ...emailsToCreate.map((email) => ({
+        email,
+        newPerks: intersectedPerkGroupData.perks,
+        perkGroupName,
+        businessID,
+      }))
+    );
+
+    usersToUpdate.push(
+      ...emailsToUpdate.map((email) => ({
+        email,
+        newPerks: intersectedPerkGroupData.perks,
+        oldPerks: existingPerkUsersDict[email].perks,
+        perkGroupName,
+      }))
+    );
+
+    usersToDelete.push(
+      ...emailsToDelete.map((email) => ({
+        email,
+      }))
+    );
   });
 
   // create users
-  await Promise.all(
-    usersToCreate.map(({ email, perkGroupName, newPerks }) =>
-      createUserHelper(email, oldBusiness.id, perkGroupName, newPerks)
-    )
-  );
+  await Promise.all(usersToCreate.map(createUserHelper));
 
   // update users
-  await Promise.all(
-    usersToUpdate.map(({ email, oldPerks, newPerks, perkGroupName }) => {
-      updateUserHelper(
-        email,
-        oldBusiness.id,
-        perkGroupName,
-        oldPerks,
-        newPerks
-      );
-    })
-  );
+  await Promise.all(usersToUpdate.map(updateUserHelper));
 
   // assert that there are no users to be deleted
   if (usersToDelete.length != 0) {
     console.error(
       'Error users to delete is not 0 in syncUsersWithBusinessDocumentPerkGroup'
     );
-    // await Promise.all(usersToDelete.map((email) => deleteUserHelper(email)));
   }
 };

@@ -4,29 +4,34 @@
 // not going off of the subscription update
 
 import { newUserTemplateGenerator } from '../../shared';
-import admin, { db, functions, stripe } from '../models';
+import admin, { db, functions } from '../models';
 
-export const createUserHelper = async (email, businessID, group, perks) => {
-  const docRef = db.collection('users').doc(email);
+export const createUserHelper = async (userToCreate: UserToCreate) => {
+  const docRef = db.collection('users').doc(userToCreate.email);
 
   await docRef.set({
-    businessID,
-    group,
-    perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
+    businessID: userToCreate.businessID,
+    group: userToCreate.perkGroupName,
+    perks: userToCreate.newPerks.reduce(
+      (map, perk) => ((map[perk] = []), map),
+      {}
+    ),
   });
 
-  const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
-    url:
-      functions.config()['stripe-firebase'].environment == 'production'
-        ? 'https://app.getperkify.com/dashboard'
-        : functions.config()['stripe-firebase'].environment == 'staging'
-        ? 'https://app.dev.getperkify.com/dashboard'
-        : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
-  });
+  const signInLink = await admin
+    .auth()
+    .generateSignInWithEmailLink(userToCreate.email, {
+      url:
+        functions.config()['stripe-firebase'].environment == 'production'
+          ? 'https://app.getperkify.com/dashboard'
+          : functions.config()['stripe-firebase'].environment == 'staging'
+          ? 'https://app.dev.getperkify.com/dashboard'
+          : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
+    });
 
   // send email
   await db.collection('mail').add({
-    to: email,
+    to: userToCreate.email,
     message: {
       subject: 'Your employer has signed you up for Perkify!',
       html: newUserTemplateGenerator({ signInLink }),
@@ -34,27 +39,19 @@ export const createUserHelper = async (email, businessID, group, perks) => {
   });
 };
 
-export const updateUserHelper = async (
-  email,
-  businessID,
-  group,
-  oldPerks,
-  newPerks
-) => {
-  const docRef = db.collection('users').doc(email);
+export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
+  const docRef = db.collection('users').doc(userToUpdate.email);
 
-  const oldUserNewPerks = newPerks.reduce((acc, perk) => {
-    if (perk in oldPerks) {
-      acc[perk] = oldPerks[perk];
+  const oldUserNewPerks = userToUpdate.newPerks.reduce((acc, perk) => {
+    if (perk in userToUpdate.oldPerks) {
+      acc[perk] = userToUpdate.oldPerks[perk];
     } else {
       acc[perk] = [];
     }
     return acc;
   }, {});
 
-  await docRef.set({
-    businessID,
-    group,
+  await docRef.update({
     perks: oldUserNewPerks,
   });
 
@@ -78,10 +75,11 @@ export const updateUserHelper = async (
   // });
 };
 
-export const deleteUserHelper = async (userDoc) => {
-  if (userDoc.data().card)
-    await stripe.issuing.cards.update(userDoc.data().card.id, {
-      status: 'canceled',
-    });
-  await db.collection('users').doc(userDoc.id).delete();
+export const deleteUserHelper = async (userToDelete: UserToDelete) => {
+  // TODO fix this
+  // if (userDoc.data().card)
+  //   await stripe.issuing.cards.update(userDoc.data().card.id, {
+  //     status: 'canceled',
+  //   });
+  await db.collection('users').doc(userToDelete.email).delete();
 };

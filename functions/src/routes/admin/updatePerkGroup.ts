@@ -1,6 +1,7 @@
 import { body, param } from 'express-validator';
 import { db } from '../../models';
 import {
+  checkIfAnyEmailsToAddAreClaimed,
   checkValidationResult,
   sanitizeEmails,
   updateStripeSubscription,
@@ -17,34 +18,37 @@ export const updatePerkGroupValidators = [
   validateAdminDoc,
   validateBusinessDoc,
   param('perkGroupName').custom(validateExistingPerkGroupName),
-  body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
+  body('emails')
+    .custom(validateEmails)
+    .customSanitizer(sanitizeEmails)
+    .custom(checkIfAnyEmailsToAddAreClaimed),
   body('perks').custom(validatePerks),
   checkValidationResult,
 ];
 
 export const updatePerkGroup = async (req, res, next) => {
   const perkGroupName = req.params.perkGroupName;
-  const { emails, perks } = req.body;
+  const { emails, perks } = req.body as PerkGroup;
   const adminData = req.adminData;
   const businessID = adminData.businessID;
 
-  // TODO validate that perkGroupName exists
   // TODO validate that you aren't adding any duplicate emails
 
   try {
     // update business doc
+    // this makes pendingBusiness equal updatedBusiness
     await db
       .collection('businesses')
       .doc(businessID)
       .update({
         [`groups.${perkGroupName}`]: {
           perks,
-          employees: emails,
+          emails,
         } as PerkGroup,
       });
 
     // sync to stripe subscription
-    await updateStripeSubscription(businessID);
+    await updateStripeSubscription(req.businessData);
 
     res.status(200).end();
   } catch (error) {

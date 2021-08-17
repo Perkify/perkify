@@ -10,13 +10,11 @@ import { shrinkUsers } from './shrinkUsers';
 // we want to call this anytime we modify a stripe subscription
 
 // update stripe subscription with business perks
-export const updateStripeSubscription = async (businessID: string) => {
+export const updateStripeSubscription = async (updatedBusiness: Business) => {
   // get business data
-  const business = (
-    await db.collection('businesses').doc(businessID).get()
-  ).data() as Business;
+  const businessID = updatedBusiness.businessID;
 
-  if (!business) {
+  if (!updatedBusiness) {
     const error = {
       status: 500,
       reason: 'Missing document',
@@ -26,17 +24,17 @@ export const updateStripeSubscription = async (businessID: string) => {
   }
 
   // remove stuff that shouldn't exist from 'users'
-  await shrinkUsers(business);
+  await shrinkUsers(updatedBusiness);
 
-  const perkCountsByName = Object.keys(business.perkGroups).reduce(
+  const perkCountsByName = Object.keys(updatedBusiness.perkGroups).reduce(
     (accumulator, perkGroupName) => {
-      business.perkGroups[perkGroupName].perks.forEach((perkName) => {
+      updatedBusiness.perkGroups[perkGroupName].perks.forEach((perkName) => {
         if (accumulator[perkName]) {
           accumulator[perkName] +=
-            business.perkGroups[perkGroupName].employees.length;
+            updatedBusiness.perkGroups[perkGroupName].emails.length;
         } else {
           accumulator[perkName] =
-            business.perkGroups[perkGroupName].employees.length;
+            updatedBusiness.perkGroups[perkGroupName].emails.length;
         }
       });
       return accumulator;
@@ -66,21 +64,8 @@ export const updateStripeSubscription = async (businessID: string) => {
   if (subscriptionItem.length == 0) {
     // the admin doesn't have any subscriptions
     // create a subscription for them
-    // this metadata will become invalid when the subscription is updated,
-    // but it is only used after creation
-
-    // can only pass strings
-    // so instead create a firestore document or each
-    // could create a separate one for each invoice,
-    // or pray that the payment is fast enough to just be able to read
-    // the business document itself
-    // i was planning on just updating the subscription object anyways
-    // so it should be fast enough. Okay so i'll go with that. Just read from the business document
-
-    // okay but so how to handle specifying the perkGroup that has been changed?
-    // in the metadata of the invoice!
     await stripe.subscriptions.create({
-      customer: business.stripeId,
+      customer: updatedBusiness.stripeId,
       items: newSubscriptionItemsList,
       metadata: { businessID },
     });
@@ -102,7 +87,7 @@ export const updateStripeSubscription = async (businessID: string) => {
 
     // create an invoice to charge the difference of the subscription
     const createdInvoice = await stripe.invoices.create({
-      customer: business.stripeId,
+      customer: updatedBusiness.stripeId,
       // auto_advance: true,
       collection_method: 'charge_automatically',
       subscription: subscriptionItem[0].id,

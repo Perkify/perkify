@@ -70,7 +70,7 @@ export const registerAdminAndBusiness = async (req, res, next) => {
 
     // set the business document
     businessRef.set({
-      id: businessRef.id,
+      businessID: businessRef.id,
       name: businessName,
       billingAddress: {
         city,

@@ -13,6 +13,11 @@ import {
   validatePerks,
 } from '../../utils';
 
+export interface CreatePerkGroupPayload {
+  perks: string[];
+  emails: string[];
+}
+
 export const createPerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
@@ -20,29 +25,30 @@ export const createPerkGroupValidators = [
   param('perkGroupName').custom(validateNewPerkGroupName),
   body('emails')
     .custom(validateEmails)
-    .custom(checkIfAnyEmailsAreClaimed)
-    .customSanitizer(sanitizeEmails),
+    .customSanitizer(sanitizeEmails)
+    .custom(checkIfAnyEmailsAreClaimed),
   body('perks').custom(validatePerks),
   checkValidationResult,
 ];
 
 export const createPerkGroup = async (req, res, next) => {
-  const perkGroupName = req.params.perkGroupName;
-  const { emails, perks } = req.body;
-  const adminData = req.adminData;
-  const businessID = adminData.businessID;
+  const perkGroupName = req.params.perkGroupName as string;
+  const { emails, perks } = req.body as CreatePerkGroupPayload;
+  const businessData = req.businessData as Business;
 
   try {
+    // TODO: Change from id to businessID on Business interface
+
     // update the business document to reflect the group of perks
     await db
       .collection('businesses')
-      .doc(businessID)
+      .doc(businessData.businessID)
       .update({
-        [`groups.${perkGroupName}`]: { perks, employees: emails } as PerkGroup,
+        [`groups.${perkGroupName}`]: { perks, emails } as PerkGroup,
       });
 
     // update the stripe subscription
-    await updateStripeSubscription(businessID);
+    await updateStripeSubscription(req.businessData);
 
     res.status(200).end();
   } catch (err) {

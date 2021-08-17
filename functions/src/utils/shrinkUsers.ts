@@ -1,94 +1,88 @@
 import { db } from '../models';
+import {
+  generateDictFromSnapshot,
+  generateEmailsPatch,
+  generatePerkGroupIntersection,
+} from '../utils';
 import { deleteUserHelper, updateUserHelper } from './crudHelpers';
 
-export const shrinkUsers = async (newBusiness: Business) => {
-  const usersToCreate: {
-    email: string;
-    newPerks: string[];
-    perkGroupName: string;
-  }[] = [];
-  const usersToUpdate: {
-    email: string;
-    oldPerks: { [key: string]: string[] };
-    newPerks: string[];
-    perkGroupName: string;
-  }[] = [];
-  const usersToDelete: string[] = [];
+export const shrinkUsers = async (updatedBusiness: Business) => {
+  const businessID = updatedBusiness.businessID;
+  const usersToCreate: UserToCreate[] = [];
+  const usersToUpdate: UserToUpdate[] = [];
+  const usersToDelete: UserToDelete[] = [];
 
   // process each perk group separately
-  Object.keys(newBusiness.perkGroups).forEach(async (perkGroupName) => {
+  Object.keys(updatedBusiness.perkGroups).forEach(async (perkGroupName) => {
     // TODO: improve this so that we can instantly tell if a perkGroup has changed
     // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
-    // get existing users
-    const businessUsersRef = await db
-      .collection('users')
-      .where('businessID', '==', newBusiness.id);
+    const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
 
-    // we just keep track of their email address
-    // it doesn't create them a user when the signup?
-    // i guess not
-    const existingUsersSnapshot = await businessUsersRef
+    // get existing users
+    const existingPerkUsersSnapshot = await db
+      .collection('users')
+      .where('businessID', '==', updatedBusiness.businessID)
       .where('perkGroup', '==', perkGroupName)
       .get();
 
     // skip if there are no docs
-    if (existingUsersSnapshot.docs.length == 0) {
+    if (existingPerkUsersSnapshot.docs.length == 0) {
       return;
     }
 
+    const existingPerkUsersDict = generateDictFromSnapshot(
+      existingPerkUsersSnapshot
+    ) as Record<string, User>;
+
     // filter the perks available to employees
-    const userPerks = Object.keys(
-      (existingUsersSnapshot.docs[0].data() as User).perks
+    const livePerkGroup = {
+      perks: Object.keys(
+        (existingPerkUsersSnapshot.docs[0].data() as User).perks
+      ),
+      emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
+    } as PerkGroup;
+
+    // intersect updatedPerkGroup with livePerkGroup
+    // to get a subset of the livePerkGroup
+    // that we will apply to livePerkGroup
+    // in order to shrink it
+    const intersectedPerkGroupData = generatePerkGroupIntersection(
+      updatedPerkGroup,
+      livePerkGroup
     );
-    const userEmails = existingUsersSnapshot.docs.map((userDoc) => userDoc.id);
 
-    const intersectedPerkGroupData = {
-      perks: newBusiness.perkGroups[perkGroupName].perks.filter((perkName) =>
-        userPerks.includes(perkName)
-      ),
-      employees: newBusiness.perkGroups[perkGroupName].employees.filter(
-        (employee) => userEmails.includes(employee)
-      ),
-    };
+    // get the emails patch
+    // you want to apply the intersected perk group data to the live emails
+    const { emailsToCreate, emailsToUpdate, emailsToDelete } =
+      generateEmailsPatch(
+        intersectedPerkGroupData.emails,
+        livePerkGroup.emails
+      );
 
-    // you want to set it to be whatever is in intersectedPerkGroupData
-    const existingUsersDict = {};
-    existingUsersSnapshot.forEach((userDoc) => {
-      // build the existingUsersDict
-      existingUsersDict[userDoc.id] = userDoc.data();
+    usersToCreate.push(
+      ...emailsToCreate.map((email) => ({
+        email,
+        newPerks: intersectedPerkGroupData.perks,
+        perkGroupName,
+        businessID,
+      }))
+    );
 
-      if (!intersectedPerkGroupData.employees.includes(userDoc.id)) {
-        // user does exist but is not in the businessData doc
-        // delete the user
-        // this should never happen
-        usersToDelete.push(userDoc.id);
-      }
-    });
+    usersToUpdate.push(
+      ...emailsToUpdate.map((email) => ({
+        email,
+        newPerks: intersectedPerkGroupData.perks,
+        oldPerks: existingPerkUsersDict[email].perks,
+        perkGroupName,
+      }))
+    );
 
-    // using create update
-    intersectedPerkGroupData.employees.map((employee) => {
-      // What emails do we want to send here?
-      // if the email doesn't exist, we send account creation email
-      // if it does exist, we send perk update email
-
-      // check if user exists
-      if (employee in existingUsersDict) {
-        // user exists
-        usersToUpdate.push({
-          email: employee,
-          oldPerks: existingUsersDict[employee].perks,
-          newPerks: intersectedPerkGroupData.perks,
-          perkGroupName,
-        });
-      } else {
-        usersToCreate.push({
-          email: employee,
-          newPerks: intersectedPerkGroupData.perks,
-          perkGroupName,
-        });
-      }
-    });
+    usersToDelete.push(
+      ...emailsToDelete.map((email) => ({
+        email,
+      }))
+    );
   });
 
   // assert that there are no users to create
@@ -96,27 +90,11 @@ export const shrinkUsers = async (newBusiness: Business) => {
     console.error(
       'Error users to create is not 0 in syncBusinessDocRemovalsToUserDocuments'
     );
-
-    // await Promise.all(
-    //   usersToCreate.map(({ email, perkGroupName, newPerks }) =>
-    //     createUserHelper(email, businessID, perkGroupName, newPerks)
-    //   )
-    // );
   }
 
   // update users
-  await Promise.all(
-    usersToUpdate.map(({ email, oldPerks, newPerks, perkGroupName }) => {
-      updateUserHelper(
-        email,
-        newBusiness.id,
-        perkGroupName,
-        oldPerks,
-        newPerks
-      );
-    })
-  );
+  await Promise.all(usersToUpdate.map(updateUserHelper));
 
   // delete users
-  await Promise.all(usersToDelete.map((email) => deleteUserHelper(email)));
+  await Promise.all(usersToDelete.map(deleteUserHelper));
 };

@@ -27,7 +27,7 @@ export const deletePerkGroup = async (req, res, next) => {
       });
 
     // update the stripe subscription
-    await updateStripeSubscription(businessID);
+    await updateStripeSubscription(req.businessData);
 
     // sync stripe subscriptions with perks
     res.status(200).end();
