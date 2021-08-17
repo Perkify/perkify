@@ -1,3 +1,4 @@
+import Stripe from 'stripe';
 import { stripeWebhookSecret } from '../../../configs';
 import { functions, stripe } from '../../../services';
 import { errorHandler } from '../../../utils';
@@ -29,7 +30,7 @@ export const issuingAuthorizationRequestWebhookHandler =
 
     try {
       if (event.type === 'issuing_authorization.request') {
-        const auth = event.data.object;
+        const auth = event.data.object as Stripe.Issuing.Authorization;
         await handleAuthorizationRequest(auth);
       }
     } catch (err) {

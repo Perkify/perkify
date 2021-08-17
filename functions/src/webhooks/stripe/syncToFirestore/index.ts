@@ -21,7 +21,7 @@ const prefixMetadata = (metadata: Record<string, string>) =>
   Object.keys(metadata).reduce((prefixedMetadata, key) => {
     prefixedMetadata[`stripe_metadata_${key}`] = metadata[key];
     return prefixedMetadata;
-  }, {});
+  }, {} as { [key: string]: string });
 
 /**
  * Create a Product record in Firestore based on a Stripe Product object.
@@ -328,23 +328,7 @@ const insertPaymentRecord = async (
     throw new Error('User not found!');
   }
   if (checkoutSession) {
-    const lineItems = await stripe.checkout.sessions.listLineItems(
-      checkoutSession.id
-    );
-    const prices: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] =
-      [];
-    for (const item of lineItems.data) {
-      prices.push(
-        admin
-          .firestore()
-          .collection(config.productsCollectionPath)
-          .doc(item.price?.product as string)
-          .collection('prices')
-          .doc(item.price?.id as string)
-      );
-    }
-    payment['prices'] = prices;
-    payment['items'] = lineItems.data;
+    console.error('Not handling checkout session payment record');
   }
   // Write to invoice to a subcollection on the subscription doc.
   await customersSnap.docs[0].ref

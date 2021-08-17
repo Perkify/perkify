@@ -15,7 +15,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
     perkGroupName: userToCreate.perkGroupName,
     perks: userToCreate.newPerks.reduce(
       (map, perk) => ((map[perk] = []), map),
-      {}
+      {} as { [key: string]: string[] }
     ),
   } as SimpleUser);
 
@@ -50,7 +50,7 @@ export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
       acc[perk] = [];
     }
     return acc;
-  }, {});
+  }, {} as { [key: string]: string[] });
 
   await docRef.update({
     perks: oldUserNewPerks,

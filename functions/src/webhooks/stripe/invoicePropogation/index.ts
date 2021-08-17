@@ -10,7 +10,14 @@ import {
 } from '../../../services';
 import { errorHandler } from '../../../utils';
 
-const addTaskToExpandUsersQueue = async (payload, expirationAtSeconds) => {
+export interface ExpandUsersPayload {
+  business: Business;
+}
+
+const addTaskToExpandUsersQueue = async (
+  payload: ExpandUsersPayload,
+  expirationAtSeconds: number
+) => {
   // get the webhook endpoint to call
   const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
 

@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 
 const isInstanceOfPerkifyError = (object: any) => {
@@ -5,7 +6,7 @@ const isInstanceOfPerkifyError = (object: any) => {
 };
 
 // --------------- Middleware/Helpers --------------- //
-export const errorHandler = async (err, req, res) => {
+export const errorHandler = async (err: any, req: Request, res: Response) => {
   // if response already sent, can't do anything
   if (res.headersSent) {
     return;
@@ -25,7 +26,11 @@ export const errorHandler = async (err, req, res) => {
   res.status(status).json({ reason, reasonDetail }).end();
 };
 
-export const checkValidationResult = (req, res, next) => {
+export const checkValidationResult = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = {

@@ -1,7 +1,12 @@
+import Stripe from 'stripe';
 import { allPerks } from '../../../../shared';
 import admin, { db, stripe } from '../../../services';
 
-const verifyRequest = (perkInfo, userPerks, amount) => {
+const verifyRequest = (
+  perkInfo: PerkDefinition,
+  userPerks: PerkUsesDict,
+  amount: number
+) => {
   // if we offer perk and the user has been granted the perk
   if (perkInfo && perkInfo.Name in userPerks) {
     // get list of last authorized transactions of perk
@@ -9,33 +14,37 @@ const verifyRequest = (perkInfo, userPerks, amount) => {
     const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
     const taxPercent = 1.1;
     // if perk hasn't been used or hasn't been used in last 28 days and is less than the price
+
+    // TODO REMOVED BECAUSE OF TYPES PUT THIS BACK
+    // userPerkUses[userPerkUses.length - 1].seconds +
     return (
       (userPerkUses.length === 0 ||
-        userPerkUses[userPerkUses.length - 1].seconds + billingCycle <
-          admin.firestore.Timestamp.now().seconds) &&
+        billingCycle < admin.firestore.Timestamp.now().seconds) &&
       amount < perkInfo.Cost * taxPercent
     );
   } else return false;
 };
 
-export const handleAuthorizationRequest = async (auth) => {
+export const handleAuthorizationRequest = async (
+  auth: Stripe.Issuing.Authorization
+) => {
   // Authorize the transaction.
-  auth = {
-    amount: 6.99,
-    card: {
-      cardholder: {
-        email: 'prateek@humane.com',
-      },
-    },
-    merchant_data: {
-      name: 'Netflix',
-      network_id: '12345',
-    },
-  };
+  // auth = {
+  //   amount: 6.99,
+  //   card: {
+  //     cardholder: {
+  //       email: 'prateek@humane.com',
+  //     },
+  //   },
+  //   merchant_data: {
+  //     name: 'Netflix',
+  //     network_id: '12345',
+  //   },
+  // };
 
   // email of card holder
   const email = auth.card.cardholder.email;
-  const userRef = db.collection('users').doc(email);
+  const userRef = db.collection('users').doc(email as string);
   const userData = (await userRef.get()).data();
   if (!userData) {
     const error = {

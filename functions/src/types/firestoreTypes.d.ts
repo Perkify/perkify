@@ -69,21 +69,20 @@ interface Business {
 }
 
 type PerkUses = string[];
+interface PerkUsesDict {
+  [key: string]: PerkUses;
+}
 
 interface SimpleUser {
   businessID: string;
   perkGroupName: string;
-  perks: {
-    [key: string]: PerkUses;
-  };
+  perks: PerkUsesDict;
 }
 
 interface User {
   businessID: string;
   perkGroupName: string;
-  perks: {
-    [key: string]: PerkUses;
-  };
+  perks: PerkUsesDict;
   firstName: string;
   lastName: string;
   card: {
