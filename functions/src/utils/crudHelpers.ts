@@ -5,6 +5,7 @@
 
 import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions } from '../models';
+import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
 export const createUserHelper = async (userToCreate: UserToCreate) => {
   const docRef = db.collection('users').doc(userToCreate.email);
@@ -82,4 +83,12 @@ export const deleteUserHelper = async (userToDelete: UserToDelete) => {
   //     status: 'canceled',
   //   });
   await db.collection('users').doc(userToDelete.email).delete();
+};
+
+export const expandUsers = async (updatedBusiness: Business) => {
+  applyChangesToLiveUsers(updatedBusiness, 'expand');
+};
+
+export const shrinkUsers = async (updatedBusiness: Business) => {
+  applyChangesToLiveUsers(updatedBusiness, 'shrink');
 };

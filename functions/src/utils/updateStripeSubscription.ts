@@ -1,6 +1,6 @@
 import { allPerksDict } from '../../shared';
 import { db, stripe } from '../models';
-import { shrinkUsers } from './shrinkUsers';
+import { shrinkUsers } from './crudHelpers';
 
 // takes an admin id and business id
 // updates the stripe subscription to match the perks and employees in the business document

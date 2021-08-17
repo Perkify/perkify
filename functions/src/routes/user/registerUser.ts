@@ -22,7 +22,6 @@ export const registerUser = async (req, res, next) => {
   const { firstName, lastName } = req.body;
   const email = req.user.email;
   const businessData = req.businessData;
-  const businessID = req.businessID;
 
   try {
     const billingAddress = businessData.billingAddress;
