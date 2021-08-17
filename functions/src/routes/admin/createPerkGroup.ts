@@ -9,15 +9,15 @@ import {
   validateBusinessDoc,
   validateEmails,
   validateFirebaseIdToken,
+  validateNewPerkGroupName,
   validatePerks,
-  validateUniquePerkGroupName,
 } from '../../utils';
 
 export const createPerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  param('perkGroupName').exists().custom(validateUniquePerkGroupName),
+  param('perkGroupName').custom(validateNewPerkGroupName),
   body('emails')
     .custom(validateEmails)
     .custom(checkIfAnyEmailsAreClaimed)

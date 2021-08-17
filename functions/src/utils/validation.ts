@@ -59,12 +59,26 @@ export const validatePerks = async (perks) => {
   return Promise.resolve();
 };
 
-export const validateUniquePerkGroupName = async (perkGroupName, { req }) => {
+export const validateNewPerkGroupName = async (perkGroupName, { req }) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
     if (Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
       return new Error(
         'Trying to create a perk group with a name that already exists'
+      );
+    }
+  } else {
+    return new Error('Perk group name not specified');
+  }
+  return;
+};
+
+export const validateExistingPerkGroupName = async (perkGroupName, { req }) => {
+  if (perkGroupName) {
+    const businessData = req.businessData as Business;
+    if (!Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
+      return new Error(
+        "Trying to update a perk group with a name that doesn't exist"
       );
     }
   } else {

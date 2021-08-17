@@ -90,7 +90,6 @@ export const registerAdminAndBusiness = async (req, res, next) => {
 
     res.status(200).end();
   } catch (err) {
-    // TODO: if globalWalletID is set then use rapid api to delete the wallet
     next(err);
   }
 };

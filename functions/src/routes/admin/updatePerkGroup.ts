@@ -1,11 +1,13 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { db } from '../../models';
 import {
   checkValidationResult,
   sanitizeEmails,
   updateStripeSubscription,
   validateAdminDoc,
+  validateBusinessDoc,
   validateEmails,
+  validateExistingPerkGroupName,
   validateFirebaseIdToken,
   validatePerks,
 } from '../../utils';
@@ -13,6 +15,8 @@ import {
 export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
+  validateBusinessDoc,
+  param('perkGroupName').custom(validateExistingPerkGroupName),
   body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
   body('perks').custom(validatePerks),
   checkValidationResult,
