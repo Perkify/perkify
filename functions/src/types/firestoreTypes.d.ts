@@ -41,6 +41,7 @@ interface BillingAddress {
   city: string;
   country: string;
   line1: string;
+  // can we make this non optional?
   line2?: string;
   postal_code: string;
   state: string;
@@ -130,6 +131,7 @@ interface UserToDelete {
 
 // there are some errors we just want to send to the client, and some that we want to log for our own debugging
 
+// TODO camelCase keys
 interface PerkDefinition {
   Name: string;
   Cost: number;
@@ -143,4 +145,8 @@ interface PerkDefinition {
 
 interface PerkDefinitionsDict {
   [key: string]: PerkDefinition;
+}
+
+interface ExpandUsersPayload {
+  business: Business;
 }

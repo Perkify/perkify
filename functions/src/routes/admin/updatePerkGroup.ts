@@ -35,8 +35,6 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
-    // TODO validate that you aren't adding any duplicate emails
-
     try {
       // update business doc
       // this makes pendingBusiness equal updatedBusiness

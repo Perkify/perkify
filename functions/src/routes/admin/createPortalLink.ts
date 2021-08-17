@@ -22,9 +22,9 @@ export const createPortalLinkValidators = [
  */
 export const createPortalLink = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const { returnUrl } = req.body;
+    const { returnUrl } = req.body as { returnUrl: string };
     const uid = req.user.uid;
-    const businessData = req.businessData as Business;
+    const businessData = req.businessData;
 
     try {
       if (!uid) throw new Error('Not authenticated!');

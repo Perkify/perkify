@@ -10,16 +10,12 @@ import {
 } from '../../../services';
 import { errorHandler } from '../../../utils';
 
-export interface ExpandUsersPayload {
-  business: Business;
-}
-
 const addTaskToExpandUsersQueue = async (
   payload: ExpandUsersPayload,
   expirationAtSeconds: number
 ) => {
   // get the webhook endpoint to call
-  const url = firebaseFunctionsUrl + '/syncUsersWithBusinessDocumentPerkGroup';
+  const url = firebaseFunctionsUrl + '/expandUsersWebhookHandler';
 
   const task = {
     httpRequest: {
@@ -75,47 +71,11 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
     await db.collection('businesses').doc(businessID).get()
   ).data() as Business;
 
-  if (invoice.metadata) {
-    // this is a modified subscription because the invoice has metadata
+  // generate the payload
+  const payload = { business };
 
-    // generate the payload
-    const payload = { business };
-
-    // create task in queue
-    await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
-  } else {
-    // this is not a subscription because the invoice does not have metadata
-
-    // calculate minutes since webhook creation
-    const subscriptionCreatedDate = new Date(subscription.created * 1000);
-    const presentDate = new Date();
-    const minutesSinceCreation =
-      Math.abs(presentDate.getTime() - subscriptionCreatedDate.getTime()) /
-      1000 /
-      60;
-
-    if (minutesSinceCreation < 60) {
-      // created less than a day ago
-      // so this corresponds to a subscription creation
-
-      const perkGroupNames = Object.keys(business.perkGroups);
-      if (perkGroupNames.length != 1) {
-        throw new Error(
-          'Expected perk group names length to be 1 upon creation of subscription'
-        );
-      }
-
-      // generate the payload
-      const payload = { business };
-
-      // create task in queue
-      await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
-    } else {
-      // created over a day ago
-      // so corresponds to a subscription renewal
-      // renewal so we want to credit the user in 2 days
-    }
-  }
+  // create task in queue
+  await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
 };
 
 export const invoicePaidWebhookHandler = functions.https.onRequest(

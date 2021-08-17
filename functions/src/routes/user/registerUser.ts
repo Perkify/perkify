@@ -26,13 +26,13 @@ export const registerUser = userPerkifyRequestTransform(
     const email = req.user.email;
     const businessData = req.businessData;
 
+    const billingAddress = businessData.billingAddress;
+
+    if (billingAddress && billingAddress?.line2 == '') {
+      delete billingAddress['line2'];
+    }
+
     try {
-      const billingAddress = businessData.billingAddress;
-
-      if (billingAddress && billingAddress?.line2 == '') {
-        delete billingAddress['line2'];
-      }
-
       const cardholder = await stripe.issuing.cardholders.create({
         type: 'individual',
         name: `${firstName} ${lastName}`,
@@ -60,7 +60,6 @@ export const registerUser = userPerkifyRequestTransform(
       const prevUserData = (
         await db.collection('users').doc(email).get()
       ).data() as SimpleUser;
-
       await db
         .collection('users')
         .doc(email)

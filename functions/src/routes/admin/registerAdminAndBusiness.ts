@@ -48,12 +48,15 @@ export const registerAdminAndBusiness = async (
     const businessRef = db.collection('businesses').doc();
 
     // create admin document to link user to business
-    await db.collection('admins').doc(newUser.uid).set({
-      email,
-      firstName,
-      lastName,
-      companyID: businessRef.id,
-    });
+    await db
+      .collection('admins')
+      .doc(newUser.uid)
+      .set({
+        email,
+        firstName,
+        lastName,
+        businessID: businessRef.id,
+      } as Admin);
 
     // create stripe customer associated with the business
     const stripeBusinessMetadata = {

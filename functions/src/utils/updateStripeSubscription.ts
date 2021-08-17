@@ -2,12 +2,8 @@ import { allPerksDict } from '../../shared';
 import { db, stripe } from '../services';
 import { shrinkUsers } from './crudHelpers';
 
-// takes an admin id and business id
-// updates the stripe subscription to match the perks and employees in the business document
-// to be used after making an update to a single perk group
-// must be called separately for each updated perk group
-
 // we want to call this anytime we modify a stripe subscription
+// takes the business definition and updates the relevant stripe subscription
 
 // update stripe subscription with business perks
 export const updateStripeSubscription = async (updatedBusiness: Business) => {

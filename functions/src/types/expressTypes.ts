@@ -40,7 +40,7 @@ export const adminPerkifyRequestTransform = (handler: AdminPerkifyHandler) => {
         reason: "Couldn't generate context",
         reasonDetail: "Couldn't generate context",
       } as PerkifyError;
-      return error;
+      return next(error);
     }
   };
 };
@@ -83,7 +83,7 @@ export const userPerkifyRequestTransform = (handler: UserPerkifyHandler) => {
         reason: "Couldn't generate context",
         reasonDetail: "Couldn't generate context",
       } as PerkifyError;
-      return error;
+      return next(error);
     }
   };
 };
