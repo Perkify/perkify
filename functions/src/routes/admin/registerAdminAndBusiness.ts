@@ -1,6 +1,6 @@
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import admin, { db, stripe } from '../../models';
-import { emailNormalizationOptions } from '../../utils';
+import { checkValidationResult, emailNormalizationOptions } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
   body('firstName').not().isEmpty(),
@@ -12,6 +12,7 @@ export const registerAdminAndBusinessValidators = [
   body('city').not().isEmpty(),
   body('state').isLength({ min: 2, max: 2 }),
   body('postalCode').not().isEmpty(),
+  checkValidationResult,
 ];
 
 export const registerAdminAndBusiness = async (req, res, next) => {
@@ -29,17 +30,6 @@ export const registerAdminAndBusiness = async (req, res, next) => {
   } = req.body;
 
   try {
-    // verify that no extra parameters were sent
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
-      };
-      return next(error);
-    }
-
     // create firebase user
     const newUser = await admin.auth().createUser({
       email,

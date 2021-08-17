@@ -63,8 +63,12 @@ const GettingStarted = () => {
       setInvalidStep(false);
 
       const bearerToken = await currentUser.getIdToken();
+      // user registers themselves
+      // after signing in?
+      // because we need their first and last name
+      // so auth isn't created until
       const response = await PerkifyApi.post(
-        'rest/auth/registerUser',
+        'rest/registerUser',
         JSON.stringify(formFields),
         {
           headers: {

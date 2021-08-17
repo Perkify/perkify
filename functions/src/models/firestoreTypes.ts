@@ -67,15 +67,35 @@ interface Business {
 
 type PerkUses = string[];
 
-interface User {
+interface SimpleUser {
   businessID: string;
-  // TODO update User to user perkGroupName instead of perkGroup
-  perkGroup: string;
+  perkGroupName: string;
   perks: {
     [key: string]: PerkUses;
   };
-  // TODO handle User has card
-  // card: string
+}
+
+interface User {
+  businessID: string;
+  perkGroupName: string;
+  perks: {
+    [key: string]: PerkUses;
+  };
+  firstName: string;
+  lastName: string;
+  card: {
+    id: string;
+    cardholderID: string;
+    number: string;
+    cvc: string;
+    exp: {
+      month: number;
+      year: number;
+    };
+    billing: {
+      address: string;
+    };
+  };
 }
 
 interface UserToCreate {

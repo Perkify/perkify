@@ -202,12 +202,32 @@ export const validateAdminDoc = async (req, res, next) => {
   }
 
   req.adminData = adminData;
+  req.businessID = adminData.businessID;
+  return next();
+};
+
+export const validateUserDoc = async (req, res, next) => {
+  const userData = (
+    await db.collection('users').doc(req.user.uid).get()
+  ).data();
+
+  if (userData == null) {
+    const error = {
+      status: 500,
+      reason: 'Missing user document',
+      reasonDetail: `Missing user document in firestore`,
+    };
+    return next(error);
+  }
+
+  req.userData = userData;
+  req.businessID = userData.businessID;
   return next();
 };
 
 export const validateBusinessDoc = async (req, res, next) => {
   const businessData = (
-    await db.collection('businesses').doc(req.adminData.businessID).get()
+    await db.collection('businesses').doc(req.businessID).get()
   ).data();
 
   if (businessData == null) {

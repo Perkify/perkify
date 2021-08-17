@@ -40,12 +40,12 @@ export const expandUsers = async (updatedBusiness: Business) => {
 
     const existingPerkUsersDict = generateDictFromSnapshot(
       existingPerkUsersSnapshot
-    ) as Record<string, User>;
+    ) as Record<string, SimpleUser>;
 
     // filter the perks available to employees
     const livePerkGroup = {
       perks: Object.keys(
-        (existingPerkUsersSnapshot.docs[0].data() as User).perks
+        (existingPerkUsersSnapshot.docs[0].data() as SimpleUser).perks
       ),
       emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
     } as PerkGroup;

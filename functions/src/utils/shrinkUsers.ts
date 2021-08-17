@@ -26,19 +26,14 @@ export const shrinkUsers = async (updatedBusiness: Business) => {
       .where('perkGroup', '==', perkGroupName)
       .get();
 
-    // skip if there are no docs
-    if (existingPerkUsersSnapshot.docs.length == 0) {
-      return;
-    }
-
     const existingPerkUsersDict = generateDictFromSnapshot(
       existingPerkUsersSnapshot
-    ) as Record<string, User>;
+    ) as Record<string, SimpleUser>;
 
     // filter the perks available to employees
     const livePerkGroup = {
       perks: Object.keys(
-        (existingPerkUsersSnapshot.docs[0].data() as User).perks
+        (existingPerkUsersSnapshot.docs[0].data() as SimpleUser).perks
       ),
       emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
     } as PerkGroup;

@@ -11,12 +11,12 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
 
   await docRef.set({
     businessID: userToCreate.businessID,
-    group: userToCreate.perkGroupName,
+    perkGroupName: userToCreate.perkGroupName,
     perks: userToCreate.newPerks.reduce(
       (map, perk) => ((map[perk] = []), map),
       {}
     ),
-  });
+  } as SimpleUser);
 
   const signInLink = await admin
     .auth()

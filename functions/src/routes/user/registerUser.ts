@@ -1,64 +1,30 @@
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import { db, stripe } from '../../models';
+import {
+  checkValidationResult,
+  validateBusinessDoc,
+  validateFirebaseIdToken,
+  validateUserDoc,
+} from '../../utils';
 
 export const registerUserValidators = [
+  validateFirebaseIdToken,
+  validateUserDoc,
+  validateBusinessDoc,
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
+  checkValidationResult,
 ];
+
+// when does registerUser get called?
+// what is the user creation flow?
 export const registerUser = async (req, res, next) => {
-  const { firstName, lastName, ...rest } = req.body;
+  const { firstName, lastName } = req.body;
+  const email = req.user.email;
+  const businessData = req.businessData;
+  const businessID = req.businessID;
 
   try {
-    // check for validation errors
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
-      };
-      return next(error);
-    }
-
-    if (Object.keys(rest).length > 0) {
-      const error = {
-        status: 400,
-        reason: 'extraneous parameters',
-        reasonDetail: Object.keys(rest).join(','),
-      };
-      return next(error);
-    }
-
-    const email = req.user.email;
-
-    // TODO: get field directly
-    const userData = (await db.collection('users').doc(email).get()).data();
-
-    if (!userData) {
-      const error = {
-        status: 500,
-        reason: 'Missing user document',
-        reasonDetail: `User documents missing from firestore`,
-      };
-      return next(error);
-    }
-
-    const businessID = userData.businessID;
-
-    const businessData = (
-      await db.collection('businesses').doc(businessID).get()
-    ).data();
-
-    if (!businessData) {
-      const error = {
-        status: 500,
-        reason: 'Missing business document',
-        reasonDetail: `Business documents missing from firestore`,
-      };
-      return next(error);
-    }
-
     const billingAddress = businessData.billingAddress;
 
     if (billingAddress && billingAddress?.line2 == '') {
@@ -87,10 +53,17 @@ export const registerUser = async (req, res, next) => {
       expand: ['number', 'cvc'],
     });
 
+    // we combine prevUserData with new data
+    // in order to be sure we are satisfying the User type
+    const prevUserData = (
+      await db.collection('users').doc(email).get()
+    ).data() as SimpleUser;
+
     await db
       .collection('users')
       .doc(email)
-      .update({
+      .set({
+        ...prevUserData,
         firstName: firstName,
         lastName: lastName,
         card: {
@@ -109,7 +82,7 @@ export const registerUser = async (req, res, next) => {
             address: billingAddress,
           },
         },
-      });
+      } as User);
 
     res.status(200).end();
   } catch (err) {
