@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { db } from '../../models';
 import {
   checkIfAnyEmailsAreClaimed,
@@ -6,14 +6,18 @@ import {
   sanitizeEmails,
   updateStripeSubscription,
   validateAdminDoc,
+  validateBusinessDoc,
   validateEmails,
   validateFirebaseIdToken,
   validatePerks,
+  validateUniquePerkGroupName,
 } from '../../utils';
 
 export const createPerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
+  validateBusinessDoc,
+  param('perkGroupName').exists().custom(validateUniquePerkGroupName),
   body('emails')
     .custom(validateEmails)
     .custom(checkIfAnyEmailsAreClaimed)
@@ -23,8 +27,6 @@ export const createPerkGroupValidators = [
 ];
 
 export const createPerkGroup = async (req, res, next) => {
-  // TODO validate that a group with that name doesn't already exist
-
   const perkGroupName = req.params.perkGroupName;
   const { emails, perks } = req.body;
   const adminData = req.adminData;

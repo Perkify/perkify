@@ -23,7 +23,7 @@ export const validateUserEmail = async (email) => {
   }
 };
 
-export const validateEmails = async (emails, next) => {
+export const validateEmails = async (emails) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {
       if (!validator.isEmail(email)) {
@@ -57,6 +57,20 @@ export const validatePerks = async (perks) => {
     return Promise.reject(new Error('send array of perks'));
   }
   return Promise.resolve();
+};
+
+export const validateUniquePerkGroupName = async (perkGroupName, { req }) => {
+  if (perkGroupName) {
+    const businessData = req.businessData as Business;
+    if (Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
+      return new Error(
+        'Trying to create a perk group with a name that already exists'
+      );
+    }
+  } else {
+    return new Error('Perk group name not specified');
+  }
+  return;
 };
 
 export const checkIfAnyEmailsAreClaimed = async (emails) => {
