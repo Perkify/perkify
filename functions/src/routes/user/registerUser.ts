@@ -9,11 +9,6 @@ import {
   validateUserDoc,
 } from '../../utils';
 
-export interface RegisterUserPayload {
-  firstName: string;
-  lastName: string;
-}
-
 export const registerUserValidators = [
   validateFirebaseIdToken,
   validateUserDoc,

@@ -86,10 +86,10 @@ const CreateGroup = () => {
     // call the api to create the group
     await PerkifyApi.post(
       `rest/perkGroup/${groupName}`,
-      JSON.stringify({
+      {
         emails: emailList,
-        perks: selectedPerks,
-      }),
+        perkNames: selectedPerks,
+      } as CreatePerkGroupPayload,
       {
         headers: {
           Authorization: `Bearer ${bearerToken}`,

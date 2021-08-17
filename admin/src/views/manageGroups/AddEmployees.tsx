@@ -71,9 +71,9 @@ const AddEmployees = ({
         PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
-            perks: groupPerks.map((perkObj) => perkObj.Name),
+            perkNames: groupPerks.map((perkObj) => perkObj.Name),
             emails: afterEmployees,
-          },
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,

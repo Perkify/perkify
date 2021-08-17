@@ -63,10 +63,10 @@ const RemovePerks = ({
         }
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
-          JSON.stringify({
+          {
             emails: emails.map((emailObj) => emailObj.email),
-            perks: afterPerksNames,
-          }),
+            perkNames: afterPerksNames,
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,

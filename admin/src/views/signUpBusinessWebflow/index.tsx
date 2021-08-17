@@ -111,7 +111,7 @@ const SignUpBusinessWebflow = () => {
             ...AdminFormProps,
             ...BusinessFormProps,
             line2: '',
-          });
+          } as RegisterAdminAndBusinessPayload);
           const result = await app
             .auth()
             .signInWithEmailAndPassword(email, password);

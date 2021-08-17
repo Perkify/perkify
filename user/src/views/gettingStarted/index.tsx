@@ -69,7 +69,7 @@ const GettingStarted = () => {
       // so auth isn't created until
       const response = await PerkifyApi.post(
         'rest/registerUser',
-        JSON.stringify(formFields),
+        formFields as RegisterUserPayload,
         {
           headers: {
             Authorization: `Bearer ${bearerToken}`,

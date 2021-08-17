@@ -30,6 +30,8 @@ const AddEmployees = ({
   groupData,
 }: AddEmployeesProps) => {
   // selected perk group from dropdown and respective error
+
+  const { business } = useContext(BusinessContext);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
   const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
@@ -78,14 +80,14 @@ const AddEmployees = ({
 
         PerkifyApi.put(
           `rest/perkGroup/${selectedPerkGroup}`,
-          JSON.stringify({
-            perks: undefined,
+          {
+            perkNames: business.perkGroups[selectedPerkGroup].perkNames,
             emails: emailList.concat(
               peopleData
                 .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
                 .map((employeeObj) => employeeObj.email)
             ),
-          }),
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
@@ -113,8 +115,6 @@ const AddEmployees = ({
       })();
     }
   };
-
-  const { business } = useContext(BusinessContext);
 
   function generatePerks() {
     return business.perkGroups[selectedPerkGroup].perkNames;

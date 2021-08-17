@@ -88,11 +88,10 @@ export default function ManagePeople(props: any) {
 
             await PerkifyApi.put(
               `rest/perkGroup/${perkGroup}`,
-              JSON.stringify({
-                group: perkGroup,
+              {
                 emails: afterEmails,
-                perks: undefined,
-              }),
+                perkNames: business.perkGroups[perkGroup].perkNames,
+              } as UpdatePerkGroupPayload,
               {
                 headers: {
                   Authorization: `Bearer ${bearerToken}`,

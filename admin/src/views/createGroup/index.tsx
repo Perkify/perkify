@@ -127,8 +127,8 @@ const CreateGroup = () => {
           `rest/perkGroup/${groupName}`,
           {
             emails: emailList,
-            perks: selectedPerks,
-          },
+            perkNames: selectedPerks,
+          } as CreatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,

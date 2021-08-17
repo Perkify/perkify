@@ -72,10 +72,10 @@ const AddPerks = ({
 
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
-          JSON.stringify({
+          {
             emails: emails.map((emailObj) => emailObj.email),
-            perks: afterPerks,
-          }),
+            perkNames: afterPerks,
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,

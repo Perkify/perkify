@@ -20,7 +20,7 @@ const Billing = () => {
         'rest/auth/createPortalLink',
         {
           returnUrl: window.location.origin + '/dashboard',
-        },
+        } as CreatePortalLinkPayload,
         {
           headers: {
             Authorization: `Bearer ${bearerToken}`,

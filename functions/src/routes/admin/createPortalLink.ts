@@ -9,10 +9,6 @@ import {
   validateFirebaseIdToken,
 } from '../../utils';
 
-export interface CreatePortalLinkPayload {
-  returnUrl: string;
-}
-
 export const createPortalLinkValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,

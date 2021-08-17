@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { GridSelectionModel } from '@material-ui/data-grid';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
 
@@ -29,6 +29,7 @@ const RemoveEmployees = ({
   employees,
 }: AddEmployeesProps) => {
   const { currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
@@ -57,10 +58,10 @@ const RemoveEmployees = ({
 
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
-          JSON.stringify({
+          {
             emails: afterEmails,
-            perks: undefined,
-          }),
+            perkNames: business.perkGroups[group].perkNames,
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,

@@ -15,11 +15,6 @@ import {
   validatePerkNames,
 } from '../../utils';
 
-export interface UpdatePerkGroupPayload {
-  perkNames: string[];
-  emails: string[];
-}
-
 export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
