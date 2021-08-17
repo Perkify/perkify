@@ -9,6 +9,10 @@ import {
   validateFirebaseIdToken,
 } from '../../utils';
 
+export interface CreatePortalLinkPayload {
+  returnUrl: string;
+}
+
 export const createPortalLinkValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
@@ -22,7 +26,7 @@ export const createPortalLinkValidators = [
  */
 export const createPortalLink = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const { returnUrl } = req.body as { returnUrl: string };
+    const { returnUrl } = req.body as CreatePortalLinkPayload;
     const uid = req.user.uid;
     const businessData = req.businessData;
 

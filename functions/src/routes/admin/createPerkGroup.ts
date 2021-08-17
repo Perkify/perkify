@@ -40,8 +40,6 @@ export const createPerkGroup = adminPerkifyRequestTransform(
     const businessData = req.businessData as Business;
 
     try {
-      // TODO: Change from id to services/expressTypesbusinessID on Business interface
-
       // update the business document to reflect the group of perks
       await db
         .collection('businesses')

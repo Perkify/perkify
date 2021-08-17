@@ -4,7 +4,7 @@
 // not going off of the subscription update
 
 import { newUserTemplateGenerator } from '../../shared';
-import admin, { db, functions } from '../services';
+import admin, { db, functions, stripe } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
 export const createUserHelper = async (userToCreate: UserToCreate) => {
@@ -15,7 +15,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
     perkGroupName: userToCreate.perkGroupName,
     perks: userToCreate.newPerks.reduce(
       (map, perk) => ((map[perk] = []), map),
-      {} as { [key: string]: string[] }
+      {} as { [key: string]: FirebaseFirestore.Timestamp[] }
     ),
   } as SimpleUser);
 
@@ -50,7 +50,7 @@ export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
       acc[perk] = [];
     }
     return acc;
-  }, {} as { [key: string]: string[] });
+  }, {} as PerkUsesDict);
 
   await docRef.update({
     perks: oldUserNewPerks,
@@ -77,11 +77,12 @@ export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
 };
 
 export const deleteUserHelper = async (userToDelete: UserToDelete) => {
-  // TODO fix this
-  // if (userDoc.data().card)
-  //   await stripe.issuing.cards.update(userDoc.data().card.id, {
-  //     status: 'canceled',
-  //   });
+  // if user has a card, delete it
+  if (userToDelete.card) {
+    await stripe.issuing.cards.update(userToDelete.card.id, {
+      status: 'canceled',
+    });
+  }
   await db.collection('users').doc(userToDelete.email).delete();
 };
 

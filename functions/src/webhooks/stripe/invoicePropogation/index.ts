@@ -67,6 +67,11 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
 
   // get the business data to be applied when the invoice becomes available
   const businessID = subscription.metadata['businessID'];
+
+  // what if business is undefined?
+  // the "as Business" hides this fact
+  // should use some sort of helper method for getting the business
+  // or throwing an error if it doesn't exist
   const business = (
     await db.collection('businesses').doc(businessID).get()
   ).data() as Business;

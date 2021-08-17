@@ -15,11 +15,10 @@ const verifyRequest = (
     const taxPercent = 1.1;
     // if perk hasn't been used or hasn't been used in last 28 days and is less than the price
 
-    // TODO REMOVED BECAUSE OF TYPES PUT THIS BACK
-    // userPerkUses[userPerkUses.length - 1].seconds +
     return (
       (userPerkUses.length === 0 ||
-        billingCycle < admin.firestore.Timestamp.now().seconds) &&
+        userPerkUses[userPerkUses.length - 1].seconds + billingCycle <
+          admin.firestore.Timestamp.now().seconds) &&
       amount < perkInfo.Cost * taxPercent
     );
   } else return false;

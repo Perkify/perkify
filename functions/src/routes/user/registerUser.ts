@@ -9,6 +9,11 @@ import {
   validateUserDoc,
 } from '../../utils';
 
+export interface RegisterUserPayload {
+  firstName: string;
+  lastName: string;
+}
+
 export const registerUserValidators = [
   validateFirebaseIdToken,
   validateUserDoc,
@@ -22,7 +27,7 @@ export const registerUserValidators = [
 // what is the user creation flow?
 export const registerUser = userPerkifyRequestTransform(
   async (req: UserPerkifyRequest, res: Response, next: NextFunction) => {
-    const { firstName, lastName } = req.body;
+    const { firstName, lastName } = req.body as RegisterUserPayload;
     const email = req.user.email;
     const businessData = req.businessData;
 

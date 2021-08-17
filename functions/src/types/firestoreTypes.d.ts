@@ -69,7 +69,7 @@ interface Business {
   };
 }
 
-type PerkUses = string[];
+type PerkUses = FirebaseFirestore.Timestamp[];
 interface PerkUsesDict {
   [key: string]: PerkUses;
 }
@@ -80,27 +80,37 @@ interface SimpleUser {
   perks: PerkUsesDict;
 }
 
+interface UserCard {
+  id: string;
+  cardholderID: string;
+  number: string;
+  cvc: string;
+  exp: {
+    month: number;
+    year: number;
+  };
+  billing: {
+    address: BillingAddress;
+  };
+}
+
 interface User {
   businessID: string;
   perkGroupName: string;
   perks: PerkUsesDict;
-  firstName: string;
-  lastName: string;
-  card: {
-    id: string;
-    cardholderID: string;
-    number: string;
-    cvc: string;
-    exp: {
-      month: number;
-      year: number;
-    };
-    billing: {
-      address: BillingAddress;
-    };
-  };
+  firstName?: string;
+  lastName?: string;
+  card?: UserCard;
 }
 
+interface ActivatedUser {
+  businessID: string;
+  perkGroupName: string;
+  perks: PerkUsesDict;
+  firstName?: string;
+  lastName?: string;
+  card?: UserCard;
+}
 interface UserToCreate {
   email: string;
   businessID: string;
@@ -118,6 +128,7 @@ interface UserToUpdate {
 
 interface UserToDelete {
   email: string;
+  card?: UserCard;
 }
 
 // flow, whenever admin makes a change it instantly updates the business doc

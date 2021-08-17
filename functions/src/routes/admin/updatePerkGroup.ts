@@ -15,6 +15,11 @@ import {
   validatePerks,
 } from '../../utils';
 
+export interface UpdatePerkGroupPayload {
+  perks: string[];
+  emails: string[];
+}
+
 export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
@@ -31,7 +36,7 @@ export const updatePerkGroupValidators = [
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupName = req.params.perkGroupName;
-    const { emails, perks } = req.body as PerkGroup;
+    const { emails, perks } = req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 

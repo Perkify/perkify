@@ -39,7 +39,7 @@ export const applyChangesToLiveUsers = async (
 
     const existingPerkUsersDict = generateDictFromSnapshot(
       existingPerkUsersSnapshot
-    ) as Record<string, SimpleUser>;
+    ) as Record<string, User>;
 
     const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
     const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
@@ -105,6 +105,7 @@ export const applyChangesToLiveUsers = async (
     usersToDelete.push(
       ...emailsToDelete.map((email) => ({
         email,
+        card: existingPerkUsersDict[email].card,
       }))
     );
   });

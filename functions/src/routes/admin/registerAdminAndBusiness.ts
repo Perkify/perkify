@@ -3,6 +3,19 @@ import { body } from 'express-validator';
 import admin, { db, stripe } from '../../services';
 import { checkValidationResult, emailNormalizationOptions } from '../../utils';
 
+export interface RegisterAdminAndBusinessPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  businessName: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+}
+
 export const registerAdminAndBusinessValidators = [
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
@@ -32,7 +45,7 @@ export const registerAdminAndBusiness = async (
     city,
     state,
     postalCode,
-  } = req.body;
+  } = req.body as RegisterAdminAndBusinessPayload;
 
   try {
     // create firebase user
