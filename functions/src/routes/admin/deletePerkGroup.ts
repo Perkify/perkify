@@ -1,4 +1,6 @@
-import admin, { db } from '../../models';
+import { NextFunction, Response } from 'express';
+import admin, { db } from '../../services';
+import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
   checkValidationResult,
   updateStripeSubscription,
@@ -12,26 +14,28 @@ export const deletePerkGroupValidators = [
   checkValidationResult,
 ];
 
-export const deletePerkGroup = async (req, res, next) => {
-  const perkGroupName = req.params.perkGroupName;
-  const adminData = req.adminData;
-  const businessID = adminData.businessID;
+export const deletePerkGroup = adminPerkifyRequestTransform(
+  async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
+    const perkGroupName = req.params.perkGroupName;
+    const adminData = req.adminData;
+    const businessID = adminData.businessID;
 
-  try {
-    // delete group from businesss' groups
-    await db
-      .collection('businesses')
-      .doc(businessID)
-      .update({
-        [`groups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
-      });
+    try {
+      // delete group from businesss' groups
+      await db
+        .collection('businesses')
+        .doc(businessID)
+        .update({
+          [`groups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
+        });
 
-    // update the stripe subscription
-    await updateStripeSubscription(req.businessData);
+      // update the stripe subscription
+      await updateStripeSubscription(req.businessData);
 
-    // sync stripe subscriptions with perks
-    res.status(200).end();
-  } catch (err) {
-    next(err);
+      // sync stripe subscriptions with perks
+      res.status(200).end();
+    } catch (err) {
+      next(err);
+    }
   }
-};
+);

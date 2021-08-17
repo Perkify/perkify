@@ -1,5 +1,7 @@
+import { NextFunction, Response } from 'express';
 import { body, param } from 'express-validator';
-import { db } from '../../models';
+import { db } from '../../services';
+import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
   checkIfAnyEmailsToAddAreClaimed,
   checkValidationResult,
@@ -26,32 +28,34 @@ export const updatePerkGroupValidators = [
   checkValidationResult,
 ];
 
-export const updatePerkGroup = async (req, res, next) => {
-  const perkGroupName = req.params.perkGroupName;
-  const { emails, perks } = req.body as PerkGroup;
-  const adminData = req.adminData;
-  const businessID = adminData.businessID;
+export const updatePerkGroup = adminPerkifyRequestTransform(
+  async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
+    const perkGroupName = req.params.perkGroupName;
+    const { emails, perks } = req.body as PerkGroup;
+    const adminData = req.adminData;
+    const businessID = adminData.businessID;
 
-  // TODO validate that you aren't adding any duplicate emails
+    // TODO validate that you aren't adding any duplicate emails
 
-  try {
-    // update business doc
-    // this makes pendingBusiness equal updatedBusiness
-    await db
-      .collection('businesses')
-      .doc(businessID)
-      .update({
-        [`groups.${perkGroupName}`]: {
-          perks,
-          emails,
-        } as PerkGroup,
-      });
+    try {
+      // update business doc
+      // this makes pendingBusiness equal updatedBusiness
+      await db
+        .collection('businesses')
+        .doc(businessID)
+        .update({
+          [`groups.${perkGroupName}`]: {
+            perks,
+            emails,
+          } as PerkGroup,
+        });
 
-    // sync to stripe subscription
-    await updateStripeSubscription(req.businessData);
+      // sync to stripe subscription
+      await updateStripeSubscription(req.businessData);
 
-    res.status(200).end();
-  } catch (error) {
-    res.status(500).end();
+      res.status(200).end();
+    } catch (error) {
+      res.status(500).end();
+    }
   }
-};
+);

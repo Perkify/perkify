@@ -1,5 +1,5 @@
 import { allPerks } from '../../../../shared';
-import admin, { db, stripe } from '../../../models';
+import admin, { db, stripe } from '../../../services';
 
 const verifyRequest = (perkInfo, userPerks, amount) => {
   // if we offer perk and the user has been granted the perk

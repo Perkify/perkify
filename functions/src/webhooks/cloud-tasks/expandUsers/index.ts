@@ -1,4 +1,4 @@
-import { functions } from '../../../models';
+import { functions } from '../../../services';
 import { expandUsers } from '../../../utils';
 
 export const expandUsersWebhookHandler = functions.https.onRequest(

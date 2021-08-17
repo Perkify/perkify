@@ -1,6 +1,13 @@
-import * as validator from 'validator';
+import { NextFunction, Response } from 'express';
+import { Request as ValidatorRequest } from 'express-validator/src/base';
+import validator from 'validator';
 import { allPerks } from '../../shared';
-import { auth, db } from '../models';
+import { auth, db } from '../services';
+import {
+  PartialAdminPerkifyRequest,
+  PartialBusinessPerkifyRequest,
+  PartialUserPerkifyRequest,
+} from '../types';
 import { generateEmailsPatch } from './perkGroupHelpers';
 // * Validation Helpers * //
 
@@ -15,7 +22,7 @@ export const emailNormalizationOptions = {
   icloud_remove_subaddress: false,
 };
 
-export const validateUserEmail = async (email) => {
+export const validateUserEmail = async (email: string) => {
   const userRef = await db.collection('users').doc(email).get();
   if (!userRef.exists) {
     return Promise.reject(new Error('You are not added by your employer'));
@@ -24,7 +31,7 @@ export const validateUserEmail = async (email) => {
   }
 };
 
-export const validateEmails = async (emails) => {
+export const validateEmails = async (emails: string[]) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {
       if (!validator.isEmail(email)) {
@@ -37,13 +44,14 @@ export const validateEmails = async (emails) => {
   return Promise.resolve();
 };
 
-export const sanitizeEmails = (emails) => {
+export const sanitizeEmails = (emails: string[]) => {
   return emails.map((email) =>
     validator.normalizeEmail(email, emailNormalizationOptions)
   );
 };
 
-export const validatePerks = async (perks) => {
+// TODO rename from Perks to PerkNames
+export const validatePerks = async (perks: string[]) => {
   if (Array.isArray(perks) && perks.length > 0) {
     for (const perk of perks) {
       if (!allPerks.some((truePerk) => truePerk.Name === perk)) {
@@ -60,7 +68,10 @@ export const validatePerks = async (perks) => {
   return Promise.resolve();
 };
 
-export const validateNewPerkGroupName = async (perkGroupName, { req }) => {
+export const validateNewPerkGroupName = async (
+  perkGroupName: string,
+  { req }: { req: ValidatorRequest }
+) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
     if (Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
@@ -74,7 +85,10 @@ export const validateNewPerkGroupName = async (perkGroupName, { req }) => {
   return;
 };
 
-export const validateExistingPerkGroupName = async (perkGroupName, { req }) => {
+export const validateExistingPerkGroupName = async (
+  perkGroupName: string,
+  { req }: { req: ValidatorRequest }
+) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
     if (!Object.keys(businessData.perkGroups.perks).includes(perkGroupName)) {
@@ -88,7 +102,7 @@ export const validateExistingPerkGroupName = async (perkGroupName, { req }) => {
   return;
 };
 
-export const checkIfAnyEmailsAreClaimed = async (emails) => {
+export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
   // check if any of the emails exist in any business
   const businessesSnapshot = await db.collection('businesses').get();
 
@@ -119,10 +133,13 @@ export const checkIfAnyEmailsAreClaimed = async (emails) => {
   }
 };
 
-export const checkIfAnyEmailsToAddAreClaimed = async (emails, { req }) => {
+export const checkIfAnyEmailsToAddAreClaimed = async (
+  emails: string[],
+  { req }: { req: ValidatorRequest }
+) => {
   // current state of perk group
   const currentPerkGroup = (req.businessData as Business).perkGroups[
-    req.params.perkGroupName
+    req.params?.perkGroupName
   ] as PerkGroup;
 
   // get the emails to be created
@@ -139,7 +156,11 @@ export const checkIfAnyEmailsToAddAreClaimed = async (emails, { req }) => {
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
-export const validateFirebaseIdToken = async (req, res, next) => {
+export const validateFirebaseIdToken = async (
+  req: PartialAdminPerkifyRequest,
+  res: Response,
+  next: NextFunction
+) => {
   if (
     (!req.headers.authorization ||
       !req.headers.authorization.startsWith('Bearer ')) &&
@@ -175,7 +196,8 @@ export const validateFirebaseIdToken = async (req, res, next) => {
 
   try {
     const decodedIdToken = await auth.verifyIdToken(idToken);
-    req.user = decodedIdToken;
+    const { email, uid } = decodedIdToken;
+    req.user = { email: email as string, uid };
     return next();
   } catch (error) {
     console.error('Error while verifying Firebase ID token:', error);
@@ -187,10 +209,22 @@ export const validateFirebaseIdToken = async (req, res, next) => {
   }
 };
 
-export const validateAdminDoc = async (req, res, next) => {
+export const validateAdminDoc = async (
+  req: PartialAdminPerkifyRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    const error = {
+      status: 500,
+      reason: 'user not available in middleware',
+      reasonDetail: 'user not available in middleware',
+    };
+    return next(error);
+  }
   const adminData = (
     await db.collection('admins').doc(req.user.uid).get()
-  ).data();
+  ).data() as Admin;
 
   if (adminData == null) {
     const error = {
@@ -206,10 +240,23 @@ export const validateAdminDoc = async (req, res, next) => {
   return next();
 };
 
-export const validateUserDoc = async (req, res, next) => {
+export const validateUserDoc = async (
+  req: PartialUserPerkifyRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    const error = {
+      status: 500,
+      reason: 'user not available in middleware',
+      reasonDetail: 'user not available in middleware',
+    };
+    return next(error);
+  }
+
   const userData = (
     await db.collection('users').doc(req.user.uid).get()
-  ).data();
+  ).data() as User;
 
   if (userData == null) {
     const error = {
@@ -225,10 +272,23 @@ export const validateUserDoc = async (req, res, next) => {
   return next();
 };
 
-export const validateBusinessDoc = async (req, res, next) => {
+export const validateBusinessDoc = async (
+  req: PartialBusinessPerkifyRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.businessID) {
+    const error = {
+      status: 500,
+      reason: 'businessID not available in middleware',
+      reasonDetail: 'businessID not available in middleware',
+    };
+    return next(error);
+  }
+
   const businessData = (
     await db.collection('businesses').doc(req.businessID).get()
-  ).data();
+  ).data() as Business;
 
   if (businessData == null) {
     const error = {

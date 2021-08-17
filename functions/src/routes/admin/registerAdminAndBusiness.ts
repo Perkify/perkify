@@ -1,5 +1,6 @@
+import { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
-import admin, { db, stripe } from '../../models';
+import admin, { db, stripe } from '../../services';
 import { checkValidationResult, emailNormalizationOptions } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
@@ -15,7 +16,11 @@ export const registerAdminAndBusinessValidators = [
   checkValidationResult,
 ];
 
-export const registerAdminAndBusiness = async (req, res, next) => {
+export const registerAdminAndBusiness = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const {
     firstName,
     lastName,

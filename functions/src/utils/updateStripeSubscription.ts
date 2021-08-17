@@ -1,5 +1,5 @@
 import { allPerksDict } from '../../shared';
-import { db, stripe } from '../models';
+import { db, stripe } from '../services';
 import { shrinkUsers } from './crudHelpers';
 
 // takes an admin id and business id
@@ -13,15 +13,6 @@ import { shrinkUsers } from './crudHelpers';
 export const updateStripeSubscription = async (updatedBusiness: Business) => {
   // get business data
   const businessID = updatedBusiness.businessID;
-
-  if (!updatedBusiness) {
-    const error = {
-      status: 500,
-      reason: 'Missing document',
-      reasonDetail: 'Could not find business data document',
-    };
-    throw error;
-  }
 
   // remove stuff that shouldn't exist from 'users'
   await shrinkUsers(updatedBusiness);
@@ -39,7 +30,7 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
       });
       return accumulator;
     },
-    {}
+    {} as { [key: string]: number }
   );
 
   // convert the count of each perk to a list of items
@@ -48,7 +39,11 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
       price: allPerksDict[perkName].stripePriceId,
       quantity: perkCountsByName[perkName],
     })
-  );
+  ) as {
+    price: string;
+    quantity: number;
+    id?: string;
+  }[];
 
   // check if the customer has an existing active subscriptions
   const subscriptionsSnapshot = await db
@@ -77,7 +72,8 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
       newSubscriptionItemsList[i]['id'] = subscriptionItem[0]
         .data()
         .items.filter(
-          (item) => item.price.id == newSubscriptionItemsList[i].price
+          (item: { price: { id: string } }) =>
+            item.price.id == newSubscriptionItemsList[i].price
         )?.[0]?.id;
     }
 

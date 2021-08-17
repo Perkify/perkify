@@ -4,7 +4,7 @@
 // not going off of the subscription update
 
 import { newUserTemplateGenerator } from '../../shared';
-import admin, { db, functions } from '../models';
+import admin, { db, functions } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
 export const createUserHelper = async (userToCreate: UserToCreate) => {

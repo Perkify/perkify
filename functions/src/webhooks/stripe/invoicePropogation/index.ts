@@ -7,7 +7,7 @@ import {
   queuePath,
   stripe,
   tasksClient,
-} from '../../../models';
+} from '../../../services';
 import { errorHandler } from '../../../utils';
 
 const addTaskToExpandUsersQueue = async (payload, expirationAtSeconds) => {

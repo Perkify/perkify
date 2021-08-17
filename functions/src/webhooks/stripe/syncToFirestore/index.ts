@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import admin, { db, functions } from '../../../models';
+import admin, { db, functions } from '../../../services';
 import config from './config';
 import { Price, Product, Subscription, TaxRate } from './interfaces';
 import * as logs from './logs';

@@ -1,12 +1,13 @@
 // import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
-import { functions } from '../models';
+import { functions } from '../services';
 import { errorHandler } from '../utils';
 import {
   createPerkGroup,
   createPerkGroupValidators,
   createPortalLink,
+  createPortalLinkValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
   registerAdminAndBusiness,
@@ -43,7 +44,8 @@ app.post(
 app.post('/user', registerUserValidators, registerUser);
 
 // create a portal link for a user
-app.post('/portalLink', createPerkGroupValidators, createPortalLink);
+// app.post('/portalLink', createPerkGroupValidators, createPortalLink);
+app.post('/portalLink', createPortalLinkValidators, createPortalLink);
 
 // perk group crud
 app.post(

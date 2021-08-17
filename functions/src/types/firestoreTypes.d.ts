@@ -1,3 +1,5 @@
+// import { Request } from "express"
+// import { auth } from "../models";
 // how do we image big companies using perkify?
 // big company signs up and pays for all of its subteams?
 // or subteams sign themselves up?
@@ -35,6 +37,15 @@ interface PerkGroup {
   emails: string[];
 }
 
+interface BillingAddress {
+  city: string;
+  country: string;
+  line1: string;
+  line2?: string;
+  postal_code: string;
+  state: string;
+}
+
 interface Business {
   // business ref id
   businessID: string;
@@ -43,15 +54,7 @@ interface Business {
   // admin ids
   admins: string[];
   // billing address
-  billingAddress: {
-    city: string;
-    country: string;
-    line1: string;
-    line2?: string;
-    postal_code: string;
-    state: string;
-  };
-
+  billingAddress: BillingAddress;
   // stripe info
   stripeId: string;
   stripeLink: string;
@@ -93,7 +96,7 @@ interface User {
       year: number;
     };
     billing: {
-      address: string;
+      address: BillingAddress;
     };
   };
 }
@@ -127,3 +130,18 @@ interface UserToDelete {
 // should we move users to be a subcollection of a business? I think that makes sense
 
 // there are some errors we just want to send to the client, and some that we want to log for our own debugging
+
+interface PerkDefinition {
+  Name: string;
+  Cost: number;
+  Period: string;
+  stripePriceId: string;
+  Img: string;
+  Product: string;
+  NetworkId: string;
+  PaymentName: string;
+}
+
+interface PerkDefinitionsDict {
+  [key: string]: PerkDefinition;
+}

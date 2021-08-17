@@ -1,5 +1,5 @@
 // RAPYD
-import { functions } from '../models';
+import { functions } from '../services';
 
 // rapyd credentials
 export const rapydSecretKey =
