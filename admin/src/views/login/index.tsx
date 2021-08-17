@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignInSide(props) {
+export default function SignInSide(props: any) {
   const classes = useStyles();
 
   const [email, setEmail] = useState('');
@@ -67,13 +67,13 @@ export default function SignInSide(props) {
   const [isForgotPasswordModalVisible, setForgotPasswordModalVisible] =
     useState(false);
 
-  const errorAlert = (error) => {
+  const errorAlert = (error: any) => {
     console.error(error);
     setErrorMessage(error);
     setOpen(true);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     if (isForgotPasswordModalVisible) {
       return;

@@ -16,12 +16,19 @@ import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
 
+interface AddEmployeesProps {
+  isAddEmployeesModalVisible: boolean;
+  setIsAddEmployeesModalVisible: (arg0: boolean) => void;
+  peopleData: { email: string; group: string; id: string }[];
+  groupData: string[];
+}
+
 const AddEmployees = ({
   isAddEmployeesModalVisible,
   setIsAddEmployeesModalVisible,
   peopleData,
   groupData,
-}) => {
+}: AddEmployeesProps) => {
   // selected perk group from dropdown and respective error
   const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
   const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
@@ -39,7 +46,7 @@ const AddEmployees = ({
   const { currentUser } = useContext(AuthContext);
 
   // handle email error
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input atleast one email');
@@ -50,7 +57,7 @@ const AddEmployees = ({
     }
   };
 
-  const addToPerkGroup = (event) => {
+  const addToPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
     if (emailsToAdd == '') {
@@ -110,7 +117,7 @@ const AddEmployees = ({
   const { business } = useContext(BusinessContext);
 
   function generatePerks() {
-    return business['groups'][selectedPerkGroup];
+    return business.perkGroups[selectedPerkGroup].perkNames;
   }
 
   function setVisible() {

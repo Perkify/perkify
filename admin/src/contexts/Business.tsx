@@ -1,15 +1,18 @@
 import { AuthContext } from 'contexts';
 import { db } from 'firebaseApp';
-import { Business } from 'models';
 import React, { useContext, useEffect, useState } from 'react';
 
 interface ContextProps {
   business: Business;
 }
 
+interface BusinessProviderProps {
+  children: React.ReactNode;
+}
+
 export const BusinessContext = React.createContext<ContextProps>(null);
 
-export const BusinessProvider = ({ children }) => {
+export const BusinessProvider = ({ children }: BusinessProviderProps) => {
   const [business, setBusiness] = useState<Business>();
   const { admin } = useContext(AuthContext);
 

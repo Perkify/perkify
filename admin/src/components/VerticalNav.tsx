@@ -87,7 +87,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function ClippedDrawer({ children }) {
+interface ClippedDrawerProps {
+  children: React.ReactNode;
+}
+
+export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);

@@ -9,6 +9,18 @@ import {
 import React from 'react';
 import { allPerksDict } from 'shared';
 
+interface PurchaseConfirmationProps {
+  isAddPerksModalVisible: boolean;
+  setIsAddPerksModalVisible: (arg0: boolean) => void;
+  title: string;
+  text: string;
+  onConfirmation: (arg0: any) => void;
+  setConfirmationModalVisible: (arg0: boolean) => void;
+  perks: string[];
+  numPeople: number;
+  creatingGroup: boolean;
+}
+
 const PurchaseConfirmation = ({
   isAddPerksModalVisible,
   setIsAddPerksModalVisible,
@@ -19,10 +31,11 @@ const PurchaseConfirmation = ({
   perks,
   numPeople,
   creatingGroup,
-}) => {
-  function roundNumber(num) {
+}: PurchaseConfirmationProps) => {
+  function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
   }
+
   function calculateCost() {
     let cost = 0;
     perks.forEach((perk) => {

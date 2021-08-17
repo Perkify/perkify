@@ -8,13 +8,21 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 
+interface ConfirmationModalProps {
+  isModalVisible: boolean;
+  setIsModalVisible: (arg0: boolean) => void;
+  title: string;
+  description: string;
+  onConfirmation: () => void;
+}
+
 const ConfirmationModal = ({
   isModalVisible,
   setIsModalVisible,
   title,
   description,
   onConfirmation,
-}) => {
+}: ConfirmationModalProps) => {
   return (
     <Dialog
       open={isModalVisible}

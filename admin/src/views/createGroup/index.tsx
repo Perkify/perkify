@@ -11,11 +11,13 @@ import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
 
-const CreateGroup = ({ history }) => {
+const CreateGroup = () => {
+  const history = useHistory();
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
@@ -40,11 +42,11 @@ const CreateGroup = ({ history }) => {
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
 
-  function roundNumber(num) {
+  function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
   }
 
-  const handlePerkChange = (event) => {
+  const handlePerkChange = (event: any) => {
     // update the controlled form
     const perks = event.target.value as string[];
 
@@ -60,7 +62,7 @@ const CreateGroup = ({ history }) => {
     setTotalCost(roundNumber(cost * numPeople * 1.1 + 4 * numPeople));
   };
 
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmails(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input at least one email');
@@ -71,7 +73,7 @@ const CreateGroup = ({ history }) => {
     }
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = (event: any) => {
     handleEmailError(event);
     let tmpNumPeople = numPeople;
     if (event.target.value === '') {
@@ -92,7 +94,7 @@ const CreateGroup = ({ history }) => {
     );
   };
 
-  const createPerkGroup = (e) => {
+  const createPerkGroup = (e: any) => {
     e.preventDefault();
     let error = false;
 

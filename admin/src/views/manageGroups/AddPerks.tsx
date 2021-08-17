@@ -15,13 +15,21 @@ import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { allPerks } from 'shared';
 
+interface AddPerksProps {
+  isAddPerksModalVisible: boolean;
+  setIsAddPerksModalVisible: (arg0: boolean) => void;
+  group: string;
+  groupPerks: PerkDefinition[];
+  emails: { email: string; group: string; id: string }[];
+}
+
 const AddPerks = ({
   isAddPerksModalVisible,
   setIsAddPerksModalVisible,
   groupPerks,
   group,
   emails,
-}) => {
+}: AddPerksProps) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [groupPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState([]);
@@ -42,7 +50,7 @@ const AddPerks = ({
     );
   }, [groupPerks]);
 
-  const addPerksToPerkGroup = (event) => {
+  const addPerksToPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
     if (perksToAdd.length == 0) {

@@ -24,11 +24,11 @@ const GeneralDashboard = () => {
   var [employees, setEmployees] = useState([]);
   var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
-  function roundNumber(num) {
+  function roundNumber(num: any) {
     return Math.round(10 * num) / 10;
   }
 
-  function roundNumberHundredth(num) {
+  function roundNumberHundredth(num: any) {
     return Math.round(100 * num) / 100;
   }
 
@@ -46,7 +46,7 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let tempDict = {};
+    let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
       let group = employee['perkGroup'];
@@ -56,7 +56,7 @@ const GeneralDashboard = () => {
       ) {
         return 0;
       }
-      business.perkGroups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -64,7 +64,7 @@ const GeneralDashboard = () => {
         }
       });
     });
-    let data = [];
+    let data: { name: string; value: number }[] = [];
     let totalValue = 0;
     Object.keys(tempDict).forEach((perk) => {
       //Creates array of total cost per perk
@@ -99,7 +99,7 @@ const GeneralDashboard = () => {
       if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.perkGroups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         cost += allPerksDict[perk].Cost;
       });
       totalCost += cost;
@@ -114,7 +114,7 @@ const GeneralDashboard = () => {
     //returns num of perks offered
     let perks = new Set([]);
     Object.keys(business.perkGroups).forEach((group) => {
-      business.perkGroups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         perks.add(perk);
       });
     });
@@ -122,17 +122,17 @@ const GeneralDashboard = () => {
     return perks.size;
   }
 
-  function getRandomInt(max) {
+  function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
 
   function calculateBarGraphData() {
     //returns bar graph data in array form
-    let retData = [];
+    let retData: { name: string; spent: number; total: number }[] = [];
     if (dashboardLoading) {
       return retData;
     }
-    let tempDict = {};
+    let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
       let group = employee['perkGroup'];
@@ -145,7 +145,7 @@ const GeneralDashboard = () => {
       if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.perkGroups[group].perks.forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -165,7 +165,7 @@ const GeneralDashboard = () => {
     return retData;
   }
 
-  function calculateAmountSpentPerPerk(perk) {
+  function calculateAmountSpentPerPerk(perk: string) {
     let totalPossibleCost = 0;
     let moneySpent = 0;
     console.log(employees);
@@ -182,7 +182,7 @@ const GeneralDashboard = () => {
     return Math.round(moneySpent / totalPossibleCost);
   }
 
-  function didSpendPerkLastMonth(employeeArray) {
+  function didSpendPerkLastMonth(employeeArray: PerkUses) {
     if (employeeArray.length == 0) {
       return false;
     }
@@ -225,7 +225,7 @@ const GeneralDashboard = () => {
       let monthlyCost = 0;
       let yearlyCost = 0;
       Object.keys(employee['perks']).forEach((perk) => {
-        employee['perks'][perk].forEach((date) => {
+        employee['perks'][perk].forEach((date: any) => {
           if (d.getFullYear() === date.toDate().getFullYear()) {
             yearlyCost += allPerksDict[perk].Cost;
           }
@@ -252,24 +252,22 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    if (business && business['groups']) {
+    if (business && business.perkGroups) {
       setEmployees(
         [].concat(
           ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].employees.map(
-              (employeeEmail) => ({
-                email: employeeEmail,
-                group: perkGroupName,
-                perks: business.perkGroups[perkGroupName].perks,
-              })
-            )
+            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
+              email: employeeEmail,
+              group: perkGroupName,
+              perks: business.perkGroups[perkGroupName].perkNames,
+            }))
           )
         )
       );
     }
   }, [business]);
 
-  function handleGroupChange(event) {
+  function handleGroupChange(event: any) {
     setSelectedGroup(event.target.value[1]);
   }
 
@@ -289,8 +287,8 @@ const GeneralDashboard = () => {
         <p>Loading</p>
       ) : !(business.cardPaymentMethods.length == 0) ? (
         <WelcomeCards />
-      ) : business['groups'] == null ||
-        Object.keys(business['groups']).length == 0 ? (
+      ) : business.perkGroups == null ||
+        Object.keys(business.perkGroups).length == 0 ? (
         <CreatePerkGroupCard />
       ) : (
         <Grid container spacing={4}>
@@ -303,13 +301,13 @@ const GeneralDashboard = () => {
           <Grid item xs={4}>
             <MetricCard
               title={'Number of Employees'}
-              number={employees.length}
+              number={employees.length.toString()}
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Total Perks Offered'}
-              number={calculatePerksOffered()}
+              number={calculatePerksOffered().toString()}
             ></MetricCard>
           </Grid>
           <Grid item xs={4}>

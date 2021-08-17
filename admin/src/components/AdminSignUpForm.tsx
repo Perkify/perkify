@@ -58,10 +58,24 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const AdminSignUpForm = (props) => {
+interface AdminSignUpFormProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  setFirstName: (arg0: string) => void;
+  setLastName: (arg0: string) => void;
+  setEmail: (arg0: string) => void;
+  setPassword: (arg0: string) => void;
+  invalidStep: boolean;
+  nextStep: (arg0: boolean) => void;
+  nextReady: boolean;
+}
+
+const AdminSignUpForm = (props: AdminSignUpFormProps) => {
   const classes = useStyles();
 
-  const fillTextbox = (setFunction) => (event) => {
+  const fillTextbox = (setFunction: (arg0: string) => void) => (event: any) => {
     setFunction(event.target.value);
   };
 

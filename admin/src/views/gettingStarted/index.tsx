@@ -10,11 +10,13 @@ import {
 import Header from 'components/Header';
 import { AuthContext } from 'contexts/Auth';
 import React, { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
 
-const CreateGroup = ({ history }) => {
+const CreateGroup = () => {
+  const history = useHistory();
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
@@ -31,7 +33,7 @@ const CreateGroup = ({ history }) => {
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
 
-  const handlePerkChange = (event) => {
+  const handlePerkChange = (event: any) => {
     // update the controlled form
     const perks = event.target.value as string[];
 
@@ -47,7 +49,7 @@ const CreateGroup = ({ history }) => {
     setTotalCost(cost * numPeople);
   };
 
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmails(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input atleast one email');
@@ -58,7 +60,7 @@ const CreateGroup = ({ history }) => {
     }
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = (event: any) => {
     handleEmailError(event);
     let tmpNumPeople = numPeople;
     if (event.target.value === '') {
@@ -77,7 +79,7 @@ const CreateGroup = ({ history }) => {
     setTotalCost(tmpNumPeople * costPerPerson);
   };
 
-  const handleAddUsers = async (event) => {
+  const handleAddUsers = async (event: any) => {
     const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
 
     const bearerToken = await currentUser.getIdToken();
@@ -98,7 +100,7 @@ const CreateGroup = ({ history }) => {
     history.push('../people');
   };
 
-  const createPerkGroup = (e) => {
+  const createPerkGroup = (e: any) => {
     e.preventDefault();
     let error = false;
     if (groupName == '') {

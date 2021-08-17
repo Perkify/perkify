@@ -6,9 +6,19 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
+import { GridSelectionModel } from '@material-ui/data-grid';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
+
+interface AddEmployeesProps {
+  isRemoveEmployeesModalVisible: boolean;
+  setIsRemoveEmployeesModalVisible: (arg0: boolean) => void;
+  employees: { email: string; group: string; id: string }[];
+  group: string;
+  selectedEmployees: GridSelectionModel;
+  setSelectedEmployees: (model: GridSelectionModel) => void;
+}
 
 const RemoveEmployees = ({
   isRemoveEmployeesModalVisible,
@@ -17,12 +27,12 @@ const RemoveEmployees = ({
   setSelectedEmployees,
   group,
   employees,
-}) => {
+}: AddEmployeesProps) => {
   const { currentUser } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
-  const removeUsers = (event) => {
+  const removeUsers = (event: any) => {
     let error = false;
 
     event.preventDefault();

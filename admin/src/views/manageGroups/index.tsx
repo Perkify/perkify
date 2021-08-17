@@ -4,7 +4,7 @@ import Header from 'components/Header';
 import { BusinessContext, LoadingContext } from 'contexts';
 import { AuthContext } from 'contexts/Auth';
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
@@ -41,8 +41,8 @@ const perkColumns = [
   },
 ];
 
-export default function ManageGroups(props) {
-  let { id } = useParams();
+export default function ManageGroups(props: any) {
+  let { id } = useParams() as { id: string };
 
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
     useState(false);
@@ -60,28 +60,6 @@ export default function ManageGroups(props) {
 
   const { business } = useContext(BusinessContext);
 
-  const history = useHistory();
-
-  function getPerkNames(perks) {
-    const retNames = perks.map((perk) => {
-      retNames.push(perk.Name);
-    });
-
-    return retNames;
-  }
-
-  let groupData: any[] = [];
-  const fillerGroupData = [
-    {
-      name: 'A',
-      id: 'abc123',
-    },
-    {
-      name: 'B',
-      id: 'abc133',
-    },
-  ];
-
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
@@ -92,7 +70,7 @@ export default function ManageGroups(props) {
       if (Object.keys(business.perkGroups).includes(id)) {
         // set perk group data
         setPerksData(
-          business.perkGroups[id].perks.map((perkGroupName, index) => ({
+          business.perkGroups[id].perkNames.map((perkGroupName, index) => ({
             ...allPerksDict[perkGroupName],
             id: index,
           }))
@@ -100,7 +78,7 @@ export default function ManageGroups(props) {
 
         // set email data
         setEmails(
-          business.perkGroups[id].employees.map((employeeEmail, index) => ({
+          business.perkGroups[id].emails.map((employeeEmail, index) => ({
             email: employeeEmail,
             id: index,
           }))

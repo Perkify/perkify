@@ -21,7 +21,7 @@ const columns = [
   },
 ];
 
-export default function ManagePeople(props) {
+export default function ManagePeople(props: any) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
     useState(false);
@@ -36,17 +36,15 @@ export default function ManagePeople(props) {
 
   useEffect(() => {
     if (business) {
-      setGroupData(Object.keys(business['groups']).sort());
+      setGroupData(Object.keys(business.perkGroups).sort());
       setPeopleData(
         [].concat(
           ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].employees.map(
-              (employeeEmail) => ({
-                email: employeeEmail,
-                group: perkGroupName,
-                id: employeeEmail,
-              })
-            )
+            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
+              email: employeeEmail,
+              group: perkGroupName,
+              id: employeeEmail,
+            }))
           )
         )
       );
