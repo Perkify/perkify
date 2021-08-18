@@ -1,18 +1,11 @@
 import Stripe from 'stripe';
-import admin, { db, functions } from '../../../services';
-import config from './config';
+import { syncToFirestoreWebhookStripeSecret } from '../../../configs';
+import admin, { db, functions, stripe } from '../../../services';
 import { Price, Product, Subscription, TaxRate } from './interfaces';
 import * as logs from './logs';
 
-const stripe = new Stripe(config.stripeSecretKey, {
-  apiVersion: '2020-08-27',
-  // Register extension as a Stripe plugin
-  // https://stripe.com/docs/building-plugins#setappinfo
-  appInfo: {
-    name: 'Firebase firestore-stripe-subscriptions',
-    version: '0.1.14',
-  },
-});
+const productsCollectionPath = 'products';
+const customersCollectionPath = 'businesses';
 
 /**
  * Prefix Stripe metadata keys with `stripe_metadata_` to be spread onto Product and Price docs in Cloud Firestore.
@@ -41,10 +34,10 @@ const createProductRecord = async (product: Stripe.Product): Promise<void> => {
   };
   await admin
     .firestore()
-    .collection(config.productsCollectionPath)
+    .collection(productsCollectionPath)
     .doc(product.id)
     .set(productData, { merge: true });
-  logs.firestoreDocCreated(config.productsCollectionPath, product.id);
+  logs.firestoreDocCreated(productsCollectionPath, product.id);
 };
 
 /**
@@ -75,7 +68,7 @@ const insertPriceRecord = async (price: Stripe.Price): Promise<void> => {
   };
   const dbRef = admin
     .firestore()
-    .collection(config.productsCollectionPath)
+    .collection(productsCollectionPath)
     .doc(price.product as string)
     .collection('prices');
   await dbRef.doc(price.id).set(priceData, { merge: true });
@@ -140,7 +133,7 @@ const insertTaxRateRecord = async (taxRate: Stripe.TaxRate): Promise<void> => {
   delete taxRateData.metadata;
   await admin
     .firestore()
-    .collection(config.productsCollectionPath)
+    .collection(productsCollectionPath)
     .doc('tax_rates')
     .collection('tax_rates')
     .doc(taxRate.id)
@@ -176,7 +169,7 @@ const manageSubscriptionStatusChange = async (
   // Get customer's UID from Firestore
   const customersSnap = await admin
     .firestore()
-    .collection(config.customersCollectionPath)
+    .collection(customersCollectionPath)
     .where('stripeId', '==', customerId)
     .get();
   if (customersSnap.size !== 1) {
@@ -194,7 +187,7 @@ const manageSubscriptionStatusChange = async (
     prices.push(
       admin
         .firestore()
-        .collection(config.productsCollectionPath)
+        .collection(productsCollectionPath)
         .doc((item.price.product as Stripe.Product).id)
         .collection('prices')
         .doc(item.price.id)
@@ -216,11 +209,11 @@ const manageSubscriptionStatusChange = async (
     }/subscriptions/${subscription.id}`,
     product: admin
       .firestore()
-      .collection(config.productsCollectionPath)
+      .collection(productsCollectionPath)
       .doc(product.id),
     price: admin
       .firestore()
-      .collection(config.productsCollectionPath)
+      .collection(productsCollectionPath)
       .doc(product.id)
       .collection('prices')
       .doc(price.id),
@@ -295,7 +288,7 @@ const insertInvoiceRecord = async (invoice: Stripe.Invoice) => {
   // Get customer's UID from Firestore
   const customersSnap = await admin
     .firestore()
-    .collection(config.customersCollectionPath)
+    .collection(customersCollectionPath)
     .where('stripeId', '==', invoice.customer)
     .get();
   if (customersSnap.size !== 1) {
@@ -321,7 +314,7 @@ const insertPaymentRecord = async (
   // Get customer's UID from Firestore
   const customersSnap = await admin
     .firestore()
-    .collection(config.customersCollectionPath)
+    .collection(customersCollectionPath)
     .where('stripeId', '==', payment.customer)
     .get();
   if (customersSnap.size !== 1) {
@@ -388,7 +381,7 @@ export const syncToFirestoreWebhookHandler = functions.https.onRequest(
       event = stripe.webhooks.constructEvent(
         req.rawBody,
         sig,
-        config.stripeWebhookSecret
+        syncToFirestoreWebhookStripeSecret
       );
     } catch (error) {
       logs.badWebhookSecret(error);
@@ -461,7 +454,7 @@ export const syncToFirestoreWebhookHandler = functions.https.onRequest(
             if (checkoutSession.tax_id_collection?.enabled) {
               const customersSnap = await admin
                 .firestore()
-                .collection(config.customersCollectionPath)
+                .collection(customersCollectionPath)
                 .where('stripeId', '==', checkoutSession.customer as string)
                 .get();
               if (customersSnap.size === 1) {
@@ -517,15 +510,15 @@ const deleteProductOrPrice = async (pr: Stripe.Product | Stripe.Price) => {
   if (pr.object === 'product') {
     await admin
       .firestore()
-      .collection(config.productsCollectionPath)
+      .collection(productsCollectionPath)
       .doc(pr.id)
       .delete();
-    logs.firestoreDocDeleted(config.productsCollectionPath, pr.id);
+    logs.firestoreDocDeleted(productsCollectionPath, pr.id);
   }
   if (pr.object === 'price') {
     await admin
       .firestore()
-      .collection(config.productsCollectionPath)
+      .collection(productsCollectionPath)
       .doc((pr as Stripe.Price).product as string)
       .collection('prices')
       .doc(pr.id)

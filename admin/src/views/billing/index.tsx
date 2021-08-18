@@ -15,19 +15,18 @@ const Billing = () => {
     (async () => {
       setDashboardLoading(true);
 
+      const payload: CreatePortalLinkPayload = {
+        returnUrl: window.location.origin + '/dashboard',
+      };
+
       const bearerToken = await currentUser.getIdToken();
-      const { data } = await PerkifyApi.post(
-        'rest/auth/createPortalLink',
-        {
-          returnUrl: window.location.origin + '/dashboard',
-        } as CreatePortalLinkPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      console.log(bearerToken);
+      const { data } = await PerkifyApi.post('rest/portalLink', payload, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
       // const functionRef = functions.httpsCallable('createPortalLink');
       // const { data } = await functionRef({
       //   returnUrl: window.location.origin + '/dashboard',

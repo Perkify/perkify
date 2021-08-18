@@ -2,7 +2,7 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import { functions } from '../services';
-import { errorHandler } from '../utils';
+import { errorHandlerMiddleware } from '../utils';
 import {
   createPerkGroup,
   createPerkGroupValidators,
@@ -64,6 +64,6 @@ app.delete(
   deletePerkGroup
 );
 
-app.use(errorHandler);
+app.use(errorHandlerMiddleware);
 
 export const restApi = functions.https.onRequest(app);

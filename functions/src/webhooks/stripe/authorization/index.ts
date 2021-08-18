@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { stripeWebhookSecret } from '../../../configs';
+import { issuingAuthorizationRequestWebhookStripeSecret } from '../../../configs';
 import { functions, stripe } from '../../../services';
 import { errorHandler } from '../../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
@@ -20,7 +20,7 @@ export const issuingAuthorizationRequestWebhookHandler =
       event = stripe.webhooks.constructEvent(
         request.rawBody,
         sig,
-        stripeWebhookSecret
+        issuingAuthorizationRequestWebhookStripeSecret
       );
     } catch (err) {
       console.log(err);

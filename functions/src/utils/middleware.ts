@@ -5,8 +5,9 @@ const isInstanceOfPerkifyError = (object: any) => {
   return 'status' in object && 'reason' in object && 'reasonDetail' in object;
 };
 
-// --------------- Middleware/Helpers --------------- //
 export const errorHandler = async (err: any, req: Request, res: Response) => {
+  console.error(err);
+
   // if response already sent, can't do anything
   if (res.headersSent) {
     return;
@@ -26,6 +27,16 @@ export const errorHandler = async (err: any, req: Request, res: Response) => {
   res.status(status).json({ reason, reasonDetail }).end();
 };
 
+// --------------- Middleware/Helpers --------------- //
+export const errorHandlerMiddleware = async (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  errorHandler(err, req, res);
+};
+
 export const checkValidationResult = (
   req: Request,
   res: Response,
@@ -40,4 +51,5 @@ export const checkValidationResult = (
     };
     return next(error);
   }
+  return next();
 };

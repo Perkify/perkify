@@ -77,24 +77,21 @@ const AddEmployees = ({
         const bearerToken = await currentUser.getIdToken();
 
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+        const payload: UpdatePerkGroupPayload = {
+          perkNames: business.perkGroups[selectedPerkGroup].perkNames,
+          emails: emailList.concat(
+            peopleData
+              .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
+              .map((employeeObj) => employeeObj.email)
+          ),
+        };
 
-        PerkifyApi.put(
-          `rest/perkGroup/${selectedPerkGroup}`,
-          {
-            perkNames: business.perkGroups[selectedPerkGroup].perkNames,
-            emails: emailList.concat(
-              peopleData
-                .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
-                .map((employeeObj) => employeeObj.email)
-            ),
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        PerkifyApi.put(`rest/perkGroup/${selectedPerkGroup}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
           .then(() => {
             setDashboardLoading(false);
             setFreezeNav(false);

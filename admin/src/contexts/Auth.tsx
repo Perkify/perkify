@@ -1,6 +1,5 @@
 import firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
 import app, { auth, db } from '../firebaseApp';
 
 type ContextProps = {
@@ -22,8 +21,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
   const [loadingAuthState, setLoadingAuthState] = useState(true);
   const [admin, setAdmin] = useState({});
-  const location = useLocation();
-  const history = useHistory();
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {

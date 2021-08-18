@@ -60,30 +60,29 @@ export const registerUser = userPerkifyRequestTransform(
       const prevUserData = (
         await db.collection('users').doc(email).get()
       ).data() as SimpleUser;
-      await db
-        .collection('users')
-        .doc(email)
-        .set({
-          ...prevUserData,
-          firstName: firstName,
-          lastName: lastName,
-          card: {
-            id: card.id,
-            cardholderID: cardholderID,
-            number: cardDetails.number,
-            cvc: cardDetails.cvc,
-            exp: {
-              month: cardDetails.exp_month,
-              year: cardDetails.exp_year,
-            },
-            // billing address saved with card for both ease of access and so if business
-            // billing address changes card still works without having to reissue cards
-            // TODO: remove this make billing address changes reissue cards?
-            billing: {
-              address: billingAddress,
-            },
+
+      const userData: User = {
+        ...prevUserData,
+        firstName: firstName,
+        lastName: lastName,
+        card: {
+          id: card.id,
+          cardholderID: cardholderID,
+          number: cardDetails.number || '',
+          cvc: cardDetails.cvc || '',
+          exp: {
+            month: cardDetails.exp_month,
+            year: cardDetails.exp_year,
           },
-        } as User);
+          // billing address saved with card for both ease of access and so if business
+          // billing address changes card still works without having to reissue cards
+          // TODO: remove this make billing address changes reissue cards?
+          billing: {
+            address: billingAddress,
+          },
+        },
+      };
+      await db.collection('users').doc(email).set(userData);
 
       res.status(200).end();
     } catch (err) {

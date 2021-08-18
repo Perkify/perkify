@@ -44,30 +44,22 @@ export const registerAdminAndBusiness = async (
       disabled: false,
     });
 
-    // create business entity
-    const businessRef = db.collection('businesses').doc();
+    // create the stripe customer
+    const customer = await stripe.customers.create();
 
-    // create admin document to link user to business
-    await db
-      .collection('admins')
-      .doc(newUser.uid)
-      .set({
-        email,
-        firstName,
-        lastName,
-        businessID: businessRef.id,
-      } as Admin);
+    // create business entity document
+    const businessRef = db.collection('businesses').doc(customer.id);
 
-    // create stripe customer associated with the business
-    const stripeBusinessMetadata = {
-      metadata: {
-        businessID: businessRef.id,
-      },
+    const adminData: Admin = {
+      email,
+      firstName,
+      lastName,
+      businessID: businessRef.id,
     };
-    const customer = await stripe.customers.create(stripeBusinessMetadata);
+    // create admin document to link user to business
+    await db.collection('admins').doc(newUser.uid).set(adminData);
 
-    // set the business document
-    businessRef.set({
+    const businessData: Business = {
       businessID: businessRef.id,
       name: businessName,
       billingAddress: {
@@ -80,11 +72,17 @@ export const registerAdminAndBusiness = async (
       },
       admins: [newUser.uid],
       perkGroups: {},
+      cardPaymentMethods: [],
       stripeId: customer.id,
       stripeLink: `https://dashboard.stripe.com${
         customer.livemode ? '' : '/test'
       }/customers/${customer.id}`,
-    } as Business);
+    };
+
+    // set the business document
+    businessRef.set(businessData);
+
+    console.log('Sending response');
 
     res.status(200).end();
   } catch (err) {

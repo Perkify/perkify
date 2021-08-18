@@ -123,19 +123,16 @@ const CreateGroup = () => {
       (async () => {
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
-        PerkifyApi.post(
-          `rest/perkGroup/${groupName}`,
-          {
-            emails: emailList,
-            perkNames: selectedPerks,
-          } as CreatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        const payload: CreatePerkGroupPayload = {
+          emails: emailList,
+          perkNames: selectedPerks,
+        };
+        PerkifyApi.post(`rest/perkGroup/${groupName}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
           .then(() => {
             setDashboardLoading(false);
             setFreezeNav(false);
@@ -272,10 +269,10 @@ const CreateGroup = () => {
         </Typography>
         <Tooltip
           disableFocusListener={
-            !business || business.cardPaymentMethods.length == 0
+            !(!business || business.cardPaymentMethods.length == 0)
           }
           disableHoverListener={
-            !business || business.cardPaymentMethods.length == 0
+            !(!business || business.cardPaymentMethods.length == 0)
           }
           title="Please add billing information before creating a group"
           placement="bottom-start"
@@ -285,7 +282,7 @@ const CreateGroup = () => {
               onClick={setVisible}
               variant="contained"
               color="primary"
-              disabled={!(!business || business.cardPaymentMethods.length == 0)}
+              disabled={!business || business.cardPaymentMethods.length == 0}
             >
               Create Perk Group
             </Button>

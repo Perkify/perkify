@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { stripeWebhookSecret } from '../../../configs';
+import { invoicePaidWebhookStripeSecret } from '../../../configs';
 import {
   db,
   firebaseFunctionsUrl,
@@ -99,7 +99,7 @@ export const invoicePaidWebhookHandler = functions.https.onRequest(
       event = stripe.webhooks.constructEvent(
         request.rawBody,
         sig,
-        stripeWebhookSecret
+        invoicePaidWebhookStripeSecret
       );
     } catch (err) {
       console.log(err);

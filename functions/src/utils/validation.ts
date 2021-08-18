@@ -169,9 +169,9 @@ export const validateFirebaseIdToken = async (
   next: NextFunction
 ) => {
   if (
-    (!req.headers.authorization ||
-      !req.headers.authorization.startsWith('Bearer ')) &&
-    !(req.cookies && req.cookies.__session)
+    !req.headers.authorization ||
+    (!req.headers.authorization.startsWith('Bearer ') &&
+      !(req.cookies && req.cookies.__session))
   ) {
     const err = {
       status: 403,
