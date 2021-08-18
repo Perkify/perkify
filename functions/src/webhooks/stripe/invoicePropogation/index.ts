@@ -40,6 +40,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   });
   const paymentIntent = expandedInvoice.payment_intent as Stripe.PaymentIntent;
   const subscription = expandedInvoice.subscription as Stripe.Subscription;
+  const customer = expandedInvoice.customer as Stripe.Customer;
 
   if (
     !paymentIntent ||
@@ -66,7 +67,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   const expirationAtSeconds = balanceTransaction.available_on;
 
   // get the business data to be applied when the invoice becomes available
-  const businessID = subscription.metadata['businessID'];
+  const businessID = customer.id;
 
   // what if business is undefined?
   // the "as Business" hides this fact
@@ -85,8 +86,10 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
     functions.config()['stripe-firebase'].environment == 'production' ||
     functions.config()['stripe-firebase'].environment == 'staging'
   ) {
+    console.log('ADDING TASK TO EXPAND QUEUE');
     await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
   } else {
+    console.log('EXPANDING USERS');
     const { business } = payload;
     await expandUsers(business);
   }
@@ -117,11 +120,12 @@ export const invoicePaidWebhookHandler = functions.https.onRequest(
     }
 
     try {
-      if (event.type === 'invoice.paid') {
+      if (event.type === 'invoice.payment_succeeded') {
         // get the invoice object
         const invoice = event.data.object as Stripe.Invoice;
 
         // propogate the invoice to the user collection
+        console.log('CALLING PROPOGATE INVOICE');
         await propogateInvoice(invoice);
       }
     } catch (err) {

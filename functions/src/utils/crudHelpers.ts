@@ -30,6 +30,10 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
           : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
     });
 
+  if (functions.config()['stripe-firebase'].environment == 'development') {
+    console.log(signInLink);
+  }
+
   // send email
   await db.collection('mail').add({
     to: userToCreate.email,

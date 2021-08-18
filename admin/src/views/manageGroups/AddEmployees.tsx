@@ -88,6 +88,7 @@ const AddEmployees = ({
             setEmailsToAdd('');
           })
           .catch((e) => {
+            console.error(e);
             console.log(e.response);
             alert(
               `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
