@@ -82,8 +82,6 @@ export const registerAdminAndBusiness = async (
     // set the business document
     businessRef.set(businessData);
 
-    console.log('Sending response');
-
     res.status(200).end();
   } catch (err) {
     next(err);

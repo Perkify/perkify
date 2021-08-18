@@ -42,14 +42,14 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`groups.${perkGroupName}`]: {
+          [`perkGroups.${perkGroupName}`]: {
             perkNames: perkNames,
             emails,
           } as PerkGroup,
         });
 
       // sync to stripe subscription
-      await updateStripeSubscription(req.businessData);
+      await updateStripeSubscription(req.businessData.businessID);
 
       res.status(200).end();
     } catch (error) {

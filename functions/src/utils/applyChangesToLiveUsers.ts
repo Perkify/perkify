@@ -43,12 +43,16 @@ export const applyChangesToLiveUsers = async (
 
     const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
     const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
-    const livePerkGroup = {
-      perkNames: Object.keys(
-        (existingPerkUsersSnapshot.docs[0].data() as SimpleUser).perkUsesDict
-      ),
-      emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
-    } as PerkGroup;
+    const livePerkGroup =
+      existingPerkUsersSnapshot.docs.length != 0
+        ? ({
+            perkNames: Object.keys(
+              (existingPerkUsersSnapshot.docs[0].data() as SimpleUser)
+                .perkUsesDict
+            ),
+            emails: existingPerkUsersSnapshot.docs.map((userDoc) => userDoc.id),
+          } as PerkGroup)
+        : { perkNames: [], emails: [] };
 
     // EXPAND
     // get the intersection of the updatedPerkGroup and the pendingPerkGroup

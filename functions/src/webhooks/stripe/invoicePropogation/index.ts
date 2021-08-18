@@ -8,7 +8,7 @@ import {
   stripe,
   tasksClient,
 } from '../../../services';
-import { errorHandler } from '../../../utils';
+import { errorHandler, expandUsers } from '../../../utils';
 
 const addTaskToExpandUsersQueue = async (
   payload: ExpandUsersPayload,
@@ -80,7 +80,16 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   const payload = { business };
 
   // create task in queue
-  await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
+
+  if (
+    functions.config()['stripe-firebase'].environment == 'production' ||
+    functions.config()['stripe-firebase'].environment == 'staging'
+  ) {
+    await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
+  } else {
+    const { business } = payload;
+    await expandUsers(business);
+  }
 };
 
 export const invoicePaidWebhookHandler = functions.https.onRequest(

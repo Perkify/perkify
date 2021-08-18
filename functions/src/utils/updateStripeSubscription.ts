@@ -5,27 +5,30 @@ import { shrinkUsers } from './crudHelpers';
 // we want to call this anytime we modify a stripe subscription
 // takes the business definition and updates the relevant stripe subscription
 
-// update stripe subscription with business perk groups
-export const updateStripeSubscription = async (updatedBusiness: Business) => {
-  // get business data
-  const businessID = updatedBusiness.businessID;
+// update stripe subscription with business perkGroups
+export const updateStripeSubscription = async (businessID: string) => {
+  const businessData = (
+    await db.collection('businesses').doc(businessID).get()
+  ).data() as Business;
+
+  if (businessData == null) {
+    throw new Error('Missing business document in firestore');
+  }
 
   // remove stuff that shouldn't exist from 'users'
-  await shrinkUsers(updatedBusiness);
+  await shrinkUsers(businessData);
 
-  const perkCountsByName = Object.keys(updatedBusiness.perkGroups).reduce(
+  const perkCountsByName = Object.keys(businessData.perkGroups).reduce(
     (accumulator, perkGroupName) => {
-      updatedBusiness.perkGroups[perkGroupName].perkNames.forEach(
-        (perkName) => {
-          if (accumulator[perkName]) {
-            accumulator[perkName] +=
-              updatedBusiness.perkGroups[perkGroupName].emails.length;
-          } else {
-            accumulator[perkName] =
-              updatedBusiness.perkGroups[perkGroupName].emails.length;
-          }
+      businessData.perkGroups[perkGroupName].perkNames.forEach((perkName) => {
+        if (accumulator[perkName]) {
+          accumulator[perkName] +=
+            businessData.perkGroups[perkGroupName].emails.length;
+        } else {
+          accumulator[perkName] =
+            businessData.perkGroups[perkGroupName].emails.length;
         }
-      );
+      });
       return accumulator;
     },
     {} as { [key: string]: number }
@@ -58,9 +61,8 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
     // the admin doesn't have any subscriptions
     // create a subscription for them
     await stripe.subscriptions.create({
-      customer: updatedBusiness.stripeId,
+      customer: businessData.stripeId,
       items: newSubscriptionItemsList,
-      metadata: { businessID },
     });
   } else {
     // the admin is already subscribed
@@ -81,11 +83,10 @@ export const updateStripeSubscription = async (updatedBusiness: Business) => {
 
     // create an invoice to charge the difference of the subscription
     const createdInvoice = await stripe.invoices.create({
-      customer: updatedBusiness.stripeId,
+      customer: businessData.stripeId,
       // auto_advance: true,
       collection_method: 'charge_automatically',
       subscription: subscriptionItem[0].id,
-      metadata: { businessID },
     });
 
     // finalize the invoice

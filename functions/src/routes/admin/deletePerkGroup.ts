@@ -21,16 +21,16 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
     const businessID = adminData.businessID;
 
     try {
-      // delete group from businesss' groups
+      // delete group from businesss' perkGroups
       await db
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`groups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
+          [`perkGroups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
         });
 
       // update the stripe subscription
-      await updateStripeSubscription(req.businessData);
+      await updateStripeSubscription(req.businessData.businessID);
 
       res.status(200).end();
     } catch (err) {

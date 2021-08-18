@@ -36,18 +36,19 @@ export const createPerkGroup = adminPerkifyRequestTransform(
 
     try {
       // update the business document to reflect the group of perkNames
+
       await db
         .collection('businesses')
         .doc(businessData.businessID)
         .update({
-          [`groups.${perkGroupName}`]: {
+          [`perkGroups.${perkGroupName}`]: {
             perkNames: perkNames,
             emails,
           } as PerkGroup,
         });
 
       // update the stripe subscription
-      await updateStripeSubscription(req.businessData);
+      await updateStripeSubscription(req.businessData.businessID);
 
       res.status(200).end();
     } catch (err) {
