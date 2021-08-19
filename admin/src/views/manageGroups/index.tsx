@@ -43,7 +43,7 @@ const perkColumns = [
 ];
 
 export default function ManageGroups(props) {
-  let { id } = useParams();
+  let { id } = useParams() as any;
 
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
     useState(false);

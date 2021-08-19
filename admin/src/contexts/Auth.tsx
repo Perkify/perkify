@@ -31,6 +31,8 @@ export const AuthProvider = ({ children }) => {
         if (userDoc) {
           setCurrentUser(user);
           const adminData = userDoc.data();
+          console.log('Set admin data');
+          console.log(adminData);
           setAdmin(adminData);
 
           const businessId = admin['companyID'];
@@ -43,6 +45,8 @@ export const AuthProvider = ({ children }) => {
                   setHasPaymentMethods(
                     businessData.cardPaymentMethods.length != 0
                   );
+                } else {
+                  setHasPaymentMethods(false);
                 }
               },
               (error) => {

@@ -268,6 +268,7 @@ const GeneralDashboard = () => {
             perks: doc.data()['perks'],
           }));
           setEmployees(people);
+          setDashboardLoading(false);
         })
         .catch((error) => {
           alert(error);
@@ -278,11 +279,11 @@ const GeneralDashboard = () => {
     return () => setDashboardLoading(false);
   }, [currentUser, admin, business]);
 
-  useEffect(() => {
-    if (hasPaymentMethods != null) {
-      setDashboardLoading(false);
-    }
-  }, [hasPaymentMethods]);
+  // useEffect(() => {
+  //   if (hasPaymentMethods != null) {
+  //     setDashboardLoading(false);
+  //   }
+  // }, [hasPaymentMethods]);
 
   function handleGroupChange(event) {
     setSelectedGroup(event.target.value[1]);
