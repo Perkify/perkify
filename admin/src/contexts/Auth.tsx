@@ -1,7 +1,6 @@
 import firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { PerkifyApi } from 'services';
 import app, { auth, db } from '../firebaseApp';
 
 type ContextProps = {
@@ -34,19 +33,34 @@ export const AuthProvider = ({ children }) => {
           const adminData = userDoc.data();
           setAdmin(adminData);
 
-          const bearerToken = await user.getIdToken();
-
-          // check if customer has payment methods
-          PerkifyApi.get('/user/auth/stripePaymentMethods', {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          })
-            .then((res) => {
-              setHasPaymentMethods(res.data.data.length > 0);
-            })
-            .catch(() => {});
+          const businessId = admin['companyID'];
+          db.collection('businesses')
+            .doc(businessId)
+            .onSnapshot(
+              (businessDoc) => {
+                const businessData = businessDoc.data();
+                if (businessData && businessData.cardPaymentMethods) {
+                  setHasPaymentMethods(
+                    businessData.cardPaymentMethods.length != 0
+                  );
+                }
+              },
+              (error) => {
+                console.error('Snapshot permissions error');
+              }
+            );
+          // const bearerToken = await user.getIdToken();
+          // // check if customer has payment methods
+          // PerkifyApi.get('/user/auth/stripePaymentMethods', {
+          //   headers: {
+          //     Authorization: `Bearer ${bearerToken}`,
+          //     'Content-Type': 'application/json',
+          //   },
+          // })
+          //   .then((res) => {
+          //     setHasPaymentMethods(res.data.data.length > 0);
+          //   })
+          //   .catch(() => {});
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');
