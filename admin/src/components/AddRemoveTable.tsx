@@ -92,6 +92,7 @@ export const AddRemoveTable = ({
   const dataGridClasses = useDataGridStyles();
 
   const CustomToolbar = () => {
+    console.log(rest.addButtonHidden);
     const classes = useToolbarStyles();
     const { state } = useGridSlotComponentProps();
     const numSelected = Object.keys(state.selection).length;
@@ -128,6 +129,8 @@ export const AddRemoveTable = ({
               <DeleteIcon />
             </IconButton>
           </Tooltip>
+        ) : rest.addButtonHidden ? (
+          <div></div>
         ) : (
           <Button
             color="primary"

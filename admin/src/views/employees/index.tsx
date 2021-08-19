@@ -127,7 +127,8 @@ export default function ManagePeople(props: any) {
           setIsRemoveModalVisible(true);
         }}
         tableName="Employees"
-        addButtonText="Add Employees"
+        addButtonText=""
+        addButtonHidden={true}
         loading={dashboardLoading}
       />
       <AddEmployees
