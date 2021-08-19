@@ -13,7 +13,7 @@ import { errorHandler, expandUsers } from '../../../utils';
 
 const addTaskToExpandUsersQueue = async (
   payload: ExpandUsersPayload,
-  expirationAtSeconds: number
+  availableOn: number
 ) => {
   // get the webhook endpoint to call
   const url = firebaseFunctionsUrl + '/expandUsersWebhookHandler';
@@ -28,7 +28,7 @@ const addTaskToExpandUsersQueue = async (
       },
     },
     scheduleTime: {
-      seconds: expirationAtSeconds,
+      seconds: availableOn,
     },
   };
   await tasksClient.createTask({ parent: queuePath, task });
@@ -65,7 +65,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   );
 
   // get the time that the money will be available
-  const expirationAtSeconds = balanceTransaction.available_on;
+  const availableOn = balanceTransaction.available_on;
 
   // get the business data to be applied when the invoice becomes available
   const businessID = customer.id;
@@ -84,7 +84,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   // create task in queue
 
   if (functions.config()['stripe-firebase'].environment == 'production') {
-    await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
+    await addTaskToExpandUsersQueue(payload, availableOn);
   } else {
     const { business } = payload;
     await expandUsers(business);
