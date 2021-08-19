@@ -101,7 +101,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
     useState('');
 
-  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
@@ -165,7 +165,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   ];
 
   const navSections: [string, [string, string, any][]][] =
-    hasPaymentMethods == true
+    business && business.cardPaymentMethods.length != 0
       ? [
           ['General', generalNav],
           ['People', peopleNav],
