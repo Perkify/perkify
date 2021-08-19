@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
 import BChart from './BarChart';
@@ -18,8 +19,9 @@ import { WelcomeCards } from './WelcomeCards';
 
 interface DashboardUser {
   email: string;
-  perkGroupName: string;
-  perkNames: string[];
+  id: string;
+  group: string;
+  perks: PerkUsesDict;
 }
 
 const GeneralDashboard = () => {
@@ -55,7 +57,7 @@ const GeneralDashboard = () => {
     let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
-      let group = employee.perkGroupName;
+      let group = employee.group;
       if (
         business.perkGroups === undefined ||
         business.perkGroups[group] === undefined
@@ -101,7 +103,7 @@ const GeneralDashboard = () => {
     let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
-      let group = employee.perkGroupName;
+      let group = employee.group;
       if (business.perkGroups[group] === undefined) {
         return 0;
       }
@@ -141,7 +143,7 @@ const GeneralDashboard = () => {
     let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
-      let group = employee.perkGroupName;
+      let group = employee.group;
       if (selectedGroup != 'All Perk Groups') {
         //If group is selected only look at employees belonging to the selected group
         if (group !== selectedGroup) {
@@ -176,14 +178,12 @@ const GeneralDashboard = () => {
     let moneySpent = 0;
     console.log(employees);
     employees.forEach((employee) => {
-      // TODO Bring this back @Cole
-      // if (employee.perkUsesDict[perk]) {
-      //   console.log('changing');
-      //   totalPossibleCost += allPerksDict[perk].Cost;
-      //   if (didSpendPerkLastMonth(employee.perkUsesDict[perk])) {
-      //     moneySpent += allPerksDict[perk].Cost;
-      //   }
-      // }
+      if (employee.perks[perk]) {
+        totalPossibleCost += allPerksDict[perk].Cost;
+        if (didSpendPerkLastMonth(employee.perks[perk])) {
+          moneySpent += allPerksDict[perk].Cost;
+        }
+      }
     });
     moneySpent *= 100;
     return Math.round(moneySpent / totalPossibleCost);
@@ -231,17 +231,16 @@ const GeneralDashboard = () => {
     employees.forEach((employee) => {
       let monthlyCost = 0;
       let yearlyCost = 0;
-      // TODO Bring this back @Cole
-      // Object.keys(employee.perkUsesDict).forEach((perk) => {
-      //   employee.perkUsesDict[perk].forEach((date: any) => {
-      //     if (d.getFullYear() === date.toDate().getFullYear()) {
-      //       yearlyCost += allPerksDict[perk].Cost;
-      //     }
-      //     if (d.getMonth() === date.toDate().getMonth()) {
-      //       monthlyCost += allPerksDict[perk].Cost;
-      //     }
-      //   });
-      // });
+      Object.keys(employee.perks).forEach((perk) => {
+        employee.perks[perk].forEach((date: any) => {
+          if (d.getFullYear() === date.toDate().getFullYear()) {
+            yearlyCost += allPerksDict[perk].Cost;
+          }
+          if (d.getMonth() === date.toDate().getMonth()) {
+            monthlyCost += allPerksDict[perk].Cost;
+          }
+        });
+      });
       let newRow = [
         employee.email,
         roundNumberHundredth(monthlyCost).toString(),
@@ -260,20 +259,34 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    if (business && business.perkGroups) {
-      setEmployees(
-        [].concat(
-          ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
-              email: employeeEmail,
-              perkGroupName: perkGroupName,
-              perkNames: business.perkGroups[perkGroupName].perkNames,
-            }))
-          )
-        )
-      );
+    setDashboardLoading(true);
+    if (Object.keys(admin).length != 0 && business) {
+      const businessId = admin['businessID'];
+
+      db.collection('users')
+        .where('businessID', '==', businessId)
+        .get()
+        .then((querySnapshot) => {
+          const people = querySnapshot.docs.map((doc, index) => {
+            const userData = doc.data() as User;
+            return {
+              email: doc.id,
+              id: doc.id,
+              group: userData.perkGroupName,
+              perks: userData.perkUsesDict,
+            };
+          });
+          setEmployees(people);
+          setDashboardLoading(false);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    } else {
+      console.info('No such document!');
     }
-  }, [business]);
+    return () => setDashboardLoading(false);
+  }, [currentUser, admin, business]);
 
   function handleGroupChange(event: any) {
     setSelectedGroup(event.target.value[1]);
