@@ -6,6 +6,7 @@ const isInstanceOfPerkifyError = (object: any) => {
 };
 
 export const errorHandler = async (err: any, req: Request, res: Response) => {
+  console.error('ERROR HANDLER ERROR');
   console.error(err);
 
   // if response already sent, can't do anything

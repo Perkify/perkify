@@ -35,7 +35,7 @@ export const applyChangesToLiveUsers = async (
       const existingPerkUsersSnapshot = await db
         .collection('users')
         .where('businessID', '==', updatedBusiness.businessID)
-        .where('perkGroup', '==', perkGroupName)
+        .where('perkGroupName', '==', perkGroupName)
         .get();
 
       const existingPerkUsersDict = generateDictFromSnapshot(
@@ -44,6 +44,12 @@ export const applyChangesToLiveUsers = async (
 
       const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
       const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
+
+      console.log(
+        'Number of existing users: ',
+        existingPerkUsersSnapshot.docs.length
+      );
+
       const livePerkGroup =
         existingPerkUsersSnapshot.docs.length != 0
           ? ({
@@ -97,8 +103,8 @@ export const applyChangesToLiveUsers = async (
 
       console.log('Generated emails to patch from');
       console.log(intersectedPerkGroupData.emails, livePerkGroup.emails);
-
       console.log(emailsToCreate, emailsToUpdate, emailsToDelete);
+
       usersToCreate.push(
         ...emailsToCreate.map((email) => ({
           email,
@@ -160,5 +166,6 @@ export const applyChangesToLiveUsers = async (
     // modification type === 'shrink'
     applyChanges.push(...usersToDelete.map(deleteUserHelper));
   }
+  console.log('APPLYING CHANGES');
   await Promise.all(applyChanges);
 };

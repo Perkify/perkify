@@ -16,12 +16,18 @@ import MetricCard from './MetricCard';
 import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
+interface DashboardUser {
+  email: string;
+  perkGroupName: string;
+  perkNames: string[];
+}
+
 const GeneralDashboard = () => {
   const { currentUser, admin, loadingAuthState } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
-  var [employees, setEmployees] = useState([]);
+  var [employees, setEmployees] = useState<DashboardUser[]>([]);
   var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
   function roundNumber(num: any) {
@@ -49,7 +55,7 @@ const GeneralDashboard = () => {
     let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
-      let group = employee['perkGroup'];
+      let group = employee.perkGroupName;
       if (
         business.perkGroups === undefined ||
         business.perkGroups[group] === undefined
@@ -95,7 +101,7 @@ const GeneralDashboard = () => {
     let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
-      let group = employee['perkGroup'];
+      let group = employee.perkGroupName;
       if (business.perkGroups[group] === undefined) {
         return 0;
       }
@@ -135,7 +141,7 @@ const GeneralDashboard = () => {
     let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
-      let group = employee['perkGroup'];
+      let group = employee.perkGroupName;
       if (selectedGroup != 'All Perk Groups') {
         //If group is selected only look at employees belonging to the selected group
         if (group !== selectedGroup) {
@@ -170,13 +176,14 @@ const GeneralDashboard = () => {
     let moneySpent = 0;
     console.log(employees);
     employees.forEach((employee) => {
-      if (employee.perks[perk]) {
-        console.log('changing');
-        totalPossibleCost += allPerksDict[perk].Cost;
-        if (didSpendPerkLastMonth(employee.perks[perk])) {
-          moneySpent += allPerksDict[perk].Cost;
-        }
-      }
+      // TODO Bring this back @Cole
+      // if (employee.perkUsesDict[perk]) {
+      //   console.log('changing');
+      //   totalPossibleCost += allPerksDict[perk].Cost;
+      //   if (didSpendPerkLastMonth(employee.perkUsesDict[perk])) {
+      //     moneySpent += allPerksDict[perk].Cost;
+      //   }
+      // }
     });
     moneySpent *= 100;
     return Math.round(moneySpent / totalPossibleCost);
@@ -224,20 +231,21 @@ const GeneralDashboard = () => {
     employees.forEach((employee) => {
       let monthlyCost = 0;
       let yearlyCost = 0;
-      Object.keys(employee['perks']).forEach((perk) => {
-        employee['perks'][perk].forEach((date: any) => {
-          if (d.getFullYear() === date.toDate().getFullYear()) {
-            yearlyCost += allPerksDict[perk].Cost;
-          }
-          if (d.getMonth() === date.toDate().getMonth()) {
-            monthlyCost += allPerksDict[perk].Cost;
-          }
-        });
-      });
+      // TODO Bring this back @Cole
+      // Object.keys(employee.perkUsesDict).forEach((perk) => {
+      //   employee.perkUsesDict[perk].forEach((date: any) => {
+      //     if (d.getFullYear() === date.toDate().getFullYear()) {
+      //       yearlyCost += allPerksDict[perk].Cost;
+      //     }
+      //     if (d.getMonth() === date.toDate().getMonth()) {
+      //       monthlyCost += allPerksDict[perk].Cost;
+      //     }
+      //   });
+      // });
       let newRow = [
         employee.email,
-        roundNumberHundredth(monthlyCost),
-        roundNumberHundredth(yearlyCost),
+        roundNumberHundredth(monthlyCost).toString(),
+        roundNumberHundredth(yearlyCost).toString(),
       ];
       arrayContent.push(newRow);
     });
@@ -258,8 +266,8 @@ const GeneralDashboard = () => {
           ...Object.keys(business.perkGroups).map((perkGroupName) =>
             business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
               email: employeeEmail,
-              group: perkGroupName,
-              perks: business.perkGroups[perkGroupName].perkNames,
+              perkGroupName: perkGroupName,
+              perkNames: business.perkGroups[perkGroupName].perkNames,
             }))
           )
         )

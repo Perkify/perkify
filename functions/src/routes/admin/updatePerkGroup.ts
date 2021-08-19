@@ -53,7 +53,7 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
 
       res.status(200).end();
     } catch (error) {
-      res.status(500).end();
+      next(error);
     }
   }
 );

@@ -45,7 +45,7 @@ export const registerAdminAndBusiness = async (
     });
 
     // create the stripe customer
-    const customer = await stripe.customers.create();
+    const customer = await stripe.customers.create({ email });
 
     // create business entity document
     const businessRef = db.collection('businesses').doc(customer.id);
