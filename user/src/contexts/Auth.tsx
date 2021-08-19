@@ -8,7 +8,7 @@ type ContextProps = {
   authenticated: boolean;
   setCurrentUser: any;
   loadingAuthState: boolean;
-  employee: any;
+  employee: User;
   setEmployee: any;
 };
 
@@ -16,7 +16,7 @@ export const AuthContext = React.createContext<Partial<ContextProps>>({});
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
-  const [employee, setEmployee] = useState({});
+  const [employee, setEmployee] = useState<User>();
   const [loadingAuthState, setLoadingAuthState] = useState(true);
   const location = useLocation();
   const history = useHistory();
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
         if (userDoc.exists) {
           setCurrentUser(user);
           const employeeData = userDoc.data();
-          setEmployee(employeeData);
+          setEmployee(employeeData as User);
         } else {
           auth.signOut();
           alert('You do not have a registered user account');

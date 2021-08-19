@@ -33,9 +33,11 @@ const db = app.firestore();
 const auth = app.auth();
 const functions = app.functions();
 
-if (process.env.REACT_APP_FIRESTORE_MODE == 'emulator') {
+if (process.env.REACT_APP_FIREBASE_MODE == 'emulator') {
   console.info('Using emulator firestore');
+  auth.useEmulator('http://localhost:9099');
   db.useEmulator('localhost', 8080);
+  functions.useEmulator('localhost', 5001);
 }
 
 export default app;
