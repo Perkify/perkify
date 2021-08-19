@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import { allPerksDict } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
@@ -145,8 +146,10 @@ export const updateStripeSubscription = async (businessID: string) => {
         proration_behavior: 'none',
       });
     } else {
-      console.error(
-        'ERROR. SHOULD NOT HAVE SIMULTANEOUS STRIPE SUBSCRIPTOIN INCREASE AND DECREASE'
+      logger.error(
+        'Should not have simultaneous subscription increase and decrease',
+        businessData,
+        quantityByPriceID
       );
     }
   }

@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import { db } from '../services';
 import {
   createUserHelper,
@@ -45,11 +46,6 @@ export const applyChangesToLiveUsers = async (
       const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
       const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
 
-      console.log(
-        'Number of existing users: ',
-        existingPerkUsersSnapshot.docs.length
-      );
-
       const livePerkGroup =
         existingPerkUsersSnapshot.docs.length != 0
           ? ({
@@ -84,9 +80,6 @@ export const applyChangesToLiveUsers = async (
       // to get a subset of the livePerkGroup
       // that we will apply to livePerkGroup
       // in order to shrink it
-      console.log('New Businesses');
-      console.log(updatedPerkGroup);
-      console.log(pendingPerkGroup);
 
       const intersectedPerkGroupData = generatePerkGroupIntersection(
         updatedPerkGroup,
@@ -100,10 +93,6 @@ export const applyChangesToLiveUsers = async (
           intersectedPerkGroupData.emails,
           livePerkGroup.emails
         );
-
-      console.log('Generated emails to patch from');
-      console.log(intersectedPerkGroupData.emails, livePerkGroup.emails);
-      console.log(emailsToCreate, emailsToUpdate, emailsToDelete);
 
       usersToCreate.push(
         ...emailsToCreate.map((email) => ({
@@ -132,6 +121,12 @@ export const applyChangesToLiveUsers = async (
     })
   );
 
+  logger.info(`Applying changes to live users for business: [${businessID}]`, {
+    usersToCreate,
+    usersToUpdate,
+    usersToDelete,
+  });
+
   const applyChanges: Promise<void>[] = [];
 
   // create users
@@ -143,9 +138,7 @@ export const applyChangesToLiveUsers = async (
 
     // assert that there are no users to create
     if (usersToCreate.length != 0) {
-      console.error(
-        'Error users to create is not 0 in syncBusinessDocRemovalsToUserDocuments'
-      );
+      logger.error('Error users to create is not 0 when shrinking live users');
     }
   }
 
@@ -158,14 +151,11 @@ export const applyChangesToLiveUsers = async (
 
     // assert that there are no users to be deleted
     if (usersToDelete.length != 0) {
-      console.error(
-        'Error users to delete is not 0 in syncUsersWithBusinessDocumentPerkGroup'
-      );
+      logger.error('Error users to delete is not 0 when expanding live users');
     }
   } else {
     // modification type === 'shrink'
     applyChanges.push(...usersToDelete.map(deleteUserHelper));
   }
-  console.log('APPLYING CHANGES');
   await Promise.all(applyChanges);
 };

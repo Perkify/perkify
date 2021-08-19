@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import Stripe from 'stripe';
 import { invoicePaidWebhookStripeSecret } from '../../../configs';
 import {
@@ -47,13 +48,13 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
     paymentIntent == undefined ||
     paymentIntent.charges.data.length == 0
   ) {
-    console.error('Invoice does not have payment intent / any charges');
+    logger.error('Invoice does not have payment intent / any charges');
     return;
   }
 
   if (!subscription) {
     // don't handle invoices unless they are associated with a subscription
-    console.error('No subscription attached to the invoice');
+    logger.error('No subscription attached to the invoice');
     return;
   }
 
@@ -83,10 +84,8 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
   // create task in queue
 
   if (functions.config()['stripe-firebase'].environment == 'production') {
-    console.log('ADDING TASK TO EXPAND QUEUE');
     await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
   } else {
-    console.log('EXPANDING USERS');
     const { business } = payload;
     await expandUsers(business);
   }
@@ -111,7 +110,7 @@ export const invoicePaidWebhookHandler = functions.https.onRequest(
         invoicePaidWebhookStripeSecret
       );
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       response.status(401).send(`Webhook Error: ${err.message}`);
       return;
     }
@@ -122,7 +121,6 @@ export const invoicePaidWebhookHandler = functions.https.onRequest(
         const invoice = event.data.object as Stripe.Invoice;
 
         // propogate the invoice to the user collection
-        console.log('CALLING PROPOGATE INVOICE');
         await propogateInvoice(invoice);
       }
     } catch (err) {

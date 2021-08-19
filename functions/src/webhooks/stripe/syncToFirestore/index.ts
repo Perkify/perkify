@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import Stripe from 'stripe';
 import { syncToFirestoreWebhookStripeSecret } from '../../../configs';
 import admin, { db, functions, stripe } from '../../../services';
@@ -95,7 +96,7 @@ const insertPaymentMethod = async (
       last4: card.last4,
     } as SimpleCardPaymentMethod);
   } else {
-    console.error('Payment method added that is not a card');
+    logger.error('Payment method added that is not a card');
   }
 };
 
@@ -114,7 +115,7 @@ const deletePaymentMethod = async (paymentMethod: Stripe.PaymentMethod) => {
         admin.firestore.FieldValue.delete(),
     });
   } else {
-    console.error('Payment method deleted that is not a card');
+    logger.error('Payment method deleted that is not a card');
   }
 };
 
@@ -321,7 +322,7 @@ const insertPaymentRecord = async (
     throw new Error('User not found!');
   }
   if (checkoutSession) {
-    console.error('Not handling checkout session payment record');
+    logger.error('Not handling checkout session payment record');
   }
   // Write to invoice to a subcollection on the subscription doc.
   await customersSnap.docs[0].ref

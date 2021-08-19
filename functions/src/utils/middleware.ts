@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import { logger } from 'firebase-functions';
 
 const isInstanceOfPerkifyError = (object: any) => {
   return 'status' in object && 'reason' in object && 'reasonDetail' in object;
 };
 
 export const errorHandler = async (err: any, req: Request, res: Response) => {
-  console.error('ERROR HANDLER ERROR');
-  console.error(err);
+  logger.error('Error handler caught error', err);
 
   // if response already sent, can't do anything
   if (res.headersSent) {

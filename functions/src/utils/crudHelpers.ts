@@ -3,6 +3,7 @@
 // and the subscription creation only happens once
 // not going off of the subscription update
 
+import { logger } from 'firebase-functions';
 import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
@@ -32,8 +33,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
 
   // if in development mode, print the sign in link
   if (functions.config()['stripe-firebase'].environment == 'development') {
-    console.log('Email: ' + userToCreate.email);
-    console.log('Sign in link: ' + signInLink);
+    logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
   }
 
   // send email

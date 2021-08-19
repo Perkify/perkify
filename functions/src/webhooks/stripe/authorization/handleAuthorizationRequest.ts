@@ -63,7 +63,6 @@ export const handleAuthorizationRequest = async (
   );
 
   if (perkInfo && verifyRequest(perkInfo, perkUsesDict, auth.amount)) {
-    console.log('verified');
     // if verified approve it
     // TODO: RECOMMENT THIS TO AUTHORIZE PERK
     // await stripe.issuing.authorizations.approve(auth['id']);

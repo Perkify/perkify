@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import Stripe from 'stripe';
 import { issuingAuthorizationRequestWebhookStripeSecret } from '../../../configs';
 import { functions, stripe } from '../../../services';
@@ -23,7 +24,7 @@ export const issuingAuthorizationRequestWebhookHandler =
         issuingAuthorizationRequestWebhookStripeSecret
       );
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       response.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }

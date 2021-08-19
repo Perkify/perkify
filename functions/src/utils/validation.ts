@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { Request as ValidatorRequest } from 'express-validator/src/base';
+import { logger } from 'firebase-functions';
 import validator from 'validator';
 import { allPerks } from '../../shared';
 import { auth, db } from '../services';
@@ -203,7 +204,7 @@ export const validateFirebaseIdToken = async (
     req.user = { email: email as string, uid };
     return next();
   } catch (error) {
-    console.error('Error while verifying Firebase ID token:', error);
+    logger.error('Error while verifying Firebase ID token', error);
     const err = {
       status: 403,
       reason: 'Unauthorized',
