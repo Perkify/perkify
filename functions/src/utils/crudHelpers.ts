@@ -1,8 +1,3 @@
-// unknown, what happens during the hour that the invoice takes to process?
-// doesn't matter, they will all be independent invoices
-// and the subscription creation only happens once
-// not going off of the subscription update
-
 import { logger } from 'firebase-functions';
 import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../services';
