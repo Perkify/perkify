@@ -79,6 +79,7 @@ const AddEmployees = ({
             setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
             setEmailsToAdd('');
+            setConfirmationModalVisible(false);
           })
           .catch((e) => {
             console.log(e.response);
