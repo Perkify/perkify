@@ -19,12 +19,18 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
   useEffect(() => {
     if (currentUser && employee) {
       const businessId = employee['businessID'];
+      console.log('BUESINSSID');
+      console.log(businessId);
       db.collection('businesses')
         .doc(businessId)
         .onSnapshot(
           (businessDoc) => {
+            console.log('Business Snapshot ');
+            console.log(businessDoc.data());
             const businessData = businessDoc.data() as Business;
+            console.log(businessData);
             if (businessData && Object.keys(businessData).length != 0) {
+              console.log('Setting business to: ', businessData);
               setBusiness({ ...businessData });
             }
           },

@@ -1,21 +1,27 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow only authenticated content owners access
-    match /admins/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId
-      allow create: if false //DOESN'T ALLOW CREATION FROM FRONT-END; is this fine? 
-      allow update: if request.auth != null && request.auth.uid == userId && request.resource.data.businessID == resource.data.businessID
+    match /{document=**} {
+    allow read,  write: if true;
     }
-    match /businesses/{docId}{
-    	allow read: if get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID == docId
-      allow write: if false //Don't want people to be able to write to businesses without us charging them 
-    }
-    match /users/{user_id}{
-    allow read: if true
-    	// allow read: if resource.data.businessID == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID
-      allow write: if false
-    }
-    //What do we want to do for mail? 
-    }
+
+
+    // // Allow only authenticated content owners access
+    // match /admins/{userId} {
+    //   allow read: if request.auth != null && request.auth.uid == userId
+    //   allow create: if false //DOESN'T ALLOW CREATION FROM FRONT-END; is this fine? 
+    //   allow update: if request.auth != null && request.auth.uid == userId && request.resource.data.businessID == resource.data.businessID
+    // }
+    // match /businesses/{docId}{
+    // 	allow read: if get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID == docId
+    //   allow write: if false //Don't want people to be able to write to businesses without us charging them 
+    // }
+    // match /users/{user_id}{
+    // allow read: if true
+    // 	// allow read: if resource.data.businessID == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID
+    //   allow write: if false
+    // }
+    // //What do we want to do for mail? 
+    // }
+  }
 }

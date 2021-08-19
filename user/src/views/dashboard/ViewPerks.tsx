@@ -45,7 +45,12 @@ const PerkCard = withStyles((theme) => ({
   },
 }))(Paper);
 
-const ViewPerks = ({ employee, business }: any) => {
+interface ViewPerksProps {
+  employee: User;
+  business: Business;
+}
+
+const ViewPerks = ({ employee, business }: ViewPerksProps) => {
   const classes = useStyles();
 
   const perksList = () => {
@@ -53,63 +58,65 @@ const ViewPerks = ({ employee, business }: any) => {
     const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
 
     console.log(business);
-    if (business.perkGroups) {
-      return business.perkGroups[employee.group].map((perk: any) => {
-        increasingDelay += 300;
-        const perkUses = employee.perks[perk];
-        // TODO: this is preferred:
-        // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
-        return (
-          <Grow in={true} timeout={increasingDelay}>
-            {/* ADD this in to open up the instructions for the perk
+    if (business && business.perkGroups) {
+      return business.perkGroups[employee.perkGroupName].perkNames.map(
+        (perkName) => {
+          increasingDelay += 300;
+          const perkUses = employee.perkUsesDict[perkName];
+          // TODO: this is preferred:
+          // (require(`images/perkLogos/${allPerksDict[perk].Img}`));
+          return (
+            <Grow in={true} timeout={increasingDelay}>
+              {/* ADD this in to open up the instructions for the perk
             <Link
               style={{ textDecoration: 'none' }}
               to={`/dashboard/perks/${perk}`}
             >
             */}
-            <PerkCard>
-              {perkUses.length === 0 ||
-              perkUses[perkUses.length - 1].seconds + billingCycle <
-                new Date('2012.08.10').getTime() / 1000 ? (
-                <InfoOutlinedIcon
-                  style={{
-                    fontSize: 32,
-                    color: orange[400],
-                    position: 'absolute',
-                    right: '0',
-                    top: '0',
-                    margin: '18px',
-                  }}
+              <PerkCard>
+                {perkUses.length === 0 ||
+                perkUses[perkUses.length - 1].seconds + billingCycle <
+                  new Date('2012.08.10').getTime() / 1000 ? (
+                  <InfoOutlinedIcon
+                    style={{
+                      fontSize: 32,
+                      color: orange[400],
+                      position: 'absolute',
+                      right: '0',
+                      top: '0',
+                      margin: '18px',
+                    }}
+                  />
+                ) : (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 32,
+                      color: green[400],
+                      position: 'absolute',
+                      right: '0',
+                      top: '0',
+                      margin: '18px',
+                    }}
+                  />
+                )}
+                <Avatar
+                  src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perkName].Img}`}
+                  alt={perkName}
+                  style={{ height: '70px', width: '70px' }}
                 />
-              ) : (
-                <CheckCircleOutlineIcon
-                  style={{
-                    fontSize: 32,
-                    color: green[400],
-                    position: 'absolute',
-                    right: '0',
-                    top: '0',
-                    margin: '18px',
-                  }}
-                />
-              )}
-              <Avatar
-                src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perk].Img}`}
-                alt={perk}
-                style={{ height: '70px', width: '70px' }}
-              />
-              <Typography variant="body1">
-                <Box fontWeight={600} mt={2}>
-                  {perk}
-                </Box>
-              </Typography>
-            </PerkCard>
-            {/*
+                <Typography variant="body1">
+                  <Box fontWeight={600} mt={2}>
+                    {perkName}
+                  </Box>
+                </Typography>
+              </PerkCard>
+              {/*
             </Link>
             */}
-          </Grow>
-        );
-      });
+            </Grow>
+          );
+        }
+      );
     } else {
       return <CircularProgress />;
     }
