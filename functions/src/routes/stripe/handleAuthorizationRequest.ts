@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { allPerks } from '../../../shared';
 import admin, { db, functions, stripe } from '../../models';
 
@@ -69,9 +70,33 @@ export const handleAuthorizationRequest = async (auth, response) => {
   // email of card holder
   const email = auth.card.cardholder.email;
   // functions.logger.log('email', email);
-  const userRef = db.collection('users').doc(email);
+
+  // const userRef = db.collection('users').doc(email);
+  // functions.logger.log('getting user data');
+  // const userData = (await userRef.get()).data();
+
+  // functions.logger.log('getting user auth');
+  // const userAuth = await admin.auth().getUserByEmail(email);
+  // functions.logger.log('getting user token', userAuth.uid);
+  // const userToken = await admin.auth().createCustomToken(userAuth.uid);
+  const userToken =
+    'ya29.a0ARrdaM-UGKD4TmPEPVNrj3EHRAWw6HS_jn8eIrsBWcctJV8eJOOI3fMduZvHZZYjZ_dLUHRFigKzuzBZjm81yC6k8aux_9tSF0BXd3onzLfVyqPnRvkA22GJ68Llp_tdt63v6HosxfDDR2zKFmZMu-fvPENx';
+  // functions.logger.log('user token:', userToken);
+  const secretKey = 'AIzaSyA8MFTaagEWsF3-9tUL1GvZq3OGeA4XL5k';
+
   functions.logger.log('getting user data');
-  const userData = (await userRef.get()).data();
+  const userDataResponse = await axios.get(
+    `https://firestore.googleapis.com/v1/projects/perkify-prod/databases/(default)/documents/users/${email}?key=${secretKey}`,
+    {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  const userData = userDataResponse.data.fields;
+  functions.logger.log('user data:', userData);
+
   if (!userData) {
     const error = {
       status: 500,
@@ -112,6 +137,7 @@ export const handleAuthorizationRequest = async (auth, response) => {
     // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
     // await stripe.issuing.authorizations.approve(auth['id']);
     resultingAuth = await stripe.issuing.authorizations.decline(auth['id']);
+    functions.logger.log('declined');
     response.status(200).send({ received: true });
   } else if (perkInfo && verifyRequest(perkInfo, userPerks, auth.amount)) {
     console.log('verified');
@@ -126,10 +152,14 @@ export const handleAuthorizationRequest = async (auth, response) => {
     response.status(200).send({ received: true });
 
     // call handle approve async so function returns within 2 seconds
+
+    const userRef = db.collection('users').doc(email);
     await handleApprove(userRef, userData, perkInfo);
   } else {
     resultingAuth = await stripe.issuing.authorizations.decline(auth['id']);
     response.status(200).send({ received: true });
+    functions.logger.log('declined');
   }
   await db.collection('transactions').doc(resultingAuth.id).set(resultingAuth);
+  functions.logger.log('finished');
 };

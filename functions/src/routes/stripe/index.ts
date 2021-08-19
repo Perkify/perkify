@@ -1,5 +1,5 @@
 import { stripeWebhookSecret } from '../../configs';
-import { stripe } from '../../models';
+import { functions, stripe } from '../../models';
 import { handleError } from '../../utils';
 import { handleAuthorizationRequest } from './handleAuthorizationRequest';
 
@@ -13,6 +13,7 @@ export const stripeWebhooks = async (request, response) => {
   // functions.logger.log('sig', sig);
   // functions.logger.log('webhook', stripeWebhookSecret);
   // Verify webhook signature and extract the event.
+  functions.logger.log('starting stripe event construct');
   try {
     event = stripe.webhooks.constructEvent(
       request.rawBody,
@@ -23,6 +24,7 @@ export const stripeWebhooks = async (request, response) => {
     console.log(err);
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
+  functions.logger.log('stripe event construct ended');
 
   // functions.logger.log('Event log:', JSON.stringify(event));
   try {
