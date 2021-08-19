@@ -1,5 +1,5 @@
-import { functions } from '../src/models';
-export const allProductionPerks = [
+import { functions } from '../src/services';
+export const allProductionPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
@@ -62,7 +62,7 @@ export const allProductionPerks = [
   },
 ];
 
-export const allDevelopmentPerks = [
+export const allDevelopmentPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
@@ -144,5 +144,5 @@ export const allPerksDict = allPerks.reduce(
     }),
     map
   ),
-  {}
+  {} as PerkDefinitionsDict
 );

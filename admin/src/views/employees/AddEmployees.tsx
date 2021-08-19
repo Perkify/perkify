@@ -16,13 +16,22 @@ import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
 
+interface AddEmployeesProps {
+  isAddEmployeesModalVisible: boolean;
+  setIsAddEmployeesModalVisible: (arg0: boolean) => void;
+  peopleData: { email: string; group: string; id: string }[];
+  groupData: string[];
+}
+
 const AddEmployees = ({
   isAddEmployeesModalVisible,
   setIsAddEmployeesModalVisible,
   peopleData,
   groupData,
-}) => {
+}: AddEmployeesProps) => {
   // selected perk group from dropdown and respective error
+
+  const { business } = useContext(BusinessContext);
   const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
   const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
@@ -39,7 +48,7 @@ const AddEmployees = ({
   const { currentUser } = useContext(AuthContext);
 
   // handle email error
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input atleast one email');
@@ -50,7 +59,7 @@ const AddEmployees = ({
     }
   };
 
-  const addToPerkGroup = (event) => {
+  const addToPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
     if (emailsToAdd == '') {
@@ -68,25 +77,21 @@ const AddEmployees = ({
         const bearerToken = await currentUser.getIdToken();
 
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+        const payload: UpdatePerkGroupPayload = {
+          perkNames: business.perkGroups[selectedPerkGroup].perkNames,
+          emails: emailList.concat(
+            peopleData
+              .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
+              .map((employeeObj) => employeeObj.email)
+          ),
+        };
 
-        PerkifyApi.put(
-          'user/auth/updatePerkGroup',
-          JSON.stringify({
-            group: selectedPerkGroup,
-            perks: undefined,
-            emails: emailList.concat(
-              peopleData
-                .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
-                .map((employeeObj) => employeeObj.email)
-            ),
-          }),
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        PerkifyApi.put(`rest/perkGroup/${selectedPerkGroup}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
           .then(() => {
             setDashboardLoading(false);
             setFreezeNav(false);
@@ -108,10 +113,8 @@ const AddEmployees = ({
     }
   };
 
-  const { business } = useContext(BusinessContext);
-
   function generatePerks() {
-    return business['groups'][selectedPerkGroup];
+    return business.perkGroups[selectedPerkGroup].perkNames;
   }
 
   function setVisible() {

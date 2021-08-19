@@ -1,77 +1,25 @@
-// import axios from 'axios';
-import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
-import * as express from 'express';
-import { functions } from './models';
+import { restApi } from './routes';
 import {
-  createGroup,
-  createGroupValidators,
-  deletePerkGroup,
-  deletePerkGroupValidators,
-  getStripePaymentMethods,
-  registerAdminAndBusiness,
-  registerAdminAndBusinessValidators,
-  registerUser,
-  registerUserValidators,
-  stripeWebhooks,
-  updatePerkGroup,
-  updatePerkGroupValidators,
-} from './routes';
-import { validateFirebaseIdToken } from './utils';
+  expandUsersWebhookHandler,
+  invoicePaidWebhookHandler,
+  issuingAuthorizationRequestWebhookHandler,
+  syncToFirestoreWebhookHandler,
+} from './webhooks';
 
-// express endpoint
+// rest api endpoint
+exports.rest = restApi;
 
-const app = express();
-const stripeWebhooksApp = express();
+// TODO update stripe webhook endpoints to match new definitions
 
-app.use(
-  cors({
-    origin: [
-      /^http?:\/\/(.+\.)?localhost(:\d+)?$/,
-      /^https?:\/\/(.+\.)?localhost(:\d+)?$/,
-      /^https?:\/\/(.+\.)?getperkify\.com(:\d+)?$/,
-      /^https?:\/\/(.+\.)?perkify-5790b.*\.web\.app$/,
-    ],
-    credentials: true,
-  })
-);
+// endpoint for expanding users when invoice becomes available
+exports.expandUsersWebhookHandler = expandUsersWebhookHandler;
 
-// --------------- Express Routes --------------- //
+// endpoint for handling issuing authorization requests
+exports.issuingAuthorizationRequestWebhookHandler =
+  issuingAuthorizationRequestWebhookHandler;
 
-app.post(
-  '/registerAdminAndBusiness',
-  registerAdminAndBusinessValidators,
-  registerAdminAndBusiness
-);
+// endpoint for generating expandUser tasks when an invoice is paid
+exports.invoicePaidWebhookHandler = invoicePaidWebhookHandler;
 
-app.use('/auth', validateFirebaseIdToken);
-app.post('/auth/registerUser', registerUserValidators, registerUser);
-app.post('/auth/createGroup', createGroupValidators, createGroup);
-app.put('/auth/updatePerkGroup', updatePerkGroupValidators, updatePerkGroup);
-app.post('/auth/deletePerkGroup', deletePerkGroupValidators, deletePerkGroup);
-
-// TODO move this to part of firestore with stripe webhook
-app.get('/auth/stripePaymentMethods', getStripePaymentMethods);
-app.use((err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  if (!(err.status && err.reason && err.reasonDetail)) {
-    return next(err);
-  }
-
-  const { status, reason, reasonDetail } = err;
-
-  res.status(status).send({ reason, reasonDetail }).end();
-});
-
-exports.user = functions.https.onRequest(app);
-
-stripeWebhooksApp.use(express.json());
-stripeWebhooksApp.post(
-  '/webhook',
-  bodyParser.raw({ type: 'application/json' }),
-  stripeWebhooks
-);
-exports.stripe = functions.https.onRequest(stripeWebhooksApp);
+// synchronize events from stripe into firestore
+exports.syncToFirestoreWebhookHandler = syncToFirestoreWebhookHandler;

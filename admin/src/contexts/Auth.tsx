@@ -1,7 +1,5 @@
 import firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import { PerkifyApi } from 'services';
 import app, { auth, db } from '../firebaseApp';
 
 type ContextProps = {
@@ -11,19 +9,18 @@ type ContextProps = {
   loadingAuthState: boolean;
   admin: any;
   setAdmin: any;
-  hasPaymentMethods: boolean;
-  setHasPaymentMethods: any;
 };
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
 
 export const AuthContext = React.createContext<Partial<ContextProps>>({});
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
   const [loadingAuthState, setLoadingAuthState] = useState(true);
   const [admin, setAdmin] = useState({});
-  const location = useLocation();
-  const history = useHistory();
-  const [hasPaymentMethods, setHasPaymentMethods] = useState(null);
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
@@ -31,22 +28,7 @@ export const AuthProvider = ({ children }) => {
         const userDoc = await db.collection('admins').doc(user.uid).get();
         if (userDoc) {
           setCurrentUser(user);
-          const adminData = userDoc.data();
-          setAdmin(adminData);
-
-          const bearerToken = await user.getIdToken();
-
-          // check if customer has payment methods
-          PerkifyApi.get('/user/auth/stripePaymentMethods', {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          })
-            .then((res) => {
-              setHasPaymentMethods(res.data.data.length > 0);
-            })
-            .catch(() => {});
+          setAdmin(userDoc.data());
         } else {
           auth.signOut();
           alert('You do not have a registered admin account');
@@ -65,8 +47,6 @@ export const AuthProvider = ({ children }) => {
         loadingAuthState,
         admin,
         setAdmin,
-        hasPaymentMethods,
-        setHasPaymentMethods,
       }}
     >
       {children}

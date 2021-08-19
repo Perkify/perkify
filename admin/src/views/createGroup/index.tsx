@@ -9,23 +9,27 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
 
-const CreateGroup = ({ history }) => {
+const CreateGroup = () => {
+  const history = useHistory();
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
+  const { business } = useContext(BusinessContext);
+
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
-  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const [groupName, setGroupName] = useState('');
   const [emails, setEmails] = useState('');
@@ -38,11 +42,11 @@ const CreateGroup = ({ history }) => {
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
 
-  function roundNumber(num) {
+  function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
   }
 
-  const handlePerkChange = (event) => {
+  const handlePerkChange = (event: any) => {
     // update the controlled form
     const perks = event.target.value as string[];
 
@@ -58,7 +62,7 @@ const CreateGroup = ({ history }) => {
     setTotalCost(roundNumber(cost * numPeople * 1.1 + 4 * numPeople));
   };
 
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmails(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input at least one email');
@@ -69,7 +73,7 @@ const CreateGroup = ({ history }) => {
     }
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = (event: any) => {
     handleEmailError(event);
     let tmpNumPeople = numPeople;
     if (event.target.value === '') {
@@ -90,7 +94,7 @@ const CreateGroup = ({ history }) => {
     );
   };
 
-  const createPerkGroup = (e) => {
+  const createPerkGroup = (e: any) => {
     e.preventDefault();
     let error = false;
 
@@ -119,21 +123,16 @@ const CreateGroup = ({ history }) => {
       (async () => {
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
-        PerkifyApi.post(
-          'user/auth/createGroup',
-          {
-            group: groupName,
-            emails: emailList,
-            perks: selectedPerks,
+        const payload: CreatePerkGroupPayload = {
+          emails: emailList,
+          perkNames: selectedPerks,
+        };
+        PerkifyApi.post(`rest/perkGroup/${groupName}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
           },
-
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        })
           .then(() => {
             setDashboardLoading(false);
             setFreezeNav(false);
@@ -269,8 +268,12 @@ const CreateGroup = ({ history }) => {
           Estimated Cost (Fees Included): ${totalCost}
         </Typography>
         <Tooltip
-          disableFocusListener={hasPaymentMethods}
-          disableHoverListener={hasPaymentMethods}
+          disableFocusListener={
+            !(!business || business.cardPaymentMethods.length == 0)
+          }
+          disableHoverListener={
+            !(!business || business.cardPaymentMethods.length == 0)
+          }
           title="Please add billing information before creating a group"
           placement="bottom-start"
         >
@@ -279,7 +282,7 @@ const CreateGroup = ({ history }) => {
               onClick={setVisible}
               variant="contained"
               color="primary"
-              disabled={!hasPaymentMethods}
+              disabled={!business || business.cardPaymentMethods.length == 0}
             >
               Create Perk Group
             </Button>

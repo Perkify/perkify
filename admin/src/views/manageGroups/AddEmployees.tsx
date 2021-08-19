@@ -14,13 +14,21 @@ import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
 
+interface AddEmployeesProps {
+  isAddEmployeesModalVisible: boolean;
+  setIsAddEmployeesModalVisible: (arg0: boolean) => void;
+  employees: { email: string; group: string; id: string }[];
+  group: string;
+  groupPerks: PerkDefinition[];
+}
+
 const AddEmployees = ({
   isAddEmployeesModalVisible,
   setIsAddEmployeesModalVisible,
   employees,
   group,
   groupPerks,
-}) => {
+}: AddEmployeesProps) => {
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
@@ -30,7 +38,7 @@ const AddEmployees = ({
     useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
-  const handleEmailError = (event) => {
+  const handleEmailError = (event: any) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input atleast one email');
@@ -41,7 +49,7 @@ const AddEmployees = ({
     }
   };
 
-  const addEmployeesToPerkGroup = (event) => {
+  const addEmployeesToPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
     if (emailsToAdd == '') {
@@ -61,12 +69,11 @@ const AddEmployees = ({
         );
 
         PerkifyApi.put(
-          'user/auth/updatePerkGroup',
+          `rest/perkGroup/${group}`,
           {
-            group,
-            perks: groupPerks.map((perkObj) => perkObj.Name),
+            perkNames: groupPerks.map((perkObj) => perkObj.Name),
             emails: afterEmployees,
-          },
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
@@ -82,6 +89,7 @@ const AddEmployees = ({
             setConfirmationModalVisible(false);
           })
           .catch((e) => {
+            console.error(e);
             console.log(e.response);
             alert(
               `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
@@ -108,11 +116,7 @@ const AddEmployees = ({
   }
 
   function generatePerks() {
-    let retVal = [];
-    groupPerks.forEach((perk) => {
-      retVal.push(perk.Name);
-    });
-    return retVal;
+    return groupPerks.map((perk) => perk.Name);
   }
 
   return isConfirmationModalVisible ? (

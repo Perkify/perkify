@@ -47,7 +47,7 @@ const data = [
   },
 ];
 
-const BChart = (props) => {
+const BChart = (props: any) => {
   const COLORS = [
     '#0088FE',
     '#00C49F',
@@ -62,7 +62,7 @@ const BChart = (props) => {
       <BarChart data={props.data}>
         <XAxis dataKey="name" />
         <YAxis height={100} unit="%" domain={[0, 100]} />
-        <Tooltip formatter={(label) => label + ' %'} cursor={false} />
+        <Tooltip formatter={(label: any) => label + ' %'} cursor={false} />
         <Bar
           dataKey="spent"
           name="Spent"

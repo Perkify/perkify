@@ -1,64 +1,30 @@
-import { body, validationResult } from 'express-validator';
-import { db, stripe } from '../../models';
-import { handleError } from '.././../utils';
+import { NextFunction, Response } from 'express';
+import { body } from 'express-validator';
+import { db, stripe } from '../../services';
+import { UserPerkifyRequest, userPerkifyRequestTransform } from '../../types';
+import {
+  checkValidationResult,
+  validateBusinessDoc,
+  validateFirebaseIdToken,
+  validateUserDoc,
+} from '../../utils';
 
 export const registerUserValidators = [
+  validateFirebaseIdToken,
+  validateUserDoc,
+  validateBusinessDoc,
   body('firstName').not().isEmpty(),
   body('lastName').not().isEmpty(),
+  checkValidationResult,
 ];
-export const registerUser = async (req, res, next) => {
-  const { firstName, lastName, ...rest } = req.body;
 
-  try {
-    // check for validation errors
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
-      };
-      return next(error);
-    }
-
-    if (Object.keys(rest).length > 0) {
-      const error = {
-        status: 400,
-        reason: 'extraneous parameters',
-        reasonDetail: Object.keys(rest).join(','),
-      };
-      return next(error);
-    }
-
+// when does registerUser get called?
+// what is the user creation flow?
+export const registerUser = userPerkifyRequestTransform(
+  async (req: UserPerkifyRequest, res: Response, next: NextFunction) => {
+    const { firstName, lastName } = req.body as RegisterUserPayload;
     const email = req.user.email;
-
-    // TODO: get field directly
-    const userData = (await db.collection('users').doc(email).get()).data();
-
-    if (!userData) {
-      const error = {
-        status: 500,
-        reason: 'Missing user document',
-        reasonDetail: `User documents missing from firestore`,
-      };
-      return next(error);
-    }
-
-    const businessID = userData.businessID;
-
-    const businessData = (
-      await db.collection('businesses').doc(businessID).get()
-    ).data();
-
-    if (!businessData) {
-      const error = {
-        status: 500,
-        reason: 'Missing business document',
-        reasonDetail: `Business documents missing from firestore`,
-      };
-      return next(error);
-    }
+    const businessData = req.businessData;
 
     const billingAddress = businessData.billingAddress;
 
@@ -66,39 +32,44 @@ export const registerUser = async (req, res, next) => {
       delete billingAddress['line2'];
     }
 
-    const cardholder = await stripe.issuing.cardholders.create({
-      type: 'individual',
-      name: `${firstName} ${lastName}`,
-      email: email,
-      billing: {
-        address: billingAddress,
-      },
-      status: 'active',
-    });
-    const cardholderID = cardholder.id;
+    try {
+      const cardholder = await stripe.issuing.cardholders.create({
+        type: 'individual',
+        name: `${firstName} ${lastName}`,
+        email: email,
+        billing: {
+          address: billingAddress,
+        },
+        status: 'active',
+      });
+      const cardholderID = cardholder.id;
 
-    const card = await stripe.issuing.cards.create({
-      cardholder: cardholderID,
-      currency: 'usd',
-      type: 'virtual',
-      status: 'active',
-    });
+      const card = await stripe.issuing.cards.create({
+        cardholder: cardholderID,
+        currency: 'usd',
+        type: 'virtual',
+        status: 'active',
+      });
 
-    const cardDetails = await stripe.issuing.cards.retrieve(card.id, {
-      expand: ['number', 'cvc'],
-    });
+      const cardDetails = await stripe.issuing.cards.retrieve(card.id, {
+        expand: ['number', 'cvc'],
+      });
 
-    await db
-      .collection('users')
-      .doc(email)
-      .update({
+      // we combine prevUserData with new data
+      // in order to be sure we are satisfying the User type
+      const prevUserData = (
+        await db.collection('users').doc(email).get()
+      ).data() as SimpleUser;
+
+      const userData: User = {
+        ...prevUserData,
         firstName: firstName,
         lastName: lastName,
         card: {
           id: card.id,
           cardholderID: cardholderID,
-          number: cardDetails.number,
-          cvc: cardDetails.cvc,
+          number: cardDetails.number || '',
+          cvc: cardDetails.cvc || '',
           exp: {
             month: cardDetails.exp_month,
             year: cardDetails.exp_year,
@@ -110,10 +81,12 @@ export const registerUser = async (req, res, next) => {
             address: billingAddress,
           },
         },
-      });
+      };
+      await db.collection('users').doc(email).set(userData);
 
-    res.status(200).end();
-  } catch (err) {
-    handleError(err, res);
+      res.status(200).end();
+    } catch (err) {
+      next(err);
+    }
   }
-};
+);

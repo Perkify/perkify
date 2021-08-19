@@ -1,6 +1,7 @@
-import { body, validationResult } from 'express-validator';
-import admin, { db } from '../../models';
-import { emailNormalizationOptions, handleError } from '../../utils';
+import { NextFunction, Request, Response } from 'express';
+import { body } from 'express-validator';
+import admin, { db, stripe } from '../../services';
+import { checkValidationResult, emailNormalizationOptions } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
   body('firstName').not().isEmpty(),
@@ -12,9 +13,14 @@ export const registerAdminAndBusinessValidators = [
   body('city').not().isEmpty(),
   body('state').isLength({ min: 2, max: 2 }),
   body('postalCode').not().isEmpty(),
+  checkValidationResult,
 ];
 
-export const registerAdminAndBusiness = async (req, res, next) => {
+export const registerAdminAndBusiness = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const {
     firstName,
     lastName,
@@ -26,29 +32,9 @@ export const registerAdminAndBusiness = async (req, res, next) => {
     city,
     state,
     postalCode,
-  } = req.body;
+  } = req.body as RegisterAdminAndBusinessPayload;
 
   try {
-    // verify that no extra parameters were sent
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
-      };
-      return next(error);
-    }
-
-    // if (Object.keys(rest).length > 0) {
-    //   const error = {
-    //     status: 400,
-    //     reason: 'extraneous parameters',
-    //     reasonDetail: Object.keys(rest).join(','),
-    //   };
-    //   return next(error);
-    // }
-
     // create firebase user
     const newUser = await admin.auth().createUser({
       email,
@@ -58,8 +44,23 @@ export const registerAdminAndBusiness = async (req, res, next) => {
       disabled: false,
     });
 
-    // create business entity
-    const businessRef = await db.collection('businesses').add({
+    // create the stripe customer
+    const customer = await stripe.customers.create({ email });
+
+    // create business entity document
+    const businessRef = db.collection('businesses').doc(customer.id);
+
+    const adminData: Admin = {
+      email,
+      firstName,
+      lastName,
+      businessID: businessRef.id,
+    };
+    // create admin document to link user to business
+    await db.collection('admins').doc(newUser.uid).set(adminData);
+
+    const businessData: Business = {
+      businessID: businessRef.id,
       name: businessName,
       billingAddress: {
         city,
@@ -70,20 +71,19 @@ export const registerAdminAndBusiness = async (req, res, next) => {
         state,
       },
       admins: [newUser.uid],
-      groups: {},
-    });
+      perkGroups: {},
+      cardPaymentMethods: [],
+      stripeId: customer.id,
+      stripeLink: `https://dashboard.stripe.com${
+        customer.livemode ? '' : '/test'
+      }/customers/${customer.id}`,
+    };
 
-    // create admin document to link user to business
-    await db.collection('admins').doc(newUser.uid).set({
-      email,
-      firstName,
-      lastName,
-      companyID: businessRef.id,
-    });
+    // set the business document
+    businessRef.set(businessData);
 
     res.status(200).end();
   } catch (err) {
-    // TODO: if globalWalletID is set then use rapid api to delete the wallet
-    handleError(err, res);
+    next(err);
   }
 };

@@ -2,7 +2,15 @@ import { AuthContext } from 'contexts';
 import React, { useContext } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
-const PublicRoute = ({ component: RouteComponent, ...rest }) => {
+interface PublicRouteProps {
+  component: React.ElementType;
+  [key: string]: any;
+}
+
+const PublicRoute = ({
+  component: RouteComponent,
+  ...rest
+}: PublicRouteProps) => {
   const { currentUser, loadingAuthState } = useContext(AuthContext);
 
   return (

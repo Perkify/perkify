@@ -1,11 +1,12 @@
 import Header from 'components/Header';
-import { LoadingContext } from 'contexts';
-import { functions } from 'firebaseApp';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { PerkifyApi } from 'services';
 
 const Billing = () => {
   const history = useHistory();
+  const { currentUser } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
@@ -13,12 +14,23 @@ const Billing = () => {
   useEffect(() => {
     (async () => {
       setDashboardLoading(true);
-      const functionRef = functions.httpsCallable(
-        'ext-firestore-stripe-subscriptions-createPortalLink'
-      );
-      const { data } = await functionRef({
+
+      const payload: CreatePortalLinkPayload = {
         returnUrl: window.location.origin + '/dashboard',
+      };
+
+      const bearerToken = await currentUser.getIdToken();
+      console.log(bearerToken);
+      const { data } = await PerkifyApi.post('rest/portalLink', payload, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
       });
+      // const functionRef = functions.httpsCallable('createPortalLink');
+      // const { data } = await functionRef({
+      //   returnUrl: window.location.origin + '/dashboard',
+      // });
       history.push('/dashboard');
       window.location.assign(data.url);
     })();

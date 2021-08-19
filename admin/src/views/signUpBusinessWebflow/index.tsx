@@ -100,18 +100,18 @@ const SignUpBusinessWebflow = () => {
     null as firebase.User | null
   );
 
-  const processStep = async (step) => {
+  const processStep = async (step: any) => {
     switch (step) {
       case 0:
         return true;
       case 1:
         try {
           setDashboardLoading(true);
-          await PerkifyApi.post('user/registerAdminAndBusiness', {
+          await PerkifyApi.post('rest/admin', {
             ...AdminFormProps,
             ...BusinessFormProps,
             line2: '',
-          });
+          } as RegisterAdminAndBusinessPayload);
           const result = await app
             .auth()
             .signInWithEmailAndPassword(email, password);
@@ -137,7 +137,7 @@ const SignUpBusinessWebflow = () => {
     }
   };
 
-  const handleNext = async (validnext) => {
+  const handleNext = async (validnext: boolean) => {
     if (validnext && (await processStep(activeStep))) {
       setInvalidStep(false);
       setActiveStep(activeStep + 1);
@@ -150,7 +150,7 @@ const SignUpBusinessWebflow = () => {
     setActiveStep(activeStep - 1);
   };
 
-  const getStepContent = (step) => {
+  const getStepContent = (step: any) => {
     switch (step) {
       case 0:
         return (

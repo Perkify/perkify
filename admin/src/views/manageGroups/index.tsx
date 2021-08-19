@@ -3,9 +3,8 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import Header from 'components/Header';
 import { BusinessContext, LoadingContext } from 'contexts';
 import { AuthContext } from 'contexts/Auth';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
@@ -42,8 +41,8 @@ const perkColumns = [
   },
 ];
 
-export default function ManageGroups(props) {
-  let { id } = useParams();
+export default function ManageGroups(props: any) {
+  let { id } = useParams<{ id: string }>();
 
   const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
     useState(false);
@@ -61,65 +60,27 @@ export default function ManageGroups(props) {
 
   const { business } = useContext(BusinessContext);
 
-  const history = useHistory();
-
-  function getPerkNames(perks) {
-    const retNames = perks.map((perk) => {
-      retNames.push(perk.Name);
-    });
-
-    return retNames;
-  }
-
-  let groupData: any[] = [];
-  const fillerGroupData = [
-    {
-      name: 'A',
-      id: 'abc123',
-    },
-    {
-      name: 'B',
-      id: 'abc133',
-    },
-  ];
-
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
   useEffect(() => {
-    if (Object.keys(admin).length != 0) {
-      setDashboardLoading(true);
-      // get list of emails that belong to the perk group
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .where('group', '==', id)
-        .onSnapshot(
-          (querySnapshot) => {
-            setEmails(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error('Error getting documents: ', error);
-          }
-        );
-      return () => setDashboardLoading(false);
-    }
-  }, [admin, id]);
-
-  useEffect(() => {
-    if (Object.keys(business).length != 0) {
-      if (Object.keys(business.groups).includes(id)) {
+    if (business) {
+      if (Object.keys(business.perkGroups).includes(id)) {
+        // set perk group data
         setPerksData(
-          business.groups[id].map((perk, index) => ({
+          business.perkGroups[id].perkNames.map((perkGroupName, index) => ({
+            ...allPerksDict[perkGroupName],
             id: index,
-            ...allPerksDict[perk],
+          }))
+        );
+
+        // set email data
+        setEmails(
+          business.perkGroups[id].emails.map((employeeEmail, index) => ({
+            email: employeeEmail,
+            id: index,
           }))
         );
         setGroupNotFound(false);

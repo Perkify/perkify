@@ -2,7 +2,6 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { PerkifyApi } from 'services';
 import AddEmployees from './AddEmployees';
@@ -15,14 +14,14 @@ const columns = [
     editable: false,
   },
   {
-    field: 'group',
-    headerName: 'Group',
+    field: 'perkGroupName',
+    headerName: 'Perk Group',
     width: 200,
     editable: false,
   },
 ];
 
-export default function ManagePeople(props) {
+export default function ManagePeople(props: any) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
     useState(false);
@@ -36,35 +35,21 @@ export default function ManagePeople(props) {
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
-    if (business && business['groups']) {
-      setGroupData(Object.keys(business['groups']).sort());
+    if (business) {
+      setGroupData(Object.keys(business.perkGroups).sort());
+      setPeopleData(
+        [].concat(
+          ...Object.keys(business.perkGroups).map((perkGroupName) =>
+            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
+              email: employeeEmail,
+              group: perkGroupName,
+              id: employeeEmail,
+            }))
+          )
+        )
+      );
     }
   }, [business]);
-
-  useEffect(() => {
-    setDashboardLoading(true);
-    // get list of employees that belong to the business
-    if (Object.keys(admin).length != 0) {
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .onSnapshot(
-          (querySnapshot) => {
-            setPeopleData(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()['group'],
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
-    }
-    return () => setDashboardLoading(false);
-  }, [admin]);
 
   const removeUsers = async () => {
     let error = false;
@@ -101,20 +86,19 @@ export default function ManagePeople(props) {
           Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
             const afterEmails = perkGroupToAfterEmails[perkGroup];
 
-            await PerkifyApi.put(
-              'user/auth/updatePerkGroup',
-              JSON.stringify({
-                group: perkGroup,
-                emails: afterEmails,
-                perks: undefined,
-              }),
-              {
-                headers: {
-                  Authorization: `Bearer ${bearerToken}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
+            // better would be to create an api folder where you can call these from
+            // should haven't to do all this copy pasting
+            const payload: UpdatePerkGroupPayload = {
+              emails: afterEmails,
+              perkNames: business.perkGroups[perkGroup].perkNames,
+            };
+
+            await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
+              headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
+              },
+            });
           })
         );
         setDashboardLoading(false);

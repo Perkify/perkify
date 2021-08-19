@@ -17,20 +17,26 @@ import MetricCard from './MetricCard';
 import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
+interface DashboardUser {
+  email: string;
+  id: string;
+  group: string;
+  perks: PerkUsesDict;
+}
+
 const GeneralDashboard = () => {
-  const { currentUser, admin, hasPaymentMethods, loadingAuthState } =
-    useContext(AuthContext);
+  const { currentUser, admin, loadingAuthState } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
-  var [employees, setEmployees] = useState([]);
-  var [selectedGroup, setSelectedGroup] = useState('All Groups');
+  var [employees, setEmployees] = useState<DashboardUser[]>([]);
+  var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
-  function roundNumber(num) {
+  function roundNumber(num: any) {
     return Math.round(10 * num) / 10;
   }
 
-  function roundNumberHundredth(num) {
+  function roundNumberHundredth(num: any) {
     return Math.round(100 * num) / 100;
   }
 
@@ -38,8 +44,8 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let retArr = Object.keys(business.groups);
-    retArr.push('All Groups');
+    let retArr = Object.keys(business.perkGroups);
+    retArr.push('All Perk Groups');
     return retArr;
   }
 
@@ -48,17 +54,17 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let tempDict = {};
+    let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Looks through each employee to create dict of total costs per perk
-      let group = employee['group'];
+      let group = employee.group;
       if (
-        business.groups === undefined ||
-        business.groups[group] === undefined
+        business.perkGroups === undefined ||
+        business.perkGroups[group] === undefined
       ) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -66,7 +72,7 @@ const GeneralDashboard = () => {
         }
       });
     });
-    let data = [];
+    let data: { name: string; value: number }[] = [];
     let totalValue = 0;
     Object.keys(tempDict).forEach((perk) => {
       //Creates array of total cost per perk
@@ -91,17 +97,17 @@ const GeneralDashboard = () => {
     }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
-    if (business.groups === undefined) {
+    if (business.perkGroups === undefined) {
       return 0;
     }
     let groupCost = {};
     employees.forEach((employee) => {
       let cost = 0;
-      let group = employee['group'];
-      if (business.groups[group] === undefined) {
+      let group = employee.group;
+      if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         cost += allPerksDict[perk].Cost;
       });
       totalCost += cost;
@@ -115,38 +121,39 @@ const GeneralDashboard = () => {
     }
     //returns num of perks offered
     let perks = new Set([]);
-    Object.keys(business.groups).forEach((group) => {
-      business.groups[group].forEach((perk) => {
+    Object.keys(business.perkGroups).forEach((group) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         perks.add(perk);
       });
     });
+
     return perks.size;
   }
 
-  function getRandomInt(max) {
+  function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
 
   function calculateBarGraphData() {
     //returns bar graph data in array form
-    let retData = [];
+    let retData: { name: string; spent: number; total: number }[] = [];
     if (dashboardLoading) {
       return retData;
     }
-    let tempDict = {};
+    let tempDict: { [key: string]: number } = {};
     employees.forEach((employee) => {
       //Creates dictionary of total amount spent per perk
-      let group = employee['group'];
-      if (selectedGroup != 'All Groups') {
+      let group = employee.group;
+      if (selectedGroup != 'All Perk Groups') {
         //If group is selected only look at employees belonging to the selected group
         if (group !== selectedGroup) {
           return 0;
         }
       }
-      if (business.groups[group] === undefined) {
+      if (business.perkGroups[group] === undefined) {
         return 0;
       }
-      business.groups[group].forEach((perk) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -166,13 +173,12 @@ const GeneralDashboard = () => {
     return retData;
   }
 
-  function calculateAmountSpentPerPerk(perk) {
+  function calculateAmountSpentPerPerk(perk: string) {
     let totalPossibleCost = 0;
     let moneySpent = 0;
     console.log(employees);
     employees.forEach((employee) => {
       if (employee.perks[perk]) {
-        console.log('changing');
         totalPossibleCost += allPerksDict[perk].Cost;
         if (didSpendPerkLastMonth(employee.perks[perk])) {
           moneySpent += allPerksDict[perk].Cost;
@@ -183,7 +189,7 @@ const GeneralDashboard = () => {
     return Math.round(moneySpent / totalPossibleCost);
   }
 
-  function didSpendPerkLastMonth(employeeArray) {
+  function didSpendPerkLastMonth(employeeArray: PerkUses) {
     if (employeeArray.length == 0) {
       return false;
     }
@@ -225,8 +231,8 @@ const GeneralDashboard = () => {
     employees.forEach((employee) => {
       let monthlyCost = 0;
       let yearlyCost = 0;
-      Object.keys(employee['perks']).forEach((perk) => {
-        employee['perks'][perk].forEach((date) => {
+      Object.keys(employee.perks).forEach((perk) => {
+        employee.perks[perk].forEach((date: any) => {
           if (d.getFullYear() === date.toDate().getFullYear()) {
             yearlyCost += allPerksDict[perk].Cost;
           }
@@ -237,8 +243,8 @@ const GeneralDashboard = () => {
       });
       let newRow = [
         employee.email,
-        roundNumberHundredth(monthlyCost),
-        roundNumberHundredth(yearlyCost),
+        roundNumberHundredth(monthlyCost).toString(),
+        roundNumberHundredth(yearlyCost).toString(),
       ];
       arrayContent.push(newRow);
     });
@@ -255,19 +261,23 @@ const GeneralDashboard = () => {
   useEffect(() => {
     setDashboardLoading(true);
     if (Object.keys(admin).length != 0 && business) {
-      const businessId = admin['companyID'];
+      const businessId = admin['businessID'];
 
       db.collection('users')
         .where('businessID', '==', businessId)
         .get()
         .then((querySnapshot) => {
-          const people = querySnapshot.docs.map((doc, index) => ({
-            email: doc.id,
-            id: index,
-            group: doc.data()['group'],
-            perks: doc.data()['perks'],
-          }));
+          const people = querySnapshot.docs.map((doc, index) => {
+            const userData = doc.data() as User;
+            return {
+              email: doc.id,
+              id: doc.id,
+              group: userData.perkGroupName,
+              perks: userData.perkUsesDict,
+            };
+          });
           setEmployees(people);
+          setDashboardLoading(false);
         })
         .catch((error) => {
           alert(error);
@@ -278,13 +288,7 @@ const GeneralDashboard = () => {
     return () => setDashboardLoading(false);
   }, [currentUser, admin, business]);
 
-  useEffect(() => {
-    if (hasPaymentMethods != null) {
-      setDashboardLoading(false);
-    }
-  }, [hasPaymentMethods]);
-
-  function handleGroupChange(event) {
+  function handleGroupChange(event: any) {
     setSelectedGroup(event.target.value[1]);
   }
 
@@ -295,21 +299,21 @@ const GeneralDashboard = () => {
           <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
         </Grid>
         <Grid item xs={2}>
-          {hasPaymentMethods == true &&
-            (business['groups'] == null ||
-              Object.keys(business['groups']).length == 0) == false && (
+          {business &&
+            business.cardPaymentMethods.length != 0 &&
+            Object.keys(business.perkGroups).length != 0 && (
               <Button color="primary" onClick={generateCSV}>
                 Download Financial Records
               </Button>
             )}
         </Grid>
       </Grid>
-      {loadingAuthState || hasPaymentMethods == null ? (
+      {loadingAuthState || !business ? (
         <p>Loading</p>
-      ) : !(hasPaymentMethods == true) ? (
+      ) : business.cardPaymentMethods.length == 0 ? (
         <WelcomeCards />
-      ) : business['groups'] == null ||
-        Object.keys(business['groups']).length == 0 ? (
+      ) : business.perkGroups == null ||
+        Object.keys(business.perkGroups).length == 0 ? (
         <CreatePerkGroupCard />
       ) : (
         <Grid container spacing={4}>
@@ -322,13 +326,13 @@ const GeneralDashboard = () => {
           <Grid item xs={4}>
             <MetricCard
               title={'Number of Employees'}
-              number={employees.length}
+              number={employees.length.toString()}
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Total Perks Offered'}
-              number={calculatePerksOffered()}
+              number={calculatePerksOffered().toString()}
             ></MetricCard>
           </Grid>
           <Grid item xs={4}>

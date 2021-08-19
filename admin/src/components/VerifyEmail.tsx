@@ -1,8 +1,14 @@
 import Button from '@material-ui/core/Button';
+import firebase from 'firebase/app';
 import { ReactComponent as EmailSVG } from 'images/email.svg';
 import React from 'react';
 
-const VerifyEmail = ({ email, newUser }) => {
+interface VerifyEmailProps {
+  email: string;
+  newUser: firebase.User;
+}
+
+const VerifyEmail = ({ email, newUser }: VerifyEmailProps) => {
   const resendVerificationEmail = async () => {
     try {
       await newUser.sendEmailVerification({

@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 
 export const LoadingContext = React.createContext<any>({});
 
-export const LoadingProvider = ({ children }) => {
+interface LoadingProviderProps {
+  children: React.ReactNode;
+}
+
+export const LoadingProvider = ({ children }: LoadingProviderProps) => {
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [freezeNav, setFreezeNav] = useState(false);
 

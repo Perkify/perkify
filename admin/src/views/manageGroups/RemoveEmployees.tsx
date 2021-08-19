@@ -6,9 +6,19 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import { AuthContext, LoadingContext } from 'contexts';
+import { GridSelectionModel } from '@material-ui/data-grid';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
+
+interface AddEmployeesProps {
+  isRemoveEmployeesModalVisible: boolean;
+  setIsRemoveEmployeesModalVisible: (arg0: boolean) => void;
+  employees: { email: string; group: string; id: string }[];
+  group: string;
+  selectedEmployees: GridSelectionModel;
+  setSelectedEmployees: (model: GridSelectionModel) => void;
+}
 
 const RemoveEmployees = ({
   isRemoveEmployeesModalVisible,
@@ -17,12 +27,13 @@ const RemoveEmployees = ({
   setSelectedEmployees,
   group,
   employees,
-}) => {
+}: AddEmployeesProps) => {
   const { currentUser } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
-  const removeUsers = (event) => {
+  const removeUsers = (event: any) => {
     let error = false;
 
     event.preventDefault();
@@ -45,13 +56,13 @@ const RemoveEmployees = ({
           return;
         }
 
+        setSelectedEmployees([]);
         await PerkifyApi.put(
-          'user/auth/updatePerkGroup',
-          JSON.stringify({
-            group,
+          `rest/perkGroup/${group}`,
+          {
             emails: afterEmails,
-            perks: undefined,
-          }),
+            perkNames: business.perkGroups[group].perkNames,
+          } as UpdatePerkGroupPayload,
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
@@ -62,7 +73,6 @@ const RemoveEmployees = ({
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemoveEmployeesModalVisible(false);
-        setSelectedEmployees([]);
       })();
     }
   };

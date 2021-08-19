@@ -3,7 +3,15 @@ import { auth } from 'firebaseApp';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
-const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
+interface PrivateRouteProps {
+  component: React.ElementType;
+  [key: string]: any;
+}
+
+const PrivateRoute = ({
+  component: RouteComponent,
+  ...rest
+}: PrivateRouteProps) => {
   const { currentUser, setCurrentUser, loadingAuthState } =
     useContext(AuthContext);
 

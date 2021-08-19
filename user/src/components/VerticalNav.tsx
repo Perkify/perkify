@@ -81,7 +81,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function ClippedDrawer({ children }) {
+interface ClippedDrawerProps {
+  children: React.ReactNode;
+}
+
+export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -110,8 +114,8 @@ export default function ClippedDrawer({ children }) {
     ['Account', accountNav],
   ];
 
-  const ListItemLink = (props) => {
-    const newProps = Object.keys(props).reduce((acc: object, prop: string) => {
+  const ListItemLink = (props: any) => {
+    const newProps = Object.keys(props).reduce((acc: any, prop: string) => {
       if (prop == 'route') {
         if (props.route.includes(':')) {
           acc['component'] = 'a';
@@ -124,7 +128,7 @@ export default function ClippedDrawer({ children }) {
         acc[prop] = props[prop];
       }
       return acc;
-    }, {});
+    }, {} as { [key: string]: any });
 
     return <ListItem {...newProps} />;
   };

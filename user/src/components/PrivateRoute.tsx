@@ -5,7 +5,15 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
 import GettingStarted from '../views/gettingStarted';
 
-const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
+interface PrivateRouteProps {
+  component: React.ElementType;
+  [key: string]: any;
+}
+
+const PrivateRoute = ({
+  component: RouteComponent,
+  ...rest
+}: PrivateRouteProps) => {
   const { currentUser, loadingAuthState, employee } = useContext(AuthContext);
   const redirectLoginTimer = useRef(null);
   const history = useHistory();

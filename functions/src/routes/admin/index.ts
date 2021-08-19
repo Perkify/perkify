@@ -1,5 +1,5 @@
-export * from './createGroup';
+export * from './createPerkGroup';
+export * from './createPortalLink';
 export * from './deletePerkGroup';
-export * from './getStripePaymentMethods';
 export * from './registerAdminAndBusiness';
 export * from './updatePerkGroup';

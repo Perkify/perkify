@@ -1,5 +1,5 @@
 {
   "stripe-firebase": {
-    "environment": "staging"
+    "environment": "development"
   }
 }

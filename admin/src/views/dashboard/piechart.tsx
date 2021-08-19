@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from 'recharts';
 
-const renderActiveShape = (props) => {
+const renderActiveShape = (props: any) => {
   const RADIAN = Math.PI / 180;
   const {
     cx,
@@ -68,7 +68,7 @@ const renderActiveShape = (props) => {
   );
 };
 
-const PChart = (props) => {
+const PChart = (props: any) => {
   var [activeIndex, setIndex] = React.useState(0);
   const COLORS = [
     '#0088FE',
@@ -79,8 +79,8 @@ const PChart = (props) => {
     '#CBC3E3',
   ];
 
-  const onPieEnter = (value) => {
-    const isIndex = (element) => element.name === value.name;
+  const onPieEnter = (value: any) => {
+    const isIndex = (element: any) => element.name === value.name;
     setIndex(props.data.findIndex(isIndex));
   };
 
@@ -99,11 +99,11 @@ const PChart = (props) => {
           dataKey="value"
           onMouseEnter={onPieEnter}
         >
-          {props.data.map((entry, index) => (
+          {props.data.map((entry: any, index: any) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(label) => label + ' %'} />
+        <Tooltip formatter={(label: any) => label + ' %'} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>

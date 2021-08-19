@@ -27,8 +27,8 @@ const GeneralDashboard = () => {
 
   const classes = useStyles();
 
-  const detailsList = (listObject) => {
-    return listObject.map((pair) => (
+  const detailsList = (listObject: any) => {
+    return listObject.map((pair: any) => (
       <React.Fragment key={pair.name}>
         <Grid item xs={6}>
           <Typography variant="body1" className={classes.details}>

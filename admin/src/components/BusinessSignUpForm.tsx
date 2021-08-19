@@ -58,12 +58,31 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const BusinessSignUpForm = (props) => {
+interface BusinessSignUpFormProps {
+  businessName: string;
+  line1: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  phone: string;
+  setBusinessName: (arg0: string) => void;
+  setAddress: (arg0: string) => void;
+  setCity: (arg0: string) => void;
+  setState: (arg0: string) => void;
+  setPostalCode: (arg0: string) => void;
+  setPhone: (arg0: string) => void;
+  invalidStep: boolean;
+  backStep: () => void;
+  nextStep: (arg0: boolean) => void;
+  nextReady: boolean;
+}
+
+const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
   const [dashboardLoading, setDashboardLoading] = React.useState(false);
 
   const classes = useStyles();
 
-  const fillTextbox = (setFunction) => (event) => {
+  const fillTextbox = (setFunction: (arg0: string) => void) => (event: any) => {
     setFunction(event.target.value);
   };
 

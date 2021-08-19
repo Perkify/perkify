@@ -87,7 +87,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function ClippedDrawer({ children }) {
+interface ClippedDrawerProps {
+  children: React.ReactNode;
+}
+
+export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -97,7 +101,7 @@ export default function ClippedDrawer({ children }) {
   const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
     useState('');
 
-  const { currentUser, hasPaymentMethods } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
@@ -114,18 +118,12 @@ export default function ClippedDrawer({ children }) {
     setDashboardLoading(true);
     setFreezeNav(true);
 
-    await PerkifyApi.post(
-      'user/auth/deletePerkGroup',
-      JSON.stringify({
-        group: isDeletePerkGroupModalVisible,
-      }),
-      {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await PerkifyApi.delete(`rest/perkGroup/${isDeletePerkGroupModalVisible}`, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     setDashboardLoading(false);
     setFreezeNav(false);
@@ -145,8 +143,8 @@ export default function ClippedDrawer({ children }) {
     useState([]);
 
   useEffect(() => {
-    if (Object.keys(business).length != 0) {
-      const tmpGroupViews = Object.keys(business.groups)
+    if (business) {
+      const tmpGroupViews = Object.keys(business.perkGroups)
         .sort()
         .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
 
@@ -167,7 +165,7 @@ export default function ClippedDrawer({ children }) {
   ];
 
   const navSections: [string, [string, string, any][]][] =
-    hasPaymentMethods == true
+    business && business.cardPaymentMethods.length != 0
       ? [
           ['General', generalNav],
           ['People', peopleNav],
