@@ -94,7 +94,7 @@ export const updateStripeSubscription = async (businessID: string) => {
       newSubscriptionItemsList[i]['id'] = subscriptionObject.items.filter(
         (item: { price: { id: string } }) =>
           item.price.id == newSubscriptionItemsList[i].price
-      )?.[0].id;
+      )?.[0]?.id;
     }
 
     const priceIDs = Object.keys(quantityByPriceID).concat(

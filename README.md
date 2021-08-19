@@ -3,7 +3,7 @@
 
 ### Testing
 
-To test everything locally run 
+To test everything locally run:
 - `cd functions && npm run start:all`
 - `cd admin && npm run start:emulator`
 - `cd user && npm run start:emulator`

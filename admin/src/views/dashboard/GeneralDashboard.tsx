@@ -299,7 +299,8 @@ const GeneralDashboard = () => {
           <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
         </Grid>
         <Grid item xs={2}>
-          {business.cardPaymentMethods.length != 0 &&
+          {business &&
+            business.cardPaymentMethods.length != 0 &&
             Object.keys(business.perkGroups).length != 0 && (
               <Button color="primary" onClick={generateCSV}>
                 Download Financial Records
