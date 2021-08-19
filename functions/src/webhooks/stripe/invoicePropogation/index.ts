@@ -82,10 +82,7 @@ const propogateInvoice = async (invoice: Stripe.Invoice) => {
 
   // create task in queue
 
-  if (
-    functions.config()['stripe-firebase'].environment == 'production' ||
-    functions.config()['stripe-firebase'].environment == 'staging'
-  ) {
+  if (functions.config()['stripe-firebase'].environment == 'production') {
     console.log('ADDING TASK TO EXPAND QUEUE');
     await addTaskToExpandUsersQueue(payload, expirationAtSeconds);
   } else {
