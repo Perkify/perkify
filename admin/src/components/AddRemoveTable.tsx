@@ -75,6 +75,7 @@ interface AddRemoveTableProps {
   addButtonText: string;
   height: number;
   loading?: boolean;
+  addButtonHidden?: boolean;
 }
 
 export const AddRemoveTable = ({
@@ -92,7 +93,6 @@ export const AddRemoveTable = ({
   const dataGridClasses = useDataGridStyles();
 
   const CustomToolbar = () => {
-    console.log(rest.addButtonHidden);
     const classes = useToolbarStyles();
     const { state } = useGridSlotComponentProps();
     const numSelected = Object.keys(state.selection).length;
