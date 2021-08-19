@@ -258,7 +258,7 @@ export const validateUserDoc = async (
   }
 
   const userData = (
-    await db.collection('users').doc(req.user.uid).get()
+    await db.collection('users').doc(req.user.email).get()
   ).data() as User;
 
   if (userData == null) {
