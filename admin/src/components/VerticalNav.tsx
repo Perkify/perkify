@@ -166,19 +166,18 @@ export default function ClippedDrawer({ children }) {
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
-  let navSections: [string, [string, string, any][]][] = [
-    ['General', generalNav],
-    ['People', peopleNav],
-    ['Perk Groups', infoNav],
-    ['Account', accountNav],
-  ];
-
-  if (hasPaymentMethods == false) {
-    navSections = [
-      ['General', generalNav],
-      ['Account', accountNav],
-    ];
-  }
+  const navSections: [string, [string, string, any][]][] =
+    hasPaymentMethods == true
+      ? [
+          ['General', generalNav],
+          ['People', peopleNav],
+          ['Perk Groups', infoNav],
+          ['Account', accountNav],
+        ]
+      : [
+          ['General', generalNav],
+          ['Account', accountNav],
+        ];
 
   const drawer = (
     <div>
