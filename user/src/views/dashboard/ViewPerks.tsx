@@ -45,7 +45,7 @@ const PerkCard = withStyles((theme) => ({
   },
 }))(Paper);
 
-const ViewPerks = ({ employee, business }) => {
+const ViewPerks = ({ employee, business }: any) => {
   const classes = useStyles();
 
   const perksList = () => {
@@ -54,7 +54,7 @@ const ViewPerks = ({ employee, business }) => {
 
     console.log(business);
     if (business.perkGroups) {
-      return business.perkGroups[employee.group].map((perk) => {
+      return business.perkGroups[employee.group].map((perk: any) => {
         increasingDelay += 300;
         const perkUses = employee.perks[perk];
         // TODO: this is preferred:

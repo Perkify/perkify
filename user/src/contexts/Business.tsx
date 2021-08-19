@@ -2,10 +2,18 @@ import { AuthContext } from 'contexts/Auth';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 
-export const BusinessContext = React.createContext<any>({});
+interface ContextProps {
+  business: Business;
+}
 
-export const BusinessProvider = ({ children }) => {
-  const [business, setBusiness] = useState({});
+interface BusinessProviderProps {
+  children: React.ReactNode;
+}
+
+export const BusinessContext = React.createContext<ContextProps>(null);
+
+export const BusinessProvider = ({ children }: BusinessProviderProps) => {
+  const [business, setBusiness] = useState<Business>();
   const { employee, currentUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -15,8 +23,8 @@ export const BusinessProvider = ({ children }) => {
         .doc(businessId)
         .onSnapshot(
           (businessDoc) => {
-            const businessData = businessDoc.data();
-            if (businessData) {
+            const businessData = businessDoc.data() as Business;
+            if (businessData && Object.keys(businessData).length != 0) {
               setBusiness({ ...businessData });
             }
           },
@@ -31,7 +39,6 @@ export const BusinessProvider = ({ children }) => {
     <BusinessContext.Provider
       value={{
         business,
-        setBusiness,
       }}
     >
       {children}

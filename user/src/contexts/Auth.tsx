@@ -12,9 +12,13 @@ type ContextProps = {
   setEmployee: any;
 };
 
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
 export const AuthContext = React.createContext<Partial<ContextProps>>({});
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState(null as firebase.User | null);
   const [employee, setEmployee] = useState<User>();
   const [loadingAuthState, setLoadingAuthState] = useState(true);

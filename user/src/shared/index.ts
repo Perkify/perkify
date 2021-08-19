@@ -1,4 +1,5 @@
-export const allProductionPerks = [
+// import { functions } from '../src/services';
+export const allProductionPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
@@ -61,14 +62,14 @@ export const allProductionPerks = [
   },
 ];
 
-export const allDevelopmentPerks = [
+export const allDevelopmentPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInq1KuQQHSHZsmq9prpaUr',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsmeSywK8YU',
     Img: 'netflix.jpg',
-    Product: 'prod_JwhE2ADq37oUrZ',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Netflix Standard',
   },
@@ -76,9 +77,9 @@ export const allDevelopmentPerks = [
     Name: 'Hulu',
     Cost: 5.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInpWKuQQHSHZsmOtbkmnD6',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsmDtISKvuX',
     Img: 'hulu.png',
-    Product: 'prod_JwhD1f77sqFDSI',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Hulu',
   },
@@ -86,9 +87,9 @@ export const allDevelopmentPerks = [
     Name: 'Audible Plus',
     Cost: 7.95,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInpEKuQQHSHZsmZRfkYK13',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsmhxvfp9Nj',
     Img: 'audible.png',
-    Product: 'prod_JwhDvuPn93HnCv',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Audible Plus',
   },
@@ -96,9 +97,9 @@ export const allDevelopmentPerks = [
     Name: 'Disney Plus',
     Cost: 7.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInoaKuQQHSHZsmN9CMDEEu',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsmcjOXLZQ5',
     Img: 'disneyplus.png',
-    Product: 'prod_JwhDWSPG0Ydeua',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Disney Plus',
   },
@@ -106,9 +107,9 @@ export const allDevelopmentPerks = [
     Name: 'Headspace',
     Cost: 12.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInnAKuQQHSHZsm22WmEyqN',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsm6MkAUBVb',
     Img: 'headspace.png',
-    Product: 'prod_JwhBWFAWY4QwSw',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Headspace',
   },
@@ -116,9 +117,9 @@ export const allDevelopmentPerks = [
     Name: 'Spotify Individual',
     Cost: 9.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JInl6KuQQHSHZsmwMGzzFUE',
+    stripePriceId: 'price_1JMiKdKuQQHSHZsmZ5ARUKue',
     Img: 'spotify.jpg',
-    Product: 'prod_Jwh9zvjiY3Ou0n',
+    Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Spotify Individual',
   },
@@ -143,5 +144,5 @@ export const allPerksDict = allPerks.reduce(
     }),
     map
   ),
-  {}
+  {} as PerkDefinitionsDict
 );

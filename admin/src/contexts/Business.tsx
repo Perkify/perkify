@@ -24,7 +24,7 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
         .onSnapshot(
           (businessDoc) => {
             const businessData = businessDoc.data() as Business;
-            if (Object.keys(businessData).length != 0) {
+            if (businessData && Object.keys(businessData).length != 0) {
               setBusiness({ ...businessData });
             }
           },
