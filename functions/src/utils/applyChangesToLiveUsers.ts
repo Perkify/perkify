@@ -21,15 +21,21 @@ export const applyChangesToLiveUsers = async (
   const usersToUpdate: UserToUpdate[] = [];
   const usersToDelete: UserToDelete[] = [];
 
-  // TODO what if pending business is not defined?
-  const pendingBusiness = (
-    await db.collection('businesses').doc(businessID).get()
-  ).data() as Business;
+  const pendingBusinessDoc = await db
+    .collection('businesses')
+    .doc(businessID)
+    .get();
+
+  if (!pendingBusinessDoc.exists) {
+    throw new Error('Missing business document in firestore');
+  }
+
+  const pendingBusiness = pendingBusinessDoc.data() as Business;
 
   // process each perk group separately
   await Promise.all(
     Object.keys(updatedBusiness.perkGroups).map(async (perkGroupName) => {
-      // TODO: improve this so that we can instantly tell if a perkGroup has changed
+      // TODOFUTURE: improve this so that we can instantly tell if a perkGroup has changed
       // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
       // get existing users
@@ -61,19 +67,10 @@ export const applyChangesToLiveUsers = async (
 
       // EXPAND
       // get the intersection of the updatedPerkGroup and the pendingPerkGroup
-      // livePerkGroup a subset of both the pendingPerkGroup and then updatedPerkGroup
+      // livePerkGroup a subset of both the pendingPerkGroup and the updatedPerkGroup
       // so the intersection is a superset of the intersection of livePerkGroup
       // therefore we are only going to be expanding the live users
       // when we put the intersection on the live users
-
-      // we need livePerkGroup to be a subset of updatedPerkGroup
-      // but is that the case?
-      // updatedPerkGroup is based off of pendingPerkGroup
-      // which means it includes any expansions that would be made to
-      // livePerkGroup
-      // as longs as expansions stay in order.
-      // if expansions go out of order, than this won't necessarily be the case
-      // this means we gotta prevent expansions from going out of order
 
       // SHRINK
       // intersect updatedPerkGroup with livePerkGroup
@@ -87,7 +84,6 @@ export const applyChangesToLiveUsers = async (
       );
 
       // get the emails patch
-      // you want to apply the intersected perk group data to the live emails
       const { emailsToCreate, emailsToUpdate, emailsToDelete } =
         generateEmailsPatch(
           intersectedPerkGroupData.emails,
