@@ -17,16 +17,16 @@ export const issuingAuthorizationRequestWebhookStripeSecret =
 
 export const invoicePaidWebhookStripeSecret =
   functions.config()['stripe-firebase'].environment == 'production'
-    ? 'whsec_QJxtG8dhmlGsnsu1YkayYj3BuP7xtJxo'
+    ? 'whsec_97xzLr3UH6REEOq4AyIYGm1tyku0W5nO'
     : functions.config()['stripe-firebase'].environment == 'staging'
-    ? 'whsec_sipiyvURbVzUUdNKhc36vJG4gmodcAHM'
+    ? 'whsec_9BCaB7yGPdhSiZgjTD0OdoRHbcM7U83I'
     : // webhook secret for stripe cli --forward
       'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP';
 
 export const syncToFirestoreWebhookStripeSecret =
   functions.config()['stripe-firebase'].environment == 'production'
-    ? 'whsec_QJxtG8dhmlGsnsu1YkayYj3BuP7xtJxo'
+    ? 'whsec_krwTeC89777ZGtSjJUoCLcYCy3ajc3my'
     : functions.config()['stripe-firebase'].environment == 'staging'
-    ? 'whsec_sipiyvURbVzUUdNKhc36vJG4gmodcAHM'
+    ? 'whsec_QL85oNjF7Aa1xklO1FLRjvLPRiT3m7Gm'
     : // webhook secret for stripe cli --forward
       'whsec_gfvRf6OpELfDLb1OqxaiKJxVscZ5qMVP';
