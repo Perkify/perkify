@@ -26,39 +26,39 @@ const handleApprove = async (userRef, userData, perkInfo) => {
       admin.firestore.FieldValue.arrayUnion(timestamp),
   });
 
-  const businessData = (
-    await db.collection("businesses").doc(userData.businessID).get()
-  ).data();
-
-  if (!businessData) {
-    const error = {
-      status: 500,
-      reason: "Missing documents",
-      reasonDetail: `Documents missing from firestore: ${userData.businessID}`,
-    };
-    throw error;
-  }
-
-  const adminID = businessData.admins[0];
-
-  const productRef = db.collection("products").doc(perkInfo.Product);
-  // get the subscription associated with the perk that was purchased from customer associated with admin
-  const perkSubscriptions = await db
-    .collection("customers")
-    .doc(adminID)
-    .collection("subscriptions")
-    .where("product", "==", productRef)
-    .where("status", "==", "active")
-    .limit(1)
-    .get();
-
-  const perkSubscriptionId = perkSubscriptions.docs[0].data().items[0].id;
-  // add one use of the perk to perks subscription
-  await stripe.subscriptionItems.createUsageRecord(perkSubscriptionId, {
-    quantity: 1,
-    timestamp: timestamp.seconds,
-    action: "increment",
-  });
+  // const businessData = (
+  //   await db.collection("businesses").doc(userData.businessID).get()
+  // ).data();
+  //
+  // if (!businessData) {
+  //   const error = {
+  //     status: 500,
+  //     reason: "Missing documents",
+  //     reasonDetail: `Documents missing from firestore: ${userData.businessID}`,
+  //   };
+  //   throw error;
+  // }
+  //
+  // const adminID = businessData.admins[0];
+  //
+  // const productRef = db.collection("products").doc(perkInfo.Product);
+  // // get the subscription associated with the perk that was purchased from customer associated with admin
+  // const perkSubscriptions = await db
+  //   .collection("customers")
+  //   .doc(adminID)
+  //   .collection("subscriptions")
+  //   .where("product", "==", productRef)
+  //   .where("status", "==", "active")
+  //   .limit(1)
+  //   .get();
+  //
+  // const perkSubscriptionId = perkSubscriptions.docs[0].data().items[0].id;
+  // // add one use of the perk to perks subscription
+  // await stripe.subscriptionItems.createUsageRecord(perkSubscriptionId, {
+  //   quantity: 1,
+  //   timestamp: timestamp.seconds,
+  //   action: "increment",
+  // });
 };
 
 export const handleAuthorizationRequest = async (auth, response) => {
