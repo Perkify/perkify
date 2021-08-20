@@ -94,7 +94,7 @@ export const allProductionPerks: PerkInfo[] = [
     stripePriceId: "price_1JJqs2KuQQHSHZsmfzgIOrJ3",
     Img: "spotify.jpg",
     Product: "prod_JxmQVILWLae2ZZ",
-    NetworkId: "123",
+    NetworkId: "420429000200209",
     // PaymentName: 'Spotify Individual',
     PaymentName: "spotify",
   },
