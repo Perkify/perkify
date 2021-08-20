@@ -1,27 +1,62 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-    allow read,  write: if true;
+
+    // helper functions
+    function isEmailVerified(request) {
+      return request.auth.token.email_verified;
+    }
+
+    function adminExists(adminID) {
+      return exists(/databases/$(database)/documents/admins/$(adminID));
+    }
+
+    function userExists(userID) {
+      return exists(/databases/$(database)/documents/users/$(userID));
+    }
+
+    function getAdminBusinessID(adminID) {
+      return get(/databases/$(database)/documents/admins/$(adminID)).data.businessID;
+    }
+
+    function getUserBusinessID(userID) {
+      return get(/databases/$(database)/documents/users/$(userID)).data.businessID;
     }
 
 
-    // // Allow only authenticated content owners access
-    // match /admins/{userId} {
-    //   allow read: if request.auth != null && request.auth.uid == userId
-    //   allow create: if false //DOESN'T ALLOW CREATION FROM FRONT-END; is this fine? 
-    //   allow update: if request.auth != null && request.auth.uid == userId && request.resource.data.businessID == resource.data.businessID
-    // }
-    // match /businesses/{docId}{
-    // 	allow read: if get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID == docId
-    //   allow write: if false //Don't want people to be able to write to businesses without us charging them 
-    // }
-    // match /users/{user_id}{
-    // allow read: if true
-    // 	// allow read: if resource.data.businessID == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.businessID
-    //   allow write: if false
-    // }
-    // //What do we want to do for mail? 
-    // }
+    // match admin documents
+    match /admins/{adminID} {
+      // let admins read their own documents
+      allow read: if request.auth.uid == adminID;
+
+      // don't let anyone update their admin document except through the backend
+      allow write: if false
+    }
+
+    // match user documents
+    match /users/{userID} {
+      // let users and read their own documents
+      // and admins read the documents of their users
+      allow read: if isEmailVerified(request) && request.auth.token.email == userID ||
+        adminExists(request.auth.uid) && getAdminBusinessID(request.auth.uid) == resource.data.businessID;
+
+      allow write: if false;
+    }
+
+
+    // match business documents and their subcollections
+    match /businesses/{businessID}/{document=**} {
+      // let verified admins and users read the business doc they belong to
+      allow read: if adminExists(request.auth.uid) && (getAdminBusinessID(request.auth.uid) == businessID) || 
+        isEmailVerified(request) && userExists(request.auth.token.email) && getUserBusinessID(request.auth.token.email) == businessID;
+
+      // don't let anyone write to business documents
+      allow write: if false;
+    }
+
+    // don't let anyone read or write mail documents
+    match /mail/{mailID} {
+      allow read, write: if false;
+    }
   }
 }
