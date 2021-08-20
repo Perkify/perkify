@@ -23,7 +23,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
           ? 'https://app.getperkify.com/dashboard'
           : functions.config()['stripe-firebase'].environment == 'staging'
           ? 'https://app.dev.getperkify.com/dashboard'
-          : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
+          : 'http://localhost:3001/dashboard',
     });
 
   // if in development mode, print the sign in link

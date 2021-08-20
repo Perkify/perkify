@@ -15,7 +15,12 @@ import {
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
-import { registerUser, registerUserValidators } from './user';
+import {
+  registerUser,
+  registerUserValidators,
+  sendSignInLink,
+  sendSignInLinkValidators,
+} from './user';
 
 const app = express();
 
@@ -42,6 +47,9 @@ app.post(
 
 // regiser a user
 app.post('/user', registerUserValidators, registerUser);
+
+// send a sign-in link to user
+app.post('/signInLink/:userEmail', sendSignInLinkValidators, sendSignInLink);
 
 // create a portal link for a user
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
