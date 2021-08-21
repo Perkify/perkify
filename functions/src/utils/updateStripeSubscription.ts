@@ -1,5 +1,5 @@
 import { logger } from 'firebase-functions';
-import { allPerksDict, taxRates } from '../../shared';
+import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
 import { shrinkUsers } from './crudHelpers';
@@ -55,7 +55,7 @@ export const updateStripeSubscription = async (businessID: string) => {
   ).concat([
     // add the perkify cost per employee with no tax rate
     {
-      price: allPerksDict['Perkify Cost Per Employee'].stripePriceId,
+      price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
       quantity: numEmployees,
       taxRates: [],
     },

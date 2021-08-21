@@ -1,15 +1,5 @@
 export const allProductionPerks: PerkDefinition[] = [
   {
-    Name: 'Perkify Cost Per Employee',
-    Cost: 3.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQwT3KuQQHSHZsm3VUYAo7Z',
-    Img: 'perkify.jpeg',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Perkify',
-  },
-  {
     Name: 'Netflix Standard',
     Cost: 13.99,
     Period: 'Monthly',
@@ -72,16 +62,6 @@ export const allProductionPerks: PerkDefinition[] = [
 ];
 
 export const allDevelopmentPerks: PerkDefinition[] = [
-  {
-    Name: 'Perkify Cost Per Employee',
-    Cost: 3.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQwShKuQQHSHZsmuKAJ3Xej',
-    Img: 'perkify.jpeg',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Perkify',
-  },
   {
     Name: 'Netflix Standard',
     Cost: 13.99,
