@@ -35,7 +35,7 @@ service cloud.firestore {
 
     // match user documents
     match /users/{userID} {
-      // let users and read their own documents
+      // let users read their own documents
       // and admins read the documents of their users
       allow read: if isEmailVerified(request) && request.auth.token.email == userID ||
         adminExists(request.auth.uid) && getAdminBusinessID(request.auth.uid) == resource.data.businessID;
