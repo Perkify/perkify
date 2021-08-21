@@ -83,7 +83,10 @@ export const handleAuthorizationRequest = async (auth, response) => {
     // resultingAuth = await stripe.issuing.authorizations.approve(auth["id"]);
     resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
     response.status(200).send({ received: true });
-  } else if (perkInfo && verifyRequest(perkInfo, userPerks, auth.amount)) {
+  } else if (
+    perkInfo &&
+    verifyRequest(perkInfo, userPerks, auth.pending_request.amount)
+  ) {
     console.log("verified");
     // if verified approve it
     // TODO: RECOMMENT THIS TO AUTHORIZE PERKS

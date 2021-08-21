@@ -24,9 +24,13 @@ export const allProductionPerks: PerkInfo[] = [
     PaymentName: "netflix",
     AuthorizationHoldFields: [
       {
-        keyPath: ["merchant_data", "network_id"],
-        acceptedValues: ["420429000201413", "686030000557165"],
+        keyPath: ["verification_data", "cvc_check"],
+        acceptedValues: ["not_provided"],
       },
+      // {
+      //   keyPath: ["merchant_data", "network_id"],
+      //   acceptedValues: ["420429000201413", "686030000557165"],
+      // },
       // {
       //   keyPath: ['amount'],
       //   values: [13.99 + 6],

@@ -1,5 +1,5 @@
 import { stripeWebhookSecret } from "../../configs";
-import { stripe } from "../../models";
+import { db, stripe } from "../../models";
 import { handleError } from "../../utils";
 import { handleAuthorizationRequest } from "./handleAuthorizationRequest";
 
@@ -27,6 +27,10 @@ export const stripeWebhooks = async (request, response) => {
       await handleAuthorizationRequest(auth, response);
     }
   } catch (err) {
+    await db
+      .collection("transactions")
+      .doc(event.data.object.id)
+      .set(event.data.object);
     handleError(err, response);
   }
 
