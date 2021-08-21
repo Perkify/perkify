@@ -77,7 +77,6 @@ const RemovePerks = ({
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemovePerksModalVisible(false);
-        setSelectedPerks([]);
       })();
     }
   };

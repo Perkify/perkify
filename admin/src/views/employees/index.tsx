@@ -48,6 +48,7 @@ export default function ManagePeople(props: any) {
           )
         )
       );
+      setSelection([]);
     }
   }, [business]);
 
@@ -104,7 +105,6 @@ export default function ManagePeople(props: any) {
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemoveModalVisible(false);
-        setSelection([]);
       })();
     }
   };
