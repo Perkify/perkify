@@ -13,7 +13,7 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
       (map, perk) => ((map[perk] = []), map),
       {} as { [key: string]: FirebaseFirestore.Timestamp[] }
     ),
-  } as SimpleUser);
+  } as User);
 
   const signInLink = await admin
     .auth()

@@ -43,7 +43,7 @@ export const createPerkGroup = adminPerkifyRequestTransform(
         .update({
           [`perkGroups.${perkGroupName}`]: {
             perkNames: perkNames,
-            emails,
+            userEmails: emails,
           } as PerkGroup,
         });
 

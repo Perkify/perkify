@@ -56,14 +56,13 @@ export const applyChangesToLiveUsers = async (
         existingPerkUsersSnapshot.docs.length != 0
           ? ({
               perkNames: Object.keys(
-                (existingPerkUsersSnapshot.docs[0].data() as SimpleUser)
-                  .perkUsesDict
+                (existingPerkUsersSnapshot.docs[0].data() as User).perkUsesDict
               ),
-              emails: existingPerkUsersSnapshot.docs.map(
+              userEmails: existingPerkUsersSnapshot.docs.map(
                 (userDoc) => userDoc.id
               ),
             } as PerkGroup)
-          : { perkNames: [], emails: [] };
+          : ({ perkNames: [], userEmails: [] } as PerkGroup);
 
       // EXPAND
       // get the intersection of the updatedPerkGroup and the pendingPerkGroup
@@ -86,8 +85,8 @@ export const applyChangesToLiveUsers = async (
       // get the emails patch
       const { emailsToCreate, emailsToUpdate, emailsToDelete } =
         generateEmailsPatch(
-          intersectedPerkGroupData.emails,
-          livePerkGroup.emails
+          intersectedPerkGroupData.userEmails,
+          livePerkGroup.userEmails
         );
 
       usersToCreate.push(
