@@ -5,12 +5,14 @@ import {
   checkValidationResult,
   updateStripeSubscription,
   validateAdminDoc,
+  validateBusinessDoc,
   validateFirebaseIdToken,
 } from '../../utils';
 
 export const deletePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
+  validateBusinessDoc,
   checkValidationResult,
 ];
 
