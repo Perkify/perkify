@@ -2,6 +2,7 @@ import firebase from 'firebase/app';
 import app, { auth, db } from 'firebaseApp';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import EmailInput from '../views/gettingStarted/EmailInput';
 
 type ContextProps = {
   currentUser: firebase.User | null;
@@ -10,7 +11,6 @@ type ContextProps = {
   loadingAuthState: boolean;
   employee: User;
   setEmployee: any;
-  setEmail: any;
 };
 
 interface AuthProviderProps {
@@ -46,6 +46,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .then((result) => {
           // Clear email from storage.
           window.localStorage.removeItem('emailForSignIn');
+          setIsLoggingIn(false);
+          history.push('/dashboard');
           // should i do:
           // setCurrentUser(result.user);?
         })
@@ -77,7 +79,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
   }, []);
 
-  return (
+  return isLoggingIn ? (
+    <EmailInput setEmail={setEmail} />
+  ) : (
     <AuthContext.Provider
       value={{
         currentUser,
@@ -86,10 +90,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         employee,
         setEmployee,
         loadingAuthState,
-        setEmail,
       }}
     >
-      {isLoggingIn ? <div> Hello World</div> : children}
+      {children}
     </AuthContext.Provider>
   );
 };

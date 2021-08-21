@@ -5,9 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { AuthContext } from 'contexts/Auth';
-import React, { useContext } from 'react';
-import { LoadingContext } from '../../contexts';
+import React from 'react';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -41,16 +39,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const GettingStarted = () => {
+const EmailInput = ({ setEmail }) => {
   const classes = useStyles();
-  const [email, setEmail] = React.useState('');
+  const [email, setLocalEmail] = React.useState('');
   const [invalidStep, setInvalidStep] = React.useState(false);
-  const { setEmail } = useContext(AuthContext);
-  const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
   const formFields = { email };
 
   const submitGetCard = async () => {
-    setDashboardLoading(true);
     setEmail(email);
   };
 
@@ -90,7 +85,7 @@ const GettingStarted = () => {
               </p>
             </Grid>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <InputLabel htmlFor="firstName" className={classes.label}>
                   Email
                 </InputLabel>
@@ -99,7 +94,7 @@ const GettingStarted = () => {
                   id="email"
                   variant="outlined"
                   style={{ width: '100%' }}
-                  onChange={fillTextbox(setEmail)}
+                  onChange={fillTextbox(setLocalEmail)}
                   value={email}
                   error={email === '' && invalidStep}
                 />
@@ -127,4 +122,4 @@ const GettingStarted = () => {
   );
 };
 
-export default GettingStarted;
+export default EmailInput;
