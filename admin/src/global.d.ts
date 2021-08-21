@@ -22,7 +22,7 @@ interface Admin {
 
 interface PerkGroup {
   perkNames: string[];
-  emails: string[];
+  userEmails: string[];
 }
 
 interface BillingAddress {
@@ -63,12 +63,6 @@ interface PerkUsesDict {
   [key: string]: PerkUses;
 }
 
-interface SimpleUser {
-  businessID: string;
-  perkGroupName: string;
-  perkUsesDict: PerkUsesDict;
-}
-
 interface UserCard {
   id: string;
   cardholderID: string;
@@ -83,23 +77,17 @@ interface UserCard {
   };
 }
 
-interface User {
+type User = {
+  email: string;
   businessID: string;
   perkGroupName: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
-}
+};
 
-interface ActivatedUser {
-  businessID: string;
-  perkGroupName: string;
-  perkUsesDict: PerkUsesDict;
-  firstName: string;
-  lastName: string;
-  card: UserCard;
-}
+type ActivatedUser = Required<User>;
 
 interface UserToCreate {
   email: string;
@@ -139,38 +127,4 @@ interface PerkDefinitionsDict {
 
 interface ExpandUsersPayload {
   business: Business;
-}
-
-// api payloads
-
-interface RegisterAdminAndBusinessPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  businessName: string;
-  line1: string;
-  line2?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-}
-
-interface RegisterUserPayload {
-  firstName: string;
-  lastName: string;
-}
-
-interface CreatePortalLinkPayload {
-  returnUrl: string;
-}
-
-interface CreatePerkGroupPayload {
-  perkNames: string[];
-  emails: string[];
-}
-
-interface UpdatePerkGroupPayload {
-  perkNames: string[];
-  emails: string[];
 }
