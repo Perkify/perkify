@@ -72,7 +72,7 @@ const AddEmployees = ({
           `rest/perkGroup/${group}`,
           {
             perkNames: groupPerks.map((perkObj) => perkObj.Name),
-            emails: afterEmployees,
+            userEmails: afterEmployees,
           } as UpdatePerkGroupPayload,
           {
             headers: {

@@ -87,7 +87,7 @@ const CreateGroup = () => {
     await PerkifyApi.post(
       `rest/perkGroup/${groupName}`,
       {
-        emails: emailList,
+        userEmails: emailList,
         perkNames: selectedPerks,
       } as CreatePerkGroupPayload,
       {

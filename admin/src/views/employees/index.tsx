@@ -40,11 +40,13 @@ export default function ManagePeople(props: any) {
       setPeopleData(
         [].concat(
           ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
-              email: employeeEmail,
-              group: perkGroupName,
-              id: employeeEmail,
-            }))
+            business.perkGroups[perkGroupName].userEmails.map(
+              (employeeEmail) => ({
+                email: employeeEmail,
+                group: perkGroupName,
+                id: employeeEmail,
+              })
+            )
           )
         )
       );
@@ -89,7 +91,7 @@ export default function ManagePeople(props: any) {
             // better would be to create an api folder where you can call these from
             // should haven't to do all this copy pasting
             const payload: UpdatePerkGroupPayload = {
-              emails: afterEmails,
+              userEmails: afterEmails,
               perkNames: business.perkGroups[perkGroup].perkNames,
             };
 

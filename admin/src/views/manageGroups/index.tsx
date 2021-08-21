@@ -78,7 +78,7 @@ export default function ManageGroups(props: any) {
 
         // set email data
         setEmails(
-          business.perkGroups[id].emails.map((employeeEmail, index) => ({
+          business.perkGroups[id].userEmails.map((employeeEmail, index) => ({
             email: employeeEmail,
             id: index,
           }))

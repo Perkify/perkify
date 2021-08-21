@@ -31,7 +31,8 @@ export const updatePerkGroupValidators = [
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupName = req.params.perkGroupName;
-    const { emails, perkNames } = req.body as UpdatePerkGroupPayload;
+    const { userEmails: emails, perkNames } =
+      req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
