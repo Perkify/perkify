@@ -38,7 +38,11 @@ export const adminPerkifyRequestTransform = (handler: AdminPerkifyHandler) => {
       const error = {
         status: 500,
         reason: "Couldn't generate context",
-        reasonDetail: "Couldn't generate context",
+        reasonDetail: `Couldn't generate context for ${
+          req.businessID
+        }. ${JSON.stringify(req.businessData)}, ${JSON.stringify(
+          req.adminData
+        )}, ${JSON.stringify(req.user)}`,
       } as PerkifyError;
       return next(error);
     }
