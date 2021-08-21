@@ -48,25 +48,24 @@ const GettingStarted = () => {
   const classes = useStyles();
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [invalidStep, setInvalidStep] = React.useState(false);
-  const { currentUser, setEmployee } = useContext(AuthContext);
+  const { currentUser, setEmployee, setAuthEmail } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
   const formFields = { firstName, lastName };
 
   const submitGetCard = async () => {
     setDashboardLoading(true);
+    setAuthEmail(email);
     try {
       if (Object.values(formFields).some((fieldprop) => fieldprop === '')) {
         setInvalidStep(true);
         return;
       }
       setInvalidStep(false);
-
+      console.log(currentUser);
       const bearerToken = await currentUser.getIdToken();
-      // user registers themselves
-      // after signing in?
-      // because we need their first and last name
-      // so auth isn't created until
+
       const response = await PerkifyApi.post(
         'rest/user',
         formFields as RegisterUserPayload,
@@ -165,6 +164,20 @@ const GettingStarted = () => {
                   onChange={fillTextbox(setLastName)}
                   value={lastName}
                   error={lastName === '' && invalidStep}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <InputLabel htmlFor="Email" className={classes.label}>
+                  Email
+                </InputLabel>
+                <BootstrapInput
+                  placeholder="johnsmith@gmail.com"
+                  id="email"
+                  variant="outlined"
+                  style={{ width: '100%' }}
+                  onChange={fillTextbox(setEmail)}
+                  value={email}
+                  error={email === '' && invalidStep}
                 />
               </Grid>
               <Grid item xs={12} md={12}>

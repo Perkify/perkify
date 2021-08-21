@@ -10,6 +10,9 @@ type ContextProps = {
   loadingAuthState: boolean;
   employee: User;
   setEmployee: any;
+  isLoggingIn: boolean;
+  setIsLoggingIn: any;
+  setAuthEmail: any;
 };
 
 interface AuthProviderProps {
@@ -24,14 +27,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loadingAuthState, setLoadingAuthState] = useState(true);
   const location = useLocation();
   const history = useHistory();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [email, setAuthEmail] = useState('');
 
   useEffect(() => {
     if (firebase.auth().isSignInWithEmailLink(location.search)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-        // User opened the link on a different device. To prevent session fixation
-        // attacks, ask the user to provide the associated email again. For example:
-        email = window.prompt('Please provide your email for confirmation');
+      if (email == '') {
+        setIsLoggingIn(true);
+        return;
       }
       // check if email is registered before signing in?
       firebase
@@ -50,8 +53,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             history.push('/login');
           } else alert('an error occurred');
         });
+    } else {
+      setIsLoggingIn(false);
     }
-  }, [location]);
+  }, [location, email]);
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
@@ -80,6 +85,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         employee,
         setEmployee,
         loadingAuthState,
+        isLoggingIn,
+        setIsLoggingIn,
+        setAuthEmail,
       }}
     >
       {children}

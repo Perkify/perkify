@@ -14,7 +14,8 @@ const PrivateRoute = ({
   component: RouteComponent,
   ...rest
 }: PrivateRouteProps) => {
-  const { currentUser, loadingAuthState, employee } = useContext(AuthContext);
+  const { currentUser, loadingAuthState, employee, isLoggingIn } =
+    useContext(AuthContext);
   const redirectLoginTimer = useRef(null);
   const history = useHistory();
   const location = useLocation();
@@ -57,13 +58,10 @@ const PrivateRoute = ({
     <Route
       {...rest}
       render={(routeProps) => {
-        if (!loadingAuthState && currentUser && employee) {
-          if (!employee?.card) {
-            // could also put this in the dashboard view. Put it in here in case in future there are other private routes
-            return <GettingStarted />;
-          } else {
-            return <RouteComponent {...routeProps} />;
-          }
+        if (!loadingAuthState && currentUser && employee && employee.card) {
+          return <RouteComponent {...routeProps} />;
+        } else if (isLoggingIn) {
+          return <GettingStarted />;
         } else {
           // TODO: show the loading screen here
         }
