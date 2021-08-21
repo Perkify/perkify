@@ -36,13 +36,23 @@ export const updateStripeSubscription = async (businessID: string) => {
     {} as { [key: string]: number }
   );
 
+  const numEmployees = Object.values(businessData.perkGroups).reduce(
+    (acc, perkGroup) => acc + perkGroup.emails.length,
+    0
+  );
+
   // convert the count of each perk to a list of items
-  const newSubscriptionItemsList = Object.keys(quantityByPriceID).map(
-    (priceID) => ({
+  const newSubscriptionItemsList = Object.keys(quantityByPriceID)
+    .map((priceID) => ({
       price: priceID,
       quantity: quantityByPriceID[priceID],
-    })
-  ) as {
+    }))
+    .concat([
+      {
+        price: allPerksDict['Perkify Cost Per Employee'].stripePriceId,
+        quantity: numEmployees,
+      },
+    ]) as {
     price: string;
     quantity: number;
     id?: string;
