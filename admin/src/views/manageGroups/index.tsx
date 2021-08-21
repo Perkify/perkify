@@ -87,6 +87,8 @@ export default function ManageGroups(props: any) {
       } else {
         setGroupNotFound(true);
       }
+      setSelectedEmployees([]);
+      setSelectedPerks([]);
     }
   }, [business, id]);
 
