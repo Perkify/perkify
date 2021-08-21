@@ -118,6 +118,8 @@ export const applyChangesToLiveUsers = async (
   );
 
   logger.info(`Applying changes to live users for business: [${businessID}]`, {
+    pendingBusiness,
+    updatedBusiness,
     usersToCreate,
     usersToUpdate,
     usersToDelete,
