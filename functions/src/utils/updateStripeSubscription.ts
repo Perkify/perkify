@@ -1,5 +1,5 @@
 import { logger } from 'firebase-functions';
-import { allPerksDict } from '../../shared';
+import { allPerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
 import { shrinkUsers } from './crudHelpers';
@@ -42,21 +42,24 @@ export const updateStripeSubscription = async (businessID: string) => {
   );
 
   // convert the count of each perk to a list of items
-  const newSubscriptionItemsList = Object.keys(quantityByPriceID)
-    .map((priceID) => ({
+  const newSubscriptionItemsList = (
+    Object.keys(quantityByPriceID).map((priceID) => ({
       price: priceID,
       quantity: quantityByPriceID[priceID],
-    }))
-    .concat([
-      {
-        price: allPerksDict['Perkify Cost Per Employee'].stripePriceId,
-        quantity: numEmployees,
-      },
-    ]) as {
-    price: string;
-    quantity: number;
-    id?: string;
-  }[];
+    })) as {
+      price: string;
+      quantity: number;
+      id?: string;
+      taxRates?: string[];
+    }[]
+  ).concat([
+    // add the perkify cost per employee with no tax rate
+    {
+      price: allPerksDict['Perkify Cost Per Employee'].stripePriceId,
+      quantity: numEmployees,
+      taxRates: [],
+    },
+  ]);
 
   // check if the customer has an existing active subscriptions
   const subscriptionsSnapshot = await db
@@ -75,6 +78,7 @@ export const updateStripeSubscription = async (businessID: string) => {
     await stripe.subscriptions.create({
       customer: businessData.stripeId,
       items: newSubscriptionItemsList,
+      default_tax_rates: [taxRates.perkifyTax.stripeTaxID],
     });
   } else {
     // the admin is already subscribed
