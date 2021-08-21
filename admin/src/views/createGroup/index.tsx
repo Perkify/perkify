@@ -59,7 +59,7 @@ const CreateGroup = () => {
       cost += allPerksDict[perk]['Cost'];
     });
     setCostPerPerson(cost);
-    setTotalCost(roundNumber(cost * numPeople * 1.1 + 4 * numPeople));
+    setTotalCost(roundNumber(cost * numPeople * 1.1 + 3.99 * numPeople));
   };
 
   const handleEmailError = (event: any) => {
@@ -90,7 +90,7 @@ const CreateGroup = () => {
     // update the number of people and total cost
     setNumPeople(tmpNumPeople);
     setTotalCost(
-      roundNumber(tmpNumPeople * costPerPerson * 1.1 + tmpNumPeople * 4)
+      roundNumber(tmpNumPeople * costPerPerson * 1.1 + tmpNumPeople * 3.99)
     );
   };
 
