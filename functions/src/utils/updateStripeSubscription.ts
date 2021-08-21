@@ -87,6 +87,8 @@ export const updateStripeSubscription = async (businessID: string) => {
 
     // const subscriptionID = subscriptionItem.id;
     const subscriptionObject = subscriptionItem.data() as Subscription;
+    const currentBillingPeriodStart =
+      subscriptionObject.current_period_start.seconds;
 
     // this isn't going to work...
     // need to actually take the diff at the employee email level
@@ -111,9 +113,13 @@ export const updateStripeSubscription = async (businessID: string) => {
       )?.[0]?.id;
     }
 
-    const priceIDs = Object.keys(quantityByPriceID).concat(
-      Object.keys(oldQuantityByPriceID)
-    );
+    const priceIDs = Object.keys(quantityByPriceID)
+      .concat(Object.keys(oldQuantityByPriceID))
+      .filter(
+        (stripePriceID) =>
+          stripePriceID !=
+          privatePerksDict['Perkify Cost Per Employee'].stripePriceID
+      );
 
     const isSubscriptionIncrease = priceIDs.every(
       (priceID) =>
@@ -128,9 +134,11 @@ export const updateStripeSubscription = async (businessID: string) => {
     if (isSubscriptionIncrease) {
       // update the subscription and charge the customer
 
+      // this is charging them only for the remaining portion of the billing cycle
       await stripe.subscriptions.update(subscriptionItem.id, {
         items: newSubscriptionItemsList,
         proration_behavior: 'always_invoice',
+        proration_date: currentBillingPeriodStart,
       });
 
       // invoice is already paid error
