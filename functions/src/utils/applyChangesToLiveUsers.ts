@@ -117,11 +117,15 @@ export const applyChangesToLiveUsers = async (
     })
   );
 
-  logger.info(`Applying changes to live users for business: [${businessID}]`, {
-    usersToCreate,
-    usersToUpdate,
-    usersToDelete,
-  });
+  logger.info(
+    `Applying changes to live users for business: [${businessID}] in ${modificationType} mode`,
+    {
+      updatedBusiness,
+      usersToCreate,
+      usersToUpdate,
+      usersToDelete,
+    }
+  );
 
   const applyChanges: Promise<void>[] = [];
 
