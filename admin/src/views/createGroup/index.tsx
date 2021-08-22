@@ -139,7 +139,15 @@ const CreateGroup = () => {
             history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
-            console.error(err);
+            console.error(e);
+            console.error(err.response);
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
+
+            alert(
+              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+            );
           });
       })();
     }

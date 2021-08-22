@@ -90,14 +90,14 @@ const AddEmployees = ({
           })
           .catch((e) => {
             console.error(e);
-            console.log(e.response);
-            alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
-            );
+            console.error(e.response);
 
             setDashboardLoading(false);
             setFreezeNav(false);
-            setEmailsToAdd('');
+
+            alert(
+              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+            );
           });
       })();
     }

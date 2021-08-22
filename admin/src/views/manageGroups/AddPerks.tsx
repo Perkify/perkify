@@ -70,23 +70,35 @@ const AddPerks = ({
           groupPerks.map((perkObj) => perkObj.Name)
         );
 
-        await PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            userEmails: emails.map((emailObj) => emailObj.email),
-            perkNames: afterPerks,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        try {
+          await PerkifyApi.put(
+            `rest/perkGroup/${group}`,
+            {
+              userEmails: emails.map((emailObj) => emailObj.email),
+              perkNames: afterPerks,
+            } as UpdatePerkGroupPayload,
+            {
+              headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
 
-        setFreezeNav(false);
-        setDashboardLoading(false);
-        setPerksToAdd([]);
+          setFreezeNav(false);
+          setDashboardLoading(false);
+          setPerksToAdd([]);
+        } catch (e) {
+          console.error(e);
+          console.error(e.response);
+
+          setDashboardLoading(false);
+          setFreezeNav(false);
+
+          alert(
+            `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+          );
+        }
       })();
     }
   };
