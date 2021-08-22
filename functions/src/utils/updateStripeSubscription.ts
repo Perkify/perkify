@@ -37,7 +37,7 @@ export const updateStripeSubscription = async (businessID: string) => {
   );
 
   const numEmployees = Object.values(businessData.perkGroups).reduce(
-    (acc, perkGroup) => acc + perkGroup.emails.length,
+    (acc, perkGroup) => acc + perkGroup.userEmails.length,
     0
   );
 
