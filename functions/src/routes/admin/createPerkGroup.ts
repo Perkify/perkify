@@ -35,6 +35,8 @@ export const createPerkGroup = adminPerkifyRequestTransform(
       req.body as CreatePerkGroupPayload;
     const businessData = req.businessData as Business;
 
+    const preUpdateBusinessData = req.businessData;
+
     try {
       // update the business document to reflect the group of perkNames
 
@@ -49,7 +51,7 @@ export const createPerkGroup = adminPerkifyRequestTransform(
         });
 
       // update the stripe subscription
-      await updateStripeSubscription(req.businessData.businessID);
+      await updateStripeSubscription(preUpdateBusinessData);
 
       res.status(200).end();
     } catch (err) {

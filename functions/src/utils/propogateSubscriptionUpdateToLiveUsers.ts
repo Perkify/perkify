@@ -1,6 +1,5 @@
 import { logger } from 'firebase-functions';
 import Stripe from 'stripe';
-import { expandUsers } from '../../../utils';
 import {
   firebaseFunctionsUrl,
   functions,
@@ -8,6 +7,7 @@ import {
   stripe,
   tasksClient,
 } from '../services';
+import { expandUsers } from '../utils';
 
 const addTaskToExpandUsersQueue = async (
   payload: ExpandUsersPayload,

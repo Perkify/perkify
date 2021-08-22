@@ -22,6 +22,8 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
+    const preUpdateBusinessData = req.businessData;
+
     try {
       // delete group from businesss' perkGroups
       await db
@@ -32,7 +34,7 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
         });
 
       // update the stripe subscription
-      await updateStripeSubscription(req.businessData.businessID);
+      await updateStripeSubscription(preUpdateBusinessData);
 
       res.status(200).end();
     } catch (err) {

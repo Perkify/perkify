@@ -36,6 +36,8 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
+    const preUpdateBusinessData = req.businessData;
+
     try {
       // update business doc
       // this makes pendingBusiness equal updatedBusiness
@@ -50,7 +52,7 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
         });
 
       // sync to stripe subscription
-      await updateStripeSubscription(req.businessData.businessID);
+      await updateStripeSubscription(preUpdateBusinessData);
 
       res.status(200).end();
     } catch (error) {
