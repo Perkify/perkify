@@ -116,7 +116,6 @@ export const applyChangesToLiveUsers = async (
       );
     })
   );
-
   logger.info(
     `Applying changes to live users for business: [${businessID}] in ${modificationType} mode`,
     {
@@ -126,7 +125,6 @@ export const applyChangesToLiveUsers = async (
       usersToDelete,
     }
   );
-
   const applyChanges: Promise<void>[] = [];
 
   // create users
