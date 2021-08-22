@@ -186,6 +186,7 @@ export const updateStripeSubscription = async (
           items: newSubscriptionItemsList,
           proration_behavior: 'always_invoice',
           proration_date: currentBillingPeriodStart,
+          payment_behavior: 'error_if_incomplete',
         }
       );
 
@@ -197,6 +198,7 @@ export const updateStripeSubscription = async (
             items: newSubscriptionItemsList,
             proration_behavior: 'always_invoice',
             proration_date: currentBillingPeriodStart,
+            payment_behavior: 'error_if_incomplete',
           }
         );
 
