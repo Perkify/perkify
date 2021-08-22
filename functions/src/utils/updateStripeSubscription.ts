@@ -76,7 +76,7 @@ export const updateStripeSubscription = async (businessID: string) => {
   if (!(subscriptionItem && subscriptionItem.exists)) {
     // the admin doesn't have any subscriptions
     // create a subscription for them
-    await stripe.subscriptions.create({
+    const subscription = await stripe.subscriptions.create({
       customer: businessData.stripeId,
       items: newSubscriptionItemsList,
     });
@@ -133,13 +133,24 @@ export const updateStripeSubscription = async (businessID: string) => {
 
     if (isSubscriptionIncrease) {
       // update the subscription and charge the customer
+      logger.info(
+        `Increasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'always_invoice',
+          proration_date: currentBillingPeriodStart,
+        }
+      );
 
       // this is charging them only for the remaining portion of the billing cycle
-      await stripe.subscriptions.update(subscriptionItem.id, {
-        items: newSubscriptionItemsList,
-        proration_behavior: 'always_invoice',
-        proration_date: currentBillingPeriodStart,
-      });
+      const subscription = await stripe.subscriptions.update(
+        subscriptionItem.id,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'always_invoice',
+          proration_date: currentBillingPeriodStart,
+        }
+      );
 
       // invoice is already paid error
 
@@ -162,6 +173,14 @@ export const updateStripeSubscription = async (businessID: string) => {
       // });
     } else if (isSubscriptionDecrease) {
       // update the subscription, don't give anything back
+
+      logger.info(
+        `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'none',
+        }
+      );
 
       await stripe.subscriptions.update(subscriptionItem.id, {
         items: newSubscriptionItemsList,
