@@ -88,15 +88,15 @@ const AddPerks = ({
           setFreezeNav(false);
           setDashboardLoading(false);
           setPerksToAdd([]);
-        } catch (e) {
-          console.error(e);
-          console.error(e.response);
+        } catch (err) {
+          console.error(err);
+          console.error(err.response);
 
           setDashboardLoading(false);
           setFreezeNav(false);
 
           alert(
-            `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+            `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
           );
         }
       })();

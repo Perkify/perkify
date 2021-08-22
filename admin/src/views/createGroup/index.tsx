@@ -94,8 +94,8 @@ const CreateGroup = () => {
     );
   };
 
-  const createPerkGroup = (e: any) => {
-    e.preventDefault();
+  const createPerkGroup = (event: any) => {
+    event.preventDefault();
     let error = false;
 
     if (groupName == '') {
@@ -121,6 +121,7 @@ const CreateGroup = () => {
       setFreezeNav(true);
       const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
       (async () => {
+        setConfirmationModalVisible(false);
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
         const payload: CreatePerkGroupPayload = {
@@ -139,14 +140,14 @@ const CreateGroup = () => {
             history.push(`/dashboard/group/${groupName}`);
           })
           .catch((err) => {
-            console.error(e);
+            console.error(err);
             console.error(err.response);
 
             setDashboardLoading(false);
             setFreezeNav(false);
 
             alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
             );
           });
       })();
