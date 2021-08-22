@@ -1,8 +1,5 @@
-import { logger } from 'firebase-functions';
-import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
-import { db, stripe } from '../services';
-import { Subscription } from '../types';
-import { shrinkUsers } from './crudHelpers';
+import { db } from '../services';
+import { expandUsers, shrinkUsers } from './crudHelpers';
 
 // we want to call this anytime we modify a stripe subscription
 // takes the business definition and updates the relevant stripe subscription
@@ -19,7 +16,9 @@ export const updateStripeSubscription = async (businessID: string) => {
 
   // remove stuff that shouldn't exist from 'users'
   await shrinkUsers(businessData);
+  await expandUsers(businessData);
 
+  /*
   const quantityByPriceID = Object.keys(businessData.perkGroups).reduce(
     (accumulator, perkGroupName) => {
       businessData.perkGroups[perkGroupName].perkNames.forEach((perkName) => {
@@ -175,4 +174,5 @@ export const updateStripeSubscription = async (businessID: string) => {
       );
     }
   }
+  */
 };
