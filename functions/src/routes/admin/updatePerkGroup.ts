@@ -20,7 +20,7 @@ export const updatePerkGroupValidators = [
   validateAdminDoc,
   validateBusinessDoc,
   param('perkGroupName').custom(validateExistingPerkGroupName),
-  body('emails')
+  body('userEmails')
     .custom(validateEmails)
     .customSanitizer(sanitizeEmails)
     .custom(checkIfAnyEmailsToAddAreClaimed),

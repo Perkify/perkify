@@ -172,7 +172,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
           ['Perk Groups', infoNav],
           ['Account', accountNav],
         ]
-      : business && business.cardPaymentMethods.length == 0
+      : business && Object.keys(business.perkGroups).length == 0
       ? [
           ['General', generalNav],
           ['People', peopleNav],
