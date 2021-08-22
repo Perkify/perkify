@@ -46,18 +46,19 @@ export const updateStripeSubscription = async (businessID: string) => {
     Object.keys(quantityByPriceID).map((priceID) => ({
       price: priceID,
       quantity: quantityByPriceID[priceID],
+      tax_rates: [taxRates.perkifyTax.stripeTaxID],
     })) as {
       price: string;
       quantity: number;
       id?: string;
-      taxRates?: string[];
+      tax_rates?: string[];
     }[]
   ).concat([
     // add the perkify cost per employee with no tax rate
     {
       price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
       quantity: numEmployees,
-      taxRates: [],
+      tax_rates: [],
     },
   ]);
 
@@ -78,7 +79,6 @@ export const updateStripeSubscription = async (businessID: string) => {
     await stripe.subscriptions.create({
       customer: businessData.stripeId,
       items: newSubscriptionItemsList,
-      default_tax_rates: [taxRates.perkifyTax.stripeTaxID],
     });
   } else {
     // the admin is already subscribed
