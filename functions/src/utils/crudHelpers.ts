@@ -26,8 +26,11 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
           : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
     });
 
-  // if in development mode, print the sign in link
-  if (functions.config()['stripe-firebase'].environment == 'development') {
+  // if in development or staging mode, print the sign in link
+  if (
+    functions.config()['stripe-firebase'].environment == 'development' ||
+    functions.config()['stripe-firebase'].environment == 'staging'
+  ) {
     logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
   }
 
