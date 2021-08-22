@@ -6,14 +6,17 @@ import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 export const createUserHelper = async (userToCreate: UserToCreate) => {
   const docRef = db.collection('users').doc(userToCreate.email);
 
-  await docRef.set({
+  const user: User = {
+    email: userToCreate.email,
     businessID: userToCreate.businessID,
     perkGroupName: userToCreate.perkGroupName,
     perkUsesDict: userToCreate.newPerkNames.reduce(
       (map, perk) => ((map[perk] = []), map),
       {} as { [key: string]: FirebaseFirestore.Timestamp[] }
     ),
-  } as SimpleUser);
+  };
+
+  await docRef.set(user);
 
   const signInLink = await admin
     .auth()

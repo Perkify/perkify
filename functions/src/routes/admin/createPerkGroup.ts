@@ -31,7 +31,8 @@ export const createPerkGroupValidators = [
 export const createPerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupName = req.params.perkGroupName as string;
-    const { emails, perkNames } = req.body as CreatePerkGroupPayload;
+    const { userEmails: emails, perkNames } =
+      req.body as CreatePerkGroupPayload;
     const businessData = req.businessData as Business;
 
     try {
@@ -43,7 +44,7 @@ export const createPerkGroup = adminPerkifyRequestTransform(
         .update({
           [`perkGroups.${perkGroupName}`]: {
             perkNames: perkNames,
-            emails,
+            userEmails: emails,
           } as PerkGroup,
         });
 

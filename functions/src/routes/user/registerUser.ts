@@ -59,7 +59,7 @@ export const registerUser = userPerkifyRequestTransform(
       // in order to be sure we are satisfying the User type
       const prevUserData = (
         await db.collection('users').doc(email).get()
-      ).data() as SimpleUser;
+      ).data() as User;
 
       const userData: User = {
         ...prevUserData,

@@ -115,7 +115,7 @@ export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
   businessesSnapshot.forEach((businessDoc) => {
     allEmployeesAcrossBusinesses.concat(
       ...Object.values((businessDoc.data() as Business).perkGroups).map(
-        (perkGroup) => perkGroup.emails
+        (perkGroup) => perkGroup.userEmails
       )
     );
   });
@@ -148,7 +148,7 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
 
   // get the emails to be created
   const { emailsToCreate } = generateEmailsPatch(
-    currentPerkGroup.emails,
+    currentPerkGroup.userEmails,
     emails
   );
 

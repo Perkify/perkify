@@ -24,10 +24,10 @@ interface CreatePortalLinkPayload {
 
 interface CreatePerkGroupPayload {
   perkNames: string[];
-  emails: string[];
+  userEmails: string[];
 }
 
 interface UpdatePerkGroupPayload {
   perkNames: string[];
-  emails: string[];
+  userEmails: string[];
 }

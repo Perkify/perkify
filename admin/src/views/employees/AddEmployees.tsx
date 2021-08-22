@@ -79,7 +79,7 @@ const AddEmployees = ({
         const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
         const payload: UpdatePerkGroupPayload = {
           perkNames: business.perkGroups[selectedPerkGroup].perkNames,
-          emails: emailList.concat(
+          userEmails: emailList.concat(
             peopleData
               .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
               .map((employeeObj) => employeeObj.email)

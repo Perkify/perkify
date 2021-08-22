@@ -25,10 +25,10 @@ export const updateStripeSubscription = async (businessID: string) => {
       businessData.perkGroups[perkGroupName].perkNames.forEach((perkName) => {
         if (accumulator[allPerksDict[perkName].stripePriceId]) {
           accumulator[allPerksDict[perkName].stripePriceId] +=
-            businessData.perkGroups[perkGroupName].emails.length;
+            businessData.perkGroups[perkGroupName].userEmails.length;
         } else {
           accumulator[allPerksDict[perkName].stripePriceId] =
-            businessData.perkGroups[perkGroupName].emails.length;
+            businessData.perkGroups[perkGroupName].userEmails.length;
         }
       });
       return accumulator;
