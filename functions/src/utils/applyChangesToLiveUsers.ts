@@ -129,22 +129,23 @@ export const applyChangesToLiveUsers = async (
   // create users
   if (modificationType === 'expand') {
     // modification type === 'expand'
+
     applyChanges.push(...usersToCreate.map(createUserHelper));
-  } else {
-    // modification type === 'shrink'
 
-    // assert that there are no users to create
-    if (usersToCreate.length != 0) {
-      logger.error('Error users to create is not 0 when shrinking live users');
+    // update users
+    applyChanges.push(...usersToUpdate.map(updateUserHelper));
+
+    if (
+      usersToUpdate.some((userToUpdate) =>
+        Object.keys(userToUpdate.oldPerkUsesDict).some(
+          (perkName) => !userToUpdate.newPerkNames.includes(perkName)
+        )
+      )
+    ) {
+      logger.error(
+        'newPerkNames is not a superset of oldPerkUsesDict when expanding live users'
+      );
     }
-  }
-
-  // update users
-  applyChanges.push(...usersToUpdate.map(updateUserHelper));
-
-  // delete users
-  if (modificationType === 'expand') {
-    // modification type === 'expand'
 
     // assert that there are no users to be deleted
     if (usersToDelete.length != 0) {
@@ -152,7 +153,30 @@ export const applyChangesToLiveUsers = async (
     }
   } else {
     // modification type === 'shrink'
+
+    // assert that there are no users to create
+    if (usersToCreate.length != 0) {
+      logger.error('Error users to create is not 0 when shrinking live users');
+    }
+
+    // update users
+    applyChanges.push(...usersToUpdate.map(updateUserHelper));
+
+    if (
+      usersToUpdate.some((userToUpdate) =>
+        userToUpdate.newPerkNames.some(
+          (perkName) =>
+            !Object.keys(userToUpdate.oldPerkUsesDict).includes(perkName)
+        )
+      )
+    ) {
+      logger.error(
+        'oldPerkUsesDict is not a superset of newPerkNames when shrinking live users'
+      );
+    }
+
     applyChanges.push(...usersToDelete.map(deleteUserHelper));
   }
+
   await Promise.all(applyChanges);
 };
