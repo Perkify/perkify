@@ -165,24 +165,23 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   ];
 
   const navSections: [string, [string, string, any][]][] =
-    business && business.cardPaymentMethods.length != 0
+    business && business.cardPaymentMethods.length == 0
       ? [
           ['General', generalNav],
-          ['People', peopleNav],
-          ['Perk Groups', infoNav],
           ['Account', accountNav],
         ]
       : business && Object.keys(business.perkGroups).length == 0
       ? [
           ['General', generalNav],
-          ['People', peopleNav],
+          ['Perk Groups', infoNav],
           ['Account', accountNav],
         ]
       : [
           ['General', generalNav],
+          ['Perk Groups', infoNav],
+          ['People', peopleNav],
           ['Account', accountNav],
         ];
-
   const drawer = (
     <div>
       {/* <Toolbar /> */}
