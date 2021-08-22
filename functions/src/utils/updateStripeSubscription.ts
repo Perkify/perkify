@@ -3,6 +3,7 @@ import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
 import { shrinkUsers } from './crudHelpers';
+import { propogateSubscriptionUpdateToLiveUsers } from './propogateSubscriptionUpdateToLiveUsers';
 
 // we want to call this anytime we modify a stripe subscription
 // takes the business definition and updates the relevant stripe subscription
@@ -80,6 +81,13 @@ export const updateStripeSubscription = async (businessID: string) => {
       customer: businessData.stripeId,
       items: newSubscriptionItemsList,
     });
+
+    if (subscription.status == 'active') {
+      // payment succeeded
+      propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
+    } else {
+      // payment failed
+    }
   } else {
     // the admin is already subscribed
     // update the subscription to reflect the new item quantities
