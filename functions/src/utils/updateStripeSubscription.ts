@@ -1,3 +1,4 @@
+import { NextFunction } from 'express';
 import { logger } from 'firebase-functions';
 import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
@@ -10,7 +11,8 @@ import { propogateSubscriptionUpdateToLiveUsers } from './propogateSubscriptionU
 
 // update stripe subscription with business perkGroups
 export const updateStripeSubscription = async (
-  preUpdateBusinessData: Business
+  preUpdateBusinessData: Business,
+  next: NextFunction
 ) => {
   const businessID = preUpdateBusinessData.businessID;
 
@@ -22,7 +24,12 @@ export const updateStripeSubscription = async (
   ).data() as Business;
 
   if (businessData == null) {
-    throw new Error('Missing business document in firestore');
+    const error = {
+      status: 500,
+      reason: 'Missing business document',
+      reasonDetail: `Missing business document in firestore`,
+    };
+    return next(error);
   }
 
   // remove stuff that shouldn't exist from 'users'
@@ -115,7 +122,7 @@ export const updateStripeSubscription = async (
         reasonDetail:
           'Payment failed with your default payment method. Please update your default payment method and try again',
       };
-      throw error;
+      return next(error);
     }
   } else {
     // the admin is already subscribed
@@ -210,7 +217,7 @@ export const updateStripeSubscription = async (
           reasonDetail:
             'Payment failed with your default payment method. Please update your default payment method and try again',
         };
-        throw error;
+        return next(error);
       }
     } else if (isSubscriptionDecrease) {
       // update the subscription, don't give anything back
