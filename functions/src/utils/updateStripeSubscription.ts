@@ -167,15 +167,18 @@ export const updateStripeSubscription = async (
 
     const isSubscriptionIncrease = priceIDs.every(
       (priceID) =>
-        quantityByPriceID[priceID] || 0 >= oldQuantityByPriceID[priceID] || 0
+        (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) >=
+        (priceID in oldQuantityByPriceID ? oldQuantityByPriceID[priceID] : 0)
     );
 
-    const isSubscriptionDecrease = priceIDs.every(
-      (priceID) =>
-        quantityByPriceID[priceID] || 0 <= oldQuantityByPriceID[priceID] || 0
-    );
+    const isSubscriptionDecrease = priceIDs.every((priceID) => {
+      return (
+        (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) <=
+        (priceID in oldQuantityByPriceID ? oldQuantityByPriceID[priceID] : 0)
+      );
+    });
 
-    if (isSubscriptionIncrease) {
+    if (isSubscriptionIncrease && !isSubscriptionDecrease) {
       // update the subscription and charge the customer
       logger.info(
         `Increasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
@@ -219,7 +222,7 @@ export const updateStripeSubscription = async (
         };
         return next(error);
       }
-    } else if (isSubscriptionDecrease) {
+    } else if (isSubscriptionDecrease && !isSubscriptionIncrease) {
       // update the subscription, don't give anything back
 
       logger.info(
