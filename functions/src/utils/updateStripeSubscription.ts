@@ -1,5 +1,5 @@
 import { logger } from 'firebase-functions';
-import { allPerksDict } from '../../shared';
+import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
 import { shrinkUsers } from './crudHelpers';
@@ -36,17 +36,31 @@ export const updateStripeSubscription = async (businessID: string) => {
     {} as { [key: string]: number }
   );
 
+  const numEmployees = Object.values(businessData.perkGroups).reduce(
+    (acc, perkGroup) => acc + perkGroup.emails.length,
+    0
+  );
+
   // convert the count of each perk to a list of items
-  const newSubscriptionItemsList = Object.keys(quantityByPriceID).map(
-    (priceID) => ({
+  const newSubscriptionItemsList = (
+    Object.keys(quantityByPriceID).map((priceID) => ({
       price: priceID,
       quantity: quantityByPriceID[priceID],
-    })
-  ) as {
-    price: string;
-    quantity: number;
-    id?: string;
-  }[];
+      tax_rates: [taxRates.perkifyTax.stripeTaxID],
+    })) as {
+      price: string;
+      quantity: number;
+      id?: string;
+      tax_rates?: string[];
+    }[]
+  ).concat([
+    // add the perkify cost per employee with no tax rate
+    {
+      price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
+      quantity: numEmployees,
+      tax_rates: [],
+    },
+  ]);
 
   // check if the customer has an existing active subscriptions
   const subscriptionsSnapshot = await db
@@ -73,6 +87,8 @@ export const updateStripeSubscription = async (businessID: string) => {
 
     // const subscriptionID = subscriptionItem.id;
     const subscriptionObject = subscriptionItem.data() as Subscription;
+    const currentBillingPeriodStart =
+      subscriptionObject.current_period_start.seconds;
 
     // this isn't going to work...
     // need to actually take the diff at the employee email level
@@ -97,9 +113,13 @@ export const updateStripeSubscription = async (businessID: string) => {
       )?.[0]?.id;
     }
 
-    const priceIDs = Object.keys(quantityByPriceID).concat(
-      Object.keys(oldQuantityByPriceID)
-    );
+    const priceIDs = Object.keys(quantityByPriceID)
+      .concat(Object.keys(oldQuantityByPriceID))
+      .filter(
+        (stripePriceID) =>
+          stripePriceID !=
+          privatePerksDict['Perkify Cost Per Employee'].stripePriceID
+      );
 
     const isSubscriptionIncrease = priceIDs.every(
       (priceID) =>
@@ -114,9 +134,11 @@ export const updateStripeSubscription = async (businessID: string) => {
     if (isSubscriptionIncrease) {
       // update the subscription and charge the customer
 
+      // this is charging them only for the remaining portion of the billing cycle
       await stripe.subscriptions.update(subscriptionItem.id, {
         items: newSubscriptionItemsList,
         proration_behavior: 'always_invoice',
+        proration_date: currentBillingPeriodStart,
       });
 
       // invoice is already paid error

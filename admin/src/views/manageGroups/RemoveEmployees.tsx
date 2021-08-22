@@ -56,7 +56,6 @@ const RemoveEmployees = ({
           return;
         }
 
-        setSelectedEmployees([]);
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
