@@ -84,7 +84,9 @@ const CreateGroup = () => {
       // user is typing
     } else {
       // if not error, update the number of people
-      const emails = event.target.value.replace(/[,'"]+/gi, ' ').split(/\s+/);
+      let emails = event.target.value.replace(/[,'"]+/gi, ' ').split(/\s+/);
+      emails = emails.filter((item: any) => item);
+      console.log(emails);
       tmpNumPeople = emails.length;
     }
     // update the number of people and total cost

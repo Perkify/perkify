@@ -8,7 +8,7 @@ export const validateEmails = (emailString: string) => {
   let emails = emailString.replace(/[,'"]+/gi, ' ').split(/\s+/);
   let retValue = true;
   emails.forEach((email) => {
-    if (validateEmail(email) === false) {
+    if (validateEmail(email) === false && email !== '') {
       retValue = false;
     }
   });
