@@ -130,7 +130,12 @@ const AddEmployees = ({
       onConfirmation={addEmployeesToPerkGroup}
       setConfirmationModalVisible={setConfirmationModalVisible}
       perks={generatePerks()}
-      numPeople={emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/).length}
+      numPeople={
+        emailsToAdd
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/)
+          .filter((item: any) => item).length
+      }
       creatingGroup={true}
     />
   ) : (
