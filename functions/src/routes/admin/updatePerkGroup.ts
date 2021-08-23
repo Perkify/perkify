@@ -19,12 +19,12 @@ export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  param('perkGroupName').custom(validateExistingPerkGroupName),
   body('userEmails')
     .custom(validateEmails)
     .customSanitizer(sanitizeEmails)
     .custom(checkIfAnyEmailsToAddAreClaimed),
   body('perkNames').custom(validatePerkNames),
+  param('perkGroupName').custom(validateExistingPerkGroupName),
   checkValidationResult,
 ];
 
