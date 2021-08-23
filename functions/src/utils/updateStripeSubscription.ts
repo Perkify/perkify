@@ -104,6 +104,7 @@ export const updateStripeSubscription = async (
       // payment succeeded
       propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
     } catch (e) {
+      logger.error(e);
       // payment failed
       // next time we try again from scratch
 

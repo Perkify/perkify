@@ -278,10 +278,10 @@ const CreateGroup = () => {
         </Typography>
         <Tooltip
           disableFocusListener={
-            !(!business || business.cardPaymentMethods.length == 0)
+            !(!business || Object.keys(business.cardPaymentMethods).length == 0)
           }
           disableHoverListener={
-            !(!business || business.cardPaymentMethods.length == 0)
+            !(!business || Object.keys(business.cardPaymentMethods).length == 0)
           }
           title="Please add billing information before creating a group"
           placement="bottom-start"
@@ -291,7 +291,10 @@ const CreateGroup = () => {
               onClick={setVisible}
               variant="contained"
               color="primary"
-              disabled={!business || business.cardPaymentMethods.length == 0}
+              disabled={
+                !business ||
+                Object.keys(business.cardPaymentMethods).length == 0
+              }
             >
               Create Perk Group
             </Button>

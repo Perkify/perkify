@@ -75,12 +75,12 @@ export const validateNewPerkGroupName = async (
   if (perkGroupName) {
     const businessData = req.businessData as Business;
     if (Object.keys(businessData.perkGroups).includes(perkGroupName)) {
-      return new Error(
+      throw new Error(
         'Trying to create a perk group with a name that already exists'
       );
     }
   } else {
-    return new Error('Perk group name not specified');
+    throw new Error('Perk group name not specified');
   }
   return;
 };
@@ -96,12 +96,12 @@ export const validateExistingPerkGroupName = async (
         perkGroupName
       )
     ) {
-      return new Error(
+      throw new Error(
         "Trying to update a perk group with a name that doesn't exist"
       );
     }
   } else {
-    return new Error('Perk group name not specified');
+    throw new Error('Perk group name not specified');
   }
   return;
 };
@@ -113,16 +113,22 @@ export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
   // generate list of all employee emails
   const allEmployeesAcrossBusinesses: string[] = [];
   businessesSnapshot.forEach((businessDoc) => {
-    allEmployeesAcrossBusinesses.concat(
-      ...Object.values((businessDoc.data() as Business).perkGroups).map(
-        (perkGroup) => perkGroup.userEmails
-      )
-    );
+    Object.values((businessDoc.data() as Business).perkGroups)
+      .map((perkGroup) => perkGroup.userEmails)
+      .forEach((perkGroupEmails) => {
+        allEmployeesAcrossBusinesses.push(...perkGroupEmails);
+      });
   });
 
   // check if any of the emails to create exist across all businesses
   const emailThatExistsInAnotherBusiness = emails.find((email) =>
     allEmployeesAcrossBusinesses.includes(email)
+  );
+
+  console.log(
+    allEmployeesAcrossBusinesses,
+    emails,
+    emailThatExistsInAnotherBusiness
   );
 
   if (emailThatExistsInAnotherBusiness) {

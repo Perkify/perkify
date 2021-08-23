@@ -11,6 +11,7 @@ interface SimpleCardPaymentMethod {
   expYear: number;
   funding: string;
   last4: string;
+  fingerprint: string;
 }
 
 interface Admin {
@@ -48,7 +49,7 @@ interface Business {
   stripeId: string;
   stripeLink: string;
 
-  cardPaymentMethods: SimpleCardPaymentMethod[];
+  cardPaymentMethods: { [key: string]: SimpleCardPaymentMethod };
   // perk group names with their perkNames and emails
   // this will have scaling problems if there are lots of emails in a business
   // but the number of emails shouldn't be too high
