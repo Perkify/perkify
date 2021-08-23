@@ -8,6 +8,10 @@ const verifyRequest = (perkInfo, userPerks, amount) => {
     const userPerkUses = userPerks[perkInfo.Name];
     const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
     const taxPercent = 1.5;
+
+    console.log(`user perks uses: ${userPerkUses}`);
+    console.log(`matched perk: ${perkInfo.Name}`);
+    console.log(`amount charged: ${amount}`);
     // if perk hasn't been used or hasn't been used in last 28 days and is less than the price
     return (
       (userPerkUses.length === 0 ||
@@ -22,7 +26,7 @@ const handleApprove = async (userRef, userData, perkInfo) => {
   const timestamp = admin.firestore.Timestamp.now();
   // note the timestamp it was used so it can't be for the next 28 days
   await userRef.update({
-    [`perks.${perkInfo.Name}`]:
+    [`perkUsesDict.${perkInfo.Name}`]:
       admin.firestore.FieldValue.arrayUnion(timestamp),
   });
 };
@@ -40,7 +44,7 @@ export const handleAuthorizationRequest = async (auth, response) => {
   // functions.logger.log('getting user data');
   const userData = (await userRef.get()).data();
   console.log(`DB Call End: ${Date.now()}`);
-  console.log(userData);
+  // console.log(userData);
 
   if (!userData) {
     const error = {
@@ -52,6 +56,7 @@ export const handleAuthorizationRequest = async (auth, response) => {
   }
   // get perks usage associated with the user who made purchase
   const userPerks = userData.perkUsesDict;
+  console.log(`user perks: ${JSON.stringify(userPerks)}`);
   // check if the transaction was using a perk that we offer (and get info on that perk)
   const perkInfo = allPerks.find(
     (perk) =>
@@ -77,32 +82,35 @@ export const handleAuthorizationRequest = async (auth, response) => {
     );
   }
 
+  console.log(`is auth hold: ${isAuthorizationHold}`);
   let resultingAuth;
   if (isAuthorizationHold) {
     // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
-    // resultingAuth = await stripe.issuing.authorizations.approve(auth["id"]);
-    resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
+    resultingAuth = await stripe.issuing.authorizations.approve(auth["id"]);
+    // resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
     response.status(200).send({ received: true });
+    console.log("auth hold accepted");
   } else if (
     perkInfo &&
     verifyRequest(perkInfo, userPerks, auth.pending_request.amount)
   ) {
-    console.log("verified");
     // if verified approve it
     // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
-    // await stripe.issuing.authorizations.approve(auth['id']);
-    resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
+    resultingAuth = await stripe.issuing.authorizations.approve(auth["id"]);
+    // resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
     // functions.logger.log('declined');
 
     // TODO: reorganize so this line isn't repeated
     response.status(200).send({ received: true });
 
+    console.log("verified and accepted");
     // call handle approve async so function returns within 2 seconds
 
     await handleApprove(userRef, userData, perkInfo);
   } else {
     resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
     response.status(200).send({ received: true });
+    console.log("declined");
   }
   await db.collection("transactions").doc(resultingAuth.id).set(resultingAuth);
 };

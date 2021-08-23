@@ -8,11 +8,6 @@ const handleAuthorizationRequest_1 = require("./handleAuthorizationRequest");
 const stripeWebhooks = async (request, response) => {
     const sig = request.headers["stripe-signature"];
     let event;
-    console.log("event construction");
-    console.log(sig);
-    console.log(configs_1.stripeWebhookSecret);
-    // console.log(request.body);
-    // console.log(request.rawBody);
     try {
         event = models_1.stripe.webhooks.constructEvent(request.rawBody, sig, configs_1.stripeWebhookSecret);
     }
@@ -20,9 +15,8 @@ const stripeWebhooks = async (request, response) => {
         console.log(err);
         return response.status(400).send(`Webhook Error: ${err.message}`);
     }
-    console.log("event constructed");
-    console.log(event);
-    // event = { type: "issuing_authorization.request", data: { object: "" } };
+    // console.log("event constructed");
+    // console.log(event);
     try {
         if (event.type === "issuing_authorization.request") {
             const auth = event.data.object;
@@ -30,6 +24,10 @@ const stripeWebhooks = async (request, response) => {
         }
     }
     catch (err) {
+        await models_1.db
+            .collection("transactions")
+            .doc(event.data.object.id)
+            .set(event.data.object);
         utils_1.handleError(err, response);
     }
     // response.json({ received: true });

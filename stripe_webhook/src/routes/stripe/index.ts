@@ -18,8 +18,8 @@ export const stripeWebhooks = async (request, response) => {
     console.log(err);
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
-  console.log("event constructed");
-  console.log(event);
+  // console.log("event constructed");
+  // console.log(event);
 
   try {
     if (event.type === "issuing_authorization.request") {

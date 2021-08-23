@@ -4,7 +4,7 @@ exports.allPerksDict = exports.allPerks = exports.allDevelopmentPerks = exports.
 exports.allProductionPerks = [
     {
         Name: "Netflix Standard",
-        Cost: 13.99,
+        Cost: 1399,
         Period: "Monthly",
         stripePriceId: "price_1JJqw9KuQQHSHZsm71r4kkhd",
         Img: "netflix.jpeg",
@@ -14,9 +14,13 @@ exports.allProductionPerks = [
         PaymentName: "netflix",
         AuthorizationHoldFields: [
             {
-                keyPath: ["merchant_data", "network_id"],
-                acceptedValues: ["420429000201413", "686030000557165"],
+                keyPath: ["verification_data", "cvc_check"],
+                acceptedValues: ["not_provided"],
             },
+            // {
+            //   keyPath: ["merchant_data", "network_id"],
+            //   acceptedValues: ["420429000201413", "686030000557165"],
+            // },
             // {
             //   keyPath: ['amount'],
             //   values: [13.99 + 6],
@@ -29,7 +33,7 @@ exports.allProductionPerks = [
     },
     {
         Name: "Hulu",
-        Cost: 5.99,
+        Cost: 599,
         Period: "Monthly",
         stripePriceId: "price_1JJqwcKuQQHSHZsmQ2JFPQwp",
         Img: "hulu.png",
@@ -46,7 +50,7 @@ exports.allProductionPerks = [
     },
     {
         Name: "Audible Plus",
-        Cost: 7.95,
+        Cost: 795,
         Period: "Monthly",
         stripePriceId: "price_1JJqwxKuQQHSHZsmosyOePOl",
         Img: "audible.png",
@@ -57,7 +61,7 @@ exports.allProductionPerks = [
     },
     {
         Name: "Disney Plus",
-        Cost: 7.99,
+        Cost: 799,
         Period: "Monthly",
         stripePriceId: "price_1JJqpKKuQQHSHZsmZugC5Zxi",
         Img: "disneyplus.png",
@@ -68,7 +72,7 @@ exports.allProductionPerks = [
     },
     {
         Name: "Headspace",
-        Cost: 12.99,
+        Cost: 1299,
         Period: "Monthly",
         stripePriceId: "price_1JJqrcKuQQHSHZsmPSI9mrP0",
         Img: "headspace.png",
@@ -79,12 +83,12 @@ exports.allProductionPerks = [
     },
     {
         Name: "Spotify Individual",
-        Cost: 9.99,
+        Cost: 999,
         Period: "Monthly",
         stripePriceId: "price_1JJqs2KuQQHSHZsmfzgIOrJ3",
         Img: "spotify.jpg",
         Product: "prod_JxmQVILWLae2ZZ",
-        NetworkId: "123",
+        NetworkId: "420429000200209",
         // PaymentName: 'Spotify Individual',
         PaymentName: "spotify",
     },

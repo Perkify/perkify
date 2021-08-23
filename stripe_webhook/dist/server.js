@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const bodyParser = require("body-parser");
+const models_1 = require("./models");
 const routes_1 = require("./routes");
 const express = require("express");
 const app = express();
@@ -12,6 +13,15 @@ const app = express();
 //     bodyParser.json()(req, res, next);
 //   }
 // });
+app.get("/_ah/warmup", async (req, res) => {
+    // Handle your warmup logic. Initiate db connection, etc.
+    // get some random data to establish connection to db
+    const userRef = models_1.db.collection("users").doc("g.cole.killian@gmail.com");
+    const userData = (await userRef.get()).data();
+    console.log("Warmup!");
+    console.log(userData);
+    res.status(200).end();
+});
 app.use(express.json({
     verify: (req, res, buf) => {
         req.rawBody = buf;

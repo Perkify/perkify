@@ -14,7 +14,7 @@ interface PerkInfo {
 export const allProductionPerks: PerkInfo[] = [
   {
     Name: "Netflix Standard",
-    Cost: 13.99,
+    Cost: 1399,
     Period: "Monthly",
     stripePriceId: "price_1JJqw9KuQQHSHZsm71r4kkhd",
     Img: "netflix.jpeg",
@@ -43,7 +43,7 @@ export const allProductionPerks: PerkInfo[] = [
   },
   {
     Name: "Hulu",
-    Cost: 5.99,
+    Cost: 599,
     Period: "Monthly",
     stripePriceId: "price_1JJqwcKuQQHSHZsmQ2JFPQwp",
     Img: "hulu.png",
@@ -60,7 +60,7 @@ export const allProductionPerks: PerkInfo[] = [
   },
   {
     Name: "Audible Plus",
-    Cost: 7.95,
+    Cost: 795,
     Period: "Monthly",
     stripePriceId: "price_1JJqwxKuQQHSHZsmosyOePOl",
     Img: "audible.png",
@@ -71,7 +71,7 @@ export const allProductionPerks: PerkInfo[] = [
   },
   {
     Name: "Disney Plus",
-    Cost: 7.99,
+    Cost: 799,
     Period: "Monthly",
     stripePriceId: "price_1JJqpKKuQQHSHZsmZugC5Zxi",
     Img: "disneyplus.png",
@@ -82,7 +82,7 @@ export const allProductionPerks: PerkInfo[] = [
   },
   {
     Name: "Headspace",
-    Cost: 12.99,
+    Cost: 1299,
     Period: "Monthly",
     stripePriceId: "price_1JJqrcKuQQHSHZsmPSI9mrP0",
     Img: "headspace.png",
@@ -93,7 +93,7 @@ export const allProductionPerks: PerkInfo[] = [
   },
   {
     Name: "Spotify Individual",
-    Cost: 9.99,
+    Cost: 999,
     Period: "Monthly",
     stripePriceId: "price_1JJqs2KuQQHSHZsmfzgIOrJ3",
     Img: "spotify.jpg",
