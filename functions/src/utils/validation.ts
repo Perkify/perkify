@@ -39,6 +39,10 @@ export const validateEmails = async (emails: string[]) => {
         return Promise.reject(new Error(`email: ${email} is not email`));
       }
     }
+
+    if (new Set(emails).size !== emails.length) {
+      throw new Error('Trying to add duplicate emails');
+    }
   } else {
     return Promise.reject(new Error('send array of emails'));
   }
@@ -91,11 +95,7 @@ export const validateExistingPerkGroupName = async (
 ) => {
   if (perkGroupName) {
     const businessData = req.businessData;
-    if (
-      !Object.keys(businessData.perkGroups[perkGroupName].perkNames).includes(
-        perkGroupName
-      )
-    ) {
+    if (!Object.keys(businessData.perkGroups).includes(perkGroupName)) {
       throw new Error(
         "Trying to update a perk group with a name that doesn't exist"
       );
