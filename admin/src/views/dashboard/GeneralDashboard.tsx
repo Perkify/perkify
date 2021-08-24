@@ -55,16 +55,9 @@ const GeneralDashboard = () => {
       return [];
     }
     let tempDict: { [key: string]: number } = {};
-    employees.forEach((employee) => {
-      //Looks through each employee to create dict of total costs per perk
-      let group = employee.group;
-      if (
-        business.perkGroups === undefined ||
-        business.perkGroups[group] === undefined
-      ) {
-        return 0;
-      }
-      business.perkGroups[group].perkNames.forEach((perk) => {
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -80,6 +73,7 @@ const GeneralDashboard = () => {
       totalValue = totalValue + tempDict[perk];
       data.push(newRow);
     });
+    console.log(data);
     let totalPercentage = 100; //Rounds number if all values don't add up to 100
     data.forEach((perkObj) => {
       perkObj.value = roundNumber((perkObj.value / totalValue) * 100);
@@ -97,22 +91,23 @@ const GeneralDashboard = () => {
     }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
+    let numEmployees = 0;
     if (business.perkGroups === undefined) {
       return 0;
     }
-    let groupCost = {};
-    employees.forEach((employee) => {
-      let cost = 0;
-      let group = employee.group;
-      if (business.perkGroups[group] === undefined) {
-        return 0;
-      }
-      business.perkGroups[group].perkNames.forEach((perk) => {
-        cost += allPerksDict[perk].Cost;
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
+        totalCost +=
+          allPerksDict[perk].Cost * localGroup.userEmails.length * 1.1;
       });
-      totalCost += cost;
+      totalCost += localGroup.userEmails.length * 4;
+      numEmployees += localGroup.userEmails.length;
     });
-    return totalCost / employees.length;
+    if (numEmployees == 0) {
+      return 0;
+    }
+    return totalCost / numEmployees;
   }
 
   function calculatePerksOffered() {
@@ -141,30 +136,23 @@ const GeneralDashboard = () => {
       return retData;
     }
     let tempDict: { [key: string]: number } = {};
-    employees.forEach((employee) => {
-      //Creates dictionary of total amount spent per perk
-      let group = employee.group;
-      if (selectedGroup != 'All Perk Groups') {
-        //If group is selected only look at employees belonging to the selected group
-        if (group !== selectedGroup) {
-          return 0;
-        }
-      }
-      if (business.perkGroups[group] === undefined) {
-        return 0;
-      }
-      business.perkGroups[group].perkNames.forEach((perk) => {
+    let numTempDict: { [key: string]: number } = {};
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
+          numTempDict[perk] += localGroup.userEmails.length;
         } else {
           tempDict[perk] = allPerksDict[perk].Cost;
+          numTempDict[perk] = localGroup.userEmails.length;
         }
       });
     });
     Object.keys(tempDict).forEach((perk) => {
       let newRow = {
         name: perk,
-        spent: calculateAmountSpentPerPerk(perk),
+        spent: calculateAmountSpentPerPerk(perk, numTempDict[perk]),
         total: 100,
       };
       retData.push(newRow);
@@ -173,20 +161,19 @@ const GeneralDashboard = () => {
     return retData;
   }
 
-  function calculateAmountSpentPerPerk(perk: string) {
-    let totalPossibleCost = 0;
-    let moneySpent = 0;
-    console.log(employees);
+  function calculateAmountSpentPerPerk(perk: string, totalPeople: number) {
+    let numPeople = 0;
     employees.forEach((employee) => {
       if (employee.perks[perk]) {
-        totalPossibleCost += allPerksDict[perk].Cost;
         if (didSpendPerkLastMonth(employee.perks[perk])) {
-          moneySpent += allPerksDict[perk].Cost;
+          numPeople += 1;
         }
       }
     });
-    moneySpent *= 100;
-    return Math.round(moneySpent / totalPossibleCost);
+    if (totalPeople == 0) {
+      return 0;
+    }
+    return Math.round(numPeople / totalPeople);
   }
 
   function didSpendPerkLastMonth(employeeArray: PerkUses) {
@@ -292,6 +279,14 @@ const GeneralDashboard = () => {
     setSelectedGroup(event.target.value[1]);
   }
 
+  function calculateNumEmployees() {
+    let retNum = 0;
+    Object.keys(business.perkGroups).forEach((group) => {
+      retNum += business.perkGroups[group].userEmails.length;
+    });
+    return retNum;
+  }
+
   return (
     <div>
       <Grid container spacing={0}>
@@ -326,7 +321,7 @@ const GeneralDashboard = () => {
           <Grid item xs={4}>
             <MetricCard
               title={'Number of Employees'}
-              number={employees.length.toString()}
+              number={calculateNumEmployees().toString()}
             />
           </Grid>
           <Grid item xs={4}>
