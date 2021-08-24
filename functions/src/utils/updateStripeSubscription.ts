@@ -75,7 +75,6 @@ export const updateStripeSubscription = async (
       price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
       quantity: numEmployees,
       tax_rates: [],
-      deleted: numEmployees == 0,
     },
   ]);
 
