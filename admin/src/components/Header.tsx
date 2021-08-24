@@ -10,6 +10,7 @@ interface HeaderProps {
     type: 'delete' | 'add';
     onClick: Function;
   };
+  icon?: any;
 }
 
 const useHeaderStyles = makeStyles((theme: Theme) =>
@@ -33,7 +34,9 @@ const Header = (props: HeaderProps) => {
     >
       <div>
         <Typography gutterBottom variant="h5" component="h2">
-          <Box fontWeight="bold">{props.title}</Box>
+          <Box fontWeight="bold">
+            {props.title} {props.icon && props.icon}{' '}
+          </Box>
         </Typography>
         {props.crumbs && (
           <Breadcrumbs aria-label="breadcrumb">
