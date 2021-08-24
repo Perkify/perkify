@@ -67,6 +67,7 @@ export const updateStripeSubscription = async (
       quantity: number;
       id?: string;
       tax_rates?: string[];
+      deleted?: boolean;
     }[]
   ).concat([
     // add the perkify cost per employee with no tax rate
@@ -74,6 +75,7 @@ export const updateStripeSubscription = async (
       price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
       quantity: numEmployees,
       tax_rates: [],
+      deleted: numEmployees == 0,
     },
   ]);
 
@@ -151,6 +153,26 @@ export const updateStripeSubscription = async (
       {} as { [key: string]: number }
     );
 
+    // remove items from the subscription with quantity 0
+    for (const priceID in oldQuantityByPriceID) {
+      // check if the priceID exists in the newSubscriptionItemsList
+      const item = newSubscriptionItemsList.find(
+        (item) => item.price == priceID
+      );
+      // if price doesn't exist in the newSubscriptionItemsList
+      // it means we are removing it from the subscription
+      // so set it's quantity to 0 and mark it to be deleted
+      if (!item) {
+        newSubscriptionItemsList.push({
+          price: priceID,
+          quantity: 0,
+          tax_rates: [taxRates.perkifyTax.stripeTaxID],
+          deleted: true,
+        });
+      }
+    }
+
+    // set the relevant ids on the items for the stripe api
     for (let i = 0; i < newSubscriptionItemsList.length; i++) {
       newSubscriptionItemsList[i]['id'] = subscriptionObject.items.filter(
         (item: { price: { id: string } }) =>
@@ -158,20 +180,28 @@ export const updateStripeSubscription = async (
       )?.[0]?.id;
     }
 
-    const priceIDs = Object.keys(quantityByPriceID)
-      .concat(Object.keys(oldQuantityByPriceID))
-      .filter(
-        (stripePriceID) =>
-          stripePriceID !=
-          privatePerksDict['Perkify Cost Per Employee'].stripePriceID
-      );
+    // get the set of priceIDs minus the perkify cost per employee
+    // use a set to remove duplicate priceIDs
+    const priceIDs = Array.from(
+      new Set(
+        Object.keys(quantityByPriceID).concat(Object.keys(oldQuantityByPriceID))
+      )
+    ).filter(
+      (stripePriceID) =>
+        stripePriceID !=
+        privatePerksDict['Perkify Cost Per Employee'].stripePriceID
+    );
 
+    // should be true if for every price id, the new subscription quantity is greater than
+    // or equal to the old subscription quantity
     const isSubscriptionIncrease = priceIDs.every(
       (priceID) =>
         (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) >=
         (priceID in oldQuantityByPriceID ? oldQuantityByPriceID[priceID] : 0)
     );
 
+    // should be true if for every price id, the new subscription quantity is less than
+    // or equal to the old subscription quantity
     const isSubscriptionDecrease = priceIDs.every((priceID) => {
       return (
         (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) <=
