@@ -5,10 +5,13 @@ export const validateEmail = (email: string) => {
 };
 
 export const validateEmails = (emailString: string) => {
-  let emails = emailString.replace(/[,'"]+/gi, ' ').split(/\s+/);
+  let emails = emailString
+    .trim()
+    .replace(/[,'"]+/gi, ' ')
+    .split(/\s+/);
   let retValue = true;
   emails.forEach((email) => {
-    if (validateEmail(email) === false && email !== '') {
+    if (validateEmail(email) === false) {
       retValue = false;
     }
   });
