@@ -154,7 +154,9 @@ export const updateStripeSubscription = async (
     );
 
     // remove items from the subscription with quantity 0
-    for (const priceID in oldQuantityByPriceID) {
+    const oldPriceIDs = Object.keys(oldQuantityByPriceID);
+    for (let i = 0; i < oldPriceIDs.length; i++) {
+      const priceID = oldPriceIDs[i];
       // check if the priceID exists in the newSubscriptionItemsList
       const item = newSubscriptionItemsList.find(
         (item) => item.price == priceID
