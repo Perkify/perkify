@@ -125,12 +125,6 @@ export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
     allEmployeesAcrossBusinesses.includes(email)
   );
 
-  console.log(
-    allEmployeesAcrossBusinesses,
-    emails,
-    emailThatExistsInAnotherBusiness
-  );
-
   if (emailThatExistsInAnotherBusiness) {
     const error = {
       status: 400,
