@@ -105,7 +105,7 @@ const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
             required
             id="bizName"
             name="Business Name"
-            label="Businesss name"
+            label="Business name"
             variant="outlined"
             fullWidth
             autoComplete="given-name"

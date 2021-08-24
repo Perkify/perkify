@@ -99,10 +99,10 @@ const AddEmployees = ({
             setEmailsToAdd('');
             setSelectedPerkGroup('');
           })
-          .catch((e) => {
-            console.log(e.response);
+          .catch((err) => {
+            console.log(err.response);
             alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
             );
             setDashboardLoading(false);
             setFreezeNav(false);

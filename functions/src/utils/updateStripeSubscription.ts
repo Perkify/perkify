@@ -1,20 +1,35 @@
+import { NextFunction } from 'express';
 import { logger } from 'firebase-functions';
 import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
 import { Subscription } from '../types';
 import { shrinkUsers } from './crudHelpers';
+import { propogateSubscriptionUpdateToLiveUsers } from './propogateSubscriptionUpdateToLiveUsers';
 
 // we want to call this anytime we modify a stripe subscription
 // takes the business definition and updates the relevant stripe subscription
 
 // update stripe subscription with business perkGroups
-export const updateStripeSubscription = async (businessID: string) => {
+export const updateStripeSubscription = async (
+  preUpdateBusinessData: Business,
+  next: NextFunction
+) => {
+  const businessID = preUpdateBusinessData.businessID;
+
   const businessData = (
-    await db.collection('businesses').doc(businessID).get()
+    await db
+      .collection('businesses')
+      .doc(preUpdateBusinessData.businessID)
+      .get()
   ).data() as Business;
 
   if (businessData == null) {
-    throw new Error('Missing business document in firestore');
+    const error = {
+      status: 500,
+      reason: 'Missing business document',
+      reasonDetail: `Missing business document in firestore`,
+    };
+    return next(error);
   }
 
   // remove stuff that shouldn't exist from 'users'
@@ -70,16 +85,46 @@ export const updateStripeSubscription = async (businessID: string) => {
     .get();
 
   const subscriptionItem = subscriptionsSnapshot.docs.filter(
-    (doc) => doc.data().canceled_at == null
+    (doc) =>
+      (doc.data() as Subscription).canceled_at == null &&
+      (doc.data() as Subscription).status == 'active'
   )?.[0];
 
   if (!(subscriptionItem && subscriptionItem.exists)) {
     // the admin doesn't have any subscriptions
     // create a subscription for them
-    await stripe.subscriptions.create({
-      customer: businessData.stripeId,
-      items: newSubscriptionItemsList,
-    });
+    try {
+      // will throw an error if payment fails
+      const subscription = await stripe.subscriptions.create({
+        customer: businessData.stripeId,
+        items: newSubscriptionItemsList,
+        payment_behavior: 'error_if_incomplete',
+      });
+
+      // payment succeeded
+      propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
+    } catch (e) {
+      logger.error(e);
+      // payment failed
+      // next time we try again from scratch
+
+      // revert changes to business document
+      await db
+        .collection('businesses')
+        .doc(businessData.businessID)
+        .update({
+          [`perkGroups`]: preUpdateBusinessData.perkGroups,
+        });
+
+      // throw an error for the client
+      const error: PerkifyError = {
+        status: 500,
+        reason: 'Insufficient funds',
+        reasonDetail:
+          'Payment failed with your default payment method. Please update your default payment method and try again',
+      };
+      return next(error);
+    }
   } else {
     // the admin is already subscribed
     // update the subscription to reflect the new item quantities
@@ -123,46 +168,75 @@ export const updateStripeSubscription = async (businessID: string) => {
 
     const isSubscriptionIncrease = priceIDs.every(
       (priceID) =>
-        quantityByPriceID[priceID] || 0 >= oldQuantityByPriceID[priceID] || 0
+        (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) >=
+        (priceID in oldQuantityByPriceID ? oldQuantityByPriceID[priceID] : 0)
     );
 
-    const isSubscriptionDecrease = priceIDs.every(
-      (priceID) =>
-        quantityByPriceID[priceID] || 0 <= oldQuantityByPriceID[priceID] || 0
-    );
+    const isSubscriptionDecrease = priceIDs.every((priceID) => {
+      return (
+        (priceID in quantityByPriceID ? quantityByPriceID[priceID] : 0) <=
+        (priceID in oldQuantityByPriceID ? oldQuantityByPriceID[priceID] : 0)
+      );
+    });
 
-    if (isSubscriptionIncrease) {
+    if (isSubscriptionIncrease && !isSubscriptionDecrease) {
       // update the subscription and charge the customer
+      logger.info(
+        `Increasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'always_invoice',
+          proration_date: currentBillingPeriodStart,
+          payment_behavior: 'error_if_incomplete',
+        }
+      );
 
-      // this is charging them only for the remaining portion of the billing cycle
-      await stripe.subscriptions.update(subscriptionItem.id, {
-        items: newSubscriptionItemsList,
-        proration_behavior: 'always_invoice',
-        proration_date: currentBillingPeriodStart,
-      });
+      try {
+        // will throw an error if payment fails
+        const subscription = await stripe.subscriptions.update(
+          subscriptionItem.id,
+          {
+            items: newSubscriptionItemsList,
+            proration_behavior: 'always_invoice',
+            proration_date: currentBillingPeriodStart,
+            payment_behavior: 'error_if_incomplete',
+          }
+        );
 
-      // invoice is already paid error
+        // payment succeeded
+        propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
+      } catch (e) {
+        // payment fails
 
-      // // create an invoice to charge the difference of the subscription
-      // const createdInvoice = await stripe.invoices.create({
-      //   customer: businessData.stripeId,
-      //   // auto_advance: true,
-      //   collection_method: 'charge_automatically',
-      //   subscription: subscriptionID,
-      // });
+        // revert changes to business document
+        await db
+          .collection('businesses')
+          .doc(businessData.businessID)
+          .update({
+            [`perkGroups`]: preUpdateBusinessData.perkGroups,
+          });
 
-      // // finalize the invoice
-      // await stripe.invoices.finalizeInvoice(createdInvoice.id, {
-      //   // auto_advance: true,
-      // });
-
-      // // pay the invoice
-      // await stripe.invoices.pay(createdInvoice.id, {
-      //   // auto_advance: true,
-      // });
-    } else if (isSubscriptionDecrease) {
+        // throw an error for the client
+        const error: PerkifyError = {
+          status: 500,
+          reason: 'Insufficient funds',
+          reasonDetail:
+            'Payment failed with your default payment method. Please update your default payment method and try again',
+        };
+        return next(error);
+      }
+    } else if (isSubscriptionDecrease && !isSubscriptionIncrease) {
       // update the subscription, don't give anything back
 
+      logger.info(
+        `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'none',
+        }
+      );
+
+      // should succeed every time
       await stripe.subscriptions.update(subscriptionItem.id, {
         items: newSubscriptionItemsList,
         proration_behavior: 'none',

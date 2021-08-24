@@ -58,6 +58,8 @@ const AddEmployees = ({
     }
     if (!error) {
       (async () => {
+        setConfirmationModalVisible(false);
+        setIsAddEmployeesModalVisible(false);
         setDashboardLoading(true);
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
@@ -88,16 +90,16 @@ const AddEmployees = ({
             setEmailsToAdd('');
             setConfirmationModalVisible(false);
           })
-          .catch((e) => {
-            console.error(e);
-            console.log(e.response);
-            alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
-            );
+          .catch((err) => {
+            console.error(err);
+            console.error(err.response);
 
             setDashboardLoading(false);
             setFreezeNav(false);
-            setEmailsToAdd('');
+
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
           });
       })();
     }
