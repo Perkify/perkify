@@ -165,7 +165,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   ];
 
   const navSections: [string, [string, string, any][]][] =
-    business && Object.keys(business.cardPaymentMethods).length == 0
+    !business || Object.keys(business.cardPaymentMethods).length == 0
       ? [
           ['General', generalNav],
           ['Account', accountNav],
