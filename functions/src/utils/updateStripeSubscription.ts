@@ -266,11 +266,23 @@ export const updateStripeSubscription = async (
         }
       );
 
-      // should succeed every time
-      await stripe.subscriptions.update(subscriptionItem.id, {
-        items: newSubscriptionItemsList,
-        proration_behavior: 'none',
-      });
+      // check if we should cancel the subscription
+      if (Object.keys(businessData.perkGroups).length == 0) {
+        // cancel the subscription because the business has no perk groups / perks
+
+        // should succeed every time
+        await stripe.subscriptions.del(subscriptionItem.id, {
+          prorate: false,
+        });
+      } else {
+        // otherwise we just update the subscription, don't cancel it
+
+        // should succeed every time
+        await stripe.subscriptions.update(subscriptionItem.id, {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'none',
+        });
+      }
     } else {
       logger.error(
         'Should not have simultaneous subscription increase and decrease',
