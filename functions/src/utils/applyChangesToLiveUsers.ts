@@ -13,7 +13,6 @@ import {
 
 // modificationType indicates whether we are expanding or shrinking live users
 export const applyChangesToLiveUsers = async (
-  preUpdatedBusiness: Business,
   updatedBusiness: Business,
   modificationType: 'expand' | 'shrink'
 ) => {
@@ -21,6 +20,17 @@ export const applyChangesToLiveUsers = async (
   const usersToCreate: UserToCreate[] = [];
   const usersToUpdate: UserToUpdate[] = [];
   const usersToDelete: UserToDelete[] = [];
+
+  const pendingBusinessDoc = await db
+    .collection('businesses')
+    .doc(businessID)
+    .get();
+
+  if (!pendingBusinessDoc.exists) {
+    throw new Error('Missing business document in firestore');
+  }
+
+  const pendingBusiness = pendingBusinessDoc.data() as Business;
 
   // get existing users
   const existingUsersSnapshot = await db
@@ -61,7 +71,7 @@ export const applyChangesToLiveUsers = async (
       );
 
       const pendingPerkGroup =
-        preUpdatedBusiness.perkGroups[perkGroupName] ||
+        pendingBusiness.perkGroups[perkGroupName] ||
         ({ perkNames: [], userEmails: [] } as PerkGroup);
       const updatedPerkGroup =
         updatedBusiness.perkGroups[perkGroupName] ||
