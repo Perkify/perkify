@@ -32,9 +32,19 @@ export const applyChangesToLiveUsers = async (
 
   const pendingBusiness = pendingBusinessDoc.data() as Business;
 
+  // get a deduplicated list of all perk group names from before and after
+  // the update
+  const allPerkGroupNames = Array.from(
+    new Set(
+      Object.keys(updatedBusiness.perkGroups).concat(
+        Object.keys(pendingBusiness.perkGroups)
+      )
+    )
+  );
+
   // process each perk group separately
   await Promise.all(
-    Object.keys(updatedBusiness.perkGroups).map(async (perkGroupName) => {
+    allPerkGroupNames.map(async (perkGroupName) => {
       // TODOFUTURE: improve this so that we can instantly tell if a perkGroup has changed
       // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
@@ -49,8 +59,12 @@ export const applyChangesToLiveUsers = async (
         existingPerkUsersSnapshot
       ) as Record<string, User>;
 
-      const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
-      const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
+      const pendingPerkGroup =
+        pendingBusiness.perkGroups[perkGroupName] ||
+        ({ perkNames: [], userEmails: [] } as PerkGroup);
+      const updatedPerkGroup =
+        updatedBusiness.perkGroups[perkGroupName] ||
+        ({ perkNames: [], userEmails: [] } as PerkGroup);
 
       const livePerkGroup =
         existingPerkUsersSnapshot.docs.length != 0
