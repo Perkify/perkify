@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import { ReactComponent as GettingStartedImage } from 'images/undraw_security_o890.svg';
 import React from 'react';
 
 const BootstrapInput = withStyles((theme) => ({
@@ -79,6 +80,9 @@ const EmailInput = ({ setEmail }) => {
             justify="center"
             style={{ height: '100%', padding: '10%' }}
           >
+            <Grid item xs={12} style={{ textAlign: 'center' }}>
+              <GettingStartedImage style={{ height: '200px', width: 'auto' }} />
+            </Grid>
             <Grid item xs={12}>
               <p className={classes.footer}>
                 Please enter in your email, so we can confirm your identity.

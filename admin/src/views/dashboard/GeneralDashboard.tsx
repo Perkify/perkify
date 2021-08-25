@@ -306,7 +306,7 @@ const GeneralDashboard = () => {
       </Grid>
       {loadingAuthState || !business ? (
         <p>Loading</p>
-      ) : business.cardPaymentMethods.length == 0 ? (
+      ) : Object.keys(business.cardPaymentMethods).length == 0 ? (
         <WelcomeCards />
       ) : business.perkGroups == null ||
         Object.keys(business.perkGroups).length == 0 ? (
