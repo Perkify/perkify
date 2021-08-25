@@ -148,8 +148,8 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
 
   // get the emails to be created
   const { emailsToCreate } = generateEmailsPatch(
-    currentPerkGroup.userEmails,
-    emails
+    emails,
+    currentPerkGroup.userEmails
   );
 
   // check if any of the emails to be created are claimed
