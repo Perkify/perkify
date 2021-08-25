@@ -43,7 +43,7 @@ export const applyChangesToLiveUsers = async (
   ) as Record<string, User>;
 
   // get a list of the perk names we would be expanding to
-  const expandingFromPerkGroupNames = Object.keys(updatedBusiness.perkGroups);
+  const expandingToPerkGroupNames = Object.keys(updatedBusiness.perkGroups);
 
   // get a list of all the perk names we would be shrinking from
   const shrinkingFromPerkGroupNames = Array.from(
@@ -57,7 +57,7 @@ export const applyChangesToLiveUsers = async (
   // pick the important list of perk names
   const importantPerkGroupNames =
     modificationType === 'expand'
-      ? expandingFromPerkGroupNames
+      ? expandingToPerkGroupNames
       : shrinkingFromPerkGroupNames;
 
   // process each perk group separately
