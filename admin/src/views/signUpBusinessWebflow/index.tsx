@@ -186,7 +186,10 @@ const SignUpBusinessWebflow = () => {
             nextReady={
               !Object.values(BusinessFormProps).some(
                 (fieldprop) => fieldprop === ''
-              )
+              ) &&
+              BusinessFormProps.postalCode.length === 5 &&
+              BusinessFormProps.state.length === 2 &&
+              BusinessFormProps.phone.length > 10
             }
           />
         );

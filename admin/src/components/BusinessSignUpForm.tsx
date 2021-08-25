@@ -4,6 +4,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SignUpGraphic from 'images/SignUpGraphic.png';
+import MaterialUiPhoneNumber from 'material-ui-phone-number';
 import React from 'react';
 
 const BootstrapInput = withStyles((theme) => ({
@@ -84,6 +85,11 @@ const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
   const fillTextbox = (setFunction: (arg0: string) => void) => (event: any) => {
     setFunction(event.target.value);
   };
+
+  const fillPhoneTextBox =
+    (setFunction: (arg0: string) => void) => (event: any) => {
+      setFunction(event);
+    };
 
   return (
     <div
@@ -170,21 +176,19 @@ const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            required
+          <MaterialUiPhoneNumber
+            disableDropdown
             id="phoneNumber"
             name="Phone Number"
             label="Phone Number"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
+            autoComplete="phone number"
+            defaultCountry="us"
             variant="outlined"
             fullWidth
-            autoComplete="phone number"
-            onChange={fillTextbox(props.setPhone)}
+            required
+            onChange={fillPhoneTextBox(props.setPhone)}
             value={props.phone}
-            error={props.phone === '' && props.invalidStep}
+            error={props.phone.length < 10 && props.invalidStep}
           />
         </Grid>
         <Grid item xs={6} md={6}>

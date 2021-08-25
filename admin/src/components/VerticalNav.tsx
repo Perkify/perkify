@@ -261,6 +261,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                         >
                           <MoreVertIcon />
                         </IconButton>
+
                         <Menu
                           id={`${name} simple menu`}
                           open={Boolean(anchorEl)}
