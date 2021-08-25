@@ -70,8 +70,8 @@ export default function ManageGroups(props: any) {
       if (Object.keys(business.perkGroups).includes(id)) {
         // set perk group data
         setPerksData(
-          business.perkGroups[id].perkNames.map((perkGroupName, index) => ({
-            ...allPerksDict[perkGroupName],
+          business.perkGroups[id].perkNames.map((perkName, index) => ({
+            ...allPerksDict[perkName],
             id: index,
           }))
         );

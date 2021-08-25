@@ -1,5 +1,7 @@
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { AuthProvider, BusinessProvider, LoadingProvider } from 'contexts';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -8,6 +10,12 @@ import 'typeface-roboto';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+
+// Make sure to call `loadStripe` outside of a component’s render to avoid
+// recreating the `Stripe` object on every render.
+const stripePromise = loadStripe(
+  'pk_test_51JBSAtKuQQHSHZsm0BKxIP1E90RF0AKVQ1gO3CwNRdDMVlwcF9qtapSbyirxbatu67LJ4yPFiepF3KpnZKl7HPxe00NE2FQBTY'
+);
 
 const theme = createTheme({
   palette: {
@@ -64,16 +72,18 @@ const theme = createTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <Router>
-        <LoadingProvider>
-          <AuthProvider>
-            <BusinessProvider>
-              <CssBaseline />
-              <App />
-            </BusinessProvider>
-          </AuthProvider>
-        </LoadingProvider>
-      </Router>
+      <Elements stripe={stripePromise}>
+        <Router>
+          <LoadingProvider>
+            <AuthProvider>
+              <BusinessProvider>
+                <CssBaseline />
+                <App />
+              </BusinessProvider>
+            </AuthProvider>
+          </LoadingProvider>
+        </Router>
+      </Elements>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
