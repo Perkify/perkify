@@ -5,12 +5,11 @@ export const validateEmail = (email: string) => {
 };
 
 export const validateEmails = (emailString: string) => {
-  let emails = emailString.replace(/[,'"]+/gi, ' ').split(/\s+/);
-  let retValue = true;
-  emails.forEach((email) => {
-    if (validateEmail(email) === false) {
-      retValue = false;
-    }
-  });
+  const emails = emailString
+    .trim()
+    .replace(/[,'"]+/gi, ' ')
+    .split(/\s+/);
+  // check that every email in the list is valid
+  const retValue = emails.every((email) => validateEmail(email));
   return retValue;
 };

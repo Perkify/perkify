@@ -13,7 +13,7 @@ import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from 'shared';
+import { allPerks, allPerksDict } from 'shared';
 
 interface AddPerksProps {
   isAddPerksModalVisible: boolean;
@@ -70,23 +70,35 @@ const AddPerks = ({
           groupPerks.map((perkObj) => perkObj.Name)
         );
 
-        await PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            emails: emails.map((emailObj) => emailObj.email),
-            perkNames: afterPerks,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        try {
+          await PerkifyApi.put(
+            `rest/perkGroup/${group}`,
+            {
+              userEmails: emails.map((emailObj) => emailObj.email),
+              perkNames: afterPerks,
+            } as UpdatePerkGroupPayload,
+            {
+              headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
 
-        setFreezeNav(false);
-        setDashboardLoading(false);
-        setPerksToAdd([]);
+          setFreezeNav(false);
+          setDashboardLoading(false);
+          setPerksToAdd([]);
+        } catch (err) {
+          console.error(err);
+          console.error(err.response);
+
+          setDashboardLoading(false);
+          setFreezeNav(false);
+
+          alert(
+            `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+          );
+        }
       })();
     }
   };
@@ -151,7 +163,12 @@ const AddPerks = ({
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
-              {name}
+              {name +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
+                allPerksDict[name].Period +
+                ')'}
             </MenuItem>
           ))}
         </Select>

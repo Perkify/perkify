@@ -72,7 +72,7 @@ export const registerAdminAndBusiness = async (
       },
       admins: [newUser.uid],
       perkGroups: {},
-      cardPaymentMethods: [],
+      cardPaymentMethods: {},
       stripeId: customer.id,
       stripeLink: `https://dashboard.stripe.com${
         customer.livemode ? '' : '/test'

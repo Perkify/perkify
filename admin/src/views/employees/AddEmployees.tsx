@@ -76,10 +76,13 @@ const AddEmployees = ({
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+        const emailList = emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/); //Gives email as a list
         const payload: UpdatePerkGroupPayload = {
           perkNames: business.perkGroups[selectedPerkGroup].perkNames,
-          emails: emailList.concat(
+          userEmails: emailList.concat(
             peopleData
               .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
               .map((employeeObj) => employeeObj.email)
@@ -99,10 +102,10 @@ const AddEmployees = ({
             setEmailsToAdd('');
             setSelectedPerkGroup('');
           })
-          .catch((e) => {
-            console.log(e.response);
+          .catch((err) => {
+            console.log(err.response);
             alert(
-              `Error. Reason: ${e.response.data.reason}. Details: ${e.response.data.reasonDetail}`
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
             );
             setDashboardLoading(false);
             setFreezeNav(false);
@@ -144,7 +147,12 @@ const AddEmployees = ({
       onConfirmation={addToPerkGroup}
       setConfirmationModalVisible={setConfirmationModalVisible}
       perks={generatePerks()}
-      numPeople={emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/).length}
+      numPeople={
+        emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/).length
+      }
       creatingGroup={true}
     />
   ) : (

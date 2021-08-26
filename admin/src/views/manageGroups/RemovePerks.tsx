@@ -64,7 +64,7 @@ const RemovePerks = ({
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
-            emails: emails.map((emailObj) => emailObj.email),
+            userEmails: emails.map((emailObj) => emailObj.email),
             perkNames: afterPerksNames,
           } as UpdatePerkGroupPayload,
           {
@@ -77,7 +77,6 @@ const RemovePerks = ({
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemovePerksModalVisible(false);
-        setSelectedPerks([]);
       })();
     }
   };

@@ -39,6 +39,10 @@ export const validateEmails = async (emails: string[]) => {
         return Promise.reject(new Error(`email: ${email} is not email`));
       }
     }
+
+    if (new Set(emails).size !== emails.length) {
+      throw new Error('Trying to add duplicate emails');
+    }
   } else {
     return Promise.reject(new Error('send array of emails'));
   }
@@ -75,12 +79,12 @@ export const validateNewPerkGroupName = async (
   if (perkGroupName) {
     const businessData = req.businessData as Business;
     if (Object.keys(businessData.perkGroups).includes(perkGroupName)) {
-      return new Error(
+      throw new Error(
         'Trying to create a perk group with a name that already exists'
       );
     }
   } else {
-    return new Error('Perk group name not specified');
+    throw new Error('Perk group name not specified');
   }
   return;
 };
@@ -91,17 +95,13 @@ export const validateExistingPerkGroupName = async (
 ) => {
   if (perkGroupName) {
     const businessData = req.businessData;
-    if (
-      !Object.keys(businessData.perkGroups[perkGroupName].perkNames).includes(
-        perkGroupName
-      )
-    ) {
-      return new Error(
+    if (!Object.keys(businessData.perkGroups).includes(perkGroupName)) {
+      throw new Error(
         "Trying to update a perk group with a name that doesn't exist"
       );
     }
   } else {
-    return new Error('Perk group name not specified');
+    throw new Error('Perk group name not specified');
   }
   return;
 };
@@ -113,11 +113,11 @@ export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
   // generate list of all employee emails
   const allEmployeesAcrossBusinesses: string[] = [];
   businessesSnapshot.forEach((businessDoc) => {
-    allEmployeesAcrossBusinesses.concat(
-      ...Object.values((businessDoc.data() as Business).perkGroups).map(
-        (perkGroup) => perkGroup.emails
-      )
-    );
+    Object.values((businessDoc.data() as Business).perkGroups)
+      .map((perkGroup) => perkGroup.userEmails)
+      .forEach((perkGroupEmails) => {
+        allEmployeesAcrossBusinesses.push(...perkGroupEmails);
+      });
   });
 
   // check if any of the emails to create exist across all businesses
@@ -148,8 +148,8 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
 
   // get the emails to be created
   const { emailsToCreate } = generateEmailsPatch(
-    currentPerkGroup.emails,
-    emails
+    emails,
+    currentPerkGroup.userEmails
   );
 
   // check if any of the emails to be created are claimed

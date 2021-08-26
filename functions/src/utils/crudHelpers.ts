@@ -6,14 +6,17 @@ import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 export const createUserHelper = async (userToCreate: UserToCreate) => {
   const docRef = db.collection('users').doc(userToCreate.email);
 
-  await docRef.set({
+  const user: User = {
+    email: userToCreate.email,
     businessID: userToCreate.businessID,
     perkGroupName: userToCreate.perkGroupName,
     perkUsesDict: userToCreate.newPerkNames.reduce(
       (map, perk) => ((map[perk] = []), map),
       {} as { [key: string]: FirebaseFirestore.Timestamp[] }
     ),
-  } as SimpleUser);
+  };
+
+  await docRef.set(user);
 
   const signInLink = await admin
     .auth()
@@ -26,8 +29,11 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
           : 'http://localhost:3001/dashboard',
     });
 
-  // if in development mode, print the sign in link
-  if (functions.config()['stripe-firebase'].environment == 'development') {
+  // if in development or staging mode, print the sign in link
+  if (
+    functions.config()['stripe-firebase'].environment == 'development' ||
+    functions.config()['stripe-firebase'].environment == 'staging'
+  ) {
     logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
   }
 

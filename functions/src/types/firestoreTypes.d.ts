@@ -11,6 +11,7 @@ interface SimpleCardPaymentMethod {
   expYear: number;
   funding: string;
   last4: string;
+  fingerprint: string;
 }
 
 interface Admin {
@@ -22,7 +23,7 @@ interface Admin {
 
 interface PerkGroup {
   perkNames: string[];
-  emails: string[];
+  userEmails: string[];
 }
 
 interface BillingAddress {
@@ -48,7 +49,7 @@ interface Business {
   stripeId: string;
   stripeLink: string;
 
-  cardPaymentMethods: SimpleCardPaymentMethod[];
+  cardPaymentMethods: { [key: string]: SimpleCardPaymentMethod };
   // perk group names with their perkNames and emails
   // this will have scaling problems if there are lots of emails in a business
   // but the number of emails shouldn't be too high
@@ -61,12 +62,6 @@ interface Business {
 type PerkUses = any[];
 interface PerkUsesDict {
   [key: string]: PerkUses;
-}
-
-interface SimpleUser {
-  businessID: string;
-  perkGroupName: string;
-  perkUsesDict: PerkUsesDict;
 }
 
 interface UserCard {
@@ -83,23 +78,17 @@ interface UserCard {
   };
 }
 
-interface User {
+type User = {
+  email: string;
   businessID: string;
   perkGroupName: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
-}
+};
 
-interface ActivatedUser {
-  businessID: string;
-  perkGroupName: string;
-  perkUsesDict: PerkUsesDict;
-  firstName: string;
-  lastName: string;
-  card: UserCard;
-}
+type ActivatedUser = Required<User>;
 
 interface UserToCreate {
   email: string;

@@ -5,12 +5,14 @@ import {
   checkValidationResult,
   updateStripeSubscription,
   validateAdminDoc,
+  validateBusinessDoc,
   validateFirebaseIdToken,
 } from '../../utils';
 
 export const deletePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
+  validateBusinessDoc,
   checkValidationResult,
 ];
 
@@ -19,6 +21,8 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
     const perkGroupName = req.params.perkGroupName;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
+
+    const preUpdateBusinessData = req.businessData;
 
     try {
       // delete group from businesss' perkGroups
@@ -30,7 +34,7 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
         });
 
       // update the stripe subscription
-      await updateStripeSubscription(req.businessData.businessID);
+      await updateStripeSubscription(preUpdateBusinessData, next);
 
       res.status(200).end();
     } catch (err) {

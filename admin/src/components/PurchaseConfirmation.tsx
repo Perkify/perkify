@@ -42,9 +42,9 @@ const PurchaseConfirmation = ({
       cost += allPerksDict[perk].Cost;
     });
     if (creatingGroup) {
-      return roundNumber(cost * numPeople * 1.1 + 4 * numPeople).toFixed(2);
+      return roundNumber(cost * numPeople * 1.1 + 3.99 * numPeople).toFixed(2);
     }
-    return roundNumber(cost * numPeople).toFixed(2);
+    return roundNumber(cost * numPeople * 1.1).toFixed(2);
   }
   return (
     <Dialog

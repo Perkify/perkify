@@ -19,21 +19,23 @@ export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  param('perkGroupName').custom(validateExistingPerkGroupName),
-  body('emails')
+  body('userEmails')
     .custom(validateEmails)
     .customSanitizer(sanitizeEmails)
     .custom(checkIfAnyEmailsToAddAreClaimed),
   body('perkNames').custom(validatePerkNames),
+  param('perkGroupName').custom(validateExistingPerkGroupName),
   checkValidationResult,
 ];
 
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupName = req.params.perkGroupName;
-    const { emails, perkNames } = req.body as UpdatePerkGroupPayload;
+    const { userEmails, perkNames } = req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
+
+    const preUpdateBusinessData = req.businessData;
 
     try {
       // update business doc
@@ -44,12 +46,12 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
         .update({
           [`perkGroups.${perkGroupName}`]: {
             perkNames: perkNames,
-            emails,
+            userEmails: userEmails,
           } as PerkGroup,
         });
 
       // sync to stripe subscription
-      await updateStripeSubscription(req.businessData.businessID);
+      await updateStripeSubscription(preUpdateBusinessData, next);
 
       res.status(200).end();
     } catch (error) {

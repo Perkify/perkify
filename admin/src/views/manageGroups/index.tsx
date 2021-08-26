@@ -78,7 +78,7 @@ export default function ManageGroups(props: any) {
 
         // set email data
         setEmails(
-          business.perkGroups[id].emails.map((employeeEmail, index) => ({
+          business.perkGroups[id].userEmails.map((employeeEmail, index) => ({
             email: employeeEmail,
             id: index,
           }))
@@ -87,6 +87,8 @@ export default function ManageGroups(props: any) {
       } else {
         setGroupNotFound(true);
       }
+      setSelectedEmployees([]);
+      setSelectedPerks([]);
     }
   }, [business, id]);
 
@@ -136,7 +138,7 @@ export default function ManageGroups(props: any) {
               setIsRemovePerksModalVisible(true);
             }}
             tableName="Group Perks"
-            addButtonText="Add Group Perk"
+            addButtonText="Add Perk"
             loading={dashboardLoading}
           />
         </Grid>

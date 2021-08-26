@@ -59,7 +59,7 @@ const CreateGroup = () => {
       cost += allPerksDict[perk]['Cost'];
     });
     setCostPerPerson(cost);
-    setTotalCost(roundNumber(cost * numPeople * 1.1 + 4 * numPeople));
+    setTotalCost(roundNumber(cost * numPeople * 1.1 + 3.99 * numPeople));
   };
 
   const handleEmailError = (event: any) => {
@@ -84,18 +84,22 @@ const CreateGroup = () => {
       // user is typing
     } else {
       // if not error, update the number of people
-      const emails = event.target.value.replace(/[,'"]+/gi, ' ').split(/\s+/);
+      const emails = event.target.value
+        .trim()
+        .replace(/[,'"]+/gi, ' ')
+        .split(/\s+/)
+        .filter((item: any) => item);
       tmpNumPeople = emails.length;
     }
     // update the number of people and total cost
     setNumPeople(tmpNumPeople);
     setTotalCost(
-      roundNumber(tmpNumPeople * costPerPerson * 1.1 + tmpNumPeople * 4)
+      roundNumber(tmpNumPeople * costPerPerson * 1.1 + tmpNumPeople * 3.99)
     );
   };
 
-  const createPerkGroup = (e: any) => {
-    e.preventDefault();
+  const createPerkGroup = (event: any) => {
+    event.preventDefault();
     let error = false;
 
     if (groupName == '') {
@@ -119,12 +123,16 @@ const CreateGroup = () => {
     if (!error) {
       setDashboardLoading(true);
       setFreezeNav(true);
-      const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+      const emailList = emails
+        .trim()
+        .replace(/[,'"]+/gi, ' ')
+        .split(/\s+/); //Gives email as a list
       (async () => {
+        setConfirmationModalVisible(false);
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
         const payload: CreatePerkGroupPayload = {
-          emails: emailList,
+          userEmails: emailList,
           perkNames: selectedPerks,
         };
         PerkifyApi.post(`rest/perkGroup/${groupName}`, payload, {
@@ -140,6 +148,14 @@ const CreateGroup = () => {
           })
           .catch((err) => {
             console.error(err);
+            console.error(err.response);
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
+
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
           });
       })();
     }
@@ -269,10 +285,10 @@ const CreateGroup = () => {
         </Typography>
         <Tooltip
           disableFocusListener={
-            !(!business || business.cardPaymentMethods.length == 0)
+            !(!business || Object.keys(business.cardPaymentMethods).length == 0)
           }
           disableHoverListener={
-            !(!business || business.cardPaymentMethods.length == 0)
+            !(!business || Object.keys(business.cardPaymentMethods).length == 0)
           }
           title="Please add billing information before creating a group"
           placement="bottom-start"
@@ -282,7 +298,10 @@ const CreateGroup = () => {
               onClick={setVisible}
               variant="contained"
               color="primary"
-              disabled={!business || business.cardPaymentMethods.length == 0}
+              disabled={
+                !business ||
+                Object.keys(business.cardPaymentMethods).length == 0
+              }
             >
               Create Perk Group
             </Button>

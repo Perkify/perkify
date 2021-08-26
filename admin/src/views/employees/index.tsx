@@ -14,7 +14,7 @@ const columns = [
     editable: false,
   },
   {
-    field: 'perkGroupName',
+    field: 'group',
     headerName: 'Perk Group',
     width: 200,
     editable: false,
@@ -40,14 +40,17 @@ export default function ManagePeople(props: any) {
       setPeopleData(
         [].concat(
           ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].emails.map((employeeEmail) => ({
-              email: employeeEmail,
-              group: perkGroupName,
-              id: employeeEmail,
-            }))
+            business.perkGroups[perkGroupName].userEmails.map(
+              (employeeEmail) => ({
+                email: employeeEmail,
+                group: perkGroupName,
+                id: employeeEmail,
+              })
+            )
           )
         )
       );
+      setSelection([]);
     }
   }, [business]);
 
@@ -62,7 +65,7 @@ export default function ManagePeople(props: any) {
         // get all employees that are not selected
         // by removing all employees that were selected
         const afterEmployees = peopleData.filter(
-          (employee, index) => selectedUsers.indexOf(index) == -1
+          (employee, index) => !selectedUsers.includes(employee.email)
         );
 
         const perkGroupToAfterEmails = afterEmployees.reduce(
@@ -89,10 +92,9 @@ export default function ManagePeople(props: any) {
             // better would be to create an api folder where you can call these from
             // should haven't to do all this copy pasting
             const payload: UpdatePerkGroupPayload = {
-              emails: afterEmails,
+              userEmails: afterEmails,
               perkNames: business.perkGroups[perkGroup].perkNames,
             };
-
             await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
               headers: {
                 Authorization: `Bearer ${bearerToken}`,
@@ -104,7 +106,6 @@ export default function ManagePeople(props: any) {
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemoveModalVisible(false);
-        setSelection([]);
       })();
     }
   };

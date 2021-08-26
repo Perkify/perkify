@@ -56,11 +56,10 @@ const RemoveEmployees = ({
           return;
         }
 
-        setSelectedEmployees([]);
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
-            emails: afterEmails,
+            userEmails: afterEmails,
             perkNames: business.perkGroups[group].perkNames,
           } as UpdatePerkGroupPayload,
           {
