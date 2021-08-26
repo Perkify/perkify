@@ -138,7 +138,7 @@ export default function ManageGroups(props: any) {
               setIsRemovePerksModalVisible(true);
             }}
             tableName="Group Perks"
-            addButtonText="Add Group Perk"
+            addButtonText="Add Perk"
             loading={dashboardLoading}
           />
         </Grid>

@@ -64,7 +64,10 @@ const AddEmployees = ({
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+        const emailList = emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/); //Gives email as a list
 
         const afterEmployees = emailList.concat(
           employees.map((employeeObj) => employeeObj.email)
@@ -132,7 +135,13 @@ const AddEmployees = ({
       onConfirmation={addEmployeesToPerkGroup}
       setConfirmationModalVisible={setConfirmationModalVisible}
       perks={generatePerks()}
-      numPeople={emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/).length}
+      numPeople={
+        emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/)
+          .filter((item: any) => item).length
+      }
       creatingGroup={true}
     />
   ) : (

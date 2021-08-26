@@ -13,7 +13,7 @@ import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from 'shared';
+import { allPerks, allPerksDict } from 'shared';
 
 interface AddPerksProps {
   isAddPerksModalVisible: boolean;
@@ -163,7 +163,12 @@ const AddPerks = ({
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
-              {name}
+              {name +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
+                allPerksDict[name].Period +
+                ')'}
             </MenuItem>
           ))}
         </Select>
