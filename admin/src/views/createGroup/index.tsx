@@ -85,6 +85,7 @@ const CreateGroup = () => {
     } else {
       // if not error, update the number of people
       const emails = event.target.value
+        .trim()
         .replace(/[,'"]+/gi, ' ')
         .split(/\s+/)
         .filter((item: any) => item);
@@ -122,7 +123,10 @@ const CreateGroup = () => {
     if (!error) {
       setDashboardLoading(true);
       setFreezeNav(true);
-      const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+      const emailList = emails
+        .trim()
+        .replace(/[,'"]+/gi, ' ')
+        .split(/\s+/); //Gives email as a list
       (async () => {
         setConfirmationModalVisible(false);
         const bearerToken = await currentUser.getIdToken();

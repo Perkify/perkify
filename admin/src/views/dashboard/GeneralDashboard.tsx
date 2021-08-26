@@ -295,7 +295,7 @@ const GeneralDashboard = () => {
         </Grid>
         <Grid item xs={2}>
           {business &&
-             Object.keys(business.cardPaymentMethods).length != 0 &&
+            Object.keys(business.cardPaymentMethods).length != 0 &&
             Object.keys(business.perkGroups).length != 0 &&
             false && (
               <Button color="primary" onClick={generateCSV}>

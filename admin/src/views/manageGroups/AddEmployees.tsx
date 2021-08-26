@@ -64,7 +64,10 @@ const AddEmployees = ({
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+        const emailList = emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/); //Gives email as a list
 
         const afterEmployees = emailList.concat(
           employees.map((employeeObj) => employeeObj.email)
@@ -134,6 +137,7 @@ const AddEmployees = ({
       perks={generatePerks()}
       numPeople={
         emailsToAdd
+          .trim()
           .replace(/[,'"]+/gi, ' ')
           .split(/\s+/)
           .filter((item: any) => item).length
