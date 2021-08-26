@@ -2,6 +2,7 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { PerkifyApi } from 'services';
 import AddEmployees from './AddEmployees';
@@ -17,6 +18,12 @@ const columns = [
     field: 'group',
     headerName: 'Perk Group',
     width: 200,
+    editable: false,
+  },
+  {
+    field: 'activated',
+    headerName: 'Account Activation Status',
+    width: 300,
     editable: false,
   },
 ];
@@ -37,20 +44,31 @@ export default function ManagePeople(props: any) {
   useEffect(() => {
     if (business) {
       setGroupData(Object.keys(business.perkGroups).sort());
-      setPeopleData(
-        [].concat(
-          ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].userEmails.map(
-              (employeeEmail) => ({
-                email: employeeEmail,
-                group: perkGroupName,
-                id: employeeEmail,
-              })
+      db.collection('users')
+        .where('businessID', '==', business.businessID)
+        .get()
+        .then((querySnapshot) => {
+          const people = querySnapshot.docs.map((doc, index) => {
+            return doc.id;
+          });
+          console.log(people);
+          setDashboardLoading(false);
+          setPeopleData(
+            [].concat(
+              ...Object.keys(business.perkGroups).map((perkGroupName) =>
+                business.perkGroups[perkGroupName].userEmails.map(
+                  (employeeEmail) => ({
+                    email: employeeEmail,
+                    group: perkGroupName,
+                    id: employeeEmail,
+                    activated: people.includes(employeeEmail) ? 'Yes' : 'No',
+                  })
+                )
+              )
             )
-          )
-        )
-      );
-      setSelection([]);
+          );
+          setSelection([]);
+        });
     }
   }, [business]);
 
