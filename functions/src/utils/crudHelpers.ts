@@ -1,5 +1,4 @@
 import { logger } from 'firebase-functions';
-import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
@@ -40,9 +39,18 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
   // send email
   await db.collection('mail').add({
     to: userToCreate.email,
-    message: {
-      subject: 'Your employer has signed you up for Perkify!',
-      html: newUserTemplateGenerator({ signInLink }),
+    template: {
+      name: 'userOnboarding',
+      data: {
+        businessName: userToCreate.businessID,
+        perks:
+          userToCreate.newPerkNames.length > 1
+            ? userToCreate.newPerkNames.slice(0, -1).join(',') +
+              ', and ' +
+              userToCreate.newPerkNames[userToCreate.newPerkNames.length - 1]
+            : userToCreate.newPerkNames[0],
+        signInLink,
+      },
     },
   });
 };

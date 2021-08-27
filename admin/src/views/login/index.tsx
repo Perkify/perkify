@@ -21,6 +21,7 @@ import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { PerkifyApi } from '../../../../user/src/services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -94,24 +95,17 @@ export default function SignInSide(props: any) {
     setOpen(false);
   };
 
-  function resetPass() {
-    app
-      .auth()
-      .sendPasswordResetEmail(resetEmail)
-      .then(() => {
-        console.log('SENT');
-        setDidResetPass(true);
-        // Password reset email sent!
-        // ..
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-        // ..
-      });
-  }
+  const resetPass = async () => {
+    setLoading(true);
+    try {
+      await PerkifyApi.post(`/rest/passwordResetLink/${email}`);
+      setLoading(false);
+      setDidResetPass(true);
+    } catch (error) {
+      setLoading(false);
+      errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
+    }
+  };
 
   return (
     <div style={{ background: '#5289f2' }}>

@@ -55,6 +55,13 @@ app.post('/signInLink/:userEmail', sendSignInLinkValidators, sendSignInLink);
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 app.post('/portalLink', createPortalLinkValidators, createPortalLink);
 
+// send a password-reset link to admin
+app.post(
+  '/passwordResetLink/:adminEmail',
+  sendSignInLinkValidators,
+  sendSignInLink
+);
+
 // perk group crud
 app.post(
   '/perkGroup/:perkGroupName',

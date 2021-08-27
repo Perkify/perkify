@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
-import admin, { db, stripe } from '../../services';
+import { logger } from 'firebase-functions';
+import admin, { db, functions, stripe } from '../../services';
 import { checkValidationResult, emailNormalizationOptions } from '../../utils';
 
 export const registerAdminAndBusinessValidators = [
@@ -81,6 +82,35 @@ export const registerAdminAndBusiness = async (
 
     // set the business document
     businessRef.set(businessData);
+
+    const confirmationLink = await admin
+      .auth()
+      .generateSignInWithEmailLink(email, {
+        url:
+          functions.config()['stripe-firebase'].environment == 'production'
+            ? 'https://admin.getperkify.com/login'
+            : functions.config()['stripe-firebase'].environment == 'staging'
+            ? 'https://admin.dev.getperkify.com/login'
+            : 'http://localhost:3000/login',
+      });
+
+    // if in development mode, print the confirmation link
+    if (functions.config()['stripe-firebase'].environment == 'development') {
+      logger.log(`Generated confirmation link for ${email}`, confirmationLink);
+    }
+
+    // send email
+    await db.collection('mail').add({
+      to: email,
+      template: {
+        name: 'adminEmailConfiramtion',
+        data: {
+          name: `${firstName} ${lastName}`,
+          email,
+          confirmationLink,
+        },
+      },
+    });
 
     res.status(200).end();
   } catch (err) {
