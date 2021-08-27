@@ -16,13 +16,13 @@ import {
   useTheme,
 } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import AddIcon from '@material-ui/icons/Add';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import GroupIcon from '@material-ui/icons/Group';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PersonIcon from '@material-ui/icons/Person';
-import SettingsIcon from '@material-ui/icons/Settings';
 import ConfirmationModal from 'components/ConfirmationModal';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import logo from 'images/logo.png';
@@ -160,7 +160,8 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const infoNav: [string, string, any][] = groupViews;
 
   const accountNav: [string, string, any][] = [
-    ['Billing', '/dashboard/billing', <SettingsIcon />],
+    // ['Settings', '/dashboard/settings', <SettingsIcon />],
+    ['Billing', '/dashboard/billing', <AccountBalanceWalletIcon />],
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
