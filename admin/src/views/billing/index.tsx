@@ -14,7 +14,7 @@ import React from 'react';
 
 const SectionHeading = ({ title }: { title: string }) => {
   return (
-    <>
+    <div>
       <Typography
         gutterBottom
         variant="button"
@@ -23,7 +23,7 @@ const SectionHeading = ({ title }: { title: string }) => {
         {title}
       </Typography>
       <Divider style={{ marginBottom: '20px' }} />
-    </>
+    </div>
   );
 };
 
