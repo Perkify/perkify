@@ -4,6 +4,7 @@ import {
   Grid,
   IconButton,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
@@ -13,6 +14,7 @@ import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import AddPaymentMethodModal from './addPaymentMethodModal';
+import RemovePaymentMethodModal from './removePaymentMethodModal';
 import { SectionHeading } from './sectionHeading';
 
 const useDisplayCardPaymentMethodsStyles = makeStyles((theme: Theme) =>
@@ -67,8 +69,12 @@ const cardPaymentIconPath = (brand: string) => {
 
 const DisplayCardPaymentMethod = ({
   card,
+  business,
+  setPaymentMethodIDToRemove,
 }: {
   card: SimpleCardPaymentMethod;
+  business: Business;
+  setPaymentMethodIDToRemove: (arg0: string) => void;
 }) => {
   const classes = useDisplayCardPaymentMethodsStyles();
   return (
@@ -88,18 +94,40 @@ const DisplayCardPaymentMethod = ({
             .toString()
             .padStart(2, '0')}/${card.expYear}`}</Typography>
           {card.default ? (
-            <IconButton
-              aria-label="clear"
-              style={{
-                margin: 0,
-                padding: 0,
-                flex: 1,
-                backgroundColor: 'transparent',
-              }}
-              disableRipple
+            <Tooltip
+              disableFocusListener={
+                !business || Object.keys(business.cardPaymentMethods).length > 1
+              }
+              disableHoverListener={
+                !business || Object.keys(business.cardPaymentMethods).length > 1
+              }
+              title="Please add another payment method before removing this one"
+              placement="bottom-start"
             >
-              <ClearIcon fontSize="small" style={{ marginLeft: 'auto' }} />
-            </IconButton>
+              <div style={{ flex: 1 }}>
+                <IconButton
+                  aria-label="clear"
+                  style={{
+                    backgroundColor: 'transparent',
+                    marginLeft: 'auto',
+                    flex: 1,
+                    margin: 0,
+                    padding: 0,
+                    float: 'right',
+                  }}
+                  disableRipple
+                  // can't clear a card unless you have another one to fall back on
+                  disabled={
+                    Object.keys(business.cardPaymentMethods).length <= 1
+                  }
+                  onClick={() =>
+                    setPaymentMethodIDToRemove(card.paymentMethodID)
+                  }
+                >
+                  <ClearIcon fontSize="small" style={{ marginLeft: 'auto' }} />
+                </IconButton>
+              </div>
+            </Tooltip>
           ) : (
             <IconButton
               aria-label="options"
@@ -149,6 +177,7 @@ const usePaymentMethodsSectionStyles = makeStyles((theme: Theme) =>
 export const PaymentMethodsSection = () => {
   const classes = usePaymentMethodsSectionStyles();
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
+  const [paymentMethodIDToRemove, setPaymentMethodIDToRemove] = useState(null);
 
   const { business } = useContext(BusinessContext);
 
@@ -159,7 +188,15 @@ export const PaymentMethodsSection = () => {
           Object.values(business.cardPaymentMethods)
             // sort the payment methods so that the default payment method goes first
             .sort((a, b) => (a.default ? -1 : 1))
-            .map((card) => <DisplayCardPaymentMethod card={card} />)}
+            .map((card) => (
+              <DisplayCardPaymentMethod
+                card={card}
+                business={business}
+                setPaymentMethodIDToRemove={(paymentID) =>
+                  setPaymentMethodIDToRemove(paymentID)
+                }
+              />
+            ))}
         <div>
           <Button
             variant="text"
@@ -184,7 +221,10 @@ export const PaymentMethodsSection = () => {
         <AddPaymentMethodModal
           isModalVisible={addingPaymentMethod}
           setIsModalVisible={setAddingPaymentMethod}
-          onAddPaymentMethod={() => {}}
+        />
+        <RemovePaymentMethodModal
+          paymentMethodIDToRemove={paymentMethodIDToRemove}
+          setPaymentMethodIDToRemove={setPaymentMethodIDToRemove}
         />
       </div>
     </SectionHeading>

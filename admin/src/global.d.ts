@@ -12,6 +12,7 @@ interface SimpleCardPaymentMethod {
   funding: string;
   last4: string;
   default: boolean;
+  paymentMethodID: string;
 }
 
 interface Admin {

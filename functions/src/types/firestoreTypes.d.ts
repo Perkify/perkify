@@ -13,6 +13,7 @@ interface SimpleCardPaymentMethod {
   last4: string;
   fingerprint: string;
   default: boolean;
+  paymentMethodID: string;
 }
 
 interface Admin {

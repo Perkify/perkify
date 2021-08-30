@@ -52,18 +52,16 @@ const useDisplayCardPaymentMethodsStyles = makeStyles((theme: Theme) =>
 interface AddPaymentMethodModalProps {
   isModalVisible: boolean;
   setIsModalVisible: (arg0: boolean) => void;
-  onAddPaymentMethod: () => void;
 }
 
 const AddPaymentMethodModal = ({
   isModalVisible,
   setIsModalVisible,
-  onAddPaymentMethod,
 }: AddPaymentMethodModalProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const classes = useDisplayCardPaymentMethodsStyles();
-  const [useAsDefaultCreditCard, setUseAsDefaultCreditCard] = useState(false);
+  const [useAsDefaultCreditCard, setUseAsDefaultCreditCard] = useState(true);
   const { business } = useContext(BusinessContext);
   const { currentUser } = useContext(AuthContext);
 
@@ -142,20 +140,22 @@ const AddPaymentMethodModal = ({
         </DialogContentText>
         {/* <div style={{ marginTop: '20px' }}> */}
         <CardElement options={CARD_OPTIONS} />
-        <FormControlLabel
-          style={{ marginTop: '20px', fontSize: '14px' }}
-          control={
-            <Checkbox
-              checked={useAsDefaultCreditCard}
-              onChange={(event) =>
-                setUseAsDefaultCreditCard(event.target.checked)
-              }
-              name="useAsDefaultCreditCard"
-              color="primary"
-            />
-          }
-          label="Use as default payment method"
-        />
+        {business && Object.keys(business.cardPaymentMethods).length != 0 && (
+          <FormControlLabel
+            style={{ marginTop: '20px', fontSize: '14px' }}
+            control={
+              <Checkbox
+                checked={useAsDefaultCreditCard}
+                onChange={(event) =>
+                  setUseAsDefaultCreditCard(event.target.checked)
+                }
+                name="useAsDefaultCreditCard"
+                color="primary"
+              />
+            }
+            label="Use as default payment method"
+          />
+        )}
         {/* </div> */}
       </DialogContent>
       <DialogActions>
@@ -165,8 +165,7 @@ const AddPaymentMethodModal = ({
         <Button
           onClick={async (event) => {
             await handleSubmit(event);
-            // await onAddPaymentMethod();
-            // setIsModalVisible(false);
+            setIsModalVisible(false);
           }}
           color="primary"
         >

@@ -10,36 +10,6 @@ import {
   validateFirebaseIdToken,
 } from '../../utils';
 
-// const deletePaymentMethod = async (paymentMethod: Stripe.PaymentMethod) => {
-//   if (paymentMethod.card) {
-//     // only support card payment methods for now
-
-//     const businessesSnapshot = await db.collection('businesses').get();
-
-//     // search all businesses for the card fingerprint
-//     businessesSnapshot.forEach((businessDoc) => {
-//       const business = businessDoc.data() as Business;
-
-//       const card = paymentMethod.card;
-
-//       if (
-//         card?.fingerprint &&
-//         card?.fingerprint in business.cardPaymentMethods
-//       ) {
-//         const docRef = db.collection('businesses').doc(businessDoc.id);
-
-//         // delete the payment method from the business doc
-//         docRef.update({
-//           [`cardPaymentMethods.${card?.fingerprint}`]:
-//             admin.firestore.FieldValue.delete(),
-//         });
-//       }
-//     });
-//   } else {
-//     logger.error('Payment method deleted that is not a card');
-//   }
-// };
-
 export const addPaymentMethodValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
@@ -87,6 +57,7 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
         last4: card.last4,
         default: useAsDefaultCreditCard,
         fingerprint: card.fingerprint,
+        paymentMethodID: paymentMethodID,
       };
 
       // update the business document

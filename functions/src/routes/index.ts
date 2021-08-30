@@ -16,6 +16,8 @@ import {
   deletePerkGroupValidators,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
+  removePaymentMethod,
+  removePaymentMethodValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
@@ -52,6 +54,12 @@ app.post(
   '/business/:businessID/paymentMethod',
   addPaymentMethodValidators,
   addPaymentMethod
+);
+
+app.delete(
+  '/business/:businessID/paymentMethod/:paymentMethodID',
+  removePaymentMethodValidators,
+  removePaymentMethod
 );
 
 // register an admin with a business
