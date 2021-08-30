@@ -10,8 +10,18 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
-import React, { useContext, useState } from 'react';
+import * as dayjs from 'dayjs';
+import { db } from 'firebaseApp';
+import React, { useContext, useEffect, useState } from 'react';
+import { allPerksByPriceIDDict } from 'shared';
 import { Subscription } from '../../types/stripeTypes';
+
+interface CostBreakdownRow {
+  perkName: string;
+  quantity: number;
+  price: number;
+  amount: number;
+}
 
 const useStyles = makeStyles({
   table: {
@@ -28,10 +38,31 @@ function createData(perkName: string, quantity: number, price: number) {
   };
 }
 
-const rows = [createData('Spotify', 2, 12.99), createData('Hulu', 5, 5.99)];
+// const rows = [createData('Spotify', 2, 12.99), createData('Hulu', 5, 5.99)];
 
-export default function BasicTable() {
+export default function BasicTable({
+  rows,
+  business,
+}: {
+  rows: CostBreakdownRow[];
+  business: Business;
+}) {
   const classes = useStyles();
+
+  const subtotal = rows.reduce((acc, row) => {
+    return acc + row.amount;
+  }, 0);
+
+  const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
+
+  const cardMaintenanceFee = Math.round(
+    Object.keys(business.perkGroups).reduce((acc, perkGroupName) => {
+      return acc + business.perkGroups[perkGroupName].userEmails.length;
+    }, 0)
+  );
+
+  const total =
+    Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) / 100;
 
   return (
     <TableContainer component={Paper} variant="outlined">
@@ -51,10 +82,42 @@ export default function BasicTable() {
                 {row.perkName}
               </TableCell>
               <TableCell align="right">{row.quantity}</TableCell>
-              <TableCell align="right">{row.price}</TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell align="right">{`$${row.price}`}</TableCell>
+              <TableCell align="right">{`$${row.amount}`}</TableCell>
             </TableRow>
           ))}
+
+          <TableRow key="subtotal">
+            <TableCell component="th" scope="row"></TableCell>
+            <TableCell align="right"></TableCell>
+            <TableCell align="right" style={{ fontWeight: 'bold' }}>
+              Subtotal
+            </TableCell>
+            <TableCell align="right">{`$${subtotal}`}</TableCell>
+          </TableRow>
+
+          <TableRow key="perkifyVolume">
+            <TableCell component="th" scope="row"></TableCell>
+            <TableCell align="right"></TableCell>
+            <TableCell align="right">Perkify Volume Fee</TableCell>
+            <TableCell align="right">{`$${volumeFee}`}</TableCell>
+          </TableRow>
+
+          <TableRow key="perkifyCardMaintenance">
+            <TableCell component="th" scope="row"></TableCell>
+            <TableCell align="right"></TableCell>
+            <TableCell align="right">Perkify Card Maintenance Fee</TableCell>
+            <TableCell align="right">{`$${cardMaintenanceFee}`}</TableCell>
+          </TableRow>
+
+          <TableRow key="total">
+            <TableCell component="th" scope="row"></TableCell>
+            <TableCell align="right"></TableCell>
+            <TableCell align="right" style={{ fontWeight: 'bold' }}>
+              Total
+            </TableCell>
+            <TableCell align="right">{`$${total}`}</TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
@@ -79,47 +142,67 @@ export const DisplayCurrentPlan = () => {
   const { business } = useContext(BusinessContext);
   const [subscriptionObject, setSubscriptionObject] =
     useState<Subscription>(null);
+  const [subscriptionPrice, setSubscriptionPrice] = useState(0);
+  const [rows, setRows] = useState<CostBreakdownRow[]>([]);
 
-  // useEffect(() => {
-  //   if (business) {
-  //     console.log(business);
-  //     (async () => {
-  //       // check if the customer has an existing active subscriptions
-  //       console.log('FETCHING SUBSCRIPTION OBJECT');
-  //       const subscriptionsSnapshot = await db
-  //         .collection('businesses')
-  //         .doc(business.businessID)
-  //         .collection('subscriptions')
-  //         .get();
+  useEffect(() => {
+    if (business) {
+      (async () => {
+        // check if the customer has an existing active subscriptions
+        const subscriptionsSnapshot = await db
+          .collection('businesses')
+          .doc(business.businessID)
+          .collection('subscriptions')
+          .get();
 
-  //       const subscriptionItem = subscriptionsSnapshot.docs.filter(
-  //         (doc) =>
-  //           (doc.data() as Subscription).canceled_at == null &&
-  //           (doc.data() as Subscription).status == 'active'
-  //       )?.[0];
+        const subscriptionItem = subscriptionsSnapshot.docs.filter(
+          (doc) =>
+            (doc.data() as Subscription).canceled_at == null &&
+            (doc.data() as Subscription).status == 'active'
+        )?.[0];
 
-  //       if (subscriptionItem && subscriptionItem.exists) {
-  //         const subscriptionObject = subscriptionItem.data() as Subscription;
-  //         setSubscriptionObject(subscriptionObject);
-  //       }
-  //     })();
-  //   }
-  // }, [business]);
+        if (subscriptionItem && subscriptionItem.exists) {
+          const subscriptionObject = subscriptionItem.data() as Subscription;
+          setSubscriptionObject(subscriptionObject);
+          setSubscriptionPrice(
+            subscriptionObject.items.reduce((acc, itemObj) => {
+              return (
+                acc + (itemObj?.quantity * itemObj.price.unit_amount) / 100
+              );
+            }, 0)
+          );
+
+          setRows(
+            subscriptionObject.items
+              .filter((itemObj) => itemObj.price.id in allPerksByPriceIDDict)
+              .map((itemObj) => ({
+                perkName: allPerksByPriceIDDict[itemObj.price.id].Name,
+                quantity: itemObj.quantity,
+                price: itemObj.price.unit_amount / 100,
+                amount: (itemObj.quantity * itemObj.price.unit_amount) / 100,
+              }))
+          );
+        }
+      })();
+    }
+  }, [business]);
 
   return (
     <div className={classes.listContainer}>
-      {true ? (
+      {subscriptionObject ? (
         <>
           <div>
             <Typography style={{ fontSize: '20px' }}>
-              $193.24 per month
+              {`$${subscriptionPrice} per month`}
             </Typography>
-            <Typography>Your plan renews on September 22, 2021</Typography>
+            <Typography>{`Your plan renews on ${dayjs
+              .unix(subscriptionObject.current_period_end.seconds)
+              .format('MMMM DD, YYYY')}`}</Typography>
           </div>
           {showBreakdown ? (
             <>
               <div>
-                <BasicTable />
+                <BasicTable rows={rows} business={business} />
               </div>
               <Grid container>
                 <Grid item xs={3}>
