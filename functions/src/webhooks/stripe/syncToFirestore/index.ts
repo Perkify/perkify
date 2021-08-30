@@ -101,18 +101,29 @@ const insertPaymentMethod = async (
 };
 
 const deletePaymentMethod = async (paymentMethod: Stripe.PaymentMethod) => {
-  const docRef = db
-    .collection('businesses')
-    .doc(paymentMethod.customer as string);
-
   if (paymentMethod.card) {
     // only support card payment methods for now
-    const card = paymentMethod.card;
 
-    // delete the payment method from the business doc
-    docRef.update({
-      [`cardPaymentMethods.${card.fingerprint}`]:
-        admin.firestore.FieldValue.delete(),
+    const businessesSnapshot = await db.collection('businesses').get();
+
+    // search all businesses for the card fingerprint
+    businessesSnapshot.forEach((businessDoc) => {
+      const business = businessDoc.data() as Business;
+
+      const card = paymentMethod.card;
+
+      if (
+        card?.fingerprint &&
+        card?.fingerprint in business.cardPaymentMethods
+      ) {
+        const docRef = db.collection('businesses').doc(businessDoc.id);
+
+        // delete the payment method from the business doc
+        docRef.update({
+          [`cardPaymentMethods.${card?.fingerprint}`]:
+            admin.firestore.FieldValue.delete(),
+        });
+      }
     });
   } else {
     logger.error('Payment method deleted that is not a card');

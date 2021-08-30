@@ -65,7 +65,7 @@ export default function ManagePeople(props: any) {
         // get all employees that are not selected
         // by removing all employees that were selected
         const afterEmployees = peopleData.filter(
-          (employee, index) => selectedUsers.indexOf(index) == -1
+          (employee, index) => !selectedUsers.includes(employee.email)
         );
 
         const perkGroupToAfterEmails = afterEmployees.reduce(
@@ -95,7 +95,6 @@ export default function ManagePeople(props: any) {
               userEmails: afterEmails,
               perkNames: business.perkGroups[perkGroup].perkNames,
             };
-
             await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
               headers: {
                 Authorization: `Bearer ${bearerToken}`,
