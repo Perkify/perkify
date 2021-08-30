@@ -1,15 +1,22 @@
 import {
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   MenuItem,
   Select,
   TextField,
   Typography,
 } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { DropzoneArea } from 'material-ui-dropzone';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
@@ -38,12 +45,17 @@ const CreateGroup = () => {
   const [groupNameError, setGroupNameError] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
+  const [isADPIntegrationVisible, setADPIntegrationVisible] = useState(false);
 
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
 
   function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
+  }
+
+  function setADPModalVisible() {
+    setADPIntegrationVisible(true);
   }
 
   const handlePerkChange = (event: any) => {
@@ -308,6 +320,55 @@ const CreateGroup = () => {
           </span>
         </Tooltip>
       </Card>
+      <Grid container spacing={0} style={{ paddingTop: 25 }}>
+        <Grid item xs={10}>
+          <Button
+            onClick={setADPModalVisible}
+            variant="contained"
+            color="primary"
+            disabled={
+              !business || Object.keys(business.cardPaymentMethods).length == 0
+            }
+          >
+            Integrate with ADP
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Dialog
+        open={isADPIntegrationVisible}
+        onClose={() => setADPIntegrationVisible(false)}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">ADP Integration</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            We don't currently support direct integration with ADP. Instead,
+            please find a spreadsheet of your employees WITH X RULES and upload
+            it below.{' '}
+            <Grid container spacing={0} style={{ paddingTop: 25 }}>
+              <Grid item xs={12}>
+                <DropzoneArea
+                  onChange={(files) => console.log('Files:', files)}
+                  filesLimit={1}
+                />
+              </Grid>
+            </Grid>
+          </DialogContentText>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setADPIntegrationVisible(false);
+              }}
+              color="primary"
+            >
+              Cancel
+            </Button>
+
+            <Button color="primary">Confirm</Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
