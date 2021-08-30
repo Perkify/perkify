@@ -5,4 +5,5 @@ export * from './createSetupIntent';
 export * from './deletePerkGroup';
 export * from './registerAdminAndBusiness';
 export * from './removePaymentMethod';
+export * from './setDefaultPaymentMethod';
 export * from './updatePerkGroup';

@@ -3,6 +3,8 @@ import {
   Chip,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
   Theme,
   Tooltip,
   Typography,
@@ -11,8 +13,10 @@ import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { createStyles, makeStyles } from '@material-ui/styles';
-import { BusinessContext } from 'contexts';
+import { AuthContext, BusinessContext } from 'contexts';
+import firebase from 'firebase/app';
 import React, { useContext, useState } from 'react';
+import { PerkifyApi } from 'services';
 import AddPaymentMethodModal from './addPaymentMethodModal';
 import RemovePaymentMethodModal from './removePaymentMethodModal';
 import { SectionHeading } from './sectionHeading';
@@ -70,13 +74,43 @@ const cardPaymentIconPath = (brand: string) => {
 const DisplayCardPaymentMethod = ({
   card,
   business,
+  currentUser,
   setPaymentMethodIDToRemove,
 }: {
   card: SimpleCardPaymentMethod;
   business: Business;
+  currentUser: firebase.User | null;
   setPaymentMethodIDToRemove: (arg0: string) => void;
 }) => {
   const classes = useDisplayCardPaymentMethodsStyles();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const setPaymentMethodAsDefault = (paymentMethodID: string) => {
+    (async () => {
+      const bearerToken = await currentUser.getIdToken();
+
+      const result = (
+        await PerkifyApi.put(
+          `rest/business/${business.businessID}/defaultPaymentMethod/${paymentMethodID}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      ).data;
+
+      if (result.error) {
+        // Display result.error.message in your UI.
+      } else {
+        console.log('Success');
+      }
+    })();
+  };
+
   return (
     <Grid container>
       <Grid item xs={4}>
@@ -129,18 +163,74 @@ const DisplayCardPaymentMethod = ({
               </div>
             </Tooltip>
           ) : (
-            <IconButton
-              aria-label="options"
-              style={{
-                margin: 0,
-                padding: 0,
-                flex: 1,
-                backgroundColor: 'transparent',
-              }}
-              disableRipple
-            >
-              <MoreHorizIcon fontSize="small" style={{ marginLeft: 'auto' }} />
-            </IconButton>
+            <>
+              <IconButton
+                aria-label="options"
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                }}
+                disableRipple
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setAnchorEl(event.currentTarget);
+                }}
+              >
+                <MoreHorizIcon
+                  fontSize="small"
+                  style={{ marginLeft: 'auto' }}
+                />
+              </IconButton>
+              <Menu
+                id={`${card.fingerprint} simple menu`}
+                open={Boolean(anchorEl)}
+                keepMounted
+                anchorEl={anchorEl}
+                onClose={(
+                  event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                ) => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  setAnchorEl(null);
+                }}
+                elevation={4}
+                anchorOrigin={{
+                  vertical: 'center',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left',
+                }}
+                getContentAnchorEl={null}
+              >
+                <MenuItem
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setAnchorEl(null);
+                    setPaymentMethodAsDefault(card.paymentMethodID);
+                  }}
+                >
+                  Make default
+                </MenuItem>
+
+                <MenuItem
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setAnchorEl(null);
+                    setPaymentMethodIDToRemove(card.paymentMethodID);
+                  }}
+                  style={{ color: 'red' }}
+                >
+                  Delete
+                </MenuItem>
+              </Menu>
+            </>
           )}
         </div>
       </Grid>
@@ -180,6 +270,7 @@ export const PaymentMethodsSection = () => {
   const [paymentMethodIDToRemove, setPaymentMethodIDToRemove] = useState(null);
 
   const { business } = useContext(BusinessContext);
+  const { currentUser } = useContext(AuthContext);
 
   return (
     <SectionHeading title="PAYMENT METHOD">
@@ -192,6 +283,7 @@ export const PaymentMethodsSection = () => {
               <DisplayCardPaymentMethod
                 card={card}
                 business={business}
+                currentUser={currentUser}
                 setPaymentMethodIDToRemove={(paymentID) =>
                   setPaymentMethodIDToRemove(paymentID)
                 }

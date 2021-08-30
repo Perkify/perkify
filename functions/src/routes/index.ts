@@ -18,6 +18,8 @@ import {
   registerAdminAndBusinessValidators,
   removePaymentMethod,
   removePaymentMethodValidators,
+  setDefaultPaymentMethod,
+  setDefaultPaymentMethodValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
@@ -54,6 +56,12 @@ app.post(
   '/business/:businessID/paymentMethod',
   addPaymentMethodValidators,
   addPaymentMethod
+);
+
+app.put(
+  '/business/:businessID/defaultPaymentMethod/:paymentMethodID',
+  setDefaultPaymentMethodValidators,
+  setDefaultPaymentMethod
 );
 
 app.delete(
