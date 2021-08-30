@@ -42,30 +42,19 @@ function createData(perkName: string, quantity: number, price: number) {
 
 export default function BasicTable({
   rows,
-  business,
+  subscriptionPrices,
 }: {
   rows: CostBreakdownRow[];
-  business: Business;
+  subscriptionPrices: SubscriptionPrices;
 }) {
   const classes = useStyles();
 
-  const subtotal = rows.reduce((acc, row) => {
-    return acc + row.amount;
-  }, 0);
-
-  const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
-
-  const cardMaintenanceFee = Math.round(
-    Object.keys(business.perkGroups).reduce((acc, perkGroupName) => {
-      return acc + business.perkGroups[perkGroupName].userEmails.length;
-    }, 0)
-  );
-
-  const total =
-    Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) / 100;
-
   return (
-    <TableContainer component={Paper} variant="outlined">
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      style={{ border: 'none' }}
+    >
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -88,35 +77,73 @@ export default function BasicTable({
           ))}
 
           <TableRow key="subtotal">
-            <TableCell component="th" scope="row"></TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right" style={{ fontWeight: 'bold' }}>
+            <TableCell
+              style={{ border: 'none' }}
+              component="th"
+              scope="row"
+            ></TableCell>
+            <TableCell style={{ border: 'none' }} align="right"></TableCell>
+            <TableCell
+              style={{ border: 'none', fontWeight: 'bold' }}
+              align="right"
+            >
               Subtotal
             </TableCell>
-            <TableCell align="right">{`$${subtotal}`}</TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              align="right"
+            >{`$${subscriptionPrices.subtotal}`}</TableCell>
           </TableRow>
 
           <TableRow key="perkifyVolume">
-            <TableCell component="th" scope="row"></TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right">Perkify Volume Fee</TableCell>
-            <TableCell align="right">{`$${volumeFee}`}</TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              component="th"
+              scope="row"
+            ></TableCell>
+            <TableCell style={{ border: 'none' }} align="right"></TableCell>
+            <TableCell style={{ border: 'none' }} align="right">
+              Perkify Volume Fee
+            </TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              align="right"
+            >{`$${subscriptionPrices.volumeFee}`}</TableCell>
           </TableRow>
 
           <TableRow key="perkifyCardMaintenance">
-            <TableCell component="th" scope="row"></TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right">Perkify Card Maintenance Fee</TableCell>
-            <TableCell align="right">{`$${cardMaintenanceFee}`}</TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              component="th"
+              scope="row"
+            ></TableCell>
+            <TableCell style={{ border: 'none' }} align="right"></TableCell>
+            <TableCell style={{ border: 'none' }} align="right">
+              Perkify Card Maintenance Fee
+            </TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              align="right"
+            >{`$${subscriptionPrices.cardMaintenanceFee}`}</TableCell>
           </TableRow>
 
           <TableRow key="total">
-            <TableCell component="th" scope="row"></TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right" style={{ fontWeight: 'bold' }}>
+            <TableCell
+              style={{ border: 'none' }}
+              component="th"
+              scope="row"
+            ></TableCell>
+            <TableCell style={{ border: 'none' }} align="right"></TableCell>
+            <TableCell
+              style={{ border: 'none', fontWeight: 'bold' }}
+              align="right"
+            >
               Total
             </TableCell>
-            <TableCell align="right">{`$${total}`}</TableCell>
+            <TableCell
+              style={{ border: 'none' }}
+              align="right"
+            >{`$${subscriptionPrices.total}`}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -136,14 +163,22 @@ const useDisplayCurrentPlanStyles = makeStyles((theme: Theme) =>
   })
 );
 
+interface SubscriptionPrices {
+  subtotal: number;
+  volumeFee: number;
+  cardMaintenanceFee: number;
+  total: number;
+}
+
 export const DisplayCurrentPlan = () => {
   const classes = useDisplayCurrentPlanStyles();
   const [showBreakdown, setShowBreakdown] = useState(false);
   const { business } = useContext(BusinessContext);
   const [subscriptionObject, setSubscriptionObject] =
     useState<Subscription>(null);
-  const [subscriptionPrice, setSubscriptionPrice] = useState(0);
   const [rows, setRows] = useState<CostBreakdownRow[]>([]);
+  const [subscriptionPrices, setSubscriptionPrices] =
+    useState<SubscriptionPrices>(null);
 
   useEffect(() => {
     if (business) {
@@ -163,25 +198,43 @@ export const DisplayCurrentPlan = () => {
 
         if (subscriptionItem && subscriptionItem.exists) {
           const subscriptionObject = subscriptionItem.data() as Subscription;
-          setSubscriptionObject(subscriptionObject);
-          setSubscriptionPrice(
-            subscriptionObject.items.reduce((acc, itemObj) => {
-              return (
-                acc + (itemObj?.quantity * itemObj.price.unit_amount) / 100
-              );
-            }, 0)
+
+          const newRows = subscriptionObject.items
+            .filter((itemObj) => itemObj.price.id in allPerksByPriceIDDict)
+            .map((itemObj) => ({
+              perkName: allPerksByPriceIDDict[itemObj.price.id].Name,
+              quantity: itemObj.quantity,
+              price: itemObj.price.unit_amount / 100,
+              amount: (itemObj.quantity * itemObj.price.unit_amount) / 100,
+            }));
+
+          const subtotal = newRows.reduce((acc, row) => {
+            return acc + row.amount;
+          }, 0);
+
+          const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
+
+          const cardMaintenanceFee = Math.round(
+            3.99 *
+              Object.keys(business.perkGroups).reduce((acc, perkGroupName) => {
+                return (
+                  acc + business.perkGroups[perkGroupName].userEmails.length
+                );
+              }, 0)
           );
 
-          setRows(
-            subscriptionObject.items
-              .filter((itemObj) => itemObj.price.id in allPerksByPriceIDDict)
-              .map((itemObj) => ({
-                perkName: allPerksByPriceIDDict[itemObj.price.id].Name,
-                quantity: itemObj.quantity,
-                price: itemObj.price.unit_amount / 100,
-                amount: (itemObj.quantity * itemObj.price.unit_amount) / 100,
-              }))
-          );
+          const total =
+            Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) / 100;
+
+          setSubscriptionPrices({
+            subtotal,
+            volumeFee,
+            cardMaintenanceFee,
+            total,
+          });
+
+          setSubscriptionObject(subscriptionObject);
+          setRows(newRows);
         }
       })();
     }
@@ -189,11 +242,11 @@ export const DisplayCurrentPlan = () => {
 
   return (
     <div className={classes.listContainer}>
-      {subscriptionObject ? (
+      {subscriptionObject && subscriptionPrices ? (
         <>
           <div>
             <Typography style={{ fontSize: '20px' }}>
-              {`$${subscriptionPrice} per month`}
+              {`$${subscriptionPrices.total} per month`}
             </Typography>
             <Typography>{`Your plan renews on ${dayjs
               .unix(subscriptionObject.current_period_end.seconds)
@@ -202,7 +255,10 @@ export const DisplayCurrentPlan = () => {
           {showBreakdown ? (
             <>
               <div>
-                <BasicTable rows={rows} business={business} />
+                <BasicTable
+                  rows={rows}
+                  subscriptionPrices={subscriptionPrices}
+                />
               </div>
               <Grid container>
                 <Grid item xs={3}>
