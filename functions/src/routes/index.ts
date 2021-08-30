@@ -8,6 +8,8 @@ import {
   createPerkGroupValidators,
   createPortalLink,
   createPortalLinkValidators,
+  createSetupIntent,
+  createSetupIntentValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
   registerAdminAndBusiness,
@@ -32,6 +34,17 @@ app.use(
 );
 
 // --------------- Express Routes --------------- //
+
+// create a setup intent for a business
+// the businessID url param is not used because it is extracted
+// from the admin making the request
+// but in the future if we want to support one admin for multiple businesses
+// we will need to specify which business we are referring to
+app.post(
+  '/business/:businessID/setupIntent',
+  createSetupIntentValidators,
+  createSetupIntent
+);
 
 // register an admin with a business
 app.post(

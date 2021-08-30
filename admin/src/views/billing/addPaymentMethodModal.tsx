@@ -12,7 +12,9 @@ import {
   Theme,
 } from '@material-ui/core';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import React, { useState } from 'react';
+import { AuthContext, BusinessContext } from 'contexts';
+import React, { useContext, useState } from 'react';
+import { PerkifyApi } from 'services';
 
 const CARD_OPTIONS = {
   //   iconStyle: 'solid' as const,
@@ -62,6 +64,8 @@ const AddPaymentMethodModal = ({
   const elements = useElements();
   const classes = useDisplayCardPaymentMethodsStyles();
   const [useAsDefaultCreditCard, setUseAsDefaultCreditCard] = useState(false);
+  const { business } = useContext(BusinessContext);
+  const { currentUser } = useContext(AuthContext);
 
   const handleSubmit = async (event: any) => {
     // Block native form submission.
@@ -73,21 +77,40 @@ const AddPaymentMethodModal = ({
       return;
     }
 
+    const bearerToken = await currentUser.getIdToken();
+
+    const { setupIntentClientSecret } = (
+      await PerkifyApi.post(
+        `rest/business/${business.businessID}/setupIntent`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    ).data;
+
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
     // each type of element.
     const cardElement = elements.getElement(CardElement);
 
     // Use your card Element with other Stripe.js APIs
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
+    const result = await stripe.confirmCardSetup(setupIntentClientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+      },
     });
 
-    if (error) {
-      console.log('[error]', error);
+    if (result.error) {
+      // Display result.error.message in your UI.
     } else {
-      console.log('[PaymentMethod]', paymentMethod);
+      // The setup has succeeded. Display a success message and send
+      // result.setupIntent.payment_method to your server to save the
+      // card to a Customer
+      console.log('Card saved successfully');
     }
   };
 
@@ -126,9 +149,10 @@ const AddPaymentMethodModal = ({
           Cancel
         </Button>
         <Button
-          onClick={async () => {
-            await onAddPaymentMethod();
-            setIsModalVisible(false);
+          onClick={async (event) => {
+            await handleSubmit(event);
+            // await onAddPaymentMethod();
+            // setIsModalVisible(false);
           }}
           color="primary"
         >
