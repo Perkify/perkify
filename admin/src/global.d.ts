@@ -11,6 +11,7 @@ interface SimpleCardPaymentMethod {
   expYear: number;
   funding: string;
   last4: string;
+  default: boolean;
 }
 
 interface Admin {
@@ -161,4 +162,9 @@ interface CreatePerkGroupPayload {
 interface UpdatePerkGroupPayload {
   perkNames: string[];
   userEmails: string[];
+}
+
+interface AddPaymentMethodPayload {
+  paymentMethodID: string;
+  useAsDefaultCreditCard: boolean;
 }

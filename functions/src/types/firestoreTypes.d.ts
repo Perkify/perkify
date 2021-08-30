@@ -12,6 +12,7 @@ interface SimpleCardPaymentMethod {
   funding: string;
   last4: string;
   fingerprint: string;
+  default: boolean;
 }
 
 interface Admin {

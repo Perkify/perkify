@@ -56,7 +56,7 @@ const DisplayCardPaymentMethod = ({
           />
           <Typography variant="body1">&bull;&bull;&bull;&bull;</Typography>
           <Typography variant="body1">{card.last4}</Typography>
-          <Chip label="Default" style={{ height: 20 }} />
+          {card.default && <Chip label="Default" style={{ height: 20 }} />}
         </div>
       </Grid>
 
@@ -113,9 +113,10 @@ export const PaymentMethodsSection = () => {
     <SectionHeading title="PAYMENT METHOD">
       <div className={classes.listContainer}>
         {business &&
-          Object.values(business.cardPaymentMethods).map((card) => (
-            <DisplayCardPaymentMethod card={card} />
-          ))}
+          Object.values(business.cardPaymentMethods)
+            // sort the payment methods so that the default payment method goes first
+            .sort((a, b) => (a.default ? -1 : 1))
+            .map((card) => <DisplayCardPaymentMethod card={card} />)}
         <div>
           <Button
             variant="text"

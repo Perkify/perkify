@@ -110,7 +110,21 @@ const AddPaymentMethodModal = ({
       // The setup has succeeded. Display a success message and send
       // result.setupIntent.payment_method to your server to save the
       // card to a Customer
+      const payload: AddPaymentMethodPayload = {
+        paymentMethodID: result.setupIntent.payment_method,
+        useAsDefaultCreditCard,
+      };
       console.log('Card saved successfully');
+      await PerkifyApi.post(
+        `rest/business/${business.businessID}/paymentMethod`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     }
   };
 

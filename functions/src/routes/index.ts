@@ -4,6 +4,8 @@ import * as express from 'express';
 import { functions } from '../services';
 import { errorHandlerMiddleware } from '../utils';
 import {
+  addPaymentMethod,
+  addPaymentMethodValidators,
   createPerkGroup,
   createPerkGroupValidators,
   createPortalLink,
@@ -44,6 +46,12 @@ app.post(
   '/business/:businessID/setupIntent',
   createSetupIntentValidators,
   createSetupIntent
+);
+
+app.post(
+  '/business/:businessID/paymentMethod',
+  addPaymentMethodValidators,
+  addPaymentMethod
 );
 
 // register an admin with a business

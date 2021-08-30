@@ -31,3 +31,8 @@ interface UpdatePerkGroupPayload {
   perkNames: string[];
   userEmails: string[];
 }
+
+interface AddPaymentMethodPayload {
+  paymentMethodID: string;
+  useAsDefaultCreditCard: boolean;
+}

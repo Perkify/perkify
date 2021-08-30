@@ -1,7 +1,7 @@
 import { logger } from 'firebase-functions';
 import Stripe from 'stripe';
 import { syncToFirestoreWebhookStripeSecret } from '../../../configs';
-import admin, { db, functions, stripe } from '../../../services';
+import admin, { functions, stripe } from '../../../services';
 import { Price, Product, Subscription, TaxRate } from './interfaces';
 import * as logs from './logs';
 
@@ -74,60 +74,6 @@ const insertPriceRecord = async (price: Stripe.Price): Promise<void> => {
     .collection('prices');
   await dbRef.doc(price.id).set(priceData, { merge: true });
   logs.firestoreDocCreated('prices', price.id);
-};
-
-const insertPaymentMethod = async (
-  paymentMethod: Stripe.PaymentMethod
-): Promise<void> => {
-  // get the business reference
-  const docRef = db
-    .collection('businesses')
-    .doc(paymentMethod.customer as string);
-
-  if (paymentMethod.card) {
-    // only support card payment methods for now
-    const card = paymentMethod.card;
-    await docRef.update(`cardPaymentMethods.${card.fingerprint}`, {
-      brand: card.brand,
-      country: card.country,
-      expMonth: card.exp_month,
-      expYear: card.exp_year,
-      funding: card.funding,
-      last4: card.last4,
-    } as SimpleCardPaymentMethod);
-  } else {
-    logger.error('Payment method added that is not a card');
-  }
-};
-
-const deletePaymentMethod = async (paymentMethod: Stripe.PaymentMethod) => {
-  if (paymentMethod.card) {
-    // only support card payment methods for now
-
-    const businessesSnapshot = await db.collection('businesses').get();
-
-    // search all businesses for the card fingerprint
-    businessesSnapshot.forEach((businessDoc) => {
-      const business = businessDoc.data() as Business;
-
-      const card = paymentMethod.card;
-
-      if (
-        card?.fingerprint &&
-        card?.fingerprint in business.cardPaymentMethods
-      ) {
-        const docRef = db.collection('businesses').doc(businessDoc.id);
-
-        // delete the payment method from the business doc
-        docRef.update({
-          [`cardPaymentMethods.${card?.fingerprint}`]:
-            admin.firestore.FieldValue.delete(),
-        });
-      }
-    });
-  } else {
-    logger.error('Payment method deleted that is not a card');
-  }
 };
 
 /**
@@ -419,18 +365,18 @@ export const syncToFirestoreWebhookHandler = functions.https.onRequest(
           case 'price.deleted':
             await deleteProductOrPrice(event.data.object as Stripe.Price);
             break;
-          case 'payment_method.attached':
-          case 'payment_method.updated':
-          case 'payment_method.automatically_updated':
-            await insertPaymentMethod(
-              event.data.object as Stripe.PaymentMethod
-            );
-            break;
-          case 'payment_method.detached':
-            await deletePaymentMethod(
-              event.data.object as Stripe.PaymentMethod
-            );
-            break;
+          // case 'payment_method.attached':
+          // case 'payment_method.updated':
+          // case 'payment_method.automatically_updated':
+          //   await insertPaymentMethod(
+          //     event.data.object as Stripe.PaymentMethod
+          //   );
+          //   break;
+          // case 'payment_method.detached':
+          //   await deletePaymentMethod(
+          //     event.data.object as Stripe.PaymentMethod
+          //   );
+          //   break;
           case 'tax_rate.created':
           case 'tax_rate.updated':
             await insertTaxRateRecord(event.data.object as Stripe.TaxRate);

@@ -1,3 +1,4 @@
+export * from './addPaymentMethod';
 export * from './createPerkGroup';
 export * from './createPortalLink';
 export * from './createSetupIntent';
