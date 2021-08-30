@@ -13,6 +13,7 @@ import {
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
+import AddIcon from '@material-ui/icons/Add';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
@@ -21,7 +22,7 @@ import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
-import { validateEmails } from 'utils/emailValidation';
+import { validateEmail, validateEmails } from 'utils/emailValidation';
 
 const CreateGroup = () => {
   const history = useHistory();
@@ -42,10 +43,23 @@ const CreateGroup = () => {
   const [emails, setEmails] = useState('');
   const [selectedPerks, setSelectedPerks] = useState([]);
 
+  const [enteredEmployees, setEnteredEmployees] = useState([
+    {
+      name: '',
+      email: '',
+      taxId: '',
+      nameError: '',
+      emailError: '',
+      taxIdError: '',
+    },
+  ]);
+
   const [groupNameError, setGroupNameError] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
-  const [isADPIntegrationVisible, setADPIntegrationVisible] = useState(false);
+  const [isADPIntegrationVisible, setIsADPIntegrationVisible] = useState(false);
+  const [isManualIntegrationVisible, setIsManualIntegrationVisible] =
+    useState(false);
 
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
@@ -55,7 +69,24 @@ const CreateGroup = () => {
   }
 
   function setADPModalVisible() {
-    setADPIntegrationVisible(true);
+    setIsADPIntegrationVisible(true);
+  }
+
+  function addEnteringEmployee() {
+    setEnteredEmployees(
+      enteredEmployees.concat({
+        email: '',
+        name: '',
+        taxId: '',
+        nameError: '',
+        emailError: '',
+        taxIdError: '',
+      })
+    );
+  }
+
+  function setManualModalVisible() {
+    setIsManualIntegrationVisible(true);
   }
 
   const handlePerkChange = (event: any) => {
@@ -84,6 +115,16 @@ const CreateGroup = () => {
       setEmailsError('');
     }
   };
+
+  function returnEmailError(emailInput: string) {
+    if (emailInput === '') {
+      return 'Please input a proper email';
+    } else if (!validateEmail(emailInput.trim())) {
+      return 'Please input a proper email';
+    } else {
+      return '';
+    }
+  }
 
   const handleEmailChange = (event: any) => {
     handleEmailError(event);
@@ -321,7 +362,7 @@ const CreateGroup = () => {
         </Tooltip>
       </Card>
       <Grid container spacing={0} style={{ paddingTop: 25 }}>
-        <Grid item xs={10}>
+        <Grid item xs={3}>
           <Button
             onClick={setADPModalVisible}
             variant="contained"
@@ -333,11 +374,132 @@ const CreateGroup = () => {
             Integrate with ADP
           </Button>
         </Grid>
+        <Grid item xs={3}>
+          <Button
+            onClick={setManualModalVisible}
+            variant="contained"
+            color="primary"
+            disabled={
+              !business || Object.keys(business.cardPaymentMethods).length == 0
+            }
+          >
+            Add Employees Manually
+          </Button>
+        </Grid>
       </Grid>
 
       <Dialog
+        open={isManualIntegrationVisible}
+        onClose={() => setIsManualIntegrationVisible(false)}
+        aria-labelledby="form-dialog-title"
+        fullWidth={true}
+        maxWidth={'md'}
+      >
+        <DialogTitle id="form-dialog-title">Manual Integration</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            If you aren't using any of our supported payroll integration
+            systems, please manually enter in employee information below.{' '}
+            <Grid container spacing={5} style={{ paddingTop: 50 }}>
+              {enteredEmployees.map((employeeInfo, index) => {
+                return (
+                  <>
+                    {' '}
+                    <Grid item xs={4} style={{ paddingTop: 0 }}>
+                      <TextField
+                        id="employee_email"
+                        variant="outlined"
+                        label="Employee Email"
+                        placeholder="johndoe@gmail.com"
+                        value={employeeInfo.email}
+                        onChange={(event) => {
+                          let copy = [...enteredEmployees];
+                          let employeeCopy = enteredEmployees[index];
+                          employeeCopy.email = event.target.value;
+                          employeeCopy.emailError = returnEmailError(
+                            event.target.value
+                          );
+                          copy[index] = employeeCopy;
+                          setEnteredEmployees(copy);
+                        }}
+                        fullWidth
+                        error={employeeInfo.emailError != ''}
+                        helperText={employeeInfo.emailError}
+                      />
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 0 }}>
+                      <TextField
+                        id="full_name"
+                        variant="outlined"
+                        label="Full Name"
+                        placeholder="John Doe"
+                        value={employeeInfo.name}
+                        onChange={(event) => {
+                          let copy = [...enteredEmployees];
+                          let employeeCopy = enteredEmployees[index];
+                          employeeCopy.name = event.target.value;
+                          copy[index] = employeeCopy;
+                          setEnteredEmployees(copy);
+                        }}
+                        fullWidth
+                        error={groupNameError != ''}
+                        helperText={groupNameError}
+                      />
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 0 }}>
+                      <TextField
+                        id="group_name"
+                        variant="outlined"
+                        label="Tax Id Number"
+                        placeholder="1234"
+                        value={employeeInfo.taxId}
+                        onChange={(event) => {
+                          let copy = [...enteredEmployees];
+                          let employeeCopy = enteredEmployees[index];
+                          employeeCopy.taxId = event.target.value;
+                          copy[index] = employeeCopy;
+                          setEnteredEmployees(copy);
+                        }}
+                        fullWidth
+                        error={groupNameError != ''}
+                        helperText={groupNameError}
+                      />
+                    </Grid>{' '}
+                  </>
+                );
+              })}
+              <Grid item xs={12} style={{ paddingTop: 0 }}>
+                <Button
+                  onClick={addEnteringEmployee}
+                  style={{ padding: 0 }}
+                  color="primary"
+                >
+                  <AddIcon />
+                  <Typography style={{ textTransform: 'none' }}>
+                    Add Another Employee
+                  </Typography>
+                </Button>
+              </Grid>
+            </Grid>
+          </DialogContentText>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setIsManualIntegrationVisible(false);
+              }}
+              color="primary"
+            >
+              Cancel
+            </Button>
+
+            <Button color="primary">Confirm</Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
         open={isADPIntegrationVisible}
-        onClose={() => setADPIntegrationVisible(false)}
+        onClose={() => setIsADPIntegrationVisible(false)}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title">ADP Integration</DialogTitle>
@@ -358,7 +520,7 @@ const CreateGroup = () => {
           <DialogActions>
             <Button
               onClick={() => {
-                setADPIntegrationVisible(false);
+                setIsADPIntegrationVisible(false);
               }}
               color="primary"
             >

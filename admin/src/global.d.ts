@@ -4,6 +4,12 @@ interface PerkifyError {
   reasonDetail: string;
 }
 
+interface EnteringEmployee {
+  email: String;
+  name: String;
+  taxId: String;
+}
+
 interface SimpleCardPaymentMethod {
   brand: string;
   country: string;
