@@ -37,7 +37,7 @@ export const validateAdminEmail = async (email: string) => {
     .collection('admins')
     .where('email', '==', email)
     .get();
-  if (!adminRef.empty) {
+  if (adminRef.empty) {
     return Promise.reject(new Error('You do not have an account'));
   } else {
     return Promise.resolve();

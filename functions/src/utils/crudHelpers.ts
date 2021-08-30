@@ -30,8 +30,9 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
 
   // if in development or staging mode, print the sign in link
   if (
-    functions.config()['stripe-firebase'].environment == 'development' ||
-    functions.config()['stripe-firebase'].environment == 'staging'
+    ['development', 'staging'].includes(
+      functions.config()['stripe-firebase'].environment
+    )
   ) {
     logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
   }
@@ -42,10 +43,10 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
     template: {
       name: 'userOnboarding',
       data: {
-        businessName: userToCreate.businessID,
+        businessName: userToCreate.businessName,
         perks:
           userToCreate.newPerkNames.length > 1
-            ? userToCreate.newPerkNames.slice(0, -1).join(',') +
+            ? userToCreate.newPerkNames.slice(0, -1).join(', ') +
               ', and ' +
               userToCreate.newPerkNames[userToCreate.newPerkNames.length - 1]
             : userToCreate.newPerkNames[0],

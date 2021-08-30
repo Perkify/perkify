@@ -83,9 +83,9 @@ export const registerAdminAndBusiness = async (
     // set the business document
     businessRef.set(businessData);
 
-    const confirmationLink = await admin
+    const verificationLink = await admin
       .auth()
-      .generateSignInWithEmailLink(email, {
+      .generateEmailVerificationLink(email, {
         url:
           functions.config()['stripe-firebase'].environment == 'production'
             ? 'https://admin.getperkify.com/login'
@@ -94,20 +94,27 @@ export const registerAdminAndBusiness = async (
             : 'http://localhost:3000/login',
       });
 
-    // if in development mode, print the confirmation link
-    if (functions.config()['stripe-firebase'].environment == 'development') {
-      logger.log(`Generated confirmation link for ${email}`, confirmationLink);
+    // if in development mode or staging mode, print the confirmation link
+    if (
+      ['development', 'staging'].includes(
+        functions.config()['stripe-firebase'].environment
+      )
+    ) {
+      logger.log(
+        `Generated email verification link for ${email}`,
+        verificationLink
+      );
     }
 
     // send email
     await db.collection('mail').add({
       to: email,
       template: {
-        name: 'adminEmailConfiramtion',
+        name: 'adminEmailConfirmation',
         data: {
           name: `${firstName} ${lastName}`,
           email,
-          confirmationLink,
+          verificationLink,
         },
       },
     });

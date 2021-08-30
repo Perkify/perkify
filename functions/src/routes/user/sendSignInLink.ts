@@ -35,8 +35,12 @@ export const sendSignInLink = async (
             : 'http://localhost:3001/dashboard',
       });
 
-    // if in development mode, print the sign in link
-    if (functions.config()['stripe-firebase'].environment == 'development') {
+    // if in development or staging mode, print the sign in link
+    if (
+      ['development', 'staging'].includes(
+        functions.config()['stripe-firebase'].environment
+      )
+    ) {
       logger.log(`Generated sign in link for ${userEmail}`, signInLink);
     }
 

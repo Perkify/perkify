@@ -77,7 +77,7 @@ export default function SignInSide(props) {
     event.preventDefault();
     setLoading(true);
     try {
-      await PerkifyApi.post(`/rest/signInLink/${email}`);
+      await PerkifyApi.post(`/rest/user/${email}/signInLink`);
       window.localStorage.setItem('emailForSignIn', email);
       setLoading(false);
       setOpenSuccess(true);

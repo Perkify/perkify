@@ -80,15 +80,17 @@ const EmailInput = ({ setEmail }) => {
             justify="center"
             style={{ height: '100%', padding: '10%' }}
           >
-            <Grid item xs={12} style={{ textAlign: 'center' }}>
-              <GettingStartedImage style={{ height: '200px', width: 'auto' }} />
-            </Grid>
-            <Grid item xs={12}>
-              <p className={classes.footer}>
-                Please enter in your email, so we can confirm your identity.
-              </p>
-            </Grid>
             <Grid container spacing={3}>
+              <Grid item xs={12} style={{ textAlign: 'center' }}>
+                <GettingStartedImage
+                  style={{ height: '200px', width: 'auto' }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <p className={classes.footer}>
+                  Please enter in your email, so we can confirm your identity.
+                </p>
+              </Grid>
               <Grid item xs={12}>
                 <InputLabel htmlFor="firstName" className={classes.label}>
                   Email

@@ -21,7 +21,7 @@ import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-import { PerkifyApi } from '../../../../user/src/services';
+import { PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -98,11 +98,12 @@ export default function SignInSide(props: any) {
   const resetPass = async () => {
     setLoading(true);
     try {
-      await PerkifyApi.post(`/rest/passwordResetLink/${email}`);
+      await PerkifyApi.post(`/rest/admin/${resetEmail}/passwordResetLink`);
       setLoading(false);
       setDidResetPass(true);
     } catch (error) {
       setLoading(false);
+      console.log(error);
       errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
     }
   };

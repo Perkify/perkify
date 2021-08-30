@@ -29,14 +29,18 @@ export const sendPasswordResetLink = async (
       .generatePasswordResetLink(adminEmail, {
         url:
           functions.config()['stripe-firebase'].environment == 'production'
-            ? 'https://app.getperkify.com/login'
+            ? 'https://admin.getperkify.com/login'
             : functions.config()['stripe-firebase'].environment == 'staging'
-            ? 'https://app.dev.getperkify.com/login'
-            : 'http://localhost:3001/login',
+            ? 'https://admin.dev.getperkify.com/login'
+            : 'http://localhost:3000/login',
       });
 
-    // if in development mode, print the sign in link
-    if (functions.config()['stripe-firebase'].environment == 'development') {
+    // if in development or staging mode, print the sign in link
+    if (
+      ['development', 'staging'].includes(
+        functions.config()['stripe-firebase'].environment
+      )
+    ) {
       logger.log(
         `Generated password reset link for ${adminEmail}`,
         passwordResetLink

@@ -12,6 +12,10 @@ import {
   deletePerkGroupValidators,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
+  sendEmailVerificationLink,
+  sendEmailVerificationLinkValidators,
+  sendPasswordResetLink,
+  sendPasswordResetLinkValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
@@ -49,17 +53,28 @@ app.post(
 app.post('/user', registerUserValidators, registerUser);
 
 // send a sign-in link to user
-app.post('/signInLink/:userEmail', sendSignInLinkValidators, sendSignInLink);
+app.post(
+  '/user/:userEmail/signInLink',
+  sendSignInLinkValidators,
+  sendSignInLink
+);
 
 // create a portal link for a user
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 app.post('/portalLink', createPortalLinkValidators, createPortalLink);
 
+// resend email confirmation link to admin
+app.post(
+  '/admin/:adminEmail/emailVerificationLink',
+  sendEmailVerificationLinkValidators,
+  sendEmailVerificationLink
+);
+
 // send a password-reset link to admin
 app.post(
-  '/passwordResetLink/:adminEmail',
-  sendSignInLinkValidators,
-  sendSignInLink
+  '/admin/:adminEmail/passwordResetLink',
+  sendPasswordResetLinkValidators,
+  sendPasswordResetLink
 );
 
 // perk group crud
