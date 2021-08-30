@@ -70,7 +70,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "prettier": "^2.3.2",
-    "prettier-plugin-organize-imports": "^2.2.0"
+    "prettier-plugin-organize-imports": "^2.2.0",
+    "stripe": "^8.171.0"
   },
   "husky": {
     "hooks": {

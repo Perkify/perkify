@@ -247,7 +247,7 @@ const GeneralDashboard = () => {
 
   useEffect(() => {
     setDashboardLoading(true);
-    if (Object.keys(admin).length != 0 && business) {
+    if (admin && business) {
       const businessId = admin['businessID'];
 
       db.collection('users')
