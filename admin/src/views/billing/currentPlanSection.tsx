@@ -34,7 +34,7 @@ export default function BasicTable() {
   const classes = useStyles();
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} variant="outlined">
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -109,11 +109,13 @@ export const DisplayCurrentPlan = () => {
   return (
     <div className={classes.listContainer}>
       {true ? (
-        <div>
-          <Typography style={{ fontSize: '20px' }}>
-            $193.24 per month
-          </Typography>
-          <Typography>Your plan renews on September 22, 2021</Typography>
+        <>
+          <div>
+            <Typography style={{ fontSize: '20px' }}>
+              $193.24 per month
+            </Typography>
+            <Typography>Your plan renews on September 22, 2021</Typography>
+          </div>
           {showBreakdown ? (
             <>
               <div>
@@ -180,7 +182,7 @@ export const DisplayCurrentPlan = () => {
               </Grid>
             </Grid>
           )}
-        </div>
+        </>
       ) : (
         <div>
           <Typography>

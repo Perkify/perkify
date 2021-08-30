@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import React, { useContext, useState } from 'react';
@@ -40,6 +41,30 @@ const useDisplayCardPaymentMethodsStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const cardPaymentIconPath = (brand: string) => {
+  //  amex, diners, discover, jcb, mastercard, unionpay, visa, or unknown
+  switch (brand) {
+    case 'amex':
+      return '/credit-card-payment-icons/amex.svg';
+    case 'diners':
+      return '/credit-card-payment-icons/diners.svg';
+    case 'discover':
+      return '/credit-card-payment-icons/discover.svg';
+    case 'jcb':
+      return '/credit-card-payment-icons/jcb.svg';
+    case 'mastercard':
+      return '/credit-card-payment-icons/mastercard.svg';
+    case 'unionpay':
+      return '/credit-card-payment-icons/unionpay.svg';
+    case 'visa':
+      return '/credit-card-payment-icons/visa.svg';
+    case 'unknown':
+      return '/credit-card-payment-icons/unknown.svg';
+    default:
+      break;
+  }
+};
+
 const DisplayCardPaymentMethod = ({
   card,
 }: {
@@ -50,27 +75,45 @@ const DisplayCardPaymentMethod = ({
     <Grid container>
       <Grid item xs={4}>
         <div className={classes.root}>
-          <img
-            style={{ height: 25 }}
-            src="/credit-card-payment-icons/visa.svg"
-          />
+          <img style={{ height: 25 }} src={cardPaymentIconPath(card.brand)} />
           <Typography variant="body1">&bull;&bull;&bull;&bull;</Typography>
           <Typography variant="body1">{card.last4}</Typography>
           {card.default && <Chip label="Default" style={{ height: 20 }} />}
         </div>
       </Grid>
 
-      <Grid item xs={4}>
+      <Grid item xs={3}>
         <div className={classes.root}>
           <Typography variant="body1">{`Expires ${card.expMonth
             .toString()
             .padStart(2, '0')}/${card.expYear}`}</Typography>
-          <IconButton
-            aria-label="clear"
-            style={{ margin: 0, padding: 0, marginLeft: '40px' }}
-          >
-            <ClearIcon fontSize="small" />
-          </IconButton>
+          {card.default ? (
+            <IconButton
+              aria-label="clear"
+              style={{
+                margin: 0,
+                padding: 0,
+                flex: 1,
+                backgroundColor: 'transparent',
+              }}
+              disableRipple
+            >
+              <ClearIcon fontSize="small" style={{ marginLeft: 'auto' }} />
+            </IconButton>
+          ) : (
+            <IconButton
+              aria-label="options"
+              style={{
+                margin: 0,
+                padding: 0,
+                flex: 1,
+                backgroundColor: 'transparent',
+              }}
+              disableRipple
+            >
+              <MoreHorizIcon fontSize="small" style={{ marginLeft: 'auto' }} />
+            </IconButton>
+          )}
         </div>
       </Grid>
     </Grid>
