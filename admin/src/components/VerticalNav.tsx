@@ -149,7 +149,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
         .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
 
       tmpGroupViews.push([
-        'Add New Group',
+        'Add New Perk Group',
         '/dashboard/create/group',
         <AddIcon />,
       ]);
@@ -249,58 +249,59 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                     <ListItemText classes={{ primary: classes.listItem }}>
                       {name}
                     </ListItemText>
-                    {sectionName == 'Perk Groups' && name != 'Add New Group' && (
-                      <>
-                        <IconButton
-                          style={{ padding: 0 }}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            setAnchorEl(event.currentTarget);
-                          }}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-
-                        <Menu
-                          id={`${name} simple menu`}
-                          open={Boolean(anchorEl)}
-                          keepMounted
-                          anchorEl={anchorEl}
-                          onClose={(
-                            event: React.MouseEvent<
-                              HTMLButtonElement,
-                              MouseEvent
-                            >
-                          ) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            setAnchorEl(null);
-                          }}
-                          elevation={4}
-                          anchorOrigin={{
-                            vertical: 'center',
-                            horizontal: 'right',
-                          }}
-                          transformOrigin={{
-                            vertical: 'center',
-                            horizontal: 'left',
-                          }}
-                          getContentAnchorEl={null}
-                        >
-                          <MenuItem
+                    {sectionName == 'Perk Groups' &&
+                      name != 'Add New Perk Group' && (
+                        <>
+                          <IconButton
+                            style={{ padding: 0 }}
                             onClick={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
-                              setAnchorEl(null);
-                              setIsDeletePerkGroupModalVisible(name);
+                              setAnchorEl(event.currentTarget);
                             }}
                           >
-                            Delete Perk Group
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
+                            <MoreVertIcon />
+                          </IconButton>
+
+                          <Menu
+                            id={`${name} simple menu`}
+                            open={Boolean(anchorEl)}
+                            keepMounted
+                            anchorEl={anchorEl}
+                            onClose={(
+                              event: React.MouseEvent<
+                                HTMLButtonElement,
+                                MouseEvent
+                              >
+                            ) => {
+                              event.stopPropagation();
+                              event.preventDefault();
+                              setAnchorEl(null);
+                            }}
+                            elevation={4}
+                            anchorOrigin={{
+                              vertical: 'center',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'center',
+                              horizontal: 'left',
+                            }}
+                            getContentAnchorEl={null}
+                          >
+                            <MenuItem
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setAnchorEl(null);
+                                setIsDeletePerkGroupModalVisible(name);
+                              }}
+                            >
+                              Delete Perk Group
+                            </MenuItem>
+                          </Menu>
+                        </>
+                      )}
                   </ListItem>
                 ))}
               </List>

@@ -231,11 +231,11 @@ const CreateGroup = () => {
                       paddingRight: 5,
                     }}
                   >
-                    Perkify uses Groups to manage the different subscriptions
-                    you'd like to give to different employees. Just give your
-                    group a name, select the people that you'd like to have in
-                    the group, and choose the perks you want to give that group
-                    access to.
+                    Perkify uses Perk Groups to manage the different
+                    subscriptions you'd like to give to different employees.
+                    Just give your group a name, select the people that you'd
+                    like to have in the group, and choose the perks you want to
+                    give that group access to.
                   </p>
                 </React.Fragment>
               }
@@ -275,10 +275,10 @@ const CreateGroup = () => {
           >
             <p>
               {' '}
-              Perkify uses Groups to manage the different subscriptions you'd
-              like to give to different employees. Just give your group a name,
-              select the people that you'd like to have in the group, and choose
-              the perks you want to give that group access to.
+              Perkify uses Perk Groups to manage the different subscriptions
+              you'd like to give to different employees. Just give your group a
+              name, select the people that you'd like to have in the group, and
+              choose the perks you want to give that group access to.
             </p>
           </Card>
         )}
