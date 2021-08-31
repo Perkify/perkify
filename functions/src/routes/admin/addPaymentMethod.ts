@@ -31,6 +31,14 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
     const card = paymentMethod.card;
     if (card && card.fingerprint && card.country) {
       // only support card payment methods for now
+      if (card.fingerprint in businessData.cardPaymentMethods) {
+        const error: PerkifyError = {
+          status: 400,
+          reason: 'This card is already attached to the business',
+          reasonDetail: 'This card is already attached to the business',
+        };
+        return next(error);
+      }
 
       // update the default payment method of the stripe customer
       await stripe.customers.update(businessData.businessID, {

@@ -32,7 +32,7 @@ export const removePaymentMethod = adminPerkifyRequestTransform(
         reasonDetail:
           "Can't delete a payment method when you only have 1 left. Please add a payment method first.",
       };
-      next(error);
+      return next(error);
     }
 
     const simpleCardToBeDeleted = Object.values(cardPaymentMethods).filter(
@@ -47,7 +47,7 @@ export const removePaymentMethod = adminPerkifyRequestTransform(
         reasonDetail:
           "Couldn't find the card to delete with the specified payment method ID",
       };
-      next(error);
+      return next(error);
     }
 
     // remove the card to be deleted from the payment methods
