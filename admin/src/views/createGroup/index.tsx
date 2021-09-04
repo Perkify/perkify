@@ -14,15 +14,25 @@ import {
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import AddIcon from '@material-ui/icons/Add';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import 'datasheet.css';
 import { DropzoneArea } from 'material-ui-dropzone';
 import React, { useContext, useState } from 'react';
+import ReactDataSheet from 'react-datasheet';
+//import 'react-datasheet/lib/react-datasheet.css';
 import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmail, validateEmails } from 'utils/emailValidation';
+
+export interface GridElement extends ReactDataSheet.Cell<GridElement, string> {
+  value: string;
+}
+
+class MyReactDataSheet extends ReactDataSheet<GridElement, string> {}
 
 const CreateGroup = () => {
   const history = useHistory();
@@ -42,6 +52,7 @@ const CreateGroup = () => {
   const [groupName, setGroupName] = useState('');
   const [emails, setEmails] = useState('');
   const [selectedPerks, setSelectedPerks] = useState([]);
+  const [isShowingBulkAdd, setIsShowingBulkAdd] = useState(false);
 
   const [enteredEmployees, setEnteredEmployees] = useState([
     {
@@ -58,6 +69,7 @@ const CreateGroup = () => {
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
   const [isADPIntegrationVisible, setIsADPIntegrationVisible] = useState(false);
+  const [gridState, setGridState] = useState([]);
   const [isManualIntegrationVisible, setIsManualIntegrationVisible] =
     useState(false);
 
@@ -151,6 +163,26 @@ const CreateGroup = () => {
     );
   };
 
+  if (gridState.length === 0) {
+    let grid: GridElement[][] = [
+      [
+        { readOnly: true, value: '' },
+        { value: 'Employee Email', readOnly: true },
+        { value: 'Name', readOnly: true },
+        { value: 'Tax Id', readOnly: true },
+      ],
+    ];
+    for (let i = 0; i < 50; i++) {
+      grid.push([
+        { readOnly: true, value: i.toString() },
+        { value: '' },
+        { value: '' },
+        { value: '' },
+      ]);
+    }
+    setGridState(grid);
+  }
+
   const createPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
@@ -237,6 +269,10 @@ const CreateGroup = () => {
       return;
     }
     setConfirmationModalVisible(true);
+  }
+
+  function onContextMenu(e: any, cell: any, i: any, j: any) {
+    return cell.readOnly ? e.preventDefault() : null;
   }
 
   return (
@@ -396,105 +432,208 @@ const CreateGroup = () => {
         maxWidth={'md'}
       >
         <DialogTitle id="form-dialog-title">Manual Integration</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            If you aren't using any of our supported payroll integration
-            systems, please manually enter in employee information below.{' '}
-            <Grid container spacing={5} style={{ paddingTop: 50 }}>
-              {enteredEmployees.map((employeeInfo, index) => {
-                return (
-                  <>
-                    {' '}
-                    <Grid item xs={4} style={{ paddingTop: 0 }}>
-                      <TextField
-                        id="employee_email"
-                        variant="outlined"
-                        label="Employee Email"
-                        placeholder="johndoe@gmail.com"
-                        value={employeeInfo.email}
-                        onChange={(event) => {
-                          let copy = [...enteredEmployees];
-                          let employeeCopy = enteredEmployees[index];
-                          employeeCopy.email = event.target.value;
-                          employeeCopy.emailError = returnEmailError(
-                            event.target.value
-                          );
-                          copy[index] = employeeCopy;
-                          setEnteredEmployees(copy);
-                        }}
-                        fullWidth
-                        error={employeeInfo.emailError != ''}
-                        helperText={employeeInfo.emailError}
-                      />
-                    </Grid>
-                    <Grid item xs={4} style={{ paddingTop: 0 }}>
-                      <TextField
-                        id="full_name"
-                        variant="outlined"
-                        label="Full Name"
-                        placeholder="John Doe"
-                        value={employeeInfo.name}
-                        onChange={(event) => {
-                          let copy = [...enteredEmployees];
-                          let employeeCopy = enteredEmployees[index];
-                          employeeCopy.name = event.target.value;
-                          copy[index] = employeeCopy;
-                          setEnteredEmployees(copy);
-                        }}
-                        fullWidth
-                        error={groupNameError != ''}
-                        helperText={groupNameError}
-                      />
-                    </Grid>
-                    <Grid item xs={4} style={{ paddingTop: 0 }}>
-                      <TextField
-                        id="group_name"
-                        variant="outlined"
-                        label="Tax Id Number"
-                        placeholder="1234"
-                        value={employeeInfo.taxId}
-                        onChange={(event) => {
-                          let copy = [...enteredEmployees];
-                          let employeeCopy = enteredEmployees[index];
-                          employeeCopy.taxId = event.target.value;
-                          copy[index] = employeeCopy;
-                          setEnteredEmployees(copy);
-                        }}
-                        fullWidth
-                        error={groupNameError != ''}
-                        helperText={groupNameError}
-                      />
-                    </Grid>{' '}
-                  </>
-                );
-              })}
-              <Grid item xs={12} style={{ paddingTop: 0 }}>
-                <Button
-                  onClick={addEnteringEmployee}
-                  style={{ padding: 0 }}
-                  color="primary"
-                >
-                  <AddIcon />
-                  <Typography style={{ textTransform: 'none' }}>
-                    Add Another Employee
-                  </Typography>
-                </Button>
+        {!isShowingBulkAdd ? (
+          <DialogContent>
+            <DialogContentText>
+              If you aren't using any of our supported payroll integration
+              systems, please manually enter in employee information below.{' '}
+              <Grid container spacing={5} style={{ paddingTop: 50 }}>
+                {enteredEmployees.map((employeeInfo, index) => {
+                  return (
+                    <>
+                      {' '}
+                      <Grid item xs={4} style={{ paddingTop: 0 }}>
+                        <TextField
+                          id="employee_email"
+                          variant="outlined"
+                          label="Employee Email"
+                          placeholder="johndoe@gmail.com"
+                          value={employeeInfo.email}
+                          onChange={(event) => {
+                            let copy = [...enteredEmployees];
+                            let employeeCopy = enteredEmployees[index];
+                            employeeCopy.email = event.target.value;
+                            employeeCopy.emailError = returnEmailError(
+                              event.target.value
+                            );
+                            copy[index] = employeeCopy;
+                            setEnteredEmployees(copy);
+                          }}
+                          fullWidth
+                          error={employeeInfo.emailError != ''}
+                          helperText={employeeInfo.emailError}
+                        />
+                      </Grid>
+                      <Grid item xs={4} style={{ paddingTop: 0 }}>
+                        <TextField
+                          id="full_name"
+                          variant="outlined"
+                          label="Full Name"
+                          placeholder="John Doe"
+                          value={employeeInfo.name}
+                          onChange={(event) => {
+                            let copy = [...enteredEmployees];
+                            let employeeCopy = enteredEmployees[index];
+                            employeeCopy.name = event.target.value;
+                            copy[index] = employeeCopy;
+                            setEnteredEmployees(copy);
+                          }}
+                          fullWidth
+                          error={groupNameError != ''}
+                          helperText={groupNameError}
+                        />
+                      </Grid>
+                      <Grid item xs={4} style={{ paddingTop: 0 }}>
+                        <TextField
+                          id="group_name"
+                          variant="outlined"
+                          label="Tax Id Number"
+                          placeholder="1234"
+                          value={employeeInfo.taxId}
+                          onChange={(event) => {
+                            let copy = [...enteredEmployees];
+                            let employeeCopy = enteredEmployees[index];
+                            employeeCopy.taxId = event.target.value;
+                            copy[index] = employeeCopy;
+                            setEnteredEmployees(copy);
+                          }}
+                          fullWidth
+                          error={groupNameError != ''}
+                          helperText={groupNameError}
+                        />
+                      </Grid>{' '}
+                    </>
+                  );
+                })}
+                <Grid item xs={10} style={{ paddingTop: 0 }}>
+                  <Button
+                    onClick={addEnteringEmployee}
+                    style={{ padding: 0 }}
+                    color="primary"
+                  >
+                    <AddIcon />
+                    <Typography style={{ textTransform: 'none' }}>
+                      Add Another Employee
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={2} style={{ paddingTop: 0, marginLeft: 'auto' }}>
+                  <Button
+                    onClick={() => {
+                      setIsShowingBulkAdd(true);
+                    }}
+                    style={{ padding: 0 }}
+                    color="primary"
+                  >
+                    <AddCircleOutlineIcon />
+                    <Typography style={{ textTransform: 'none' }}>
+                      Bulk Add
+                    </Typography>
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
-          </DialogContentText>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setIsManualIntegrationVisible(false);
-              }}
-              color="primary"
-            >
-              Cancel
-            </Button>
+            </DialogContentText>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setIsShowingBulkAdd(false);
+                  setIsManualIntegrationVisible(false);
+                }}
+                color="primary"
+              >
+                Cancel
+              </Button>
 
-            <Button color="primary">Confirm</Button>
-          </DialogActions>
-        </DialogContent>
+              <Button
+                color="primary"
+                onClick={() => {
+                  setIsShowingBulkAdd(false);
+                }}
+              >
+                Confirm
+              </Button>
+            </DialogActions>
+          </DialogContent>
+        ) : (
+          <DialogContent>
+            <div className={'sheet-container'}>
+              <MyReactDataSheet
+                data={gridState}
+                valueRenderer={(cell) => cell.value}
+                onContextMenu={onContextMenu}
+                onCellsChanged={(changes) => {
+                  const gridCopy = gridState;
+                  changes.forEach(({ cell, row, col, value }) => {
+                    gridCopy[row][col] = { ...gridCopy[row][col], value };
+                  });
+                  setGridState(gridCopy);
+                }}
+              />
+            </div>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setIsManualIntegrationVisible(false);
+                  setIsShowingBulkAdd(false);
+                }}
+                color="primary"
+              >
+                Cancel
+              </Button>
+
+              <Button
+                color="primary"
+                onClick={() => {
+                  let enteredEmployeesCopy: any[] = [];
+                  // let grid: GridElement[][] = [
+                  //   [
+                  //     { readOnly: true, value: '' },
+                  //     { value: 'Name', readOnly: true },
+                  //     { value: 'Email', readOnly: true },
+                  //     { value: 'Tax Id', readOnly: true },
+                  //   ],
+                  // ];
+                  // for (let i = 0; i < 50; i++) {
+                  //   grid.push([
+                  //     { readOnly: true, value: i.toString() },
+                  //     { value: '' },
+                  //     { value: '' },
+                  //     { value: '' },
+                  //   ]);
+                  // }
+                  gridState.forEach((row) => {
+                    if (row[1].readOnly) {
+                      return;
+                    } else {
+                      if (
+                        row[1].value !== '' ||
+                        row[2].value !== '' ||
+                        row[3].value !== ''
+                      ) {
+                        const newEmployee = {
+                          name: row[2].value,
+                          email: row[1].value,
+                          taxId: row[3].value,
+                          nameError: '',
+                          emailError:
+                            validateEmail(row[1].value) === false
+                              ? 'Please input proper emails'
+                              : '',
+                          taxIdError: '',
+                        };
+                        enteredEmployeesCopy.push(newEmployee);
+                      }
+                    }
+                  });
+                  setEnteredEmployees(enteredEmployeesCopy);
+                  setIsShowingBulkAdd(false);
+                }}
+              >
+                Confirm
+              </Button>
+            </DialogActions>
+          </DialogContent>
+        )}
       </Dialog>
 
       <Dialog
