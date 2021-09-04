@@ -107,13 +107,23 @@ export default function BasicTable({
               style={{ border: 'none', display: 'flex', alignItems: 'center' }}
               align="right"
             >
-              <p style={{ order: 1 }}>Perkify Volume Fee</p>
-              <Tooltip
-                title="The perkify volume fee is 10% of the subtotal."
-                placement="bottom-start"
+              <p style={{ order: 1, padding: 0, margin: 0 }}>
+                Perkify Volume Fee
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginLeft: '5px',
+                }}
               >
-                <InfoOutlinedIcon fontSize="small" style={{ order: 2 }} />
-              </Tooltip>
+                <Tooltip
+                  title="The perkify volume fee is 10% of the cost of perks."
+                  placement="bottom-start"
+                >
+                  <InfoOutlinedIcon fontSize="small" style={{ order: 2 }} />
+                </Tooltip>
+              </div>
             </TableCell>
             <TableCell
               style={{ border: 'none' }}
@@ -128,8 +138,27 @@ export default function BasicTable({
               scope="row"
             ></TableCell>
             <TableCell style={{ border: 'none' }} align="right"></TableCell>
-            <TableCell style={{ border: 'none' }} align="right">
-              Perkify Card Maintenance Fee
+            <TableCell
+              style={{ border: 'none', display: 'flex', alignItems: 'center' }}
+              align="right"
+            >
+              <p style={{ order: 1, padding: 0, margin: 0 }}>
+                Perkify Card Maintenance Fee
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginLeft: '5px',
+                }}
+              >
+                <Tooltip
+                  title="The perkify card maintenance fee is $3.99 per employee."
+                  placement="bottom-start"
+                >
+                  <InfoOutlinedIcon fontSize="small" style={{ order: 2 }} />
+                </Tooltip>
+              </div>
             </TableCell>
             <TableCell
               style={{ border: 'none' }}
@@ -232,18 +261,20 @@ export const DisplayCurrentPlan = () => {
 
               const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
 
-              const cardMaintenanceFee = Math.round(
-                3.99 *
-                  Object.keys(business.perkGroups).reduce(
-                    (acc, perkGroupName) => {
-                      return (
-                        acc +
-                        business.perkGroups[perkGroupName].userEmails.length
-                      );
-                    },
-                    0
-                  )
-              );
+              const cardMaintenanceFee =
+                Math.round(
+                  3.99 *
+                    Object.keys(business.perkGroups).reduce(
+                      (acc, perkGroupName) => {
+                        return (
+                          acc +
+                          business.perkGroups[perkGroupName].userEmails.length
+                        );
+                      },
+                      0
+                    ) *
+                    100
+                ) / 100;
 
               const total =
                 Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) /
