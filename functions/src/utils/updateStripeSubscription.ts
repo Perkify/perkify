@@ -259,17 +259,11 @@ export const updateStripeSubscription = async (
     } else if (isSubscriptionDecrease && !isSubscriptionIncrease) {
       // update the subscription, don't give anything back
 
-      logger.info(
-        `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
-        {
-          items: newSubscriptionItemsList,
-          proration_behavior: 'none',
-        }
-      );
-
       // check if we should cancel the subscription
       if (Object.keys(businessData.perkGroups).length == 0) {
         // cancel the subscription because the business has no perk groups / perks
+
+        logger.info(`Deleting stripe subscription ${subscriptionItem.id} for ${businessID}`)
 
         // should succeed every time
         await stripe.subscriptions.del(subscriptionItem.id, {
@@ -277,6 +271,15 @@ export const updateStripeSubscription = async (
         });
       } else {
         // otherwise we just update the subscription, don't cancel it
+
+
+      logger.info(
+        `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+        {
+          items: newSubscriptionItemsList,
+          proration_behavior: 'none',
+        }
+      );
 
         // should succeed every time
         await stripe.subscriptions.update(subscriptionItem.id, {

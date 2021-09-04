@@ -1,4 +1,4 @@
-import { Button, Grid, Theme, Typography } from '@material-ui/core';
+import { Button, Grid, Theme, Tooltip, Typography } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
@@ -71,8 +72,8 @@ export default function BasicTable({
                 {row.perkName}
               </TableCell>
               <TableCell align="right">{row.quantity}</TableCell>
-              <TableCell align="right">{`$${row.price}`}</TableCell>
-              <TableCell align="right">{`$${row.amount}`}</TableCell>
+              <TableCell align="right">{`$${row.price.toFixed(2)}`}</TableCell>
+              <TableCell align="right">{`$${row.amount.toFixed(2)}`}</TableCell>
             </TableRow>
           ))}
 
@@ -92,7 +93,7 @@ export default function BasicTable({
             <TableCell
               style={{ border: 'none' }}
               align="right"
-            >{`$${subscriptionPrices.subtotal}`}</TableCell>
+            >{`$${subscriptionPrices.subtotal.toFixed(2)}`}</TableCell>
           </TableRow>
 
           <TableRow key="perkifyVolume">
@@ -102,13 +103,22 @@ export default function BasicTable({
               scope="row"
             ></TableCell>
             <TableCell style={{ border: 'none' }} align="right"></TableCell>
-            <TableCell style={{ border: 'none' }} align="right">
-              Perkify Volume Fee
+            <TableCell
+              style={{ border: 'none', display: 'flex', alignItems: 'center' }}
+              align="right"
+            >
+              <p>Perkify Volume Fee</p>
+              <Tooltip
+                title="The perkify volume fee is 10% of the subtotal."
+                placement="bottom-start"
+              >
+                <InfoOutlinedIcon fontSize="small" style={{ order: 2 }} />
+              </Tooltip>
             </TableCell>
             <TableCell
               style={{ border: 'none' }}
               align="right"
-            >{`$${subscriptionPrices.volumeFee}`}</TableCell>
+            >{`$${subscriptionPrices.volumeFee.toFixed(2)}`}</TableCell>
           </TableRow>
 
           <TableRow key="perkifyCardMaintenance">
@@ -124,7 +134,9 @@ export default function BasicTable({
             <TableCell
               style={{ border: 'none' }}
               align="right"
-            >{`$${subscriptionPrices.cardMaintenanceFee}`}</TableCell>
+            >{`$${subscriptionPrices.cardMaintenanceFee.toFixed(
+              2
+            )}`}</TableCell>
           </TableRow>
 
           <TableRow key="total">
@@ -143,7 +155,7 @@ export default function BasicTable({
             <TableCell
               style={{ border: 'none' }}
               align="right"
-            >{`$${subscriptionPrices.total}`}</TableCell>
+            >{`$${subscriptionPrices.total.toFixed(2)}`}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -246,7 +258,7 @@ export const DisplayCurrentPlan = () => {
         <>
           <div>
             <Typography style={{ fontSize: '20px' }}>
-              {`$${subscriptionPrices.total} per month`}
+              {`$${subscriptionPrices.total.toFixed(2)} per month`}
             </Typography>
             <Typography>{`Your plan renews on ${dayjs
               .unix(subscriptionObject.current_period_end.seconds)

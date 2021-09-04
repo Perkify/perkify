@@ -135,7 +135,7 @@ const DisplayCardPaymentMethod = ({
               disableHoverListener={
                 !business || Object.keys(business.cardPaymentMethods).length > 1
               }
-              title="Please add another payment method before removing this one"
+              title="If you'd like to change your default payment method, please add another payment method before removing this one. If you'd like to cancel your Perkify subscription, please delete all your perk groups first."
               placement="bottom-start"
             >
               <div style={{ flex: 1 }}>
