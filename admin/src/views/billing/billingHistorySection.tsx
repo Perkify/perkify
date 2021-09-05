@@ -399,7 +399,8 @@ export const DisplayBillingHistory = () => {
             )
         ) : (
           <Typography>
-            No billing history. This business has not paid any invoices yet.
+            No billing history related to the current perkify plan. This
+            business does not have a perkify plan yet.
           </Typography>
         )}
       </div>

@@ -9,7 +9,7 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import { AuthContext, BusinessContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
 
@@ -34,8 +34,10 @@ const RemovePaymentMethodModal = ({
   const classes = useDisplayCardPaymentMethodsStyles();
   const { business } = useContext(BusinessContext);
   const { currentUser } = useContext(AuthContext);
+  const { setDashboardLoading } = useContext(LoadingContext);
 
   const removePaymentMethod = async (event: any) => {
+    setDashboardLoading(true);
     // Block native form submission.
     event.preventDefault();
 
@@ -58,6 +60,7 @@ const RemovePaymentMethodModal = ({
     } else {
       console.log('Success');
     }
+    setDashboardLoading(false);
   };
 
   return (

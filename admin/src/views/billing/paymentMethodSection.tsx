@@ -13,7 +13,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { createStyles, makeStyles } from '@material-ui/styles';
-import { AuthContext, BusinessContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import firebase from 'firebase/app';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -83,11 +83,13 @@ const DisplayCardPaymentMethod = ({
   setPaymentMethodIDToRemove: (arg0: string) => void;
 }) => {
   const classes = useDisplayCardPaymentMethodsStyles();
+  const { setDashboardLoading } = useContext(LoadingContext);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const setPaymentMethodAsDefault = (paymentMethodID: string) => {
     (async () => {
+      setDashboardLoading(true);
       const bearerToken = await currentUser.getIdToken();
 
       const result = (
@@ -108,6 +110,8 @@ const DisplayCardPaymentMethod = ({
       } else {
         console.log('Success');
       }
+
+      setDashboardLoading(false);
     })();
   };
 
@@ -130,10 +134,14 @@ const DisplayCardPaymentMethod = ({
           {card.default ? (
             <Tooltip
               disableFocusListener={
-                !business || Object.keys(business.cardPaymentMethods).length > 1
+                !business ||
+                Object.keys(business.cardPaymentMethods).length > 1 ||
+                Object.keys(business.perkGroups).length == 0
               }
               disableHoverListener={
-                !business || Object.keys(business.cardPaymentMethods).length > 1
+                !business ||
+                Object.keys(business.cardPaymentMethods).length > 1 ||
+                Object.keys(business.perkGroups).length == 0
               }
               title="If you'd like to change your default payment method, please add another payment method before removing this one. If you'd like to cancel your Perkify subscription, please delete all your perk groups first."
               placement="bottom-start"
@@ -152,7 +160,8 @@ const DisplayCardPaymentMethod = ({
                   disableRipple
                   // can't clear a card unless you have another one to fall back on
                   disabled={
-                    Object.keys(business.cardPaymentMethods).length <= 1
+                    Object.keys(business.cardPaymentMethods).length <= 1 &&
+                    Object.keys(business.perkGroups).length != 0
                   }
                   onClick={() =>
                     setPaymentMethodIDToRemove(card.paymentMethodID)
