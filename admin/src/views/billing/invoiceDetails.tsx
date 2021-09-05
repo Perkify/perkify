@@ -166,9 +166,13 @@ export const InvoiceDetails = ({
             />
             <InfoRow
               keyName="Payment method:"
-              value={`${
-                cardData.brand.charAt(0).toUpperCase() + cardData.brand.slice(1)
-              } \u2022\u2022\u2022\u2022 ${cardData.last4}`}
+              value={
+                cardData &&
+                `${
+                  cardData.brand.charAt(0).toUpperCase() +
+                  cardData.brand.slice(1)
+                } \u2022\u2022\u2022\u2022 ${cardData.last4}`
+              }
             />
 
             <InfoRow keyName="From:" value={invoiceObject.account_name} />

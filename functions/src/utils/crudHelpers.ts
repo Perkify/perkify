@@ -90,7 +90,6 @@ export const deleteUserHelper = async (userToDelete: UserToDelete) => {
       status: 'canceled',
     });
   }
-  console.log('Deleteing user ', userToDelete.email);
   await db.collection('users').doc(userToDelete.email).delete();
 };
 
