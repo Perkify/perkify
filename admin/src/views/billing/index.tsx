@@ -5,7 +5,6 @@ import React from 'react';
 import { DisplayBillingHistory } from './billingHistorySection';
 import { DisplayCurrentPlan } from './currentPlanSection';
 import { PaymentMethodsSection } from './paymentMethodSection';
-import { SectionHeading } from './sectionHeading';
 
 const useBillingPageStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,13 +27,9 @@ const Billing = () => {
 
       <PaymentMethodsSection />
 
-      <SectionHeading title="CURRENT PERKIFY PLAN">
-        <DisplayCurrentPlan />
-      </SectionHeading>
+      <DisplayCurrentPlan />
 
-      <SectionHeading title="BILLING HISTORY">
-        <DisplayBillingHistory />
-      </SectionHeading>
+      <DisplayBillingHistory />
     </div>
   );
 };

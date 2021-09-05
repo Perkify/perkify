@@ -9,6 +9,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { allPerksByPriceIDDict } from 'shared';
 import { Subscription } from '../../types/stripeTypes';
 import PriceBreakdownTable from './priceBreakdownTable';
+import { SectionHeading } from './sectionHeading';
 
 interface CostBreakdownRow {
   perkName: string;
@@ -127,31 +128,63 @@ export const DisplayCurrentPlan = () => {
   }, [business]);
 
   return (
-    <div className={classes.listContainer}>
-      {subscriptionObject && subscriptionPrices ? (
-        <>
-          <div>
-            <Typography style={{ fontSize: '20px' }}>
-              {`$${subscriptionPrices.total.toFixed(2)} per month`}
-            </Typography>
-            <Typography>{`Your plan renews on ${dayjs
-              .unix(subscriptionObject.current_period_end.seconds)
-              .format('MMMM DD, YYYY')}`}</Typography>
-          </div>
-          {showBreakdown ? (
-            <>
-              <div>
-                <PriceBreakdownTable
-                  rows={rows}
-                  subscriptionPrices={subscriptionPrices}
-                />
-              </div>
+    <SectionHeading title="CURRENT PERKIFY PLAN">
+      <div className={classes.listContainer}>
+        {subscriptionObject && subscriptionPrices ? (
+          <>
+            <div>
+              <Typography style={{ fontSize: '20px' }}>
+                {`$${subscriptionPrices.total.toFixed(2)} per month`}
+              </Typography>
+              <Typography>{`Your plan renews on ${dayjs
+                .unix(subscriptionObject.current_period_end.seconds)
+                .format('MMMM DD, YYYY')}`}</Typography>
+            </div>
+            {showBreakdown ? (
+              <>
+                <div>
+                  <PriceBreakdownTable
+                    rows={rows}
+                    subscriptionPrices={subscriptionPrices}
+                  />
+                </div>
+                <Grid container>
+                  <Grid item xs={3}>
+                    <Button
+                      variant="text"
+                      disableRipple
+                      onClick={() => setShowBreakdown(false)}
+                      style={{
+                        padding: 0,
+                        margin: 0,
+                        textTransform: 'none',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          color: 'grey',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <ExpandLessIcon
+                          fontSize="small"
+                          style={{ marginRight: '5px' }}
+                        />
+                        Hide Breakdown
+                      </Typography>
+                    </Button>
+                  </Grid>
+                </Grid>
+              </>
+            ) : (
               <Grid container>
                 <Grid item xs={3}>
                   <Button
                     variant="text"
                     disableRipple
-                    onClick={() => setShowBreakdown(false)}
+                    onClick={() => setShowBreakdown(true)}
                     style={{
                       padding: 0,
                       margin: 0,
@@ -166,55 +199,25 @@ export const DisplayCurrentPlan = () => {
                         alignItems: 'center',
                       }}
                     >
-                      <ExpandLessIcon
+                      <ExpandMoreIcon
                         fontSize="small"
                         style={{ marginRight: '5px' }}
                       />
-                      Hide Breakdown
+                      Show Breakdown
                     </Typography>
                   </Button>
                 </Grid>
               </Grid>
-            </>
-          ) : (
-            <Grid container>
-              <Grid item xs={3}>
-                <Button
-                  variant="text"
-                  disableRipple
-                  onClick={() => setShowBreakdown(true)}
-                  style={{
-                    padding: 0,
-                    margin: 0,
-                    textTransform: 'none',
-                    backgroundColor: 'transparent',
-                  }}
-                >
-                  <Typography
-                    style={{
-                      color: 'grey',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <ExpandMoreIcon
-                      fontSize="small"
-                      style={{ marginRight: '5px' }}
-                    />
-                    Show Breakdown
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-        </>
-      ) : (
-        <div>
-          <Typography>
-            No plan. This business has not created any perk groups yet.
-          </Typography>
-        </div>
-      )}
-    </div>
+            )}
+          </>
+        ) : (
+          <div>
+            <Typography>
+              No plan. This business has not created any perk groups yet.
+            </Typography>
+          </div>
+        )}
+      </div>
+    </SectionHeading>
   );
 };

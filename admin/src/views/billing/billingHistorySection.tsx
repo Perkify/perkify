@@ -8,6 +8,7 @@ import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { Subscription } from '../../types/stripeTypes';
 import { InvoiceDetails } from './invoiceDetails';
+import { SectionHeading } from './sectionHeading';
 
 const useDisplayBillingHistoryStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,7 +74,7 @@ export const DisplayBillingHistory = () => {
   }, [business]);
 
   return (
-    <>
+    <SectionHeading title="BILLING HISTORY">
       <div className={classes.listContainer}>
         {invoiceRows ? (
           <>
@@ -200,6 +201,6 @@ export const DisplayBillingHistory = () => {
           />
         )}
       </Drawer>
-    </>
+    </SectionHeading>
   );
 };
