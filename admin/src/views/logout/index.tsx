@@ -1,7 +1,7 @@
 import Header from 'components/Header';
-import { auth } from 'firebaseApp';
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { auth } from 'services';
 
 const GeneralDashboard = () => {
   const history = useHistory();

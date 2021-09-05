@@ -1,3 +1,4 @@
+import { environment } from '../services';
 import {
   allDevelopmentPerks,
   allDevelopmentPerksByPriceIDDict,
@@ -10,7 +11,6 @@ import {
   productionCardMaintenancePerk,
   productionTaxRates,
 } from './constants';
-const environment = process.env.FIREBASE_STRIPE_ENVIRONMENT;
 
 export const allPerks =
   environment == 'production' ? allProductionPerks : allDevelopmentPerks;

@@ -4,8 +4,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
+import { db } from 'services';
 import { allPerksByPriceIDDict } from 'shared';
 import PriceBreakdownTable from './priceBreakdownTable';
 
