@@ -76,106 +76,106 @@ export const DisplayBillingHistory = () => {
     <>
       <div className={classes.listContainer}>
         {invoiceRows ? (
-          invoiceRows
-            .slice(
-              0,
-              showMore
-                ? invoiceRows.length
-                : invoiceRows.length >= 3
-                ? 3
-                : invoiceRows.length
-            )
-            .map((invoiceObj) => (
+          <>
+            {invoiceRows
+              .slice(
+                0,
+                showMore
+                  ? invoiceRows.length
+                  : invoiceRows.length >= 3
+                  ? 3
+                  : invoiceRows.length
+              )
+              .map((invoiceObj) => (
+                <Grid container>
+                  <Grid item xs={3}>
+                    <Typography
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {dayjs.unix(invoiceObj.paidAt).format('MMMM DD, YYYY')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Typography>{`$${invoiceObj.total / 100}`}</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography
+                      onClick={() => {
+                        setViewInvoiceDetailsID(invoiceObj.id);
+                      }}
+                      variant="button"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      View invoice details
+                    </Typography>
+                  </Grid>
+                </Grid>
+              ))}
+            {invoiceRows.length <= 3 ? null : showMore ? (
               <Grid container>
                 <Grid item xs={3}>
-                  <Typography
+                  <Button
+                    variant="text"
+                    disableRipple
+                    onClick={() => setShowMore(false)}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
+                      padding: 0,
+                      margin: 0,
+                      textTransform: 'none',
+                      backgroundColor: 'transparent',
                     }}
                   >
-                    {dayjs.unix(invoiceObj.paidAt).format('MMMM DD, YYYY')}
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <Typography>{`$${invoiceObj.total / 100}`}</Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography
-                    onClick={() => {
-                      setViewInvoiceDetailsID(invoiceObj.id);
-                    }}
-                    variant="button"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    View invoice details
-                  </Typography>
+                    <Typography
+                      style={{
+                        color: 'grey',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <ExpandLessIcon
+                        fontSize="small"
+                        style={{ marginRight: '5px' }}
+                      />
+                      Show less
+                    </Typography>
+                  </Button>
                 </Grid>
               </Grid>
-            ))
-            .concat(
-              invoiceRows.length <= 3 ? null : showMore ? (
-                <Grid container>
-                  <Grid item xs={3}>
-                    <Button
-                      variant="text"
-                      disableRipple
-                      onClick={() => setShowMore(false)}
+            ) : (
+              <Grid container>
+                <Grid item xs={3}>
+                  <Button
+                    variant="text"
+                    disableRipple
+                    onClick={() => setShowMore(true)}
+                    style={{
+                      padding: 0,
+                      margin: 0,
+                      textTransform: 'none',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
+                    <Typography
                       style={{
-                        padding: 0,
-                        margin: 0,
-                        textTransform: 'none',
-                        backgroundColor: 'transparent',
+                        color: 'grey',
+                        display: 'flex',
+                        alignItems: 'center',
                       }}
                     >
-                      <Typography
-                        style={{
-                          color: 'grey',
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <ExpandLessIcon
-                          fontSize="small"
-                          style={{ marginRight: '5px' }}
-                        />
-                        Show less
-                      </Typography>
-                    </Button>
-                  </Grid>
+                      <ExpandMoreIcon
+                        fontSize="small"
+                        style={{ marginRight: '5px' }}
+                      />
+                      Show More
+                    </Typography>
+                  </Button>
                 </Grid>
-              ) : (
-                <Grid container>
-                  <Grid item xs={3}>
-                    <Button
-                      variant="text"
-                      disableRipple
-                      onClick={() => setShowMore(true)}
-                      style={{
-                        padding: 0,
-                        margin: 0,
-                        textTransform: 'none',
-                        backgroundColor: 'transparent',
-                      }}
-                    >
-                      <Typography
-                        style={{
-                          color: 'grey',
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <ExpandMoreIcon
-                          fontSize="small"
-                          style={{ marginRight: '5px' }}
-                        />
-                        Show More
-                      </Typography>
-                    </Button>
-                  </Grid>
-                </Grid>
-              )
-            )
+              </Grid>
+            )}
+          </>
         ) : (
           <Typography>
             No billing history related to the current perkify plan. This
