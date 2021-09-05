@@ -78,6 +78,23 @@ export const allProductionPerksDict = allProductionPerks.reduce(
   {} as PerkDefinitionsDict
 );
 
+export const allProductionPerksByPriceIDDict = allProductionPerks.reduce(
+  (map, perk) => (
+    (map[perk.stripePriceId] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+      Img: perk.Img,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
+    }),
+    map
+  ),
+  {} as PerkDefinitionsDict
+);
+
 export const allDevelopmentPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
@@ -144,6 +161,23 @@ export const allDevelopmentPerks: PerkDefinition[] = [
 export const allDevelopmentPerksDict = allDevelopmentPerks.reduce(
   (map, perk) => (
     (map[perk.Name] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+      Img: perk.Img,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
+    }),
+    map
+  ),
+  {} as PerkDefinitionsDict
+);
+
+export const allDevelopmentPerksByPriceIDDict = allDevelopmentPerks.reduce(
+  (map, perk) => (
+    (map[perk.stripePriceId] = {
       Cost: perk['Cost'],
       Period: perk['Period'],
       Name: perk.Name,

@@ -14,7 +14,7 @@ import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { allPerksByPriceIDDict, privatePerksByPriceIDDict } from 'shared';
+import { allPerksByPriceIDDict, cardMaintenancePerk } from 'shared';
 import PriceBreakdownTable from './priceBreakdownTable';
 import { SectionHeading } from './sectionHeading';
 
@@ -117,10 +117,12 @@ const InvoiceDetails = ({
 
       const cardMaintenanceFee =
         Object.values(mergedLineItems)
-          .filter((lineItem) => lineItem.priceID in privatePerksByPriceIDDict)
+          .filter(
+            (lineItem) => lineItem.priceID == cardMaintenancePerk.stripePriceID
+          )
           .map((simpleLineItem) => ({
-            perkName: privatePerksByPriceIDDict[simpleLineItem.priceID].name,
-            price: privatePerksByPriceIDDict[simpleLineItem.priceID].cost,
+            perkName: cardMaintenancePerk.name,
+            price: cardMaintenancePerk.cost,
             quantity: simpleLineItem.quantity,
             amount: simpleLineItem.amount,
           }))?.[0]?.amount || 0;
