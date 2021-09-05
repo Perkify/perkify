@@ -1,5 +1,6 @@
-import { Grid, IconButton, Typography } from '@material-ui/core';
+import { IconButton, Typography } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
+import { InfoRow } from 'components/InfoRow';
 import * as dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { db } from 'services';
@@ -157,40 +158,20 @@ export const InvoiceDetails = ({
           </Typography>
 
           <SectionHeading title="SUMMARY" color="grey">
-            <Grid container>
-              <Grid item xs={3}>
-                Payment date:
-              </Grid>
-              <Grid item xs={6}>
-                <Typography>
-                  {dayjs
-                    .unix(invoiceObject.status_transitions.paid_at)
-                    .format('MMMM DD, YYYY')}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs={3}>
-                Payment method:
-              </Grid>
-              <Grid item xs={6}>
-                {cardData && (
-                  <Typography>{`${
-                    cardData.brand.charAt(0).toUpperCase() +
-                    cardData.brand.slice(1)
-                  } \u2022\u2022\u2022\u2022 ${cardData.last4}`}</Typography>
-                )}
-              </Grid>
-            </Grid>
+            <InfoRow
+              keyName="Payment date:"
+              value={dayjs
+                .unix(invoiceObject.status_transitions.paid_at)
+                .format('MMMM DD, YYYY')}
+            />
+            <InfoRow
+              keyName="Payment method:"
+              value={`${
+                cardData.brand.charAt(0).toUpperCase() + cardData.brand.slice(1)
+              } \u2022\u2022\u2022\u2022 ${cardData.last4}`}
+            />
 
-            <Grid container>
-              <Grid item xs={3}>
-                From:
-              </Grid>
-              <Grid item xs={6}>
-                <Typography>{invoiceObject.account_name}</Typography>
-              </Grid>
-            </Grid>
+            <InfoRow keyName="From:" value={invoiceObject.account_name} />
           </SectionHeading>
 
           <SectionHeading title="ITEMS" color="grey">
