@@ -10,20 +10,6 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { makeStyles } from '@material-ui/styles';
 import React from 'react';
 
-interface CostBreakdownRow {
-  perkName: string;
-  quantity: number;
-  price: number;
-  amount: number;
-}
-
-interface SubscriptionPrices {
-  subtotal: number;
-  volumeFee: number;
-  cardMaintenanceFee: number;
-  total: number;
-}
-
 const useStyles = makeStyles({
   table: {
     minWidth: 550,
