@@ -33,6 +33,8 @@ const db = app.firestore();
 const auth = app.auth();
 const functions = app.functions();
 
+const environment = process.env.FIREBASE_STRIPE_ENVIRONMENT;
+
 if (process.env.REACT_APP_FIREBASE_MODE == 'emulator') {
   console.info('Using emulator firestore');
   auth.useEmulator('http://localhost:9099');
@@ -40,5 +42,5 @@ if (process.env.REACT_APP_FIREBASE_MODE == 'emulator') {
   functions.useEmulator('localhost', 5001);
 }
 
-export default app;
-export { db, auth, functions };
+// export default app;
+export { app, db, auth, functions, environment };

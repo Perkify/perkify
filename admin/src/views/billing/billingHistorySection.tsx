@@ -4,9 +4,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { Subscription } from '../../types/stripeTypes';
+import { db } from 'services';
 import { InvoiceDetails } from './invoiceDetails';
 import { SectionHeading } from './sectionHeading';
 

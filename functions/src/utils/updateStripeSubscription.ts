@@ -1,8 +1,7 @@
 import { NextFunction } from 'express';
 import { logger } from 'firebase-functions';
-import { allPerksDict, privatePerksDict, taxRates } from '../../shared';
 import { db, stripe } from '../services';
-import { Subscription } from '../types';
+import { allPerksDict, cardMaintenancePerk, taxRates } from '../shared';
 import { shrinkUsers } from './crudHelpers';
 import { propogateSubscriptionUpdateToLiveUsers } from './propogateSubscriptionUpdateToLiveUsers';
 
@@ -72,7 +71,7 @@ export const updateStripeSubscription = async (
   ).concat([
     // add the perkify cost per employee with no tax rate
     {
-      price: privatePerksDict['Perkify Cost Per Employee'].stripePriceID,
+      price: cardMaintenancePerk.stripePriceID,
       quantity: numEmployees,
       tax_rates: [],
     },
@@ -193,9 +192,7 @@ export const updateStripeSubscription = async (
         Object.keys(quantityByPriceID).concat(Object.keys(oldQuantityByPriceID))
       )
     ).filter(
-      (stripePriceID) =>
-        stripePriceID !=
-        privatePerksDict['Perkify Cost Per Employee'].stripePriceID
+      (stripePriceID) => stripePriceID != cardMaintenancePerk.stripePriceID
     );
 
     // should be true if for every price id, the new subscription quantity is greater than

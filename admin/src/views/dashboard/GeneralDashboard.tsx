@@ -8,8 +8,8 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
+import { db } from 'services';
 import { allPerksDict } from 'shared';
 import BChart from './BarChart';
 import { CreatePerkGroupCard } from './CreatePerkGroupCard';

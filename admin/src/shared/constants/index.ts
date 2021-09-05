@@ -1,5 +1,3 @@
-import { functions } from '../src/services';
-
 export const allProductionPerks: PerkDefinition[] = [
   {
     Name: 'Netflix Standard',
@@ -62,6 +60,40 @@ export const allProductionPerks: PerkDefinition[] = [
     PaymentName: 'Spotify Individual',
   },
 ];
+
+export const allProductionPerksDict = allProductionPerks.reduce(
+  (map, perk) => (
+    (map[perk.Name] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+      Img: perk.Img,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
+    }),
+    map
+  ),
+  {} as PerkDefinitionsDict
+);
+
+export const allProductionPerksByPriceIDDict = allProductionPerks.reduce(
+  (map, perk) => (
+    (map[perk.stripePriceId] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+      Img: perk.Img,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
+    }),
+    map
+  ),
+  {} as PerkDefinitionsDict
+);
 
 export const allDevelopmentPerks: PerkDefinition[] = [
   {
@@ -126,12 +158,7 @@ export const allDevelopmentPerks: PerkDefinition[] = [
   },
 ];
 
-export const allPerks =
-  functions.config()['stripe-firebase'].environment == 'production'
-    ? allProductionPerks
-    : allDevelopmentPerks;
-
-export const allPerksDict = allPerks.reduce(
+export const allDevelopmentPerksDict = allDevelopmentPerks.reduce(
   (map, perk) => (
     (map[perk.Name] = {
       Cost: perk['Cost'],
@@ -147,3 +174,48 @@ export const allPerksDict = allPerks.reduce(
   ),
   {} as PerkDefinitionsDict
 );
+
+export const allDevelopmentPerksByPriceIDDict = allDevelopmentPerks.reduce(
+  (map, perk) => (
+    (map[perk.stripePriceId] = {
+      Cost: perk['Cost'],
+      Period: perk['Period'],
+      Name: perk.Name,
+      Img: perk.Img,
+      stripePriceId: perk.stripePriceId,
+      PaymentName: perk.PaymentName,
+      Product: perk.Product,
+      NetworkId: perk.NetworkId,
+    }),
+    map
+  ),
+  {} as PerkDefinitionsDict
+);
+
+export const productionTaxRates = {
+  perkifyTax: {
+    stripeTaxID: 'txr_1JQwiMKuQQHSHZsmmD7Gf99O',
+  },
+};
+
+export const developmentTaxRates = {
+  perkifyTax: {
+    stripeTaxID: 'txr_1JQwiHKuQQHSHZsmAxTOyFTH',
+  },
+};
+
+export const productionCardMaintenancePerk: PrivatePerkDefinition = {
+  name: 'Perkify Cost Per Employee',
+  cost: 3.99,
+  period: 'Monthly',
+  stripePriceID: 'price_1JQwT3KuQQHSHZsm3VUYAo7Z',
+  stripeProductID: 'prod_K4UBKT9PixGkHS',
+};
+
+export const developmentCardMaintenancePerk: PrivatePerkDefinition = {
+  name: 'Perkify Cost Per Employee',
+  cost: 3.99,
+  period: 'Monthly',
+  stripePriceID: 'price_1JQwShKuQQHSHZsmuKAJ3Xej',
+  stripeProductID: 'prod_K0joFcwnLJ2uXG',
+};

@@ -1,9 +1,9 @@
 import { Grid, IconButton, Typography } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import * as dayjs from 'dayjs';
-import { db } from 'firebaseApp';
 import React, { useEffect, useState } from 'react';
-import { allPerksByPriceIDDict, privatePerksByPriceIDDict } from 'shared';
+import { db } from 'services';
+import { allPerksByPriceIDDict, cardMaintenancePerk } from 'shared';
 import PriceBreakdownTable from './priceBreakdownTable';
 import { SectionHeading } from './sectionHeading';
 
@@ -106,10 +106,12 @@ export const InvoiceDetails = ({
       // get the card maintenance fee
       const cardMaintenanceFee =
         Object.values(mergedLineItems)
-          .filter((lineItem) => lineItem.priceID in privatePerksByPriceIDDict)
+          .filter(
+            (lineItem) => lineItem.priceID == cardMaintenancePerk.stripePriceID
+          )
           .map((simpleLineItem) => ({
-            perkName: privatePerksByPriceIDDict[simpleLineItem.priceID].name,
-            price: privatePerksByPriceIDDict[simpleLineItem.priceID].cost,
+            perkName: cardMaintenancePerk.name,
+            price: cardMaintenancePerk.cost,
             quantity: simpleLineItem.quantity,
             amount: simpleLineItem.amount,
           }))?.[0]?.amount || 0;

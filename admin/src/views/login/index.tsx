@@ -20,9 +20,9 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
-import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { app } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {

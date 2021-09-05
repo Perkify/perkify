@@ -1,5 +1,11 @@
 // api payloads
 
+interface PerkifyError {
+  status: number;
+  reason: string;
+  reasonDetail: string;
+}
+
 interface RegisterAdminAndBusinessPayload {
   firstName: string;
   lastName: string;
@@ -35,4 +41,8 @@ interface UpdatePerkGroupPayload {
 interface AddPaymentMethodPayload {
   paymentMethodID: string;
   useAsDefaultCreditCard: boolean;
+}
+
+interface ExpandUsersPayload {
+  business: Business;
 }

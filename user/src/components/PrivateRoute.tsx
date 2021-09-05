@@ -1,8 +1,8 @@
 import { AuthContext } from 'contexts/Auth';
 import firebase from 'firebase';
-import { auth, db } from 'firebaseApp';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
+import { auth, db } from 'services';
 import GettingStarted from '../views/gettingStarted';
 
 interface PrivateRouteProps {
