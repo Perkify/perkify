@@ -124,7 +124,7 @@ const InvoiceDetails = ({
             {`$${subscriptionPrices.total}`}
           </Typography>
 
-          <SectionHeading title="SUMMARY">
+          <SectionHeading title="SUMMARY" color="grey">
             <Grid container>
               <Grid item xs={3}>
                 Payment date:
@@ -161,7 +161,7 @@ const InvoiceDetails = ({
             </Grid>
           </SectionHeading>
 
-          <SectionHeading title="ITEMS">
+          <SectionHeading title="ITEMS" color="grey">
             <PriceBreakdownTable
               rows={rows}
               subscriptionPrices={subscriptionPrices}

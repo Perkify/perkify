@@ -4,11 +4,11 @@ import React from 'react';
 export const SectionHeading = ({
   title,
   children,
-}: // color,
-{
+  color,
+}: {
   title: string;
   children: React.ReactNode;
-  // color?: string;
+  color?: string;
 }) => {
   return (
     <div style={{ marginBottom: '80px' }}>
@@ -18,7 +18,7 @@ export const SectionHeading = ({
         style={{
           display: 'inline-block',
           fontWeight: 'bold',
-          // color: color ? color : 'black',
+          color: color ? color : 'black',
         }}
       >
         {title}
