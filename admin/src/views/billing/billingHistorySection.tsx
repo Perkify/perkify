@@ -1,5 +1,14 @@
-import { Drawer, Grid, IconButton, Theme, Typography } from '@material-ui/core';
+import {
+  Button,
+  Drawer,
+  Grid,
+  IconButton,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
@@ -286,36 +295,108 @@ export const DisplayBillingHistory = () => {
     <>
       <div className={classes.listContainer}>
         {invoiceRows ? (
-          invoiceRows.map((invoiceObj) => (
-            <Grid container>
-              <Grid item xs={3}>
-                <Typography
-                  style={{
-                    // fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  {dayjs.unix(invoiceObj.paidAt).format('MMMM DD, YYYY')}
-                  {/* <OpenInNewIcon fontSize="small" style={{ marginLeft: '5px' }} /> */}
-                </Typography>
+          invoiceRows
+            .slice(
+              0,
+              showMore
+                ? invoiceRows.length
+                : invoiceRows.length >= 3
+                ? 3
+                : invoiceRows.length
+            )
+            .map((invoiceObj) => (
+              <Grid container>
+                <Grid item xs={3}>
+                  <Typography
+                    style={{
+                      // fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {dayjs.unix(invoiceObj.paidAt).format('MMMM DD, YYYY')}
+                    {/* <OpenInNewIcon fontSize="small" style={{ marginLeft: '5px' }} /> */}
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography>{`$${invoiceObj.total / 100}`}</Typography>
+                </Grid>
+                <Grid item xs={3}>
+                  <Typography
+                    onClick={() => {
+                      setViewInvoiceDetailsID(invoiceObj.id);
+                    }}
+                    variant="button"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    View invoice details
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid item xs={2}>
-                <Typography>{`$${invoiceObj.total / 100}`}</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography
-                  onClick={() => {
-                    setViewInvoiceDetailsID(invoiceObj.id);
-                  }}
-                  variant="button"
-                  style={{ cursor: 'pointer' }}
-                >
-                  View invoice details
-                </Typography>
-              </Grid>
-            </Grid>
-          ))
+            ))
+            .concat(
+              invoiceRows.length <= 3 ? null : showMore ? (
+                <Grid container>
+                  <Grid item xs={3}>
+                    <Button
+                      variant="text"
+                      disableRipple
+                      onClick={() => setShowMore(false)}
+                      style={{
+                        padding: 0,
+                        margin: 0,
+                        textTransform: 'none',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          color: 'grey',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <ExpandLessIcon
+                          fontSize="small"
+                          style={{ marginRight: '5px' }}
+                        />
+                        Show less
+                      </Typography>
+                    </Button>
+                  </Grid>
+                </Grid>
+              ) : (
+                <Grid container>
+                  <Grid item xs={3}>
+                    <Button
+                      variant="text"
+                      disableRipple
+                      onClick={() => setShowMore(true)}
+                      style={{
+                        padding: 0,
+                        margin: 0,
+                        textTransform: 'none',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          color: 'grey',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <ExpandMoreIcon
+                          fontSize="small"
+                          style={{ marginRight: '5px' }}
+                        />
+                        Show More
+                      </Typography>
+                    </Button>
+                  </Grid>
+                </Grid>
+              )
+            )
         ) : (
           <Typography>
             No billing history. This business has not paid any invoices yet.
