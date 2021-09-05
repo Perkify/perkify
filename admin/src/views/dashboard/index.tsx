@@ -3,11 +3,11 @@ import { LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import Billing from 'views/billing';
+import Settings from 'views/businessSettings';
 import CreateGroup from 'views/createGroup';
 import ManagePeople from 'views/employees';
 import Logout from 'views/logout';
 import ManageGroups from 'views/manageGroups';
-import Settings from 'views/settings';
 import GeneralDashboard from './GeneralDashboard';
 
 const Dashboard = () => {
