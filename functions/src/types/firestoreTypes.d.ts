@@ -1,9 +1,5 @@
-interface PerkifyError {
-  status: number;
-  reason: string;
-  reasonDetail: string;
-}
-
+// simple card payment method
+// used for storing payment methods in businesses
 interface SimpleCardPaymentMethod {
   brand: string;
   country: string;
@@ -16,18 +12,7 @@ interface SimpleCardPaymentMethod {
   paymentMethodID: string;
 }
 
-interface Admin {
-  businessID: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface PerkGroup {
-  perkNames: string[];
-  userEmails: string[];
-}
-
+// represents a businesses billing address
 interface BillingAddress {
   city: string;
   country: string;
@@ -38,6 +23,13 @@ interface BillingAddress {
   state: string;
 }
 
+// represents a perk group in a business
+interface PerkGroup {
+  perkNames: string[];
+  userEmails: string[];
+}
+
+// represents a business
 interface Business {
   // business ref id
   businessID: string;
@@ -60,12 +52,23 @@ interface Business {
   };
 }
 
-// FirebaseFirestore.Timestamp
-type PerkUses = any[];
+// represents an admin
+interface Admin {
+  businessID: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+// list of timestamps corresponding to perk uses
+type PerkUses = FirebaseFirestore.Timestamp[];
+
+// mapping from perk to corresponding perk uses
 interface PerkUsesDict {
   [key: string]: PerkUses;
 }
 
+// for storing a user's virtual card
 interface UserCard {
   id: string;
   cardholderID: string;
@@ -80,6 +83,8 @@ interface UserCard {
   };
 }
 
+// User object
+// firstName, lastName, and card are optional
 type User = {
   email: string;
   businessID: string;
@@ -90,27 +95,8 @@ type User = {
   card?: UserCard;
 };
 
+// once a user is activated, all types are required
 type ActivatedUser = Required<User>;
-
-interface UserToCreate {
-  email: string;
-  businessID: string;
-  perkGroupName: string;
-  newPerkNames: string[];
-}
-
-interface UserToUpdate {
-  email: string;
-  newPerkNames: string[];
-  oldPerkUsesDict: {
-    [key: string]: PerkUses;
-  };
-}
-
-interface UserToDelete {
-  email: string;
-  card?: UserCard;
-}
 
 // TODO camelCase keys
 interface PerkDefinition {
@@ -128,6 +114,14 @@ interface PerkDefinitionsDict {
   [key: string]: PerkDefinition;
 }
 
-interface ExpandUsersPayload {
-  business: Business;
+interface PrivatePerkDefinition {
+  name: string;
+  cost: number;
+  period: string;
+  stripePriceID: string;
+  stripeProductID: string;
+}
+
+interface PrivatePerkDefinitionsDict {
+  [key: string]: PrivatePerkDefinition;
 }

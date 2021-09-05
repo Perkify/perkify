@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
 import { param } from 'express-validator';
 import { db, stripe } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkValidationResult,
   validateAdminDoc,
   validateBusinessDoc,

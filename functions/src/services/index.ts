@@ -26,6 +26,8 @@ const queuePath: string = tasksClient.queuePath(
   queue
 );
 
+const environment = functions.config()['stripe-firebase'].environment;
+
 export default admin;
 
 export {
@@ -38,4 +40,5 @@ export {
   project,
   firebaseProjectLocation,
   firebaseFunctionsUrl,
+  environment,
 };

@@ -2,8 +2,8 @@ import { NextFunction, Response } from 'express';
 import { body } from 'express-validator';
 import { logger } from 'firebase-functions';
 import { db, stripe } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkValidationResult,
   validateAdminDoc,
   validateBusinessDoc,

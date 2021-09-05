@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { stripe } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkValidationResult,
   validateAdminDoc,
   validateBusinessDoc,

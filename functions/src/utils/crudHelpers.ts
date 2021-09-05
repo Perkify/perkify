@@ -1,5 +1,4 @@
 import { logger } from 'firebase-functions';
-import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
@@ -38,13 +37,14 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
   }
 
   // send email
-  await db.collection('mail').add({
-    to: userToCreate.email,
-    message: {
-      subject: 'Your employer has signed you up for Perkify!',
-      html: newUserTemplateGenerator({ signInLink }),
-    },
-  });
+  // changed in email PR
+  // await db.collection('mail').add({
+  //   to: userToCreate.email,
+  //   message: {
+  //     subject: 'Your employer has signed you up for Perkify!',
+  //     html: newUserTemplateGenerator({ signInLink }),
+  //   },
+  // });
 };
 
 export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
