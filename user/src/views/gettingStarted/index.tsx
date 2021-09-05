@@ -8,9 +8,8 @@ import TextField from '@material-ui/core/TextField';
 import { AuthContext } from 'contexts/Auth';
 import { ReactComponent as GettingStartedImage } from 'images/gettingStarted.svg';
 import React, { useContext } from 'react';
-import { PerkifyApi } from 'services';
+import { db, PerkifyApi } from 'services';
 import { LoadingContext } from '../../contexts';
-import { db } from '../../firebaseApp';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {

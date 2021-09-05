@@ -14,8 +14,8 @@ import Typography from '@material-ui/core/Typography';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
-import app, { db } from 'firebaseApp';
 import React, { useState } from 'react';
+import { app, db } from 'services';
 
 function Copyright() {
   return (
