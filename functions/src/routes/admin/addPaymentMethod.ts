@@ -40,11 +40,6 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
         return next(error);
       }
 
-      // update the default payment method of the stripe customer
-      await stripe.customers.update(businessData.businessID, {
-        invoice_settings: { default_payment_method: paymentMethodID },
-      });
-
       // get the business payment methods
       const cardPaymentMethods = req.businessData.cardPaymentMethods;
 
@@ -52,6 +47,11 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
         // set all of them to false if we are adding a default card
         Object.keys(cardPaymentMethods).forEach((cardFingerprint) => {
           cardPaymentMethods[cardFingerprint].default = false;
+        });
+
+        // update the default payment method of the stripe customer
+        await stripe.customers.update(businessData.businessID, {
+          invoice_settings: { default_payment_method: paymentMethodID },
         });
       }
 
