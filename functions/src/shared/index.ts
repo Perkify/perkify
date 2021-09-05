@@ -1,8 +1,10 @@
 import { environment } from '../services';
 import {
   allDevelopmentPerks,
+  allDevelopmentPerksByPriceIDDict,
   allDevelopmentPerksDict,
   allProductionPerks,
+  allProductionPerksByPriceIDDict,
   allProductionPerksDict,
   developmentCardMaintenancePerk,
   developmentTaxRates,
@@ -17,6 +19,11 @@ export const allPerksDict =
   environment == 'production'
     ? allProductionPerksDict
     : allDevelopmentPerksDict;
+
+export const allPerksByPriceIDDict =
+  environment == 'production'
+    ? allProductionPerksByPriceIDDict
+    : allDevelopmentPerksByPriceIDDict;
 
 export const cardMaintenancePerk =
   environment == 'production'

@@ -15,7 +15,6 @@ import * as dayjs from 'dayjs';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksByPriceIDDict, privatePerksByPriceIDDict } from 'shared';
-import { Subscription } from '../../types/stripeTypes';
 import PriceBreakdownTable from './priceBreakdownTable';
 import { SectionHeading } from './sectionHeading';
 
