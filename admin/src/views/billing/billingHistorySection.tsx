@@ -5,11 +5,16 @@ import { BusinessContext } from 'contexts';
 import * as dayjs from 'dayjs';
 import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { allPerksByPriceIDDict } from 'shared';
+import { allPerksByPriceIDDict, privatePerksByPriceIDDict } from 'shared';
 import { Subscription } from '../../types/stripeTypes';
 import PriceBreakdownTable from './priceBreakdownTable';
 import { SectionHeading } from './sectionHeading';
 
+interface SimpleLineItem {
+  priceID: string;
+  quantity: number;
+  amount: number;
+}
 interface CostBreakdownRow {
   perkName: string;
   quantity: number;
@@ -55,27 +60,68 @@ const InvoiceDetails = ({
           );
         });
 
-      const newRows: CostBreakdownRow[] = invoiceObject.lines.data
-        .filter((lineItem: any) => lineItem.price.id in allPerksByPriceIDDict)
-        .map((lineItem: any) => ({
-          perkName: allPerksByPriceIDDict[lineItem.price.id].Name,
-          quantity: lineItem.quantity,
-          price: allPerksByPriceIDDict[lineItem.price.id].Cost,
-          amount: lineItem.amount / 100,
+      const mergedLineItems: { [key: string]: SimpleLineItem } =
+        invoiceObject.lines.data
+          .map((lineItem: any) => ({
+            priceID: lineItem.price.id,
+            quantity: lineItem.quantity,
+            amount: lineItem.amount / 100,
+          }))
+          .reduce(
+            (
+              acc: { [key: string]: SimpleLineItem },
+              simpleLineItem: SimpleLineItem
+            ) => {
+              if (simpleLineItem.priceID in acc) {
+                const accLineItem = acc[simpleLineItem.priceID];
+                acc[simpleLineItem.priceID] = {
+                  priceID: simpleLineItem.priceID,
+                  quantity:
+                    accLineItem.quantity +
+                    (simpleLineItem.amount > 0
+                      ? simpleLineItem.quantity
+                      : -simpleLineItem.quantity),
+                  amount: accLineItem.amount + simpleLineItem.amount,
+                };
+              } else {
+                acc[simpleLineItem.priceID] = {
+                  priceID: simpleLineItem.priceID,
+                  quantity:
+                    simpleLineItem.amount > 0
+                      ? simpleLineItem.quantity
+                      : -simpleLineItem.quantity,
+                  amount: simpleLineItem.amount,
+                };
+              }
+              return acc;
+            },
+            {}
+          );
+
+      const newRows: CostBreakdownRow[] = Object.values(mergedLineItems)
+        .filter((lineItem) => lineItem.priceID in allPerksByPriceIDDict)
+        .map((simpleLineItem) => ({
+          perkName: allPerksByPriceIDDict[simpleLineItem.priceID].Name,
+          price: allPerksByPriceIDDict[simpleLineItem.priceID].Cost,
+          quantity: simpleLineItem.quantity,
+          amount: simpleLineItem.amount,
         }));
 
-      const cardMaintenanceFeeItem = invoiceObject.lines.data.filter(
-        (lineItem: any) => !(lineItem.price.id in allPerksByPriceIDDict)
-      )[0];
+      const cardMaintenanceFee =
+        Object.values(mergedLineItems)
+          .filter((lineItem) => lineItem.priceID in privatePerksByPriceIDDict)
+          .map((simpleLineItem) => ({
+            perkName: privatePerksByPriceIDDict[simpleLineItem.priceID].name,
+            price: privatePerksByPriceIDDict[simpleLineItem.priceID].cost,
+            quantity: simpleLineItem.quantity,
+            amount: simpleLineItem.amount,
+          }))?.[0]?.amount || 0;
 
       const subtotal = newRows.reduce((acc, row) => {
         return acc + row.amount;
       }, 0);
 
       const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
-
-      const cardMaintenanceFee =
-        Math.round(3.99 * cardMaintenanceFeeItem.quantity * 100) / 100;
 
       const total =
         Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) / 100;
@@ -209,27 +255,29 @@ export const DisplayBillingHistory = () => {
             (doc.data() as Subscription).status == 'active'
         )?.[0];
 
-        db.collection('businesses')
-          .doc(business.businessID)
-          .collection('subscriptions')
-          .doc(staticSubscriptionItem.id)
-          .collection('invoices')
-          .onSnapshot((invoicesSnapshot) => {
-            // want to get paid invoices, their dates, and their price
-            const paidInvoices = invoicesSnapshot.docs.filter(
-              (doc) => doc.data().status == 'paid'
-            );
+        if (staticSubscriptionItem) {
+          db.collection('businesses')
+            .doc(business.businessID)
+            .collection('subscriptions')
+            .doc(staticSubscriptionItem.id)
+            .collection('invoices')
+            .onSnapshot((invoicesSnapshot) => {
+              // want to get paid invoices, their dates, and their price
+              const paidInvoices = invoicesSnapshot.docs
+                .filter((doc) => doc.data().status == 'paid')
+                .sort((a, b) => (a.data().paid_at > b.data().paid_at ? -1 : 1));
 
-            setInvoiceRows(
-              paidInvoices.map((invoice) => ({
-                paidAt: invoice.data().status_transitions.paid_at,
-                total: invoice.data().total,
-                id: invoice.data().id,
-              }))
-            );
+              setInvoiceRows(
+                paidInvoices.map((invoice) => ({
+                  paidAt: invoice.data().status_transitions.paid_at,
+                  total: invoice.data().total,
+                  id: invoice.data().id,
+                }))
+              );
 
-            setInvoiceObjects(paidInvoices.map((invoice) => invoice.data()));
-          });
+              setInvoiceObjects(paidInvoices.map((invoice) => invoice.data()));
+            });
+        }
       })();
     }
   }, [business]);
@@ -237,7 +285,7 @@ export const DisplayBillingHistory = () => {
   return (
     <>
       <div className={classes.listContainer}>
-        {invoiceRows &&
+        {invoiceRows ? (
           invoiceRows.map((invoiceObj) => (
             <Grid container>
               <Grid item xs={3}>
@@ -260,13 +308,19 @@ export const DisplayBillingHistory = () => {
                   onClick={() => {
                     setViewInvoiceDetailsID(invoiceObj.id);
                   }}
+                  variant="button"
                   style={{ cursor: 'pointer' }}
                 >
                   View invoice details
                 </Typography>
               </Grid>
             </Grid>
-          ))}
+          ))
+        ) : (
+          <Typography>
+            No billing history. This business has not paid any invoices yet.
+          </Typography>
+        )}
       </div>
       <Drawer
         anchor="right"

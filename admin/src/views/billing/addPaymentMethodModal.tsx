@@ -12,31 +12,17 @@ import {
   Theme,
 } from '@material-ui/core';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { AuthContext, BusinessContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 
 const CARD_OPTIONS = {
-  //   iconStyle: 'solid' as const,
   style: {
     base: {
-      //       iconColor: '#c4f0ff',
-      //       color: '#fff',
       fontWeight: 500,
       fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
       fontSize: '18px',
-      //       fontSmoothing: 'antialiased',
-      //       ':-webkit-autofill': {
-      //         color: '#fce883',
-      //       },
-      //       '::placeholder': {
-      //         color: '#87bbfd',
-      //       },
     },
-    //     invalid: {
-    //       iconColor: '#ffc7ee',
-    //       color: '#ffc7ee',
-    //     },
   },
 };
 
@@ -65,9 +51,12 @@ const AddPaymentMethodModal = ({
   const { business } = useContext(BusinessContext);
   const { currentUser } = useContext(AuthContext);
 
+  const { setDashboardLoading } = useContext(LoadingContext);
+
   const handleSubmit = async (event: any) => {
     // Block native form submission.
     event.preventDefault();
+    setDashboardLoading(true);
 
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
@@ -112,18 +101,23 @@ const AddPaymentMethodModal = ({
         paymentMethodID: result.setupIntent.payment_method,
         useAsDefaultCreditCard,
       };
-      console.log('Card saved successfully');
-      await PerkifyApi.post(
-        `rest/business/${business.businessID}/paymentMethod`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+
+      try {
+        await PerkifyApi.post(
+          `rest/business/${business.businessID}/paymentMethod`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        alert(error.response.data.reason);
+      }
     }
+    setDashboardLoading(false);
   };
 
   return (

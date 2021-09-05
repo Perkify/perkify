@@ -1,128 +1,8 @@
-export const allProductionPerks: PerkDefinition[] = [
-  {
-    Name: 'Netflix Standard',
-    Cost: 13.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmDumwGzZO',
-    Img: 'netflix.jpeg',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
-  },
-  {
-    Name: 'Hulu',
-    Cost: 5.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmONWkPuco',
-    Img: 'hulu.png',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Hulu',
-  },
-  {
-    Name: 'Audible Plus',
-    Cost: 7.95,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsm4AKknHlG',
-    Img: 'audible.png',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Audible Plus',
-  },
-  {
-    Name: 'Disney Plus',
-    Cost: 7.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmy9hQBoua',
-    Img: 'disneyplus.png',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Disney Plus',
-  },
-  {
-    Name: 'Headspace',
-    Cost: 12.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmYkEC0shJ',
-    Img: 'headspace.png',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Headspace',
-  },
-  {
-    Name: 'Spotify Individual',
-    Cost: 9.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmsONWEqGC',
-    Img: 'spotify.jpg',
-    Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Spotify Individual',
-  },
-];
-
-export const allDevelopmentPerks: PerkDefinition[] = [
-  {
-    Name: 'Netflix Standard',
-    Cost: 13.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmeSywK8YU',
-    Img: 'netflix.jpg',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
-  },
-  {
-    Name: 'Hulu',
-    Cost: 5.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmDtISKvuX',
-    Img: 'hulu.png',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Hulu',
-  },
-  {
-    Name: 'Audible Plus',
-    Cost: 7.95,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmhxvfp9Nj',
-    Img: 'audible.png',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Audible Plus',
-  },
-  {
-    Name: 'Disney Plus',
-    Cost: 7.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmcjOXLZQ5',
-    Img: 'disneyplus.png',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Disney Plus',
-  },
-  {
-    Name: 'Headspace',
-    Cost: 12.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsm6MkAUBVb',
-    Img: 'headspace.png',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Headspace',
-  },
-  {
-    Name: 'Spotify Individual',
-    Cost: 9.99,
-    Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmZ5ARUKue',
-    Img: 'spotify.jpg',
-    Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Spotify Individual',
-  },
-];
+import { allDevelopmentPerks, allProductionPerks } from './perkDefinitions';
+import {
+  privateDevelopmentPerks,
+  privateProductionPerks,
+} from './privatePerkDefinitions';
 
 export const allPerks =
   process.env.FIREBASE_STRIPE_ENVIRONMENT == 'production'
@@ -161,4 +41,37 @@ export const allPerksByPriceIDDict = allPerks.reduce(
     map
   ),
   {} as PerkDefinitionsDict
+);
+
+export const privatePerks =
+  process.env.FIREBASE_STRIPE_ENVIRONMENT == 'production'
+    ? privateProductionPerks
+    : privateDevelopmentPerks;
+
+export const privatePerksDict = privatePerks.reduce(
+  (map, perk) => (
+    (map[perk.name] = {
+      cost: perk['cost'],
+      period: perk['period'],
+      name: perk.name,
+      stripePriceID: perk.stripePriceID,
+      stripeProductID: perk.stripeProductID,
+    }),
+    map
+  ),
+  {} as PrivatePerkDefinitionsDict
+);
+
+export const privatePerksByPriceIDDict = privatePerks.reduce(
+  (map, perk) => (
+    (map[perk.stripePriceID] = {
+      cost: perk['cost'],
+      period: perk['period'],
+      name: perk.name,
+      stripePriceID: perk.stripePriceID,
+      stripeProductID: perk.stripeProductID,
+    }),
+    map
+  ),
+  {} as PrivatePerkDefinitionsDict
 );

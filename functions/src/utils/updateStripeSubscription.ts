@@ -95,6 +95,11 @@ export const updateStripeSubscription = async (
     // the admin doesn't have any subscriptions
     // create a subscription for them
     try {
+      logger.info(`Creating stripe subscription for ${businessID}`, {
+        customer: businessData.stripeId,
+        items: newSubscriptionItemsList,
+        payment_behavior: 'error_if_incomplete',
+      });
       // will throw an error if payment fails
       const subscription = await stripe.subscriptions.create({
         customer: businessData.stripeId,
@@ -263,7 +268,9 @@ export const updateStripeSubscription = async (
       if (Object.keys(businessData.perkGroups).length == 0) {
         // cancel the subscription because the business has no perk groups / perks
 
-        logger.info(`Deleting stripe subscription ${subscriptionItem.id} for ${businessID}`)
+        logger.info(
+          `Deleting stripe subscription ${subscriptionItem.id} for ${businessID}`
+        );
 
         // should succeed every time
         await stripe.subscriptions.del(subscriptionItem.id, {
@@ -272,14 +279,13 @@ export const updateStripeSubscription = async (
       } else {
         // otherwise we just update the subscription, don't cancel it
 
-
-      logger.info(
-        `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
-        {
-          items: newSubscriptionItemsList,
-          proration_behavior: 'none',
-        }
-      );
+        logger.info(
+          `Decreasing stripe subscription ${subscriptionItem.id} for ${businessID}`,
+          {
+            items: newSubscriptionItemsList,
+            proration_behavior: 'none',
+          }
+        );
 
         // should succeed every time
         await stripe.subscriptions.update(subscriptionItem.id, {

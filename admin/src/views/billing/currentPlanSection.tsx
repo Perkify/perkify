@@ -62,60 +62,66 @@ export const DisplayCurrentPlan = () => {
             (doc.data() as Subscription).status == 'active'
         )?.[0];
 
-        db.collection('businesses')
-          .doc(business.businessID)
-          .collection('subscriptions')
-          .doc(staticSubscriptionItem.id)
-          .onSnapshot((subscriptionItem) => {
-            if (subscriptionItem && subscriptionItem.exists) {
-              const subscriptionObject =
-                subscriptionItem.data() as Subscription;
+        if (staticSubscriptionItem) {
+          db.collection('businesses')
+            .doc(business.businessID)
+            .collection('subscriptions')
+            .doc(staticSubscriptionItem.id)
+            .onSnapshot((subscriptionItem) => {
+              if (subscriptionItem && subscriptionItem.exists) {
+                const subscriptionObject =
+                  subscriptionItem.data() as Subscription;
 
-              const newRows = subscriptionObject.items
-                .filter((itemObj) => itemObj.price.id in allPerksByPriceIDDict)
-                .map((itemObj) => ({
-                  perkName: allPerksByPriceIDDict[itemObj.price.id].Name,
-                  quantity: itemObj.quantity,
-                  price: allPerksByPriceIDDict[itemObj.price.id].Cost,
-                  amount: (itemObj.quantity * itemObj.price.unit_amount) / 100,
-                }));
+                const newRows = subscriptionObject.items
+                  .filter(
+                    (itemObj) => itemObj.price.id in allPerksByPriceIDDict
+                  )
+                  .map((itemObj) => ({
+                    perkName: allPerksByPriceIDDict[itemObj.price.id].Name,
+                    quantity: itemObj.quantity,
+                    price: allPerksByPriceIDDict[itemObj.price.id].Cost,
+                    amount:
+                      (itemObj.quantity * itemObj.price.unit_amount) / 100,
+                  }));
 
-              const subtotal = newRows.reduce((acc, row) => {
-                return acc + row.amount;
-              }, 0);
+                const subtotal = newRows.reduce((acc, row) => {
+                  return acc + row.amount;
+                }, 0);
 
-              const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
+                const volumeFee = Math.round(subtotal * 0.1 * 100) / 100;
 
-              const cardMaintenanceFee =
-                Math.round(
-                  3.99 *
-                    Object.keys(business.perkGroups).reduce(
-                      (acc, perkGroupName) => {
-                        return (
-                          acc +
-                          business.perkGroups[perkGroupName].userEmails.length
-                        );
-                      },
-                      0
-                    ) *
-                    100
-                ) / 100;
+                const cardMaintenanceFee =
+                  Math.round(
+                    3.99 *
+                      Object.keys(business.perkGroups).reduce(
+                        (acc, perkGroupName) => {
+                          return (
+                            acc +
+                            business.perkGroups[perkGroupName].userEmails.length
+                          );
+                        },
+                        0
+                      ) *
+                      100
+                  ) / 100;
 
-              const total =
-                Math.round((subtotal + volumeFee + cardMaintenanceFee) * 100) /
-                100;
+                const total =
+                  Math.round(
+                    (subtotal + volumeFee + cardMaintenanceFee) * 100
+                  ) / 100;
 
-              setSubscriptionPrices({
-                subtotal,
-                volumeFee,
-                cardMaintenanceFee,
-                total,
-              });
+                setSubscriptionPrices({
+                  subtotal,
+                  volumeFee,
+                  cardMaintenanceFee,
+                  total,
+                });
 
-              setSubscriptionObject(subscriptionObject);
-              setRows(newRows);
-            }
-          });
+                setSubscriptionObject(subscriptionObject);
+                setRows(newRows);
+              }
+            });
+        }
       })();
     }
   }, [business]);

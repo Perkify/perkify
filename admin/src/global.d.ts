@@ -128,6 +128,18 @@ interface PerkDefinitionsDict {
   [key: string]: PerkDefinition;
 }
 
+interface PrivatePerkDefinition {
+  name: string;
+  cost: number;
+  period: string;
+  stripePriceID: string;
+  stripeProductID: string;
+}
+
+interface PrivatePerkDefinitionsDict {
+  [key: string]: PrivatePerkDefinition;
+}
+
 interface ExpandUsersPayload {
   business: Business;
 }

@@ -34,8 +34,8 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
       if (card.fingerprint in businessData.cardPaymentMethods) {
         const error: PerkifyError = {
           status: 400,
-          reason: 'This card is already attached to the business',
-          reasonDetail: 'This card is already attached to the business',
+          reason: 'This card is already attached to the business.',
+          reasonDetail: 'This card is already attached to the business.',
         };
         return next(error);
       }
