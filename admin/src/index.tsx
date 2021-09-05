@@ -14,7 +14,9 @@ import reportWebVitals from './reportWebVitals';
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe(
-  'pk_test_51JBSAtKuQQHSHZsm0BKxIP1E90RF0AKVQ1gO3CwNRdDMVlwcF9qtapSbyirxbatu67LJ4yPFiepF3KpnZKl7HPxe00NE2FQBTY'
+  process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
+    ? 'pk_live_51JBSAtKuQQHSHZsmwpyyKzdDlJbYWINu1T0WkQfInvcchoyQ3KZ7QqF56ouAL0fWQ8pG0iXbgHxcVztbhDU7iSsv00xrGDMvOq'
+    : 'pk_test_51JBSAtKuQQHSHZsm0BKxIP1E90RF0AKVQ1gO3CwNRdDMVlwcF9qtapSbyirxbatu67LJ4yPFiepF3KpnZKl7HPxe00NE2FQBTY'
 );
 
 const theme = createTheme({
