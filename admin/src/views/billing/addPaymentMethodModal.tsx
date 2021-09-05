@@ -132,7 +132,6 @@ const AddPaymentMethodModal = ({
         <DialogContentText style={{ marginBottom: '30px' }}>
           Please add your credit card below.
         </DialogContentText>
-        {/* <div style={{ marginTop: '20px' }}> */}
         <CardElement options={CARD_OPTIONS} />
         {business && Object.keys(business.cardPaymentMethods).length != 0 && (
           <FormControlLabel
@@ -150,7 +149,6 @@ const AddPaymentMethodModal = ({
             label="Use as default payment method"
           />
         )}
-        {/* </div> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setIsModalVisible(false)} color="primary">
