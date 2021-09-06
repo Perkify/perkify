@@ -245,14 +245,16 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    setEmployees(
-      employees.map((employee) => ({
-        email: employee.email,
-        id: employee.email,
-        group: employee.perkGroupID,
-        perks: employee.perkUsesDict,
-      }))
-    );
+    if (employees) {
+      setEmployees(
+        employees.map((employee) => ({
+          email: employee.email,
+          id: employee.email,
+          group: employee.perkGroupID,
+          perks: employee.perkUsesDict,
+        }))
+      );
+    }
   }, [employees]);
 
   function handleGroupChange(event: any) {

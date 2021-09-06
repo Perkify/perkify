@@ -85,6 +85,7 @@ interface UserCard {
 }
 
 type Employee = {
+  // employeeID -> id
   email: string;
   businessID: string;
   perkGroupID: string;

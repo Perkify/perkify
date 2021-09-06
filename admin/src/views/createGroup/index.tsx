@@ -317,7 +317,9 @@ const CreateGroup = () => {
   }
 
   useEffect(() => {
-    setEmployeesData(employees);
+    setEmployeesData(
+      employees.map((employee) => ({ ...employee, id: employee.email }))
+    );
     setSelection([]);
   }, [employees]);
   return (

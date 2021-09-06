@@ -35,8 +35,12 @@ export default function ManagePeople(props: any) {
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
-    setPeopleData(employees);
-    setSelection([]);
+    if (employees) {
+      setPeopleData(
+        employees.map((employee) => ({ ...employee, id: employee.email }))
+      );
+      setSelection([]);
+    }
   }, [employees]);
 
   const removeUsers = async () => {

@@ -39,7 +39,7 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
         );
 
       // get employes
-      db.collection('business')
+      db.collection('businesses')
         .doc(businessId)
         .collection('employees')
         .onSnapshot((employeesSnapshot) => {
