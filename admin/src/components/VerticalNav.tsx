@@ -102,7 +102,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     useState('');
 
   const { currentUser } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
@@ -168,23 +168,24 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
+  console.log(business);
+  console.log(employees);
   const navSections: [string, [string, string, any][]][] =
     !business || Object.keys(business.cardPaymentMethods).length == 0
       ? [
           ['General', generalNav],
           ['Account', accountNav],
         ]
-      : business && Object.keys(business.perkGroups).length == 0
+      : employees && employees.length == 0
       ? [
           ['General', generalNav],
-          ['Perk Groups', infoNav],
           ['People', peopleNav],
           ['Account', accountNav],
         ]
       : [
           ['General', generalNav],
-          ['Perk Groups', infoNav],
           ['People', peopleNav],
+          ['Perk Groups', infoNav],
           ['Account', accountNav],
         ];
   const drawer = (
