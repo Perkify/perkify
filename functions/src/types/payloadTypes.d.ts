@@ -35,4 +35,5 @@ interface CreatePerkGroupPayload {
 interface UpdatePerkGroupPayload {
   perkNames: string[];
   employeeIDs: string[];
+  perkGroupName: string;
 }

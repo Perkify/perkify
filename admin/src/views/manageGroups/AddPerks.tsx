@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
@@ -39,6 +39,7 @@ const AddPerks = ({
   const { currentUser } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
+  const { business } = useContext(BusinessContext);
 
   React.useEffect(() => {
     setAvailablePerks(
@@ -71,19 +72,20 @@ const AddPerks = ({
         );
 
         try {
-          await PerkifyApi.put(
-            `rest/perkGroup/${group}`,
-            {
-              employeeIDs: emails.map((emailObj) => emailObj.employeeID),
-              perkNames: afterPerks,
-            } as UpdatePerkGroupPayload,
-            {
-              headers: {
-                Authorization: `Bearer ${bearerToken}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          const payload: UpdatePerkGroupPayload = {
+            employeeIDs: emails.map((emailObj) => emailObj.employeeID),
+            perkNames: afterPerks,
+            perkGroupName: Object.keys(business.perkGroups).find(
+              (perkGroupID) =>
+                business.perkGroups[perkGroupID].perkGroupName == group
+            ),
+          };
+          await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
 
           setFreezeNav(false);
           setDashboardLoading(false);

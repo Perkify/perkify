@@ -26,7 +26,8 @@ export const updatePerkGroupValidators = [
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const perkGroupID = req.params.perkGroupID;
-    const { employeeIDs, perkNames } = req.body as UpdatePerkGroupPayload;
+    const { employeeIDs, perkNames, perkGroupName } =
+      req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
@@ -35,14 +36,18 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
     try {
       // update business doc
       // this makes pendingBusiness equal updatedBusiness
+
+      const newPerkGroup: PerkGroup = {
+        perkGroupName,
+        perkNames,
+        employeeIDs,
+      };
+
       await db
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`perkGroups.${perkGroupID}`]: {
-            perkNames: perkNames,
-            employeeIDs: employeeIDs,
-          } as PerkGroup,
+          [`perkGroups.${perkGroupID}`]: newPerkGroup,
         });
 
       // sync to stripe subscription

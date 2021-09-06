@@ -58,19 +58,21 @@ const RemoveEmployees = ({
           return;
         }
 
-        await PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            employeeIDs: afterEmails,
-            perkNames: business.perkGroups[group].perkNames,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const payload: UpdatePerkGroupPayload = {
+          employeeIDs: afterEmails,
+          perkNames: business.perkGroups[group].perkNames,
+          perkGroupName: Object.keys(business.perkGroups).find(
+            (perkGroupID) =>
+              business.perkGroups[perkGroupID].perkGroupName == group
+          ),
+        };
+
+        await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemoveEmployeesModalVisible(false);

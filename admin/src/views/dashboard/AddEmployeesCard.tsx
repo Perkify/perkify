@@ -45,7 +45,7 @@ export const AddEmployeesCard = () => {
                     backgroundColor: '#00AB55',
                   }}
                 >
-                  Create Perk Group
+                  Add Employees
                 </Button>
               </div>
               <img
