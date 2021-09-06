@@ -38,7 +38,7 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
           }
         );
 
-      // get employes
+      // get employees
       db.collection('businesses')
         .doc(businessId)
         .collection('employees')
