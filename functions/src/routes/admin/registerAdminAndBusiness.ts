@@ -77,12 +77,6 @@ export const registerAdminAndBusiness = async (
         postal_code: postalCode,
         state,
       },
-    };
-
-    // set the business document
-    businessRef.set(businessData);
-
-    const privateBusinessData = {
       perkGroups: {},
       cardPaymentMethods: {},
       stripeId: customer.id,
@@ -90,6 +84,9 @@ export const registerAdminAndBusiness = async (
         customer.livemode ? '' : '/test'
       }/customers/${customer.id}`,
     };
+
+    // set the business document
+    businessRef.set(businessData);
 
     res.status(200).end();
   } catch (err) {

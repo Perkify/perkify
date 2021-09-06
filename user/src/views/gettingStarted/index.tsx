@@ -85,10 +85,14 @@ const GettingStarted = () => {
         };
       }
 
-      // should I do this here or elsewhere?
-      const userDoc = await db.collection('users').doc(currentUser.email).get();
-      const employeeData = userDoc.data();
-      setEmployee(employeeData);
+      const userDoc = await db
+        .collectionGroup('employees')
+        .where('employeeID', '==', currentUser.uid)
+        .get();
+      if (!userDoc.empty) {
+        const employeeData = userDoc.docs[0].data();
+        setEmployee(employeeData as Employee);
+      }
       setDashboardLoading(false);
     } catch (e) {
       setDashboardLoading(false);

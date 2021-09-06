@@ -11,8 +11,8 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/businesses/$(businessID)/admins/$(adminID));
     }
 
-    function userExists(userID) {
-      return exists(/databases/$(database)/documents/users/$(userID));
+    function employeeExists(businessID, employeeID) {
+      return exists(/databases/$(database)/documents/businesses/$(businessID)/employees/$(employeeID));
     }
 
     function getAdminBusinessID(businessID, adminID) {
@@ -46,7 +46,7 @@ service cloud.firestore {
     // match business documents and their subcollections
     match /businesses/{businessID}/{document=**} {
       // let verified admins read the business doc they belong to
-      allow read: if adminExists(businessID,request.auth.uid);
+      allow read: if adminExists(businessID,request.auth.uid) || employeeExists(businessID,request.auth.uid);
 
       // don't let anyone write to business documents
       allow write: if false;
