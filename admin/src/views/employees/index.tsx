@@ -43,54 +43,55 @@ export default function ManagePeople(props: any) {
   }, [employees]);
 
   const removeUsers = async () => {
-    // let error = false;
-    // if (!error) {
-    //   await (async () => {
-    //     setDashboardLoading(true);
-    //     setFreezeNav(true);
-    //     const bearerToken = await currentUser.getIdToken();
-    //     // get all employees that are not selected
-    //     // by removing all employees that were selected
-    //     const afterEmployees = peopleData.filter(
-    //       (employee, index) => !selectedUsers.includes(employee.email)
-    //     );
-    //     const perkGroupToAfterEmails = afterEmployees.reduce(
-    //       (accumulator, employeeObj) => {
-    //         if (accumulator[employeeObj.group] != null) {
-    //           accumulator[employeeObj.group].push(employeeObj.email);
-    //         } else {
-    //           accumulator[employeeObj.group] = [employeeObj.email];
-    //         }
-    //         return accumulator;
-    //       },
-    //       {}
-    //     );
-    //     // this is not an extensive check.
-    //     if (afterEmployees.length === 0) {
-    //       alert('Error: cannot remove all perks from a perk group');
-    //     }
-    //     await Promise.all(
-    //       Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
-    //         const afterEmails = perkGroupToAfterEmails[perkGroup];
-    //         // better would be to create an api folder where you can call these from
-    //         // should haven't to do all this copy pasting
-    //         const payload: UpdatePerkGroupPayload = {
-    //           userEmails: afterEmails,
-    //           perkNames: business.perkGroups[perkGroup].perkNames,
-    //         };
-    //         await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
-    //           headers: {
-    //             Authorization: `Bearer ${bearerToken}`,
-    //             'Content-Type': 'application/json',
-    //           },
-    //         });
-    //       })
-    //     );
-    //     setDashboardLoading(false);
-    //     setFreezeNav(false);
-    //     setIsRemoveModalVisible(false);
-    //   })();
-    // }
+    let error = false;
+    if (!error) {
+      await (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
+        const bearerToken = await currentUser.getIdToken();
+        // get all employees that are not selected
+        // by removing all employees that were selected
+        const afterEmployees = peopleData.filter(
+          (employee, index) => !selectedUsers.includes(employee.email)
+        );
+        const perkGroupToAfterEmails = afterEmployees.reduce(
+          (accumulator, employeeObj) => {
+            if (accumulator[employeeObj.group] != null) {
+              accumulator[employeeObj.group].push(employeeObj.email);
+            } else {
+              accumulator[employeeObj.group] = [employeeObj.email];
+            }
+            return accumulator;
+          },
+          {}
+        );
+        // this is not an extensive check.
+        if (afterEmployees.length === 0) {
+          alert('Error: cannot remove all perks from a perk group');
+        }
+        await Promise.all(
+          Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
+            const afterEmails = perkGroupToAfterEmails[perkGroup];
+            // better would be to create an api folder where you can call these from
+            // should haven't to do all this copy pasting
+            // const payload: UpdatePerkGroupPayload = {
+            //   userEmails: afterEmails,
+            //   perkNames: business.perkGroups[perkGroup].perkNames,
+            //   perkGroupName: Object.keys()
+            // };
+            // await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
+            //   headers: {
+            //     Authorization: `Bearer ${bearerToken}`,
+            //     'Content-Type': 'application/json',
+            //   },
+            // });
+          })
+        );
+        setDashboardLoading(false);
+        setFreezeNav(false);
+        setIsRemoveModalVisible(false);
+      })();
+    }
   };
 
   return (
@@ -111,7 +112,7 @@ export default function ManagePeople(props: any) {
           setIsRemoveModalVisible(true);
         }}
         tableName="Employees"
-        addButtonText="add employees"
+        addButtonText="Add Employees"
         addButtonHidden={false}
         loading={dashboardLoading}
       />
