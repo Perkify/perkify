@@ -68,7 +68,7 @@ const GettingStarted = () => {
       // because we need their first and last name
       // so auth isn't created until
       const response = await PerkifyApi.post(
-        'rest/user',
+        'rest/employee/register',
         formFields as RegisterUserPayload,
         {
           headers: {

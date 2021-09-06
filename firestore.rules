@@ -30,16 +30,15 @@ service cloud.firestore {
       allow read: if request.auth.uid == resource.data.adminID;
 
       // don't let anyone update their admin document except through the backend
-      allow write: if true;
+      allow write: if false;
     }
 
-    // match user documents
-    match /users/{userID} {
-      // let users read their own documents
-      // and admins read the documents of their users
-      allow read: if isEmailVerified(request) && request.auth.token.email == userID ||
-        adminExists(resource.data.businessID, request.auth.uid);
+    // match employee documents during collectionGroup queries
+    match /{path=**}/employees/{employeeID} {
+      // let employees read their own documents
+      allow read: if request.auth.uid == resource.data.employeeID;
 
+      // don't let anyone update their admin document except through the backend
       allow write: if false;
     }
 

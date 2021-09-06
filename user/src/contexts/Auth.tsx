@@ -65,10 +65,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     app.auth().onAuthStateChanged(async (user) => {
       setLoadingAuthState(true);
       if (user) {
-        const userDoc = await db.collection('users').doc(user.email).get();
-        if (userDoc.exists) {
+        const userDoc = await db
+          .collectionGroup('employees')
+          .where('employeeID', '==', user.uid)
+          .get();
+        if (!userDoc.empty) {
           setCurrentUser(user);
-          const employeeData = userDoc.data();
+          const employeeData = userDoc.docs[0].data();
           setEmployee(employeeData as User);
         } else {
           auth.signOut();
