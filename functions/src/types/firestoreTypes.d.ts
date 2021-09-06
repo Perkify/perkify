@@ -23,6 +23,11 @@ interface Admin {
   isOwner: boolean;
 }
 
+// interface PerkGroup {
+//   perkNames: string[];
+//   userEmails: string[];
+// }
+
 interface PerkGroup {
   perkGroupName: string;
   employeeIDs: string[];

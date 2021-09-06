@@ -11,18 +11,27 @@ interface SimpleCardPaymentMethod {
   expYear: number;
   funding: string;
   last4: string;
+  fingerprint: string;
 }
 
 interface Admin {
   businessID: string;
+  adminID: string;
   email: string;
   firstName: string;
   lastName: string;
+  isOwner: boolean;
 }
 
+// interface PerkGroup {
+//   perkNames: string[];
+//   userEmails: string[];
+// }
+
 interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
   perkNames: string[];
-  userEmails: string[];
 }
 
 interface BillingAddress {
@@ -40,8 +49,6 @@ interface Business {
   businessID: string;
   // business name
   name: string;
-  // admin ids
-  admins: string[];
   // billing address
   billingAddress: BillingAddress;
   // stripe info
@@ -77,27 +84,30 @@ interface UserCard {
   };
 }
 
-type User = {
+type Employee = {
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
 };
 
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
 interface UserToCreate {
   email: string;
+  employeeID: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   newPerkNames: string[];
 }
 
 interface UserToUpdate {
-  email: string;
+  businessID: string;
+  employeeID: string;
+  perkGroupID: string;
   newPerkNames: string[];
   oldPerkUsesDict: {
     [key: string]: PerkUses;
@@ -105,7 +115,8 @@ interface UserToUpdate {
 }
 
 interface UserToDelete {
-  email: string;
+  businessID: string;
+  employeeID: string;
   card?: UserCard;
 }
 

@@ -58,7 +58,7 @@ const CreateGroup = () => {
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const [numPeople, setNumPeople] = useState(0);
   const [costPerPerson, setCostPerPerson] = useState(0);
@@ -317,23 +317,9 @@ const CreateGroup = () => {
   }
 
   useEffect(() => {
-    if (business) {
-      setEmployeesData(
-        [].concat(
-          ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].userEmails.map(
-              (employeeEmail) => ({
-                email: employeeEmail,
-                group: perkGroupName,
-                id: employeeEmail,
-              })
-            )
-          )
-        )
-      );
-      setSelection([]);
-    }
-  }, [business]);
+    setEmployeesData(employees);
+    setSelection([]);
+  }, [employees]);
   return (
     <div
       style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}

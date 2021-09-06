@@ -29,30 +29,15 @@ export default function ManagePeople(props: any) {
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
   const { currentUser, admin } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
-    if (business) {
-      setGroupData(Object.keys(business.perkGroups).sort());
-      setPeopleData(
-        [].concat(
-          ...Object.keys(business.perkGroups).map((perkGroupName) =>
-            business.perkGroups[perkGroupName].userEmails.map(
-              (employeeEmail) => ({
-                email: employeeEmail,
-                group: perkGroupName,
-                id: employeeEmail,
-              })
-            )
-          )
-        )
-      );
-      setSelection([]);
-    }
-  }, [business]);
+    setPeopleData(employees);
+    setSelection([]);
+  }, [employees]);
 
   const removeUsers = async () => {
     let error = false;

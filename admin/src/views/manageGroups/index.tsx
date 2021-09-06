@@ -58,7 +58,7 @@ export default function ManageGroups(props: any) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
@@ -70,18 +70,20 @@ export default function ManageGroups(props: any) {
       if (Object.keys(business.perkGroups).includes(id)) {
         // set perk group data
         setPerksData(
-          business.perkGroups[id].perkNames.map((perkGroupName, index) => ({
-            ...allPerksDict[perkGroupName],
+          business.perkGroups[id].perkNames.map((perkName, index) => ({
+            ...allPerksDict[perkName],
             id: index,
           }))
         );
 
         // set email data
         setEmails(
-          business.perkGroups[id].userEmails.map((employeeEmail, index) => ({
-            email: employeeEmail,
-            id: index,
-          }))
+          employees
+            .filter((employee) => employee.perkGroupID == id)
+            .map((employee, index) => ({
+              email: employee.email,
+              id: index,
+            }))
         );
         setGroupNotFound(false);
       } else {
@@ -90,7 +92,7 @@ export default function ManageGroups(props: any) {
       setSelectedEmployees([]);
       setSelectedPerks([]);
     }
-  }, [business, id]);
+  }, [business, id, employees]);
 
   if (groupNotFound) {
     return (
