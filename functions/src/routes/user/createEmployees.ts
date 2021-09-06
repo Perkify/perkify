@@ -37,7 +37,7 @@ export const createEmployees = adminPerkifyRequestTransform(
         });
 
         const employeeRef = db
-          .collection('bussinesses')
+          .collection('businesses')
           .doc(businessData.businessID)
           .collection('employees')
           .doc(newEmployee.uid);

@@ -81,7 +81,7 @@ const AddEmployees = ({
           epmloyeeEmails: emailList,
         };
 
-        PerkifyApi.put(`rest/perkGroup/${selectedPerkGroup}`, payload, {
+        PerkifyApi.post(`rest/perkGroup/${selectedPerkGroup}`, payload, {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
             'Content-Type': 'application/json',
@@ -121,6 +121,46 @@ const AddEmployees = ({
     if (error || emailsError != '') {
       return;
     }
+    if (!error) {
+      (async () => {
+        setDashboardLoading(true);
+        setFreezeNav(true);
+        const bearerToken = await currentUser.getIdToken();
+
+        const emailList = emailsToAdd
+          .trim()
+          .replace(/[,'"]+/gi, ' ')
+          .split(/\s+/); //Gives email as a list
+        const payload = {
+          employeeEmails: emailList,
+        };
+
+        PerkifyApi.post(`rest/employee`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(() => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setIsAddEmployeesModalVisible(false);
+            setEmailsToAdd('');
+            setSelectedPerkGroup('');
+          })
+          .catch((err) => {
+            console.log(err.response);
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setEmailsToAdd('');
+            setSelectedPerkGroup('');
+          });
+      })();
+    }
+
     //TODO: Add Users
     //setConfirmationModalVisible(true);
   }

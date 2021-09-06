@@ -527,6 +527,9 @@ const CreateGroup = () => {
             </Button>
             <Button
               onClick={() => {
+                if (selectedUsers.length === 0) {
+                  return;
+                }
                 console.log(selectedUsers);
                 let copy = [...employeeChipData];
                 let index = copy.length;
