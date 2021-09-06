@@ -316,7 +316,9 @@ const CreateGroup = () => {
   useEffect(() => {
     if (employees) {
       setEmployeesData(
-        employees.map((employee) => ({ ...employee, id: employee.email }))
+        employees
+          .map((employee) => ({ ...employee, id: employee.email }))
+          .filter((employee) => !('perkGroupID' in employee))
       );
       setSelection([]);
     }
@@ -467,6 +469,7 @@ const CreateGroup = () => {
                   root: classes.inputRoot,
                   input: classes.inputInput,
                 }}
+                style={{ width: '100%' }}
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={(event) => {
                   requestSearch(event.target.value);

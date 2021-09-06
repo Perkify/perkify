@@ -183,7 +183,7 @@ export default function ManageGroups(props: any) {
         isAddEmployeesModalVisible={isAddEmployeesModalVisible}
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
         group={id}
-        employees={groupEmails}
+        groupEmployees={groupEmails}
         groupPerks={groupPerks}
       />
       <RemoveEmployees
