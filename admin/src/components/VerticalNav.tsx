@@ -168,8 +168,6 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
-  console.log(business);
-  console.log(employees);
   const navSections: [string, [string, string, any][]][] =
     !business || Object.keys(business.cardPaymentMethods).length == 0
       ? [
