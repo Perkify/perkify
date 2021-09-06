@@ -10,6 +10,7 @@ import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
+import { AddEmployeesCard } from './AddEmployeesCard';
 import BChart from './BarChart';
 import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
@@ -292,6 +293,8 @@ const GeneralDashboard = () => {
         <p>Loading</p>
       ) : Object.keys(business.cardPaymentMethods).length == 0 ? (
         <WelcomeCards />
+      ) : !employees || employees.length == 0 ? (
+        <AddEmployeesCard></AddEmployeesCard>
       ) : business.perkGroups == null ||
         Object.keys(business.perkGroups).length == 0 ? (
         <CreatePerkGroupCard />
