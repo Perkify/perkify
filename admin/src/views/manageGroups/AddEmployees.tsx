@@ -17,7 +17,7 @@ import { validateEmails } from 'utils/emailValidation';
 interface AddEmployeesProps {
   isAddEmployeesModalVisible: boolean;
   setIsAddEmployeesModalVisible: (arg0: boolean) => void;
-  employees: { email: string; group: string; id: string }[];
+  employees: { email: string; group: string; id: string; employeeID: string }[];
   group: string;
   groupPerks: PerkDefinition[];
 }
@@ -70,14 +70,14 @@ const AddEmployees = ({
           .split(/\s+/); //Gives email as a list
 
         const afterEmployees = emailList.concat(
-          employees.map((employeeObj) => employeeObj.email)
+          employees.map((employeeObj) => employeeObj.employeeID)
         );
 
         PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
             perkNames: groupPerks.map((perkObj) => perkObj.Name),
-            userEmails: afterEmployees,
+            employeeIDs: afterEmployees,
           } as UpdatePerkGroupPayload,
           {
             headers: {

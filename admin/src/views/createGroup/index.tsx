@@ -237,11 +237,8 @@ const CreateGroup = () => {
       error = true;
     }
 
-    if (emails == '') {
+    if (employeeChipData.length == 0) {
       setEmailsError('Please input at least one email');
-      error = true;
-    } else if (!validateEmails(emails)) {
-      setEmailsError('Please input proper emails');
       error = true;
     }
 
@@ -253,19 +250,21 @@ const CreateGroup = () => {
     if (!error) {
       setDashboardLoading(true);
       setFreezeNav(true);
-      const emailList = emails
-        .trim()
-        .replace(/[,'"]+/gi, ' ')
-        .split(/\s+/); //Gives email as a list
+
+      const employeeIDList = employeeChipData.map(
+        (employeeChip) => employeeChip.employeeID
+      );
+
       (async () => {
         setConfirmationModalVisible(false);
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
         const payload: CreatePerkGroupPayload = {
-          userEmails: emailList,
           perkNames: selectedPerks,
+          employeeIDs: employeeIDList,
+          perkGroupName: groupName,
         };
-        PerkifyApi.post(`rest/perkGroup/${groupName}`, payload, {
+        PerkifyApi.post(`rest/perkGroup`, payload, {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
             'Content-Type': 'application/json',
@@ -298,11 +297,8 @@ const CreateGroup = () => {
       error = true;
     }
 
-    if (emails == '') {
+    if (employeeChipData.length == 0) {
       setEmailsError('Please input at least one email');
-      error = true;
-    } else if (!validateEmails(emails)) {
-      setEmailsError('Please input proper emails');
       error = true;
     }
 
@@ -311,6 +307,7 @@ const CreateGroup = () => {
       error = true;
     }
     if (error) {
+      console.log(error);
       return;
     }
     setConfirmationModalVisible(true);
@@ -322,6 +319,7 @@ const CreateGroup = () => {
     );
     setSelection([]);
   }, [employees]);
+
   return (
     <div
       style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}
@@ -336,9 +334,10 @@ const CreateGroup = () => {
         onConfirmation={createPerkGroup}
         setConfirmationModalVisible={setConfirmationModalVisible}
         perks={selectedPerks}
-        numPeople={numPeople}
+        numPeople={employeeChipData.length}
         creatingGroup={true}
       />
+
       <Header
         title="Create Group"
         crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
@@ -505,7 +504,6 @@ const CreateGroup = () => {
               onClick={() => {
                 setIsAddEmployeesModalVisible(false);
                 setSelection([]);
-                console.log(preSearch);
                 setEmployeeSearchState('');
                 setEmployeesData(preSearch);
               }}
@@ -518,12 +516,17 @@ const CreateGroup = () => {
                 if (selectedUsers.length === 0) {
                   return;
                 }
-                console.log(selectedUsers);
                 let copy = [...employeeChipData];
                 let index = copy.length;
                 selectedUsers.forEach((user) => {
                   console.log(user);
-                  copy.push({ key: index, label: user });
+                  copy.push({
+                    key: index,
+                    label: user,
+                    employeeID: employees.find(
+                      (employee) => employee.email == user
+                    ).employeeID,
+                  });
                   index += 1;
                 });
                 setEmployeeChipData(copy);

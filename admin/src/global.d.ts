@@ -85,6 +85,7 @@ interface UserCard {
 }
 
 type Employee = {
+  employeeID: string;
   email: string;
   businessID: string;
   perkGroupID: string;
@@ -142,6 +143,8 @@ interface ExpandUsersPayload {
 
 // api payloads
 
+// api payloads
+
 interface RegisterAdminAndBusinessPayload {
   firstName: string;
   lastName: string;
@@ -155,6 +158,10 @@ interface RegisterAdminAndBusinessPayload {
   postalCode: string;
 }
 
+interface CreateEmployeesPayload {
+  employeeEmails: string[];
+}
+
 interface RegisterUserPayload {
   firstName: string;
   lastName: string;
@@ -166,10 +173,11 @@ interface CreatePortalLinkPayload {
 
 interface CreatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
+  perkGroupName: string;
 }
 
 interface UpdatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
 }

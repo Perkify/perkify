@@ -20,7 +20,7 @@ interface RemovePerksProps {
 
   groupPerks: PerkDefinition[];
   group: string;
-  emails: { email: string; group: string; id: string }[];
+  emails: { email: string; group: string; id: string; employeeID: string }[];
 }
 
 const RemovePerks = ({
@@ -64,7 +64,7 @@ const RemovePerks = ({
         await PerkifyApi.put(
           `rest/perkGroup/${group}`,
           {
-            userEmails: emails.map((emailObj) => emailObj.email),
+            employeeIDs: emails.map((emailObj) => emailObj.employeeID),
             perkNames: afterPerksNames,
           } as UpdatePerkGroupPayload,
           {

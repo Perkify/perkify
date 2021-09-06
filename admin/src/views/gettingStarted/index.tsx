@@ -11,7 +11,6 @@ import Header from 'components/Header';
 import { AuthContext } from 'contexts/Auth';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
 
@@ -79,26 +78,26 @@ const CreateGroup = () => {
     setTotalCost(tmpNumPeople * costPerPerson);
   };
 
-  const handleAddUsers = async (event: any) => {
-    const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
+  // const handleAddUsers = async (event: any) => {
+  //   const emailList = emails.replace(/[,'"]+/gi, ' ').split(/\s+/); //Gives email as a list
 
-    const bearerToken = await currentUser.getIdToken();
-    // call the api to create the group
-    await PerkifyApi.post(
-      `rest/perkGroup/${groupName}`,
-      {
-        userEmails: emailList,
-        perkNames: selectedPerks,
-      } as CreatePerkGroupPayload,
-      {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    history.push('../people');
-  };
+  //   const bearerToken = await currentUser.getIdToken();
+  //   // call the api to create the group
+  //   await PerkifyApi.post(
+  //     `rest/perkGroup/${groupName}`,
+  //     {
+  //       userEmails: emailList,
+  //       perkNames: selectedPerks,
+  //     } as CreatePerkGroupPayload,
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${bearerToken}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     }
+  //   );
+  //   history.push('../people');
+  // };
 
   const createPerkGroup = (e: any) => {
     e.preventDefault();

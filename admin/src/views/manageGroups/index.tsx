@@ -83,6 +83,7 @@ export default function ManageGroups(props: any) {
             .map((employee, index) => ({
               email: employee.email,
               id: index,
+              employeeID: employee.employeeID,
             }))
         );
         setGroupNotFound(false);

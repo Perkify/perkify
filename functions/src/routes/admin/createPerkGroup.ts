@@ -37,14 +37,17 @@ export const createPerkGroup = adminPerkifyRequestTransform(
       // generate a random id using business collection but doesn't actually edit db
       const perkGroupID = db.collection('businesses').doc().id;
 
+      const newPerkGroup: PerkGroup = {
+        perkGroupName,
+        perkNames,
+        employeeIDs,
+      };
+
       await db
         .collection('businesses')
         .doc(businessData.businessID)
         .update({
-          [`perkGroups.${perkGroupID}`]: {
-            perkGroupName,
-            perkNames,
-          } as PerkGroup,
+          [`perkGroups.${perkGroupID}`]: newPerkGroup,
         });
 
       // add all the employees to group

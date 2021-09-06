@@ -20,7 +20,7 @@ interface AddPerksProps {
   setIsAddPerksModalVisible: (arg0: boolean) => void;
   group: string;
   groupPerks: PerkDefinition[];
-  emails: { email: string; group: string; id: string }[];
+  emails: { email: string; group: string; id: string; employeeID: string }[];
 }
 
 const AddPerks = ({
@@ -74,7 +74,7 @@ const AddPerks = ({
           await PerkifyApi.put(
             `rest/perkGroup/${group}`,
             {
-              userEmails: emails.map((emailObj) => emailObj.email),
+              employeeIDs: emails.map((emailObj) => emailObj.employeeID),
               perkNames: afterPerks,
             } as UpdatePerkGroupPayload,
             {
