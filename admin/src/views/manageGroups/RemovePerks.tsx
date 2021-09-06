@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { GridSelectionModel } from '@material-ui/data-grid';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
 
@@ -37,6 +37,7 @@ const RemovePerks = ({
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
+  const { business } = useContext(BusinessContext);
   const removePerksFromPerkGroup = (event: any) => {
     let error = false;
 
@@ -61,19 +62,20 @@ const RemovePerks = ({
           setSelectedPerks([]);
           return;
         }
-        await PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            employeeIDs: emails.map((emailObj) => emailObj.employeeID),
-            perkNames: afterPerksNames,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const payload: UpdatePerkGroupPayload = {
+          employeeIDs: emails.map((emailObj) => emailObj.employeeID),
+          perkNames: afterPerksNames,
+          perkGroupName: Object.keys(business.perkGroups).find(
+            (perkGroupID) =>
+              business.perkGroups[perkGroupID].perkGroupName == group
+          ),
+        };
+        await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemovePerksModalVisible(false);

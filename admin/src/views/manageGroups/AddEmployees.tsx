@@ -147,19 +147,18 @@ const AddEmployees = ({
         });
         console.log('printing after employee ids', afterEmployeeIds);
 
-        PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            perkNames: groupPerks.map((perkObj) => perkObj.Name),
-            employeeIDs: afterEmployeeIds,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        const payload: UpdatePerkGroupPayload = {
+          perkNames: groupPerks.map((perkObj) => perkObj.Name),
+          employeeIDs: afterEmployeeIds,
+          perkGroupName: business.perkGroups[group].perkGroupName,
+        };
+
+        PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
           .then(() => {
             setDashboardLoading(false);
             setFreezeNav(false);
