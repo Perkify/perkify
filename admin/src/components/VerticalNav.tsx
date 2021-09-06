@@ -146,7 +146,11 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     if (business) {
       const tmpGroupViews = Object.keys(business.perkGroups)
         .sort()
-        .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
+        .map((perkGroupID) => [
+          business.perkGroups[perkGroupID].perkGroupName,
+          '/dashboard/group/' + perkGroupID,
+          <GroupIcon />,
+        ]);
 
       tmpGroupViews.push([
         'Add New Group',

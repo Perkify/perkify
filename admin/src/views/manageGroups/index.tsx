@@ -76,31 +76,42 @@ export default function ManageGroups(props: any) {
           }))
         );
 
-        // set email data
-        setEmails(
-          employees
-            .filter((employee) => employee.perkGroupID == id)
-            .map((employee, index) => ({
-              email: employee.email,
-              id: index,
-              employeeID: employee.employeeID,
-            }))
-        );
         setGroupNotFound(false);
       } else {
         setGroupNotFound(true);
       }
-      setSelectedEmployees([]);
       setSelectedPerks([]);
     }
-  }, [business, id, employees]);
+  }, [business, id]);
+
+  useEffect(() => {
+    if (employees) {
+      // set email data
+      setEmails(
+        employees
+          .filter((employee) => employee.perkGroupID == id)
+          .map((employee, index) => ({
+            email: employee.email,
+            id: index,
+            employeeID: employee.employeeID,
+          }))
+      );
+      setSelectedEmployees([]);
+    }
+  }, [id, employees]);
 
   if (groupNotFound) {
     return (
       <>
         <Header
-          title={`Manage ${id} Group`}
-          crumbs={['Dashboard', 'Perk Groups', id]}
+          title={`Manage ${
+            business && business.perkGroups[id].perkGroupName
+          } Group`}
+          crumbs={[
+            'Dashboard',
+            'Perk Groups',
+            business && business.perkGroups[id].perkGroupName,
+          ]}
         />
         <div style={{ width: '50%', marginTop: '100px' }}>
           <Typography variant="h2">Perk Group Not Found</Typography>
@@ -116,8 +127,14 @@ export default function ManageGroups(props: any) {
   return (
     <>
       <Header
-        title={`Manage ${id} Group`}
-        crumbs={['Dashboard', 'Perk Groups', id]}
+        title={`Manage ${
+          business && business.perkGroups[id].perkGroupName
+        } Group`}
+        crumbs={[
+          'Dashboard',
+          'Perk Groups',
+          business && business.perkGroups[id].perkGroupName,
+        ]}
         // button={{
         //   type: 'delete',
         //   onClick: () => {

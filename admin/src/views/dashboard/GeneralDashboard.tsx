@@ -247,12 +247,14 @@ const GeneralDashboard = () => {
   useEffect(() => {
     if (employees) {
       setEmployees(
-        employees.map((employee) => ({
-          email: employee.email,
-          id: employee.email,
-          group: employee.perkGroupID,
-          perks: employee.perkUsesDict,
-        }))
+        employees
+          .filter((employee) => employee.perkGroupID != undefined)
+          .map((employee) => ({
+            email: employee.email,
+            id: employee.email,
+            group: employee.perkGroupID,
+            perks: employee.perkUsesDict,
+          }))
       );
     }
   }, [employees]);
