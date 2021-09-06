@@ -314,10 +314,12 @@ const CreateGroup = () => {
   }
 
   useEffect(() => {
-    setEmployeesData(
-      employees.map((employee) => ({ ...employee, id: employee.email }))
-    );
-    setSelection([]);
+    if (employees) {
+      setEmployeesData(
+        employees.map((employee) => ({ ...employee, id: employee.email }))
+      );
+      setSelection([]);
+    }
   }, [employees]);
 
   return (
