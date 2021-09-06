@@ -18,7 +18,9 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
 
   useEffect(() => {
     if (admin) {
+      console.log(admin);
       const businessId = admin['businessID'];
+      console.log(businessId);
       db.collection('businesses')
         .doc(businessId)
         .onSnapshot(

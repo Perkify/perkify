@@ -174,6 +174,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
       ? [
           ['General', generalNav],
           ['Perk Groups', infoNav],
+          ['People', peopleNav],
           ['Account', accountNav],
         ]
       : [

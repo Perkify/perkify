@@ -5,8 +5,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -80,13 +78,8 @@ const AddEmployees = ({
           .trim()
           .replace(/[,'"]+/gi, ' ')
           .split(/\s+/); //Gives email as a list
-        const payload: UpdatePerkGroupPayload = {
-          perkNames: business.perkGroups[selectedPerkGroup].perkNames,
-          userEmails: emailList.concat(
-            peopleData
-              .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
-              .map((employeeObj) => employeeObj.email)
-          ),
+        const payload = {
+          epmloyeeEmails: emailList,
         };
 
         PerkifyApi.put(`rest/perkGroup/${selectedPerkGroup}`, payload, {
@@ -117,17 +110,13 @@ const AddEmployees = ({
   };
 
   function generatePerks() {
-    return business.perkGroups[selectedPerkGroup].perkNames;
+    return ['Netflix Standard'];
   }
 
   function setVisible() {
     let error = false;
     if (emailsToAdd == '') {
       setEmailsError('Enter emails');
-      error = true;
-    }
-    if (selectedPerkGroup.length == 0) {
-      setSelectedPerkGroupError('Select perk group');
       error = true;
     }
     if (error || emailsError != '') {
@@ -187,28 +176,6 @@ const AddEmployees = ({
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perk Group
         </Typography>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          displayEmpty
-          variant="outlined"
-          value={selectedPerkGroup}
-          fullWidth
-          onChange={(event) => {
-            setSelectedPerkGroupError('');
-            setSelectedPerkGroup(event.target.value as string);
-          }}
-          error={selectedPerkGroupError != ''}
-        >
-          <MenuItem value="" disabled>
-            Select Perk Group
-          </MenuItem>
-          {groupData.map((name) => (
-            <MenuItem value={name} key={name}>
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
       </DialogContent>
       <DialogActions>
         <Button

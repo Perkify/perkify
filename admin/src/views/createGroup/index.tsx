@@ -66,9 +66,11 @@ const CreateGroup = () => {
     setEmails(event.target.value);
     if (event.target.value === '') {
       setEmailsError('Please input at least one email');
-    } else if (!validateEmails(event.target.value)) {
-      setEmailsError('Please input proper emails');
-    } else {
+    }
+    // } else if (!validateEmails(event.target.value)) {
+    //   setEmailsError('Please input proper emails');
+    // }
+    else {
       setEmailsError('');
     }
   };
@@ -112,7 +114,7 @@ const CreateGroup = () => {
       error = true;
     } else if (!validateEmails(emails)) {
       setEmailsError('Please input proper emails');
-      error = true;
+      //error = true;
     }
 
     if (selectedPerks.length == 0) {
@@ -131,11 +133,12 @@ const CreateGroup = () => {
         setConfirmationModalVisible(false);
         const bearerToken = await currentUser.getIdToken();
         // call the api to create the group
-        const payload: CreatePerkGroupPayload = {
-          userEmails: emailList,
+        const payload = {
+          employeeIDs: emailList,
           perkNames: selectedPerks,
+          perkGroupName: groupName,
         };
-        PerkifyApi.post(`rest/perkGroup/${groupName}`, payload, {
+        PerkifyApi.post(`rest/perkGroup`, payload, {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
             'Content-Type': 'application/json',
@@ -165,15 +168,15 @@ const CreateGroup = () => {
     let error = false;
     if (groupName == '') {
       setGroupNameError('Enter a group name');
-      error = true;
+      // error = true;
     }
 
     if (emails == '') {
       setEmailsError('Please input at least one email');
-      error = true;
+      // error = true;
     } else if (!validateEmails(emails)) {
       setEmailsError('Please input proper emails');
-      error = true;
+      //error = true;
     }
 
     if (selectedPerks.length == 0) {

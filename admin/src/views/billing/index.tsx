@@ -19,6 +19,8 @@ const Billing = () => {
         returnUrl: window.location.origin + '/dashboard',
       };
 
+      console.log(currentUser);
+
       const bearerToken = await currentUser.getIdToken();
       console.log(bearerToken);
       const { data } = await PerkifyApi.post('rest/portalLink', payload, {

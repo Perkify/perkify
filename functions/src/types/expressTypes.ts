@@ -52,7 +52,7 @@ export const adminPerkifyRequestTransform = (handler: AdminPerkifyHandler) => {
 export interface UserPerkifyContext {
   businessID: string;
   businessData: Business;
-  userData: User;
+  userData: Employee;
   user: {
     email: string;
     uid: string;

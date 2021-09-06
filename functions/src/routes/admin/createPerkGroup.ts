@@ -1,15 +1,13 @@
 import { NextFunction, Response } from 'express';
-import { body, param } from 'express-validator';
+import { body } from 'express-validator';
 import { db } from '../../services';
 import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
-  checkIfAnyEmailsAreClaimed,
+  checkEmployeesExist,
   checkValidationResult,
-  sanitizeEmails,
   updateStripeSubscription,
   validateAdminDoc,
   validateBusinessDoc,
-  validateEmails,
   validateFirebaseIdToken,
   validateNewPerkGroupName,
   validatePerkNames,
@@ -19,19 +17,16 @@ export const createPerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  body('userEmails')
-    .custom(validateEmails)
-    .customSanitizer(sanitizeEmails)
-    .custom(checkIfAnyEmailsAreClaimed),
+  body('employeeIDs').custom(checkEmployeesExist),
   body('perkNames').custom(validatePerkNames),
-  param('perkGroupName').custom(validateNewPerkGroupName),
+  body('perkGroupName').custom(validateNewPerkGroupName),
   checkValidationResult,
 ];
 
 export const createPerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const perkGroupName = req.params.perkGroupName as string;
-    const { userEmails, perkNames } = req.body as CreatePerkGroupPayload;
+    const { employeeIDs, perkNames, perkGroupName } =
+      req.body as CreatePerkGroupPayload;
     const businessData = req.businessData as Business;
 
     const preUpdateBusinessData = req.businessData;
@@ -39,15 +34,28 @@ export const createPerkGroup = adminPerkifyRequestTransform(
     try {
       // update the business document to reflect the group of perkNames
 
+      // generate a random id using business collection but doesn't actually edit db
+      const perkGroupID = db.collection('businesses').doc().id;
+
       await db
         .collection('businesses')
         .doc(businessData.businessID)
         .update({
-          [`perkGroups.${perkGroupName}`]: {
-            perkNames: perkNames,
-            userEmails: userEmails,
+          [`perkGroups.${perkGroupID}`]: {
+            perkGroupName,
+            perkNames,
           } as PerkGroup,
         });
+
+      // add all the employees to group
+      for (const employeeID of employeeIDs) {
+        await db
+          .collection('businesses')
+          .doc(businessData.businessID)
+          .collection('employees')
+          .doc(employeeID)
+          .update({ perkGroupID });
+      }
 
       // update the stripe subscription
       await updateStripeSubscription(preUpdateBusinessData, next);

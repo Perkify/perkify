@@ -40,10 +40,10 @@ export const updateStripeSubscription = async (
       businessData.perkGroups[perkGroupName].perkNames.forEach((perkName) => {
         if (accumulator[allPerksDict[perkName].stripePriceId]) {
           accumulator[allPerksDict[perkName].stripePriceId] +=
-            businessData.perkGroups[perkGroupName].userEmails.length;
+            businessData.perkGroups[perkGroupName].employeeIDs.length;
         } else {
           accumulator[allPerksDict[perkName].stripePriceId] =
-            businessData.perkGroups[perkGroupName].userEmails.length;
+            businessData.perkGroups[perkGroupName].employeeIDs.length;
         }
       });
       return accumulator;
@@ -52,7 +52,7 @@ export const updateStripeSubscription = async (
   );
 
   const numEmployees = Object.values(businessData.perkGroups).reduce(
-    (acc, perkGroup) => acc + perkGroup.userEmails.length,
+    (acc, perkGroup) => acc + perkGroup.employeeIDs.length,
     0
   );
 

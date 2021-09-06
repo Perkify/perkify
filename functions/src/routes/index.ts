@@ -15,7 +15,12 @@ import {
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
-import { registerUser, registerUserValidators } from './user';
+import {
+  createEmployees,
+  createEmployeesValidators,
+  registerUser,
+  registerUserValidators,
+} from './user';
 
 const app = express();
 
@@ -41,25 +46,20 @@ app.post(
 );
 
 // regiser a user
-app.post('/user', registerUserValidators, registerUser);
+app.post('/employee', createEmployeesValidators, createEmployees);
+
+// regiser a user
+app.post('/employee/register', registerUserValidators, registerUser);
 
 // create a portal link for a user
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 app.post('/portalLink', createPortalLinkValidators, createPortalLink);
 
 // perk group crud
-app.post(
-  '/perkGroup/:perkGroupName',
-  createPerkGroupValidators,
-  createPerkGroup
-);
-app.put(
-  '/perkGroup/:perkGroupName',
-  updatePerkGroupValidators,
-  updatePerkGroup
-);
+app.post('/perkGroup', createPerkGroupValidators, createPerkGroup);
+app.put('/perkGroup/:perkGroupID', updatePerkGroupValidators, updatePerkGroup);
 app.delete(
-  '/perkGroup/:perkGroupName',
+  '/perkGroup/:perkGroupID',
   deletePerkGroupValidators,
   deletePerkGroup
 );
