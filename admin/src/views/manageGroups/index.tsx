@@ -65,9 +65,12 @@ export default function ManageGroups(props: any) {
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
+  const [perkGroupName, setPerkGroupName] = useState('');
+
   useEffect(() => {
     if (business) {
       if (Object.keys(business.perkGroups).includes(id)) {
+        setPerkGroupName(business.perkGroups[id].perkGroupName);
         // set perk group data
         setPerksData(
           business.perkGroups[id].perkNames.map((perkName, index) => ({
@@ -103,7 +106,7 @@ export default function ManageGroups(props: any) {
   if (groupNotFound) {
     return (
       <>
-        <Header
+        {/* <Header
           title={`Manage ${
             business && business.perkGroups[id].perkGroupName
           } Group`}
@@ -112,7 +115,7 @@ export default function ManageGroups(props: any) {
             'Perk Groups',
             business && business.perkGroups[id].perkGroupName,
           ]}
-        />
+        /> */}
         <div style={{ width: '50%', marginTop: '100px' }}>
           <Typography variant="h2">Perk Group Not Found</Typography>
           <Typography variant="h5" style={{ marginTop: '20px' }}>
@@ -127,14 +130,8 @@ export default function ManageGroups(props: any) {
   return (
     <>
       <Header
-        title={`Manage ${
-          business && business.perkGroups[id].perkGroupName
-        } Group`}
-        crumbs={[
-          'Dashboard',
-          'Perk Groups',
-          business && business.perkGroups[id].perkGroupName,
-        ]}
+        title={`Manage ${perkGroupName} Group`}
+        crumbs={['Dashboard', 'Perk Groups', perkGroupName]}
         // button={{
         //   type: 'delete',
         //   onClick: () => {

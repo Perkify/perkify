@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+import { param } from 'express-validator';
 import admin, { db } from '../../services';
 import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
@@ -6,6 +7,7 @@ import {
   updateStripeSubscription,
   validateAdminDoc,
   validateBusinessDoc,
+  validateExistingPerkGroupID,
   validateFirebaseIdToken,
 } from '../../utils';
 
@@ -13,6 +15,7 @@ export const deletePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
+  param('perkGroupID').custom(validateExistingPerkGroupID),
   checkValidationResult,
 ];
 

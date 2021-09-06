@@ -270,10 +270,10 @@ const CreateGroup = () => {
             'Content-Type': 'application/json',
           },
         })
-          .then(() => {
+          .then((response) => {
             setDashboardLoading(false);
             setFreezeNav(false);
-            history.push(`/dashboard/group/${groupName}`);
+            history.push(`/dashboard/group/${response.data.perkGroupID}`);
           })
           .catch((err) => {
             console.error(err);

@@ -298,7 +298,13 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                               event.preventDefault();
                               event.stopPropagation();
                               setAnchorEl(null);
-                              setIsDeletePerkGroupModalVisible(name);
+                              setIsDeletePerkGroupModalVisible(
+                                Object.keys(business.perkGroups).find(
+                                  (perkGroupID) =>
+                                    business.perkGroups[perkGroupID]
+                                      .perkGroupName == name
+                                )
+                              );
                             }}
                           >
                             Delete Perk Group
