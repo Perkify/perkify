@@ -77,8 +77,11 @@ export default function SignInSide(props) {
     event.preventDefault();
     setLoading(true);
     try {
-      const userDoc = await db.collection('users').doc(email).get();
-      if (!userDoc) {
+      const userDoc = await db
+        .collectionGroup('employees')
+        .where('email', '==', email)
+        .get();
+      if (userDoc.empty) {
         throw new Error('Your employer has not signed you up with that email');
       }
       await app.auth().sendSignInLinkToEmail(email, {

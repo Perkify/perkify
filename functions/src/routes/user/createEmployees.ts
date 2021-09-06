@@ -41,7 +41,11 @@ export const createEmployees = adminPerkifyRequestTransform(
           .doc(businessData.businessID)
           .collection('employees')
           .doc(newEmployee.uid);
-        batch.set(employeeRef, { email, employeeID: employeeRef.id });
+        batch.set(employeeRef, {
+          email,
+          employeeID: employeeRef.id,
+          businessID: businessData.businessID,
+        });
       }
 
       await batch.commit();
