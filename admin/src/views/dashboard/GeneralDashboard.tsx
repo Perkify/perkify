@@ -29,7 +29,7 @@ const GeneralDashboard = () => {
   const { business, employees } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
-  var [oldStyleEmployees, setEmployees] = useState<DashboardUser[]>([]);
+  var [oldStyleEmployees, setOldStyleEmployees] = useState<DashboardUser[]>([]);
   var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
   function roundNumber(num: any) {
@@ -247,7 +247,7 @@ const GeneralDashboard = () => {
 
   useEffect(() => {
     if (employees) {
-      setEmployees(
+      setOldStyleEmployees(
         employees
           .filter((employee) => employee.perkGroupID != undefined)
           .map((employee) => ({
