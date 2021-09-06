@@ -42,7 +42,7 @@ const AddEmployees = ({
   const handleEmailError = (event: any) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === '') {
-      setEmailsError('Please input atleast one email');
+      setEmailsError('Please input at least one email');
     } else if (!validateEmails(event.target.value)) {
       setEmailsError('Please input proper emails');
     } else {
