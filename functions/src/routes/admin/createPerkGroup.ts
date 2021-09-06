@@ -50,20 +50,21 @@ export const createPerkGroup = adminPerkifyRequestTransform(
           [`perkGroups.${perkGroupID}`]: newPerkGroup,
         });
 
-      // add all the employees to group
-      for (const employeeID of employeeIDs) {
-        await db
-          .collection('businesses')
-          .doc(businessData.businessID)
-          .collection('employees')
-          .doc(employeeID)
-          .update({ perkGroupID });
-      }
+      // revisit this later
+      // // add all the employees to group
+      // for (const employeeid of employeeIDs) {
+      //   await db
+      //     .collection('businesses')
+      //     .doc(businessData.businessID)
+      //     .collection('employees')
+      //     .doc(employeeid)
+      //     .update({ perkGroupID });
+      // }
 
       // update the stripe subscription
       await updateStripeSubscription(preUpdateBusinessData, next);
 
-      res.status(200).end();
+      res.status(200).json({ perkGroupID, perkGroup: newPerkGroup });
     } catch (err) {
       next(err);
     }

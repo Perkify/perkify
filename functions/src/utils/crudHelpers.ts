@@ -105,6 +105,7 @@ export const deleteUserHelper = async (userToDelete: UserToDelete) => {
     .doc(userToDelete.employeeID)
     .update({
       perkGroupID: FieldValue.delete(),
+      perkUsesDict: FieldValue.delete(),
     });
 };
 

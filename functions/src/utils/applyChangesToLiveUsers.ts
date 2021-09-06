@@ -53,7 +53,7 @@ export const applyChangesToLiveUsers = async (
         (userID) => existingEmployeesDict[userID].perkGroupID
       )
     )
-  );
+  ).filter((perkGroupID) => perkGroupID != null);
 
   // pick the important list of perk group names
   const importantPerkGroupIDs =
@@ -68,8 +68,17 @@ export const applyChangesToLiveUsers = async (
       // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
       // where query directly from firestore instead?
-      const existingPerkEmployeeDocs = existingEmployeesSnapshot.docs.filter(
+
+      //
+      const livePerkEmployeeDocs = existingEmployeesSnapshot.docs.filter(
         (userDoc) => (userDoc.data() as Employee).perkGroupID === perkGroupID
+      );
+
+      logger.info('perkGroupID', perkGroupID);
+
+      logger.info(
+        'live employees',
+        livePerkEmployeeDocs.map((doc) => doc.data())
       );
 
       const pendingPerkGroup =
@@ -81,14 +90,12 @@ export const applyChangesToLiveUsers = async (
         ({ perkNames: [], employeeIDs: [], perkGroupName: '' } as PerkGroup);
 
       const livePerkGroup =
-        existingPerkEmployeeDocs.length != 0
+        livePerkEmployeeDocs.length != 0
           ? ({
               perkNames: Object.keys(
-                (existingPerkEmployeeDocs[0].data() as Employee).perkUsesDict
+                (livePerkEmployeeDocs[0].data() as Employee).perkUsesDict
               ),
-              employeeIDs: existingPerkEmployeeDocs.map(
-                (userDoc) => userDoc.id
-              ),
+              employeeIDs: livePerkEmployeeDocs.map((userDoc) => userDoc.id),
             } as PerkGroup)
           : ({
               perkNames: [],
