@@ -1,22 +1,56 @@
 import {
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
   MenuItem,
   Select,
   TextField,
+  Theme,
   Typography,
 } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
+import InputBase from '@material-ui/core/InputBase';
+import Paper from '@material-ui/core/Paper';
+import { alpha, createStyles, makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
+import { DataGrid } from '@material-ui/data-grid';
+import SearchIcon from '@material-ui/icons/Search';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
 
+const columns = [
+  {
+    field: 'email',
+    headerName: 'Email',
+    width: 300,
+    editable: false,
+  },
+];
+const useDataGridStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      border: 'none',
+      // padding: "10px 20px",
+    },
+  })
+);
+
+const testRows = [{ id: 0, email: 'jerry1ye10@gmail.com' }];
+
 const CreateGroup = () => {
+  const dataGridClasses = useDataGridStyles();
+
   const history = useHistory();
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
@@ -33,14 +67,88 @@ const CreateGroup = () => {
 
   const [groupName, setGroupName] = useState('');
   const [emails, setEmails] = useState('');
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
+    useState(false);
+  const [employeesData, setEmployeesData] = useState([]);
   const [selectedPerks, setSelectedPerks] = useState([]);
+  const [selectedUsers, setSelection] = useState([]);
+  const [employeeSearchValue, setEmployeeSearchState] = useState('');
 
   const [groupNameError, setGroupNameError] = useState('');
   const [emailsError, setEmailsError] = useState('');
   const [selectedPerksError, setSelectedPerksError] = useState('');
 
+  const handleDelete = (chipToDelete: any) => () => {
+    console.log(employeesData);
+    console.log(chipToDelete);
+    setEmployeeChipData((chips) =>
+      chips.filter((chip) => chip.key !== chipToDelete.key)
+    );
+
+    let copy = [...employeesData];
+    copy.push({
+      email: chipToDelete.label,
+      group: chipToDelete.label,
+      id: chipToDelete.label,
+    });
+    setEmployeesData(copy);
+  };
+
+  const [employeeChipData, setEmployeeChipData] = React.useState([]);
+
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
+
+  const useStyles = makeStyles((theme) => ({
+    search: {
+      position: 'relative',
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: alpha(theme.palette.common.white, 0.15),
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
+      },
+      marginRight: theme.spacing(2),
+      marginLeft: 0,
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(0),
+        width: 'auto',
+      },
+    },
+    searchIcon: {
+      padding: theme.spacing(0, 2),
+      height: '100%',
+      position: 'absolute',
+      pointerEvents: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    inputRoot: {
+      color: 'inherit',
+    },
+    inputInput: {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        width: '20ch',
+      },
+    },
+    root: {
+      display: 'flex',
+      justifyContent: 'left',
+      flexWrap: 'wrap',
+      listStyle: 'none',
+      padding: theme.spacing(0.5),
+      margin: 0,
+    },
+    chip: {
+      margin: theme.spacing(0.5),
+    },
+  }));
 
   function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
@@ -49,7 +157,6 @@ const CreateGroup = () => {
   const handlePerkChange = (event: any) => {
     // update the controlled form
     const perks = event.target.value as string[];
-
     setSelectedPerksError('');
 
     setSelectedPerks(perks);
@@ -62,6 +169,23 @@ const CreateGroup = () => {
     setTotalCost(roundNumber(cost * numPeople * 1.1 + 3.99 * numPeople));
   };
 
+  function escapeRegExp(value: any) {
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  }
+
+  let [preSearch, setPreSearch] = useState([]);
+  const requestSearch = (searchValue: string) => {
+    console.log(employeesData);
+    setEmployeeSearchState(searchValue);
+    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
+    const filteredRows = preSearch.filter((row: any) => {
+      return Object.keys(row).some((field) => {
+        return searchRegex.test(row[field].toString());
+      });
+    });
+    setEmployeesData(filteredRows);
+  };
+
   const handleEmailError = (event: any) => {
     setEmails(event.target.value);
     if (event.target.value === '') {
@@ -72,6 +196,8 @@ const CreateGroup = () => {
       setEmailsError('');
     }
   };
+
+  const classes = useStyles();
 
   const handleEmailChange = (event: any) => {
     handleEmailError(event);
@@ -186,6 +312,24 @@ const CreateGroup = () => {
     setConfirmationModalVisible(true);
   }
 
+  useEffect(() => {
+    if (business) {
+      setEmployeesData(
+        [].concat(
+          ...Object.keys(business.perkGroups).map((perkGroupName) =>
+            business.perkGroups[perkGroupName].userEmails.map(
+              (employeeEmail) => ({
+                email: employeeEmail,
+                group: perkGroupName,
+                id: employeeEmail,
+              })
+            )
+          )
+        )
+      );
+      setSelection([]);
+    }
+  }, [business]);
   return (
     <div
       style={dashboardLoading ? { pointerEvents: 'none', opacity: '0.4' } : {}}
@@ -228,22 +372,46 @@ const CreateGroup = () => {
           helperText={groupNameError}
         />
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
-          Emails
+          <Grid container spacing={0} alignItems="flex-end">
+            <Grid item xs={9}>
+              Employees
+            </Grid>
+            <Grid item xs={3}>
+              <Button
+                type="submit"
+                fullWidth
+                color="primary"
+                style={{ padding: 0 }}
+                onClick={() => {
+                  setPreSearch(employeesData);
+                  setIsAddEmployeesModalVisible(true);
+                }}
+              >
+                Select Employees
+              </Button>
+            </Grid>
+          </Grid>
         </Typography>
-        <TextField
-          id="emailaddresses"
-          variant="outlined"
-          label=""
-          placeholder="Insert emails separated by commas or newlines"
-          value={emails}
-          onChange={handleEmailChange}
-          fullWidth
-          multiline
-          rows={4}
-          maxRows={4}
-          error={emailsError != ''}
-          helperText={emailsError}
-        />
+        <Paper
+          component="ul"
+          className={classes.root}
+          style={{ minHeight: 50 }}
+        >
+          {employeeChipData.map((data) => {
+            let icon;
+
+            return (
+              <li key={data.key}>
+                <Chip
+                  icon={icon}
+                  label={data.label}
+                  onDelete={handleDelete(data)}
+                  className={classes.chip}
+                />
+              </li>
+            );
+          })}
+        </Paper>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
         </Typography>
@@ -279,6 +447,106 @@ const CreateGroup = () => {
         {/* {selectedGroupError != "" && (
           <FormHelperText>{selectedGroupError}</FormHelperText>
         )} */}
+
+        <Dialog
+          open={isAddEmployeesModalVisible}
+          onClose={() => {
+            setIsAddEmployeesModalVisible(false);
+            setEmployeesData(preSearch);
+            setEmployeeSearchState('');
+            setSelection([]);
+          }}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Select Employees</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              To add users to the perk group, please select them from the table
+              below.
+            </DialogContentText>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(event) => {
+                  requestSearch(event.target.value);
+                }}
+              />
+            </div>
+            <Card style={{ height: 300, border: 0 }} elevation={4}>
+              <DataGrid
+                classes={{
+                  root: dataGridClasses.root,
+                }}
+                rows={employeesData}
+                columns={columns}
+                pageSize={10}
+                rowHeight={60}
+                headerHeight={60}
+                checkboxSelection
+                selectionModel={selectedUsers}
+                onSelectionModelChange={(selectionModel) => {
+                  setSelection(selectionModel);
+                }}
+                disableColumnFilter={true}
+                filterModel={{
+                  items: [
+                    {
+                      columnField: 'email',
+                      operatorValue: 'contains',
+                      value: employeeSearchValue,
+                    },
+                  ],
+                }}
+              />
+            </Card>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setIsAddEmployeesModalVisible(false);
+                setSelection([]);
+                console.log(preSearch);
+                setEmployeeSearchState('');
+                setEmployeesData(preSearch);
+              }}
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                console.log(selectedUsers);
+                let copy = [...employeeChipData];
+                let index = copy.length;
+                selectedUsers.forEach((user) => {
+                  console.log(user);
+                  copy.push({ key: index, label: user });
+                  index += 1;
+                });
+                setEmployeeChipData(copy);
+                setIsAddEmployeesModalVisible(false);
+                setEmployeeSearchState('');
+                setEmployeesData(
+                  preSearch.filter((employee) => {
+                    return !selectedUsers.includes(employee.email);
+                  })
+                );
+                setSelection([]);
+              }}
+              color="primary"
+            >
+              Add Users
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Estimated Cost (Fees Included): ${totalCost}
