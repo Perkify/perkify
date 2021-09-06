@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
@@ -27,12 +27,6 @@ const AddEmployees = ({
   groupData,
 }: AddEmployeesProps) => {
   // selected perk group from dropdown and respective error
-
-  const { business } = useContext(BusinessContext);
-  const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
-  const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
-  const [isConfirmationModalVisible, setConfirmationModalVisible] =
-    useState(false);
 
   // emails entered into form and respective error
   const [emailsToAdd, setEmailsToAdd] = useState('');
@@ -56,68 +50,29 @@ const AddEmployees = ({
     }
   };
 
-  const addToPerkGroup = (event: any) => {
-    event.preventDefault();
-    let error = false;
-    if (emailsToAdd == '') {
-      setEmailsError('Enter emails');
-      error = true;
-    }
-    if (selectedPerkGroup.length == 0) {
-      setSelectedPerkGroupError('Select perk group');
-      error = true;
-    }
-    if (!error) {
-      (async () => {
-        setDashboardLoading(true);
-        setFreezeNav(true);
-        const bearerToken = await currentUser.getIdToken();
-
-        const emailList = emailsToAdd
-          .trim()
-          .replace(/[,'"]+/gi, ' ')
-          .split(/\s+/); //Gives email as a list
-        const payload = {
-          epmloyeeEmails: emailList,
-        };
-
-        PerkifyApi.post(`rest/perkGroup/${selectedPerkGroup}`, payload, {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(() => {
-            setDashboardLoading(false);
-            setFreezeNav(false);
-            setIsAddEmployeesModalVisible(false);
-            setEmailsToAdd('');
-            setSelectedPerkGroup('');
-          })
-          .catch((err) => {
-            console.log(err.response);
-            alert(
-              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
-            );
-            setDashboardLoading(false);
-            setFreezeNav(false);
-            setEmailsToAdd('');
-            setSelectedPerkGroup('');
-          });
-      })();
-    }
-  };
-
-  function generatePerks() {
-    return ['Netflix Standard'];
-  }
-
   function addUsers() {
     let error = false;
     if (emailsToAdd == '') {
       setEmailsError('Enter emails');
       error = true;
     }
+
+    const emailList = emailsToAdd
+      .trim()
+      .replace(/[,'"]+/gi, ' ')
+      .split(/\s+/); //Gives email as a list
+
+    const duplicateEmail = emailList.find((email) =>
+      peopleData.map((person) => person.email).includes(email)
+    );
+
+    if (duplicateEmail) {
+      setEmailsError(
+        `Attempting to add an employee with email ${duplicateEmail}, but that email already exists`
+      );
+      error = true;
+    }
+
     if (error || emailsError != '') {
       return;
     }
@@ -127,11 +82,7 @@ const AddEmployees = ({
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd
-          .trim()
-          .replace(/[,'"]+/gi, ' ')
-          .split(/\s+/); //Gives email as a list
-        const payload = {
+        const payload: CreateEmployeesPayload = {
           employeeEmails: emailList,
         };
 
@@ -146,7 +97,6 @@ const AddEmployees = ({
             setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
             setEmailsToAdd('');
-            setSelectedPerkGroup('');
           })
           .catch((err) => {
             console.log(err.response);
@@ -156,13 +106,9 @@ const AddEmployees = ({
             setDashboardLoading(false);
             setFreezeNav(false);
             setEmailsToAdd('');
-            setSelectedPerkGroup('');
           });
       })();
     }
-
-    //TODO: Add Users
-    //setConfirmationModalVisible(true);
   }
 
   return (
