@@ -8,7 +8,6 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
@@ -113,7 +112,7 @@ const AddEmployees = ({
     return ['Netflix Standard'];
   }
 
-  function setVisible() {
+  function addUsers() {
     let error = false;
     if (emailsToAdd == '') {
       setEmailsError('Enter emails');
@@ -122,29 +121,11 @@ const AddEmployees = ({
     if (error || emailsError != '') {
       return;
     }
-    setConfirmationModalVisible(true);
+    //TODO: Add Users
+    //setConfirmationModalVisible(true);
   }
 
-  return isConfirmationModalVisible ? (
-    <PurchaseConfirmation
-      isAddPerksModalVisible={isAddEmployeesModalVisible}
-      setIsAddPerksModalVisible={setIsAddEmployeesModalVisible}
-      title={'Add Employees'}
-      text={
-        'Are you sure you want to add these employees for a total cost of $'
-      }
-      onConfirmation={addToPerkGroup}
-      setConfirmationModalVisible={setConfirmationModalVisible}
-      perks={generatePerks()}
-      numPeople={
-        emailsToAdd
-          .trim()
-          .replace(/[,'"]+/gi, ' ')
-          .split(/\s+/).length
-      }
-      creatingGroup={true}
-    />
-  ) : (
+  return (
     <Dialog
       open={isAddEmployeesModalVisible}
       onClose={() => setIsAddEmployeesModalVisible(false)}
@@ -154,7 +135,7 @@ const AddEmployees = ({
       <DialogContent>
         <DialogContentText>
           To add users to this organization, please enter their email addresses
-          below and select a group from the dropdown.
+          below.
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Emails
@@ -173,9 +154,6 @@ const AddEmployees = ({
           error={emailsError != ''}
           helperText={emailsError}
         />
-        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
-          Perk Group
-        </Typography>
       </DialogContent>
       <DialogActions>
         <Button
@@ -184,7 +162,7 @@ const AddEmployees = ({
         >
           Cancel
         </Button>
-        <Button onClick={setVisible} color="primary">
+        <Button onClick={addUsers} color="primary">
           Add Users
         </Button>
       </DialogActions>
