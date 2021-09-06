@@ -23,6 +23,7 @@ export const emailNormalizationOptions = {
   icloud_remove_subaddress: false,
 };
 
+// check that the employee document exists
 export const validateEmployee = async (employeeID: string) => {
   const employeeRef = await db
     .collectionGroup('employees')
@@ -149,21 +150,21 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
 };
 
 export const checkEmployeesExist = async (employeeIDs: string[]) => {
-  for (const employeeID of employeeIDs) {
-    const employeeRef = await db
-      .collectionGroup('employees')
-      .where('employeeID', '==', employeeID)
-      .get();
-    if (employeeRef.empty) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: `Employee ${employeeID} doesn't exist`,
-      };
-      // throwing error so that it can get caught
-      // by the caller which will then call next(error)
-      throw error;
-    }
+  // list of employees matching employeeIDs
+  const matchingEmployeesRef = await db
+    .collectionGroup('employees')
+    .where('employeeID', 'in', employeeIDs)
+    .get();
+
+  if (matchingEmployeesRef.size < employeeIDs.length) {
+    // check which employeeID is missing from the list of employees matching employeeIDs
+    const existingEmployeeIDs = matchingEmployeesRef.docs.map(
+      (doc) => (doc.data() as Employee).employeeID
+    );
+    const missingEmployeeID = employeeIDs.find(
+      (employeeID) => !existingEmployeeIDs.includes(employeeID)
+    );
+    throw new Error(`Employee ${missingEmployeeID} doesn't exist`);
   }
 };
 
