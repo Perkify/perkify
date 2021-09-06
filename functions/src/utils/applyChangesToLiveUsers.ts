@@ -67,18 +67,8 @@ export const applyChangesToLiveUsers = async (
       // TODOFUTURE: improve this so that we can instantly tell if a perkGroup has changed
       // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
-      // where query directly from firestore instead?
-
-      //
       const livePerkEmployeeDocs = existingEmployeesSnapshot.docs.filter(
         (userDoc) => (userDoc.data() as Employee).perkGroupID === perkGroupID
-      );
-
-      logger.info('perkGroupID', perkGroupID);
-
-      logger.info(
-        'live employees',
-        livePerkEmployeeDocs.map((doc) => doc.data())
       );
 
       const pendingPerkGroup =
