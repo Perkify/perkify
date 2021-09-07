@@ -4,8 +4,10 @@ import {
   Card,
   CardContent,
   Grid,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -95,8 +97,32 @@ export const WelcomeCards = ({
                 </Grid>
 
                 <ol>
-                  <Typography component="li" variant="h5">
-                    Add a payment method
+                  <Typography
+                    component="li"
+                    variant="h5"
+                    style={{
+                      textDecoration: 'line-through',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      Add a payment method
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginLeft: '5px',
+                        }}
+                      >
+                        <Tooltip
+                          title="The perkify volume fee is 10% of the cost of perks."
+                          placement="bottom-start"
+                        >
+                          <InfoOutlinedIcon
+                            style={{ order: 2, color: 'grey' }}
+                          />
+                        </Tooltip>
+                      </span>
+                    </div>
                   </Typography>
                   <Typography component="li" variant="h5">
                     Add your employees
