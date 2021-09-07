@@ -86,7 +86,7 @@ const AdminSignUpForm = (props: AdminSignUpFormProps) => {
   const handlePasswordChange = (event: any) => {
     if (event.target.value.length < 6 && event.target.value.length > 0) {
       setPasswordError(
-        'Please make sure your password is atleast 6 characters long'
+        'Please make sure your password is at least 6 characters long'
       );
     } else {
       setPasswordError('');
