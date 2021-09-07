@@ -3,7 +3,7 @@ import { body, param } from 'express-validator';
 import { db } from '../../services';
 import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
-  checkEmployeesExist,
+  checkEmployeesExistInBusiness,
   checkValidationResult,
   updateStripeSubscription,
   validateAdminDoc,
@@ -17,7 +17,7 @@ export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  body('employeeIDs').custom(checkEmployeesExist),
+  body('employeeIDs').custom(checkEmployeesExistInBusiness),
   body('perkNames').custom(validatePerkNames),
   param('perkGroupID').custom(validateExistingPerkGroupID),
   checkValidationResult,

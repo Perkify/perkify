@@ -149,22 +149,31 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
   await checkIfAnyEmailsAreClaimed(employeesToCreate);
 };
 
-export const checkEmployeesExist = async (employeeIDs: string[]) => {
-  // list of employees matching employeeIDs
-  const matchingEmployeesRef = await db
-    .collectionGroup('employees')
-    .where('employeeID', 'in', employeeIDs)
-    .get();
-
-  if (matchingEmployeesRef.size < employeeIDs.length) {
-    // check which employeeID is missing from the list of employees matching employeeIDs
-    const existingEmployeeIDs = matchingEmployeesRef.docs.map(
-      (doc) => (doc.data() as Employee).employeeID
-    );
-    const missingEmployeeID = employeeIDs.find(
-      (employeeID) => !existingEmployeeIDs.includes(employeeID)
-    );
-    throw new Error(`Employee ${missingEmployeeID} doesn't exist`);
+export const checkEmployeesExistInBusiness = async (
+  employeeIDs: string[],
+  { req }: { req: ValidatorRequest }
+) => {
+  if (!req.businessID) {
+    return Promise.reject(new Error('businessID not available in middleware'));
+  }
+  for (const employeeID of employeeIDs) {
+    const employeeRef = await db
+      .collection('businesses')
+      .doc(req.businessID)
+      .collection('employees')
+      .doc(employeeID)
+      .get();
+    if (employeeRef == null) {
+      const error = {
+        status: 400,
+        reason: 'Bad Request',
+        reasonDetail: `Employee ${employeeID} doesn't exist`,
+      };
+      // throwing error so that it can get caught
+      // by the caller which will then call next(error)
+      throw error;
+    }
+    return Promise.resolve();
   }
 };
 

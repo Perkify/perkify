@@ -18,6 +18,8 @@ import {
 import {
   createEmployees,
   createEmployeesValidators,
+  deleteEmployees,
+  deleteEmployeesValidators,
   registerUser,
   registerUserValidators,
 } from './user';
@@ -45,10 +47,12 @@ app.post(
   registerAdminAndBusiness
 );
 
-// regiser a user
+// create an employee
 app.post('/employee', createEmployeesValidators, createEmployees);
+// delete employees
+app.post('/employee/delete', deleteEmployeesValidators, deleteEmployees);
 
-// regiser a user
+// regiser an employee with a card
 app.post('/employee/register', registerUserValidators, registerUser);
 
 // create a portal link for a user

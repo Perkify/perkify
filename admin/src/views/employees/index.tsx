@@ -3,6 +3,7 @@ import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useEffect, useState } from 'react';
+import { PerkifyApi } from '../../services';
 import AddEmployees from './AddEmployees';
 
 const columns = [
@@ -49,47 +50,35 @@ export default function ManagePeople(props: any) {
         setDashboardLoading(true);
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
-        // get all employees that are not selected
-        // by removing all employees that were selected
-        const afterEmployees = peopleData.filter(
-          (employee, index) => !selectedUsers.includes(employee.email)
+        const employeeIDs = selectedUsers.map(
+          (user) =>
+            employees.find((employee) => employee.email == user).employeeID
         );
-        const perkGroupToAfterEmails = afterEmployees.reduce(
-          (accumulator, employeeObj) => {
-            if (accumulator[employeeObj.group] != null) {
-              accumulator[employeeObj.group].push(employeeObj.email);
-            } else {
-              accumulator[employeeObj.group] = [employeeObj.email];
-            }
-            return accumulator;
+        const payload: DeleteEmployeesPayload = {
+          employeeIDs,
+        };
+        PerkifyApi.post('rest/employee/delete', payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
           },
-          {}
-        );
-        // this is not an extensive check.
-        if (afterEmployees.length === 0) {
-          alert('Error: cannot remove all perks from a perk group');
-        }
-        await Promise.all(
-          Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
-            const afterEmails = perkGroupToAfterEmails[perkGroup];
-            // better would be to create an api folder where you can call these from
-            // should haven't to do all this copy pasting
-            // const payload: UpdatePerkGroupPayload = {
-            //   userEmails: afterEmails,
-            //   perkNames: business.perkGroups[perkGroup].perkNames,
-            //   perkGroupName: Object.keys()
-            // };
-            // await PerkifyApi.put(`rest/perkGroup/${perkGroup}`, payload, {
-            //   headers: {
-            //     Authorization: `Bearer ${bearerToken}`,
-            //     'Content-Type': 'application/json',
-            //   },
-            // });
+        })
+          .then((response) => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setIsRemoveModalVisible(false);
           })
-        );
-        setDashboardLoading(false);
-        setFreezeNav(false);
-        setIsRemoveModalVisible(false);
+          .catch((err) => {
+            console.error(err);
+            console.error(err.response);
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
+
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
+          });
       })();
     }
   };
