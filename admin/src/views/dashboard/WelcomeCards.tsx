@@ -3,6 +3,9 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
   Grid,
   Typography,
 } from '@material-ui/core';
@@ -29,25 +32,66 @@ export const WelcomeCards = () => {
                 <Typography gutterBottom variant="h4" component="h2">
                   <Box fontWeight="bold">Welcome to Perkify!</Box>
                 </Typography>
-                <Typography gutterBottom variant="h5" component="h3">
-                  Connect a payment method to start creating live benefits for
-                  your employees.
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    marginTop: '30px',
-                    width: '250px',
-                    fontWeight: 'bold',
-                    backgroundColor: '#00AB55',
-                  }}
-                  onClick={() => {
-                    history.push('/dashboard/billing');
-                  }}
-                >
-                  Set up billing
-                </Button>
+                <Grid item xs={12}>
+                  <Typography gutterBottom variant="h5" component="h3">
+                    Connect a payment method to start creating live benefits for
+                    your employees.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{
+                      marginTop: '30px',
+                      width: '250px',
+                      fontWeight: 'bold',
+                      backgroundColor: '#00AB55',
+                    }}
+                    onClick={() => {
+                      history.push('/dashboard/billing');
+                    }}
+                  >
+                    Set up billing
+                  </Button>
+                </Grid>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FormGroup row>
+                  <div
+                    aria-disabled
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      right: 0,
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 9999,
+                    }}
+                  ></div>
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Set Up Billing" />}
+                    label="Set Up Billing"
+                  ></FormControlLabel>
+
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Add Employees" />}
+                    label="Add Employees"
+                  />
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Create a Perk Group" />}
+                    label="Create a Perk Group"
+                  />
+                </FormGroup>
               </div>
               <img
                 src="/welcome_graphic.svg"
