@@ -46,6 +46,7 @@ export const AddEmployeesCard = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                    zIndex: 9999,
                   }}
                 >
                   Add Employees
@@ -65,7 +66,7 @@ export const AddEmployeesCard = () => {
                       position: 'absolute',
                       width: '100%',
                       height: '100%',
-                      zIndex: 9999,
+                      zIndex: 5000,
                     }}
                   ></div>
                   <FormControlLabel

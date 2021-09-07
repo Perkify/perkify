@@ -45,6 +45,7 @@ export const WelcomeCards = () => {
                       width: '250px',
                       fontWeight: 'bold',
                       backgroundColor: '#00AB55',
+                      zIndex: 9999,
                     }}
                     onClick={() => {
                       history.push('/dashboard/billing');
@@ -72,7 +73,7 @@ export const WelcomeCards = () => {
                       right: 0,
                       width: '100%',
                       height: '100%',
-                      zIndex: 9999,
+                      zIndex: 5000,
                     }}
                   ></div>
                   <FormControlLabel

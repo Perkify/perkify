@@ -47,6 +47,7 @@ export const CreatePerkGroupCard = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                    zIndex: 9999,
                   }}
                 >
                   Create Perk Group
@@ -70,18 +71,18 @@ export const CreatePerkGroupCard = () => {
                       right: 0,
                       width: '100%',
                       height: '100%',
-                      zIndex: 9999,
+                      zIndex: 5000,
                     }}
                   ></div>
                   <FormControlLabel
                     style={{ width: '100%' }}
-                    control={<Checkbox name="Set Up Billing" />}
+                    control={<Checkbox checked={true} name="Set Up Billing" />}
                     label="Set Up Billing"
                   ></FormControlLabel>
 
                   <FormControlLabel
                     style={{ width: '100%' }}
-                    control={<Checkbox name="Add Employees" />}
+                    control={<Checkbox checked={true} name="Add Employees" />}
                     label="Add Employees"
                   />
                   <FormControlLabel
