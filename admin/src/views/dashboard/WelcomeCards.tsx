@@ -3,16 +3,54 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
   Grid,
   Typography,
 } from '@material-ui/core';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-export const WelcomeCards = () => {
+interface TodoItemProps {
+  completed: boolean;
+  text: string;
+}
+
+const TodoItem = ({ completed, text }: TodoItemProps) => {
+  return (
+    <>
+      {/* <Grid item xs={2}>
+        <Chip
+          style={{ backgroundColor: 'lightgreen' }}
+          label={completed ? 'DONE' : 'TODO'}
+        ></Chip>
+      </Grid> */}
+      <Grid item xs={6}>
+        <Typography gutterBottom variant="h6">
+          {text}
+        </Typography>
+
+        {/* <Typography gutterBottom variant="body1">
+                    Connect a payment method to start creating live benefits for
+                    your employees.
+                  </Typography> */}
+      </Grid>
+      <Grid item xs={6}>
+        <Button>Complete Now</Button>
+      </Grid>
+    </>
+  );
+};
+
+interface WelcomeCardsProps {
+  hasCardPaymentMethods: boolean;
+  hasEmployees: boolean;
+  hasPerkGroups: boolean;
+}
+
+export const WelcomeCards = ({
+  hasCardPaymentMethods,
+  hasEmployees,
+  hasPerkGroups,
+}: WelcomeCardsProps) => {
   const history = useHistory();
   return (
     <div>
@@ -32,12 +70,14 @@ export const WelcomeCards = () => {
                 <Typography gutterBottom variant="h4" component="h2">
                   <Box fontWeight="bold">Welcome to Perkify!</Box>
                 </Typography>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ marginBottom: '30px' }}>
                   <Typography gutterBottom variant="h5" component="h3">
-                    Connect a payment method to start creating live benefits for
-                    your employees.
+                    Complete the following steps to finish setting up your
+                    perkify account.
+                    {/* Connect a payment method to start creating live benefits for
+                    your employees. */}
                   </Typography>
-                  <Button
+                  {/* <Button
                     variant="contained"
                     color="primary"
                     style={{
@@ -51,10 +91,47 @@ export const WelcomeCards = () => {
                     }}
                   >
                     Set up billing
-                  </Button>
+                  </Button> */}
                 </Grid>
+
+                <ol>
+                  <Typography component="li" variant="h5">
+                    Add a payment method
+                  </Typography>
+                  <Typography component="li" variant="h5">
+                    Add your employees
+                  </Typography>
+                  <Typography component="li" variant="h5">
+                    Create your first perk group
+                  </Typography>
+                </ol>
+                {/* <Grid container>
+                  <TodoItem completed={false} text="1. Add a payment method" />
+
+                  <Grid item xs={12}>
+                    <Typography gutterBottom variant="h6">
+                      2. Add Your Employees
+                    </Typography>
+
+                    <Typography gutterBottom variant="body1">
+                    Add the email addresses of your employees to your perkify
+                    business account.
+                  </Typography>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Typography gutterBottom variant="h6">
+                      3. Create Your First Perk Group
+                    </Typography>
+
+                    <Typography gutterBottom variant="body1">
+                    Create your first perk group to start generating live
+                    satisfaction.
+                  </Typography>
+                  </Grid>
+                </Grid> */}
               </div>
-              <div
+              {/* <div
                 style={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -92,7 +169,7 @@ export const WelcomeCards = () => {
                     label="Create a Perk Group"
                   />
                 </FormGroup>
-              </div>
+              </div> */}
               <img
                 src="/welcome_graphic.svg"
                 alt="Welcome Graphic"
