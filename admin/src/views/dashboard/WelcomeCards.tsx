@@ -16,6 +16,15 @@ export const WelcomeCards = () => {
   const history = useHistory();
   return (
     <div>
+      <div
+        aria-disabled
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          zIndex: 5000,
+        }}
+      ></div>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <Card style={{ backgroundColor: '#C8FACD' }}>
@@ -61,19 +70,6 @@ export const WelcomeCards = () => {
                 }}
               >
                 <FormGroup row>
-                  <div
-                    aria-disabled
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      bottom: 0,
-                      right: 0,
-                      width: '100%',
-                      height: '100%',
-                      zIndex: 5000,
-                    }}
-                  ></div>
                   <FormControlLabel
                     style={{ width: '100%' }}
                     control={<Checkbox name="Set Up Billing" />}
