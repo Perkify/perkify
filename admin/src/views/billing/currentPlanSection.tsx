@@ -83,7 +83,8 @@ export const DisplayCurrentPlan = () => {
                         (acc, perkGroupName) => {
                           return (
                             acc +
-                            business.perkGroups[perkGroupName].userEmails.length
+                            business.perkGroups[perkGroupName].employeeIDs
+                              .length
                           );
                         },
                         0
