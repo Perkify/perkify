@@ -14,7 +14,7 @@ const columns = [
     editable: false,
   },
   {
-    field: 'group',
+    field: 'perkGroupName',
     headerName: 'Perk Group',
     width: 200,
     editable: false,
@@ -37,7 +37,13 @@ export default function ManagePeople(props: any) {
   useEffect(() => {
     if (employees) {
       setPeopleData(
-        employees.map((employee) => ({ ...employee, id: employee.email }))
+        employees.map((employee) => ({
+          ...employee,
+          id: employee.email,
+          perkGroupName:
+            employee.perkGroupID &&
+            business.perkGroups[employee.perkGroupID].perkGroupName,
+        }))
       );
       setSelection([]);
     }
