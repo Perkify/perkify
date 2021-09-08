@@ -1,7 +1,7 @@
 import { AuthContext } from 'contexts/Auth';
-import { auth } from 'firebaseApp';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
+import { auth } from 'services';
 
 interface PrivateRouteProps {
   component: React.ElementType;

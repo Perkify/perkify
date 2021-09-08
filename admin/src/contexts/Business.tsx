@@ -1,6 +1,6 @@
 import { AuthContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
+import { db } from 'services';
 
 interface ContextProps {
   business: Business;

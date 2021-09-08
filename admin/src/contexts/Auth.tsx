@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
-import app, { auth, db } from '../firebaseApp';
+import { app, auth, db } from 'services';
 
 type ContextProps = {
   currentUser: firebase.User | null;

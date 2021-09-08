@@ -4,18 +4,26 @@ import * as express from 'express';
 import { functions } from '../services';
 import { errorHandlerMiddleware } from '../utils';
 import {
+  addPaymentMethod,
+  addPaymentMethodValidators,
   createPerkGroup,
   createPerkGroupValidators,
   createPortalLink,
   createPortalLinkValidators,
+  createSetupIntent,
+  createSetupIntentValidators,
   deletePerkGroup,
   deletePerkGroupValidators,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
+  removePaymentMethod,
+  removePaymentMethodValidators,
   sendEmailVerificationLink,
   sendEmailVerificationLinkValidators,
   sendPasswordResetLink,
   sendPasswordResetLinkValidators,
+  setDefaultPaymentMethod,
+  setDefaultPaymentMethodValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
@@ -45,6 +53,35 @@ app.use(
 );
 
 // --------------- Express Routes --------------- //
+
+// create a setup intent for a business
+// the businessID url param is not used because it is extracted
+// from the admin making the request
+// but in the future if we want to support one admin for multiple businesses
+// we will need to specify which business we are referring to
+app.post(
+  '/business/:businessID/setupIntent',
+  createSetupIntentValidators,
+  createSetupIntent
+);
+
+app.post(
+  '/business/:businessID/paymentMethod',
+  addPaymentMethodValidators,
+  addPaymentMethod
+);
+
+app.put(
+  '/business/:businessID/defaultPaymentMethod/:paymentMethodID',
+  setDefaultPaymentMethodValidators,
+  setDefaultPaymentMethod
+);
+
+app.delete(
+  '/business/:businessID/paymentMethod/:paymentMethodID',
+  removePaymentMethodValidators,
+  removePaymentMethod
+);
 
 // register an admin with a business
 app.post(

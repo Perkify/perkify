@@ -1,9 +1,9 @@
 import { NextFunction, Response } from 'express';
 import { body } from 'express-validator';
 import { db, stripe } from '../../services';
-import { UserPerkifyRequest, userPerkifyRequestTransform } from '../../types';
 import {
   checkValidationResult,
+  userPerkifyRequestTransform,
   validateBusinessDoc,
   validateFirebaseIdToken,
   validateUserDoc,

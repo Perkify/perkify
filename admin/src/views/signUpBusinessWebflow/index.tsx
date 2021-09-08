@@ -8,10 +8,9 @@ import AdminSignUpForm from 'components/AdminSignUpForm';
 import BusinessSignUpForm from 'components/BusinessSignUpForm';
 import VerifyEmail from 'components/VerifyEmail';
 import firebase from 'firebase/app';
-import app from 'firebaseApp';
 import logo from 'images/logo.png';
 import React from 'react';
-import { PerkifyApi } from 'services';
+import { app, PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
 
 const useStyles = makeStyles((theme) =>

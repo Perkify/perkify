@@ -1,10 +1,11 @@
 import { NextFunction, Response } from 'express';
 import { body } from 'express-validator';
-import admin, { db, stripe } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
+import admin, { db } from '../../services';
 import {
+  adminPerkifyRequestTransform,
   checkEmployeesExistInBusiness,
   checkValidationResult,
+  updateStripeSubscription,
   validateAdminDoc,
   validateBusinessDoc,
   validateFirebaseIdToken,
@@ -23,7 +24,13 @@ export const deleteEmployees = adminPerkifyRequestTransform(
     const { employeeIDs } = req.body as DeleteEmployeesPayload;
     const businessID = req.businessID;
 
+    // overview
+    // first remove employees from the business document
+    // then update the stripe subscription
+    // then delete the user documents
+
     try {
+      let perkGroupsChanged = false;
       const batch = db.batch();
       for (const employeeID of employeeIDs) {
         const employeeRef = db
@@ -32,12 +39,8 @@ export const deleteEmployees = adminPerkifyRequestTransform(
           .collection('employees')
           .doc(employeeID);
         const employeeData = (await employeeRef.get()).data() as Employee;
-        if (employeeData?.card?.id) {
-          await stripe.issuing.cards.update(employeeData.card.id, {
-            status: 'canceled',
-          });
-        }
         if (employeeData?.perkGroupID) {
+          perkGroupsChanged = true;
           await db
             .collection('businesses')
             .doc(businessID)
@@ -46,10 +49,27 @@ export const deleteEmployees = adminPerkifyRequestTransform(
                 admin.firestore.FieldValue.arrayRemove(employeeID),
             });
         }
-        batch.delete(employeeRef);
       }
 
+      // remove employees from the business document
       await batch.commit();
+
+      // this will update the stripe subscription and delete the employee cards
+      if (perkGroupsChanged) {
+        await updateStripeSubscription(req.businessData, next);
+      }
+
+      // delete the employee documents
+      const employeeDeleteBatch = db.batch();
+      for (const employeeID of employeeIDs) {
+        const employeeRef = db
+          .collection('businesses')
+          .doc(businessID)
+          .collection('employees')
+          .doc(employeeID);
+        employeeDeleteBatch.delete(employeeRef);
+      }
+      await employeeDeleteBatch.commit();
 
       res.status(200).end();
     } catch (err) {

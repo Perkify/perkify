@@ -10,8 +10,10 @@ const firebaseProjectLocation = 'us-central1';
 const queue = 'firestore-stripe-delay';
 const firebaseFunctionsUrl = `https://${firebaseProjectLocation}-${project}.cloudfunctions.net`;
 
-admin.initializeApp();
-// axios.defaults.baseURL = rapydBaseURL;
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
 const db = admin.firestore();
 const auth = admin.auth();
 
@@ -26,6 +28,8 @@ const queuePath: string = tasksClient.queuePath(
   queue
 );
 
+const environment = functions.config()['stripe-firebase'].environment;
+
 export default admin;
 
 export {
@@ -38,4 +42,5 @@ export {
   project,
   firebaseProjectLocation,
   firebaseFunctionsUrl,
+  environment,
 };

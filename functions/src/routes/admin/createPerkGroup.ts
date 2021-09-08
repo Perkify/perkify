@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
 import { body } from 'express-validator';
 import { db } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkEmployeesExistInBusiness,
   checkValidationResult,
   updateStripeSubscription,
