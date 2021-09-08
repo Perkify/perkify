@@ -4,6 +4,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SignUpGraphic from 'images/SignUpGraphic.png';
+import MaterialUiPhoneNumber from 'material-ui-phone-number';
 import React from 'react';
 
 const BootstrapInput = withStyles((theme) => ({
@@ -79,12 +80,16 @@ interface BusinessSignUpFormProps {
 
 const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
   const [dashboardLoading, setDashboardLoading] = React.useState(false);
-
   const classes = useStyles();
 
   const fillTextbox = (setFunction: (arg0: string) => void) => (event: any) => {
     setFunction(event.target.value);
   };
+
+  const fillPhoneTextBox =
+    (setFunction: (arg0: string) => void) => (event: any) => {
+      setFunction(event);
+    };
 
   return (
     <div
@@ -152,7 +157,7 @@ const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
             inputProps={{ maxLength: 2 }}
             onChange={fillTextbox(props.setState)}
             value={props.state}
-            error={props.state === '' && props.invalidStep}
+            error={props.state.length !== 2 && props.invalidStep}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -163,28 +168,27 @@ const BusinessSignUpForm = (props: BusinessSignUpFormProps) => {
             label="Zip / Postal code"
             variant="outlined"
             fullWidth
+            inputProps={{ maxLength: 5 }}
             autoComplete="shipping postal-code"
             onChange={fillTextbox(props.setPostalCode)}
             value={props.postalCode}
-            error={props.postalCode === '' && props.invalidStep}
+            error={props.postalCode.length !== 5 && props.invalidStep}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            required
+          <MaterialUiPhoneNumber
+            disableDropdown
             id="phoneNumber"
             name="Phone Number"
             label="Phone Number"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
+            autoComplete="phone number"
+            defaultCountry="us"
             variant="outlined"
             fullWidth
-            autoComplete="phone number"
-            onChange={fillTextbox(props.setPhone)}
+            required
+            onChange={fillPhoneTextBox(props.setPhone)}
             value={props.phone}
-            error={props.phone === '' && props.invalidStep}
+            error={props.phone.length < 10 && props.invalidStep}
           />
         </Grid>
         <Grid item xs={6} md={6}>

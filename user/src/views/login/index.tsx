@@ -15,7 +15,7 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
 import React, { useState } from 'react';
-import { PerkifyApi } from '../../services';
+import { PerkifyApi } from 'services';
 
 function Copyright() {
   return (

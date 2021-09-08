@@ -18,10 +18,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Alert } from '@material-ui/lab';
-import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-import { PerkifyApi } from 'services';
+import { app, PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {

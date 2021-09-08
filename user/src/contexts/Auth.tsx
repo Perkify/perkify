@@ -1,7 +1,7 @@
 import firebase from 'firebase/app';
-import app, { auth, db } from 'firebaseApp';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { app, auth, db } from 'services';
 import EmailInput from '../views/gettingStarted/EmailInput';
 
 type ContextProps = {

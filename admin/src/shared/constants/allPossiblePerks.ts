@@ -228,4 +228,4 @@
 //   {}
 // );
 
-export const placeHolder = [];
+export const placeHolder: unknown[] = [];

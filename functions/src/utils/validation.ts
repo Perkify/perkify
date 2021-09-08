@@ -2,13 +2,8 @@ import { NextFunction, Response } from 'express';
 import { Request as ValidatorRequest } from 'express-validator/src/base';
 import { logger } from 'firebase-functions';
 import validator from 'validator';
-import { allPerks } from '../../shared';
 import { auth, db } from '../services';
-import {
-  PartialAdminPerkifyRequest,
-  PartialBusinessPerkifyRequest,
-  PartialUserPerkifyRequest,
-} from '../types';
+import { allPerks } from '../shared';
 import { generateEmailsPatch } from './perkGroupHelpers';
 // * Validation Helpers * //
 
