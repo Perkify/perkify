@@ -157,6 +157,10 @@ interface CreateEmployeesPayload {
   employeeEmails: string[];
 }
 
+interface DeleteEmployeesPayload {
+  employeeIDs: string[];
+}
+
 interface RegisterUserPayload {
   firstName: string;
   lastName: string;
