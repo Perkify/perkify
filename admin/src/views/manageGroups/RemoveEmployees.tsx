@@ -61,10 +61,7 @@ const RemoveEmployees = ({
         const payload: UpdatePerkGroupPayload = {
           employeeIDs: afterEmails,
           perkNames: business.perkGroups[group].perkNames,
-          perkGroupName: Object.keys(business.perkGroups).find(
-            (perkGroupID) =>
-              business.perkGroups[perkGroupID].perkGroupName == group
-          ),
+          perkGroupName: business.perkGroups[group].perkGroupName,
         };
 
         await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {

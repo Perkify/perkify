@@ -75,10 +75,7 @@ const AddPerks = ({
           const payload: UpdatePerkGroupPayload = {
             employeeIDs: emails.map((emailObj) => emailObj.employeeID),
             perkNames: afterPerks,
-            perkGroupName: Object.keys(business.perkGroups).find(
-              (perkGroupID) =>
-                business.perkGroups[perkGroupID].perkGroupName == group
-            ),
+            perkGroupName: business.perkGroups[group].perkGroupName,
           };
           await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
             headers: {
