@@ -21,6 +21,7 @@ import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
