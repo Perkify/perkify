@@ -283,13 +283,6 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                               event.stopPropagation();
                               event.preventDefault();
                               setAnchorEl(null);
-                              setIsDeletePerkGroupModalVisible(
-                                Object.keys(business.perkGroups).find(
-                                  (perkGroupID) =>
-                                    business.perkGroups[perkGroupID]
-                                      .perkGroupName == name
-                                )
-                              );
                             }}
                             elevation={4}
                             anchorOrigin={{
@@ -307,7 +300,13 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 setAnchorEl(null);
-                                setIsDeletePerkGroupModalVisible(name);
+                                setIsDeletePerkGroupModalVisible(
+                                  Object.keys(business.perkGroups).find(
+                                    (perkGroupID) =>
+                                      business.perkGroups[perkGroupID]
+                                        .perkGroupName == name
+                                  )
+                                );
                               }}
                             >
                               Delete Perk Group
