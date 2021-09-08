@@ -140,6 +140,7 @@ const CreateGroup = () => {
     root: {
       display: 'flex',
       justifyContent: 'left',
+      alignItems: 'center',
       flexWrap: 'wrap',
       listStyle: 'none',
       padding: theme.spacing(0.5),
@@ -388,24 +389,31 @@ const CreateGroup = () => {
           </Grid>
         </Typography>
         <Paper
+          variant="outlined"
           component="ul"
           className={classes.root}
-          style={{ minHeight: 50 }}
+          style={{ minHeight: 55, borderColor: 'rgba(0, 0, 0, .2)' }}
         >
-          {employeeChipData.map((data) => {
-            let icon;
+          {employeeChipData.length == 0 ? (
+            <Typography style={{ marginLeft: '10px', color: 'grey' }}>
+              Click select employees
+            </Typography>
+          ) : (
+            employeeChipData.map((data) => {
+              let icon;
 
-            return (
-              <li key={data.key}>
-                <Chip
-                  icon={icon}
-                  label={data.label}
-                  onDelete={handleDelete(data)}
-                  className={classes.chip}
-                />
-              </li>
-            );
-          })}
+              return (
+                <li key={data.key}>
+                  <Chip
+                    icon={icon}
+                    label={data.label}
+                    onDelete={handleDelete(data)}
+                    className={classes.chip}
+                  />
+                </li>
+              );
+            })
+          )}
         </Paper>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
