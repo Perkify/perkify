@@ -8,9 +8,9 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
+import { AddEmployeesCard } from './AddEmployeesCard';
 import BChart from './BarChart';
 import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
@@ -26,10 +26,10 @@ interface DashboardUser {
 
 const GeneralDashboard = () => {
   const { currentUser, admin, loadingAuthState } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
-  var [employees, setEmployees] = useState<DashboardUser[]>([]);
+  var [oldStyleEmployees, setOldStyleEmployees] = useState<DashboardUser[]>([]);
   var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
   function roundNumber(num: any) {
@@ -99,10 +99,10 @@ const GeneralDashboard = () => {
       let localGroup = business.perkGroups[group];
       localGroup.perkNames.forEach((perk) => {
         totalCost +=
-          allPerksDict[perk].Cost * localGroup.userEmails.length * 1.1;
+          allPerksDict[perk].Cost * localGroup.employeeIDs.length * 1.1;
       });
-      totalCost += localGroup.userEmails.length * 4;
-      numEmployees += localGroup.userEmails.length;
+      totalCost += localGroup.employeeIDs.length * 4;
+      numEmployees += localGroup.employeeIDs.length;
     });
     if (numEmployees == 0) {
       return 0;
@@ -142,10 +142,10 @@ const GeneralDashboard = () => {
       localGroup.perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
-          numTempDict[perk] += localGroup.userEmails.length;
+          numTempDict[perk] += localGroup.employeeIDs.length;
         } else {
           tempDict[perk] = allPerksDict[perk].Cost;
-          numTempDict[perk] = localGroup.userEmails.length;
+          numTempDict[perk] = localGroup.employeeIDs.length;
         }
       });
     });
@@ -163,7 +163,7 @@ const GeneralDashboard = () => {
 
   function calculateAmountSpentPerPerk(perk: string, totalPeople: number) {
     let numPeople = 0;
-    employees.forEach((employee) => {
+    oldStyleEmployees.forEach((employee) => {
       if (employee.perks[perk]) {
         if (didSpendPerkLastMonth(employee.perks[perk])) {
           numPeople += 1;
@@ -215,7 +215,7 @@ const GeneralDashboard = () => {
         'Total spent in ' + d.getFullYear(),
       ],
     ];
-    employees.forEach((employee) => {
+    oldStyleEmployees.forEach((employee) => {
       let monthlyCost = 0;
       let yearlyCost = 0;
       Object.keys(employee.perks).forEach((perk) => {
@@ -246,34 +246,19 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    setDashboardLoading(true);
-    if (Object.keys(admin).length != 0 && business) {
-      const businessId = admin['businessID'];
-
-      db.collection('users')
-        .where('businessID', '==', businessId)
-        .get()
-        .then((querySnapshot) => {
-          const people = querySnapshot.docs.map((doc, index) => {
-            const userData = doc.data() as User;
-            return {
-              email: doc.id,
-              id: doc.id,
-              group: userData.perkGroupName,
-              perks: userData.perkUsesDict,
-            };
-          });
-          setEmployees(people);
-          setDashboardLoading(false);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    } else {
-      console.info('No such document!');
+    if (employees) {
+      setOldStyleEmployees(
+        employees
+          .filter((employee) => employee.perkGroupID != undefined)
+          .map((employee) => ({
+            email: employee.email,
+            id: employee.email,
+            group: employee.perkGroupID,
+            perks: employee.perkUsesDict,
+          }))
+      );
     }
-    return () => setDashboardLoading(false);
-  }, [currentUser, admin, business]);
+  }, [employees]);
 
   function handleGroupChange(event: any) {
     setSelectedGroup(event.target.value[1]);
@@ -282,7 +267,7 @@ const GeneralDashboard = () => {
   function calculateNumEmployees() {
     let retNum = 0;
     Object.keys(business.perkGroups).forEach((group) => {
-      retNum += business.perkGroups[group].userEmails.length;
+      retNum += business.perkGroups[group].employeeIDs.length;
     });
     return retNum;
   }
@@ -308,6 +293,8 @@ const GeneralDashboard = () => {
         <p>Loading</p>
       ) : Object.keys(business.cardPaymentMethods).length == 0 ? (
         <WelcomeCards />
+      ) : !employees || employees.length == 0 ? (
+        <AddEmployeesCard></AddEmployeesCard>
       ) : business.perkGroups == null ||
         Object.keys(business.perkGroups).length == 0 ? (
         <CreatePerkGroupCard />

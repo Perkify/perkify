@@ -5,13 +5,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from '@material-ui/core';
-import PurchaseConfirmation from 'components/PurchaseConfirmation';
-import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
+import { AuthContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { validateEmails } from 'utils/emailValidation';
@@ -31,12 +28,6 @@ const AddEmployees = ({
 }: AddEmployeesProps) => {
   // selected perk group from dropdown and respective error
 
-  const { business } = useContext(BusinessContext);
-  const [selectedPerkGroup, setSelectedPerkGroup] = useState('');
-  const [selectedPerkGroupError, setSelectedPerkGroupError] = useState('');
-  const [isConfirmationModalVisible, setConfirmationModalVisible] =
-    useState(false);
-
   // emails entered into form and respective error
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
@@ -51,7 +42,7 @@ const AddEmployees = ({
   const handleEmailError = (event: any) => {
     setEmailsToAdd(event.target.value);
     if (event.target.value === '') {
-      setEmailsError('Please input atleast one email');
+      setEmailsError('Please input at least one email');
     } else if (!validateEmails(event.target.value)) {
       setEmailsError('Please input proper emails');
     } else {
@@ -59,16 +50,31 @@ const AddEmployees = ({
     }
   };
 
-  const addToPerkGroup = (event: any) => {
-    event.preventDefault();
+  function addUsers() {
     let error = false;
     if (emailsToAdd == '') {
       setEmailsError('Enter emails');
       error = true;
     }
-    if (selectedPerkGroup.length == 0) {
-      setSelectedPerkGroupError('Select perk group');
+
+    const emailList = emailsToAdd
+      .trim()
+      .replace(/[,'"]+/gi, ' ')
+      .split(/\s+/); //Gives email as a list
+
+    const duplicateEmail = emailList.find((email) =>
+      peopleData.map((person) => person.email).includes(email)
+    );
+
+    if (duplicateEmail) {
+      setEmailsError(
+        `Attempting to add an employee with email ${duplicateEmail}, but that email already exists`
+      );
       error = true;
+    }
+
+    if (error || emailsError != '') {
+      return;
     }
     if (!error) {
       (async () => {
@@ -76,20 +82,11 @@ const AddEmployees = ({
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
 
-        const emailList = emailsToAdd
-          .trim()
-          .replace(/[,'"]+/gi, ' ')
-          .split(/\s+/); //Gives email as a list
-        const payload: UpdatePerkGroupPayload = {
-          perkNames: business.perkGroups[selectedPerkGroup].perkNames,
-          userEmails: emailList.concat(
-            peopleData
-              .filter((employeeObj) => employeeObj.group == selectedPerkGroup)
-              .map((employeeObj) => employeeObj.email)
-          ),
+        const payload: CreateEmployeesPayload = {
+          employeeEmails: emailList,
         };
 
-        PerkifyApi.put(`rest/perkGroup/${selectedPerkGroup}`, payload, {
+        PerkifyApi.post(`rest/employee`, payload, {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
             'Content-Type': 'application/json',
@@ -100,7 +97,6 @@ const AddEmployees = ({
             setFreezeNav(false);
             setIsAddEmployeesModalVisible(false);
             setEmailsToAdd('');
-            setSelectedPerkGroup('');
           })
           .catch((err) => {
             console.log(err.response);
@@ -110,52 +106,12 @@ const AddEmployees = ({
             setDashboardLoading(false);
             setFreezeNav(false);
             setEmailsToAdd('');
-            setSelectedPerkGroup('');
           });
       })();
     }
-  };
-
-  function generatePerks() {
-    return business.perkGroups[selectedPerkGroup].perkNames;
   }
 
-  function setVisible() {
-    let error = false;
-    if (emailsToAdd == '') {
-      setEmailsError('Enter emails');
-      error = true;
-    }
-    if (selectedPerkGroup.length == 0) {
-      setSelectedPerkGroupError('Select perk group');
-      error = true;
-    }
-    if (error || emailsError != '') {
-      return;
-    }
-    setConfirmationModalVisible(true);
-  }
-
-  return isConfirmationModalVisible ? (
-    <PurchaseConfirmation
-      isAddPerksModalVisible={isAddEmployeesModalVisible}
-      setIsAddPerksModalVisible={setIsAddEmployeesModalVisible}
-      title={'Add Employees'}
-      text={
-        'Are you sure you want to add these employees for a total cost of $'
-      }
-      onConfirmation={addToPerkGroup}
-      setConfirmationModalVisible={setConfirmationModalVisible}
-      perks={generatePerks()}
-      numPeople={
-        emailsToAdd
-          .trim()
-          .replace(/[,'"]+/gi, ' ')
-          .split(/\s+/).length
-      }
-      creatingGroup={true}
-    />
-  ) : (
+  return (
     <Dialog
       open={isAddEmployeesModalVisible}
       onClose={() => setIsAddEmployeesModalVisible(false)}
@@ -165,7 +121,7 @@ const AddEmployees = ({
       <DialogContent>
         <DialogContentText>
           To add users to this organization, please enter their email addresses
-          below and select a group from the dropdown.
+          below.
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Emails
@@ -184,31 +140,6 @@ const AddEmployees = ({
           error={emailsError != ''}
           helperText={emailsError}
         />
-        <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
-          Perk Group
-        </Typography>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          displayEmpty
-          variant="outlined"
-          value={selectedPerkGroup}
-          fullWidth
-          onChange={(event) => {
-            setSelectedPerkGroupError('');
-            setSelectedPerkGroup(event.target.value as string);
-          }}
-          error={selectedPerkGroupError != ''}
-        >
-          <MenuItem value="" disabled>
-            Select Perk Group
-          </MenuItem>
-          {groupData.map((name) => (
-            <MenuItem value={name} key={name}>
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
       </DialogContent>
       <DialogActions>
         <Button
@@ -217,7 +148,7 @@ const AddEmployees = ({
         >
           Cancel
         </Button>
-        <Button onClick={setVisible} color="primary">
+        <Button onClick={addUsers} color="primary">
           Add Users
         </Button>
       </DialogActions>

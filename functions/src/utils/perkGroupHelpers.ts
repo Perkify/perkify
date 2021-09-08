@@ -6,38 +6,42 @@ export const generatePerkGroupIntersection = (
     perkNames: perkGroup1.perkNames.filter((perkName) =>
       perkGroup2.perkNames.includes(perkName)
     ),
-    userEmails: perkGroup1.userEmails.filter((email) =>
-      perkGroup2.userEmails.includes(email)
+    employeeIDs: perkGroup1.employeeIDs.filter((employeeID) =>
+      perkGroup2.employeeIDs.includes(employeeID)
     ),
   } as PerkGroup);
 
 // it's not really a diff, because it is assymetrical. It's a patch!
 export const generateEmailsPatch = (
-  updatedEmails: string[],
-  liveEmails: string[]
+  updatedEmployeeIDs: string[],
+  liveEmployeeIDs: string[]
 ) => {
-  const emailsToCreate: string[] = [];
-  const emailsToUpdate: string[] = [];
-  const emailsToDelete: string[] = [];
+  const employeesToCreate: string[] = [];
+  const employeesToUpdate: string[] = [];
+  const employeesToDelete: string[] = [];
 
-  liveEmails.forEach((email) => {
-    if (!updatedEmails.includes(email)) {
+  liveEmployeeIDs.forEach((employeeID) => {
+    if (!updatedEmployeeIDs.includes(employeeID)) {
       // user does exist but is not in the businessData doc
       // delete the user
-      emailsToDelete.push(email);
+      employeesToDelete.push(employeeID);
     }
   });
 
-  updatedEmails.map((email) => {
+  updatedEmployeeIDs.map((email) => {
     // check if user exists
-    if (liveEmails.includes(email)) {
+    if (liveEmployeeIDs.includes(email)) {
       // user exists
-      emailsToUpdate.push(email);
+      employeesToUpdate.push(email);
     } else {
       // user does not exist
-      emailsToCreate.push(email);
+      employeesToCreate.push(email);
     }
   });
 
-  return { emailsToCreate, emailsToUpdate, emailsToDelete };
+  return {
+    employeesToCreate: employeesToCreate,
+    employeesToUpdate: employeesToUpdate,
+    employeesToDelete: employeesToDelete,
+  };
 };

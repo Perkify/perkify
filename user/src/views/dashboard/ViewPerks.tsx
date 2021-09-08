@@ -46,7 +46,7 @@ const PerkCard = withStyles((theme) => ({
 }))(Paper);
 
 interface ViewPerksProps {
-  employee: User;
+  employee: Employee;
   business: Business;
 }
 
@@ -59,7 +59,7 @@ const ViewPerks = ({ employee, business }: ViewPerksProps) => {
 
     console.log(business);
     if (business && business.perkGroups) {
-      return business.perkGroups[employee.perkGroupName].perkNames.map(
+      return business.perkGroups[employee.perkGroupID].perkNames.map(
         (perkName) => {
           increasingDelay += 300;
           const perkUses = employee.perkUsesDict[perkName];

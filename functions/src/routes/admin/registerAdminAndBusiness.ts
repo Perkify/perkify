@@ -55,10 +55,17 @@ export const registerAdminAndBusiness = async (
       email,
       firstName,
       lastName,
-      businessID: businessRef.id,
+      businessID: businessRef.id, // possibly remove this?
+      adminID: newUser.uid,
+      isOwner: true,
     };
     // create admin document to link user to business
-    await db.collection('admins').doc(newUser.uid).set(adminData);
+    await db
+      .collection('businesses')
+      .doc(customer.id)
+      .collection('admins')
+      .doc(newUser.uid)
+      .set(adminData);
 
     const businessData: Business = {
       businessID: businessRef.id,
@@ -71,7 +78,6 @@ export const registerAdminAndBusiness = async (
         postal_code: postalCode,
         state,
       },
-      admins: [newUser.uid],
       perkGroups: {},
       cardPaymentMethods: {},
       stripeId: customer.id,

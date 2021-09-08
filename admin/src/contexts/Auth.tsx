@@ -24,15 +24,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     app.auth().onAuthStateChanged(async (user) => {
-      if (user) {
-        const userDoc = await db.collection('admins').doc(user.uid).get();
-        if (userDoc) {
-          setCurrentUser(user);
-          setAdmin(userDoc.data());
-        } else {
-          auth.signOut();
-          alert('You do not have a registered admin account');
+      try {
+        if (user) {
+          const adminSnap = await db
+            .collectionGroup('admins')
+            .where('adminID', '==', user.uid)
+            .get();
+          if (adminSnap.size == 1) {
+            setCurrentUser(user);
+            setAdmin(adminSnap.docs[0].data());
+          } else {
+            auth.signOut();
+            alert('You do not have a registered admin account');
+          }
         }
+      } catch (e) {
+        console.log(e);
       }
       setLoadingAuthState(false);
     });

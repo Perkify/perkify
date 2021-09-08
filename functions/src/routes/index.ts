@@ -20,6 +20,10 @@ import {
   updatePerkGroupValidators,
 } from './admin';
 import {
+  createEmployees,
+  createEmployeesValidators,
+  deleteEmployees,
+  deleteEmployeesValidators,
   registerUser,
   registerUserValidators,
   sendSignInLink,
@@ -49,8 +53,13 @@ app.post(
   registerAdminAndBusiness
 );
 
-// regiser a user
-app.post('/user', registerUserValidators, registerUser);
+// create an employee
+app.post('/employee', createEmployeesValidators, createEmployees);
+// delete employees
+app.post('/employee/delete', deleteEmployeesValidators, deleteEmployees);
+
+// regiser an employee with a card
+app.post('/employee/register', registerUserValidators, registerUser);
 
 // send a sign-in link to user
 app.post(
@@ -78,18 +87,10 @@ app.post(
 );
 
 // perk group crud
-app.post(
-  '/perkGroup/:perkGroupName',
-  createPerkGroupValidators,
-  createPerkGroup
-);
-app.put(
-  '/perkGroup/:perkGroupName',
-  updatePerkGroupValidators,
-  updatePerkGroup
-);
+app.post('/perkGroup', createPerkGroupValidators, createPerkGroup);
+app.put('/perkGroup/:perkGroupID', updatePerkGroupValidators, updatePerkGroup);
 app.delete(
-  '/perkGroup/:perkGroupName',
+  '/perkGroup/:perkGroupID',
   deletePerkGroupValidators,
   deletePerkGroup
 );

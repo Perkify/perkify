@@ -58,47 +58,64 @@ export default function ManageGroups(props: any) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
 
+  const [perkGroupName, setPerkGroupName] = useState('');
+
   useEffect(() => {
     if (business) {
       if (Object.keys(business.perkGroups).includes(id)) {
+        setPerkGroupName(business.perkGroups[id].perkGroupName);
         // set perk group data
         setPerksData(
-          business.perkGroups[id].perkNames.map((perkGroupName, index) => ({
-            ...allPerksDict[perkGroupName],
+          business.perkGroups[id].perkNames.map((perkName, index) => ({
+            ...allPerksDict[perkName],
             id: index,
           }))
         );
 
-        // set email data
-        setEmails(
-          business.perkGroups[id].userEmails.map((employeeEmail, index) => ({
-            email: employeeEmail,
-            id: index,
-          }))
-        );
         setGroupNotFound(false);
       } else {
         setGroupNotFound(true);
       }
-      setSelectedEmployees([]);
       setSelectedPerks([]);
     }
   }, [business, id]);
 
+  useEffect(() => {
+    if (employees) {
+      // set email data
+      setEmails(
+        employees
+          .filter((employee) => employee.perkGroupID == id)
+          .map((employee, index) => ({
+            email: employee.email,
+            id: index,
+            employeeID: employee.employeeID,
+          }))
+      );
+      setSelectedEmployees([]);
+    }
+  }, [id, employees]);
+
   if (groupNotFound) {
     return (
       <>
-        <Header
-          title={`Manage ${id} Group`}
-          crumbs={['Dashboard', 'Perk Groups', id]}
-        />
+        {/* <Header
+          title={`Manage ${
+            business && business.perkGroups[id].perkGroupName
+          } Group`}
+          crumbs={[
+            'Dashboard',
+            'Perk Groups',
+            business && business.perkGroups[id].perkGroupName,
+          ]}
+        /> */}
         <div style={{ width: '50%', marginTop: '100px' }}>
           <Typography variant="h2">Perk Group Not Found</Typography>
           <Typography variant="h5" style={{ marginTop: '20px' }}>
@@ -113,8 +130,8 @@ export default function ManageGroups(props: any) {
   return (
     <>
       <Header
-        title={`Manage ${id} Group`}
-        crumbs={['Dashboard', 'Perk Groups', id]}
+        title={`Manage ${perkGroupName} Group`}
+        crumbs={['Dashboard', 'Perk Groups', perkGroupName]}
         // button={{
         //   type: 'delete',
         //   onClick: () => {
@@ -166,7 +183,7 @@ export default function ManageGroups(props: any) {
         isAddEmployeesModalVisible={isAddEmployeesModalVisible}
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
         group={id}
-        employees={groupEmails}
+        groupEmployees={groupEmails}
         groupPerks={groupPerks}
       />
       <RemoveEmployees

@@ -3,14 +3,12 @@ import { body, param } from 'express-validator';
 import { db } from '../../services';
 import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
-  checkIfAnyEmailsToAddAreClaimed,
+  checkEmployeesExistInBusiness,
   checkValidationResult,
-  sanitizeEmails,
   updateStripeSubscription,
   validateAdminDoc,
   validateBusinessDoc,
-  validateEmails,
-  validateExistingPerkGroupName,
+  validateExistingPerkGroupID,
   validateFirebaseIdToken,
   validatePerkNames,
 } from '../../utils';
@@ -19,19 +17,17 @@ export const updatePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
-  body('userEmails')
-    .custom(validateEmails)
-    .customSanitizer(sanitizeEmails)
-    .custom(checkIfAnyEmailsToAddAreClaimed),
+  body('employeeIDs').custom(checkEmployeesExistInBusiness),
   body('perkNames').custom(validatePerkNames),
-  param('perkGroupName').custom(validateExistingPerkGroupName),
+  param('perkGroupID').custom(validateExistingPerkGroupID),
   checkValidationResult,
 ];
 
 export const updatePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const perkGroupName = req.params.perkGroupName;
-    const { userEmails, perkNames } = req.body as UpdatePerkGroupPayload;
+    const perkGroupID = req.params.perkGroupID;
+    const { employeeIDs, perkNames, perkGroupName } =
+      req.body as UpdatePerkGroupPayload;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
@@ -40,14 +36,18 @@ export const updatePerkGroup = adminPerkifyRequestTransform(
     try {
       // update business doc
       // this makes pendingBusiness equal updatedBusiness
+
+      const newPerkGroup: PerkGroup = {
+        perkGroupName,
+        perkNames,
+        employeeIDs,
+      };
+
       await db
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`perkGroups.${perkGroupName}`]: {
-            perkNames: perkNames,
-            userEmails: userEmails,
-          } as PerkGroup,
+          [`perkGroups.${perkGroupID}`]: newPerkGroup,
         });
 
       // sync to stripe subscription

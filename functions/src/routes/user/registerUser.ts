@@ -24,6 +24,7 @@ export const registerUser = userPerkifyRequestTransform(
   async (req: UserPerkifyRequest, res: Response, next: NextFunction) => {
     const { firstName, lastName } = req.body as RegisterUserPayload;
     const email = req.user.email;
+    const employeeID = req.user.uid;
     const businessData = req.businessData;
 
     const billingAddress = businessData.billingAddress;
@@ -58,10 +59,15 @@ export const registerUser = userPerkifyRequestTransform(
       // we combine prevUserData with new data
       // in order to be sure we are satisfying the User type
       const prevUserData = (
-        await db.collection('users').doc(email).get()
-      ).data() as User;
+        await db
+          .collection('businesses')
+          .doc(businessData.businessID)
+          .collection('employees')
+          .doc(employeeID)
+          .get()
+      ).data() as Employee;
 
-      const userData: User = {
+      const userData: Employee = {
         ...prevUserData,
         firstName: firstName,
         lastName: lastName,
@@ -82,7 +88,12 @@ export const registerUser = userPerkifyRequestTransform(
           },
         },
       };
-      await db.collection('users').doc(email).set(userData);
+      await db
+        .collection('businesses')
+        .doc(businessData.businessID)
+        .collection('employees')
+        .doc(employeeID)
+        .set(userData);
 
       res.status(200).end();
     } catch (err) {
