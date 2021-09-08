@@ -44,8 +44,6 @@ interface Business {
   businessID: string;
   // business name
   name: string;
-  // admin ids
-  admins: string[];
   // billing address
   billingAddress: BillingAddress;
   // stripe info

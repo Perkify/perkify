@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
 import { body } from 'express-validator';
 import { auth, db } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkIfAnyEmailsAreClaimed,
   checkValidationResult,
   sanitizeEmails,

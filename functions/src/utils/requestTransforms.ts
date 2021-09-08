@@ -28,25 +28,6 @@ export const adminPerkifyRequestTransform = (handler: AdminPerkifyHandler) => {
   };
 };
 
-export interface UserPerkifyContext {
-  businessID: string;
-  businessData: Business;
-  userData: Employee;
-  user: {
-    email: string;
-    uid: string;
-  };
-}
-
-export type PartialUserPerkifyRequest = Request & Partial<UserPerkifyContext>;
-export type UserPerkifyRequest = Request & UserPerkifyContext;
-
-export type UserPerkifyHandler = (
-  req: UserPerkifyRequest,
-  res: Response,
-  next: NextFunction
-) => any;
-
 export const userPerkifyRequestTransform = (handler: UserPerkifyHandler) => {
   return (
     req: PartialAdminPerkifyRequest,

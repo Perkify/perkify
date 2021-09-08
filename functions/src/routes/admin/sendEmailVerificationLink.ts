@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
 import { logger } from 'firebase-functions';
 import admin, { db, functions } from '../../services';
-import { AdminPerkifyRequest, adminPerkifyRequestTransform } from '../../types';
 import {
+  adminPerkifyRequestTransform,
   checkValidationResult,
   validateAdminDoc,
   validateBusinessDoc,
