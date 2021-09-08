@@ -32,86 +32,126 @@ export const applyChangesToLiveUsers = async (
 
   const pendingBusiness = pendingBusinessDoc.data() as Business;
 
+  // get existing users
+  const existingEmployeesSnapshot = await db
+    .collection('businesses')
+    .doc(updatedBusiness.businessID)
+    .collection('employees')
+    .get();
+
+  const existingEmployeesDict = generateDictFromSnapshot(
+    existingEmployeesSnapshot
+  ) as Record<string, Employee>;
+
+  // get a list of the perk groups we would be expanding to
+  const expandingToPerkGroupIDs = Object.keys(updatedBusiness.perkGroups);
+
+  // get a list of all the perk group names we would be shrinking from
+  const shrinkingFromPerkGroupIDs = Array.from(
+    new Set(
+      Object.keys(existingEmployeesDict).map(
+        (userID) => existingEmployeesDict[userID].perkGroupID
+      )
+    )
+  ).filter((perkGroupID) => perkGroupID != null);
+
+  // pick the important list of perk group names
+  const importantPerkGroupIDs =
+    modificationType === 'expand'
+      ? expandingToPerkGroupIDs
+      : shrinkingFromPerkGroupIDs;
+
   // process each perk group separately
   await Promise.all(
-    Object.keys(updatedBusiness.perkGroups).map(async (perkGroupName) => {
+    importantPerkGroupIDs.map(async (perkGroupID) => {
       // TODOFUTURE: improve this so that we can instantly tell if a perkGroup has changed
       // if it hasn't, skip a loop to avoid fetching firestore documents and speed things up
 
-      // get existing users
-      const existingPerkUsersSnapshot = await db
-        .collection('users')
-        .where('businessID', '==', updatedBusiness.businessID)
-        .where('perkGroupName', '==', perkGroupName)
-        .get();
+      const livePerkEmployeeDocs = existingEmployeesSnapshot.docs.filter(
+        (userDoc) => (userDoc.data() as Employee).perkGroupID === perkGroupID
+      );
 
-      const existingPerkUsersDict = generateDictFromSnapshot(
-        existingPerkUsersSnapshot
-      ) as Record<string, User>;
+      const pendingPerkGroup =
+        pendingBusiness.perkGroups[perkGroupID] ||
+        ({ perkNames: [], employeeIDs: [], perkGroupName: '' } as PerkGroup);
 
-      const pendingPerkGroup = pendingBusiness.perkGroups[perkGroupName];
-      const updatedPerkGroup = updatedBusiness.perkGroups[perkGroupName];
+      const payloadPerkGroup =
+        updatedBusiness.perkGroups[perkGroupID] ||
+        ({ perkNames: [], employeeIDs: [], perkGroupName: '' } as PerkGroup);
 
       const livePerkGroup =
-        existingPerkUsersSnapshot.docs.length != 0
+        livePerkEmployeeDocs.length != 0
           ? ({
               perkNames: Object.keys(
-                (existingPerkUsersSnapshot.docs[0].data() as User).perkUsesDict
+                (livePerkEmployeeDocs[0].data() as Employee).perkUsesDict
               ),
-              userEmails: existingPerkUsersSnapshot.docs.map(
-                (userDoc) => userDoc.id
-              ),
+              employeeIDs: livePerkEmployeeDocs.map((userDoc) => userDoc.id),
             } as PerkGroup)
-          : ({ perkNames: [], userEmails: [] } as PerkGroup);
+          : ({
+              perkNames: [],
+              employeeIDs: [],
+              perkGroupName: '',
+            } as PerkGroup);
 
       // EXPAND
-      // get the intersection of the updatedPerkGroup and the pendingPerkGroup
-      // livePerkGroup a subset of both the pendingPerkGroup and the updatedPerkGroup
+      // get the intersection of the payloadPerkGroup and the pendingPerkGroup
+      // livePerkGroup a subset of both the pendingPerkGroup and the payloadPerkGroup
       // so the intersection is a superset of the intersection of livePerkGroup
       // therefore we are only going to be expanding the live users
       // when we put the intersection on the live users
 
       // SHRINK
-      // intersect updatedPerkGroup with livePerkGroup
+      // intersect payloadPerkGroup with livePerkGroup
       // to get a subset of the livePerkGroup
       // that we will apply to livePerkGroup
       // in order to shrink it
 
       const intersectedPerkGroupData = generatePerkGroupIntersection(
-        updatedPerkGroup,
+        payloadPerkGroup,
         modificationType === 'expand' ? pendingPerkGroup : livePerkGroup
       );
 
       // get the emails patch
-      const { emailsToCreate, emailsToUpdate, emailsToDelete } =
+      const { employeesToCreate, employeesToUpdate, employeesToDelete } =
         generateEmailsPatch(
-          intersectedPerkGroupData.userEmails,
-          livePerkGroup.userEmails
+          intersectedPerkGroupData.employeeIDs,
+          livePerkGroup.employeeIDs
         );
 
       usersToCreate.push(
-        ...emailsToCreate.map((email) => ({
-          email,
+        ...employeesToCreate.map((employeeID) => ({
+          employeeID,
           newPerkNames: intersectedPerkGroupData.perkNames,
-          perkGroupName,
+          perkGroupID,
           businessID,
+          email: existingEmployeesDict[employeeID].email,
+          businessName: updatedBusiness.name,
         }))
       );
 
       usersToUpdate.push(
-        ...emailsToUpdate.map((email) => ({
-          email,
+        ...employeesToUpdate.map((employeeID) => ({
+          employeeID,
+          businessID,
           newPerkNames: intersectedPerkGroupData.perkNames,
-          oldPerkUsesDict: existingPerkUsersDict[email].perkUsesDict,
-          perkGroupName,
+          oldPerkUsesDict: existingEmployeesDict[employeeID].perkUsesDict,
+          perkGroupID,
         }))
       );
 
       usersToDelete.push(
-        ...emailsToDelete.map((email) => ({
-          email,
-          card: existingPerkUsersDict[email].card,
+        ...employeesToDelete.map((employeeID) => ({
+          businessID,
+          employeeID,
+          card: existingEmployeesDict[employeeID].card,
         }))
+      );
+
+      console.log(
+        intersectedPerkGroupData.employeeIDs,
+        livePerkGroup.employeeIDs,
+        employeesToDelete,
+        modificationType
       );
     })
   );

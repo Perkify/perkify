@@ -18,12 +18,25 @@ import {
   registerAdminAndBusinessValidators,
   removePaymentMethod,
   removePaymentMethodValidators,
+  sendEmailVerificationLink,
+  sendEmailVerificationLinkValidators,
+  sendPasswordResetLink,
+  sendPasswordResetLinkValidators,
   setDefaultPaymentMethod,
   setDefaultPaymentMethodValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
-import { registerUser, registerUserValidators } from './user';
+import {
+  createEmployees,
+  createEmployeesValidators,
+  deleteEmployees,
+  deleteEmployeesValidators,
+  registerUser,
+  registerUserValidators,
+  sendSignInLink,
+  sendSignInLinkValidators,
+} from './user';
 
 const app = express();
 
@@ -77,26 +90,44 @@ app.post(
   registerAdminAndBusiness
 );
 
-// regiser a user
-app.post('/user', registerUserValidators, registerUser);
+// create an employee
+app.post('/employee', createEmployeesValidators, createEmployees);
+// delete employees
+app.post('/employee/delete', deleteEmployeesValidators, deleteEmployees);
+
+// regiser an employee with a card
+app.post('/employee/register', registerUserValidators, registerUser);
+
+// send a sign-in link to user
+app.post(
+  '/user/:userEmail/signInLink',
+  sendSignInLinkValidators,
+  sendSignInLink
+);
 
 // create a portal link for a user
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 app.post('/portalLink', createPortalLinkValidators, createPortalLink);
 
-// perk group crud
+// resend email confirmation link to admin
 app.post(
-  '/perkGroup/:perkGroupName',
-  createPerkGroupValidators,
-  createPerkGroup
+  '/admin/:adminEmail/emailVerificationLink',
+  sendEmailVerificationLinkValidators,
+  sendEmailVerificationLink
 );
-app.put(
-  '/perkGroup/:perkGroupName',
-  updatePerkGroupValidators,
-  updatePerkGroup
+
+// send a password-reset link to admin
+app.post(
+  '/admin/:adminEmail/passwordResetLink',
+  sendPasswordResetLinkValidators,
+  sendPasswordResetLink
 );
+
+// perk group crud
+app.post('/perkGroup', createPerkGroupValidators, createPerkGroup);
+app.put('/perkGroup/:perkGroupID', updatePerkGroupValidators, updatePerkGroup);
 app.delete(
-  '/perkGroup/:perkGroupName',
+  '/perkGroup/:perkGroupID',
   deletePerkGroupValidators,
   deletePerkGroup
 );

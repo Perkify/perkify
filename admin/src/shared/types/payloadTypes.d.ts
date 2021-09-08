@@ -19,6 +19,14 @@ interface RegisterAdminAndBusinessPayload {
   postalCode: string;
 }
 
+interface CreateEmployeesPayload {
+  employeeEmails: string[];
+}
+
+interface DeleteEmployeesPayload {
+  employeeIDs: string[];
+}
+
 interface RegisterUserPayload {
   firstName: string;
   lastName: string;
@@ -30,12 +38,14 @@ interface CreatePortalLinkPayload {
 
 interface CreatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
+  perkGroupName: string;
 }
 
 interface UpdatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
+  perkGroupName: string;
 }
 
 interface AddPaymentMethodPayload {

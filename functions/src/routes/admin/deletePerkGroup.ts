@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+import { param } from 'express-validator';
 import admin, { db } from '../../services';
 import {
   adminPerkifyRequestTransform,
@@ -6,6 +7,7 @@ import {
   updateStripeSubscription,
   validateAdminDoc,
   validateBusinessDoc,
+  validateExistingPerkGroupID,
   validateFirebaseIdToken,
 } from '../../utils';
 
@@ -13,12 +15,13 @@ export const deletePerkGroupValidators = [
   validateFirebaseIdToken,
   validateAdminDoc,
   validateBusinessDoc,
+  param('perkGroupID').custom(validateExistingPerkGroupID),
   checkValidationResult,
 ];
 
 export const deletePerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const perkGroupName = req.params.perkGroupName;
+    const perkGroupID = req.params.perkGroupID;
     const adminData = req.adminData;
     const businessID = adminData.businessID;
 
@@ -30,7 +33,7 @@ export const deletePerkGroup = adminPerkifyRequestTransform(
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`perkGroups.${perkGroupName}`]: admin.firestore.FieldValue.delete(),
+          [`perkGroups.${perkGroupID}`]: admin.firestore.FieldValue.delete(),
         });
 
       // update the stripe subscription

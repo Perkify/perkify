@@ -27,7 +27,7 @@ declare global {
   interface UserPerkifyContext {
     businessID: string;
     businessData: Business;
-    userData: User;
+    userData: Employee;
     user: {
       email: string;
       uid: string;
@@ -59,13 +59,17 @@ declare global {
   // types for user manipulation
   interface UserToCreate {
     email: string;
+    employeeID: string;
     businessID: string;
-    perkGroupName: string;
+    perkGroupID: string;
+    businessName: string;
     newPerkNames: string[];
   }
 
   interface UserToUpdate {
-    email: string;
+    businessID: string;
+    employeeID: string;
+    perkGroupID: string;
     newPerkNames: string[];
     oldPerkUsesDict: {
       [key: string]: PerkUses;
@@ -73,7 +77,8 @@ declare global {
   }
 
   interface UserToDelete {
-    email: string;
+    businessID: string;
+    employeeID: string;
     card?: UserCard;
   }
 }

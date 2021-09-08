@@ -34,11 +34,10 @@ const PrivateRoute = ({
       // the better long term solution is probs to use auth roles and check the account is logged in as either a user or admin
       if (currentUser) {
         const userDoc = await db
-          .collection('users')
-          .doc(currentUser.email)
+          .collectionGroup('employees')
+          .where('employeeID', '==', currentUser.uid)
           .get();
-        // could also check for employee data here
-        if (!userDoc.exists) {
+        if (userDoc.empty) {
           await auth.signOut();
           alert('You have not yet been added by your employer');
         }

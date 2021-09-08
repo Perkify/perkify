@@ -6,7 +6,6 @@ import {
   DialogTitle,
   Snackbar,
 } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -18,11 +17,10 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-import { app } from 'services';
+import { app, PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -96,24 +94,18 @@ export default function SignInSide(props: any) {
     setOpen(false);
   };
 
-  function resetPass() {
-    app
-      .auth()
-      .sendPasswordResetEmail(resetEmail)
-      .then(() => {
-        console.log('SENT');
-        setDidResetPass(true);
-        // Password reset email sent!
-        // ..
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-        // ..
-      });
-  }
+  const resetPass = async () => {
+    setLoading(true);
+    try {
+      await PerkifyApi.post(`/rest/admin/${resetEmail}/passwordResetLink`);
+      setLoading(false);
+      setDidResetPass(true);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
+    }
+  };
 
   return (
     <div style={{ background: '#5289f2' }}>
@@ -141,6 +133,7 @@ export default function SignInSide(props: any) {
             width: '100vw',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 2000,
           }}
         >
           <CircularProgress color="secondary" style={{ zIndex: 20 }} />
@@ -191,9 +184,6 @@ export default function SignInSide(props: any) {
               square
             >
               <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                  <LockOutlinedIcon />
-                </Avatar>
                 <Typography component="h1" variant="h5">
                   Perkify Admin Login
                 </Typography>

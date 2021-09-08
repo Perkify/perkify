@@ -67,7 +67,7 @@ const GettingStarted = () => {
       // because we need their first and last name
       // so auth isn't created until
       const response = await PerkifyApi.post(
-        'rest/user',
+        'rest/employee/register',
         formFields as RegisterUserPayload,
         {
           headers: {
@@ -84,10 +84,14 @@ const GettingStarted = () => {
         };
       }
 
-      // should I do this here or elsewhere?
-      const userDoc = await db.collection('users').doc(currentUser.email).get();
-      const employeeData = userDoc.data();
-      setEmployee(employeeData);
+      const userDoc = await db
+        .collectionGroup('employees')
+        .where('employeeID', '==', currentUser.uid)
+        .get();
+      if (!userDoc.empty) {
+        const employeeData = userDoc.docs[0].data();
+        setEmployee(employeeData as Employee);
+      }
       setDashboardLoading(false);
     } catch (e) {
       setDashboardLoading(false);

@@ -18,10 +18,26 @@ export const emailNormalizationOptions = {
   icloud_remove_subaddress: false,
 };
 
-export const validateUserEmail = async (email: string) => {
-  const userRef = await db.collection('users').doc(email).get();
-  if (!userRef.exists) {
+// check that the employee document exists
+export const validateEmployee = async (employeeID: string) => {
+  const employeeRef = await db
+    .collectionGroup('employees')
+    .where('employeeID', '==', employeeID)
+    .get();
+  if (!employeeRef.empty) {
     return Promise.reject(new Error('You are not added by your employer'));
+  } else {
+    return Promise.resolve();
+  }
+};
+
+export const validateAdminEmail = async (email: string) => {
+  const adminRef = await db
+    .collection('admins')
+    .where('email', '==', email)
+    .get();
+  if (adminRef.empty) {
+    return Promise.reject(new Error('You do not have an account'));
   } else {
     return Promise.resolve();
   }
@@ -51,7 +67,7 @@ export const sanitizeEmails = (emails: string[]) => {
 };
 
 export const validatePerkNames = async (perkNames: string[]) => {
-  if (Array.isArray(perkNames) && perkNames.length > 0) {
+  if (Array.isArray(perkNames)) {
     for (const perk of perkNames) {
       if (!allPerks.some((truePerk) => truePerk.Name === perk)) {
         return Promise.reject(new Error(`perk: ${perk} is not supported`));
@@ -62,7 +78,7 @@ export const validatePerkNames = async (perkNames: string[]) => {
       throw new Error('Trying to add duplicate perkNames');
     }
   } else {
-    return Promise.reject(new Error('send array of perkNames'));
+    return Promise.reject(new Error('Send array of perkNames'));
   }
   return Promise.resolve();
 };
@@ -84,13 +100,13 @@ export const validateNewPerkGroupName = async (
   return;
 };
 
-export const validateExistingPerkGroupName = async (
-  perkGroupName: string,
+export const validateExistingPerkGroupID = async (
+  perkGroupID: string,
   { req }: { req: ValidatorRequest }
 ) => {
-  if (perkGroupName) {
+  if (perkGroupID) {
     const businessData = req.businessData;
-    if (!Object.keys(businessData.perkGroups).includes(perkGroupName)) {
+    if (!Object.keys(businessData.perkGroups).includes(perkGroupID)) {
       throw new Error(
         "Trying to update a perk group with a name that doesn't exist"
       );
@@ -102,33 +118,22 @@ export const validateExistingPerkGroupName = async (
 };
 
 export const checkIfAnyEmailsAreClaimed = async (emails: string[]) => {
-  // check if any of the emails exist in any business
-  const businessesSnapshot = await db.collection('businesses').get();
-
-  // generate list of all employee emails
-  const allEmployeesAcrossBusinesses: string[] = [];
-  businessesSnapshot.forEach((businessDoc) => {
-    Object.values((businessDoc.data() as Business).perkGroups)
-      .map((perkGroup) => perkGroup.userEmails)
-      .forEach((perkGroupEmails) => {
-        allEmployeesAcrossBusinesses.push(...perkGroupEmails);
-      });
-  });
-
-  // check if any of the emails to create exist across all businesses
-  const emailThatExistsInAnotherBusiness = emails.find((email) =>
-    allEmployeesAcrossBusinesses.includes(email)
-  );
-
-  if (emailThatExistsInAnotherBusiness) {
-    const error = {
-      status: 400,
-      reason: 'Bad Request',
-      reasonDetail: `added email ${emailThatExistsInAnotherBusiness} that is already in another group`,
-    };
-    // throwing error so that it can get caught
-    // by the caller which will then call next(error)
-    throw error;
+  for (const email of emails) {
+    // check if any of the emails exist in any business
+    const employeeRef = await db
+      .collectionGroup('employees')
+      .where('email', '==', email)
+      .get();
+    if (!employeeRef.empty) {
+      const error = {
+        status: 400,
+        reason: 'Bad Request',
+        reasonDetail: `Added email, ${email}, that already exist`,
+      };
+      // throwing error so that it can get caught
+      // by the caller which will then call next(error)
+      throw error;
+    }
   }
 };
 
@@ -142,13 +147,41 @@ export const checkIfAnyEmailsToAddAreClaimed = async (
   ] as PerkGroup;
 
   // get the emails to be created
-  const { emailsToCreate } = generateEmailsPatch(
+  const { employeesToCreate } = generateEmailsPatch(
     emails,
-    currentPerkGroup.userEmails
+    currentPerkGroup.employeeIDs
   );
 
   // check if any of the emails to be created are claimed
-  await checkIfAnyEmailsAreClaimed(emailsToCreate);
+  await checkIfAnyEmailsAreClaimed(employeesToCreate);
+};
+
+export const checkEmployeesExistInBusiness = async (
+  employeeIDs: string[],
+  { req }: { req: ValidatorRequest }
+) => {
+  if (!req.businessID) {
+    return Promise.reject(new Error('businessID not available in middleware'));
+  }
+  for (const employeeID of employeeIDs) {
+    const employeeRef = await db
+      .collection('businesses')
+      .doc(req.businessID)
+      .collection('employees')
+      .doc(employeeID)
+      .get();
+    if (employeeRef == null) {
+      const error = {
+        status: 400,
+        reason: 'Bad Request',
+        reasonDetail: `Employee ${employeeID} doesn't exist`,
+      };
+      // throwing error so that it can get caught
+      // by the caller which will then call next(error)
+      throw error;
+    }
+    return Promise.resolve();
+  }
 };
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
@@ -221,10 +254,19 @@ export const validateAdminDoc = async (
     };
     return next(error);
   }
-  const adminData = (
-    await db.collection('admins').doc(req.user.uid).get()
-  ).data() as Admin;
-
+  const adminSnap = await db
+    .collectionGroup('admins')
+    .where('adminID', '==', req.user.uid)
+    .get();
+  if (adminSnap.size !== 1) {
+    const error = {
+      status: 500,
+      reason: 'admin account does not exist',
+      reasonDetail: 'admin account does not exist',
+    };
+    return next(error);
+  }
+  const adminData = adminSnap.docs[0].data() as Admin;
   if (adminData == null) {
     const error = {
       status: 500,
@@ -253,21 +295,30 @@ export const validateUserDoc = async (
     return next(error);
   }
 
-  const userData = (
-    await db.collection('users').doc(req.user.email).get()
-  ).data() as User;
-
-  if (userData == null) {
+  const employeeSnap = await db
+    .collectionGroup('employees')
+    .where('employeeID', '==', req.user.uid)
+    .get();
+  if (employeeSnap.size !== 1) {
     const error = {
       status: 500,
-      reason: 'Missing user document',
-      reasonDetail: `Missing user document in firestore`,
+      reason: 'Employee does not exist',
+      reasonDetail: 'employee does not exist',
+    };
+    return next(error);
+  }
+  const employeeData = employeeSnap.docs[0].data() as Employee;
+  if (employeeData == null) {
+    const error = {
+      status: 500,
+      reason: 'Missing employee document',
+      reasonDetail: `Missing employee document in firestore`,
     };
     return next(error);
   }
 
-  req.userData = userData;
-  req.businessID = userData.businessID;
+  req.userData = employeeData;
+  req.businessID = employeeData.businessID;
   return next();
 };
 

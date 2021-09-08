@@ -12,21 +12,28 @@ interface SimpleCardPaymentMethod {
   paymentMethodID: string;
 }
 
-// represents a businesses billing address
+interface Admin {
+  businessID: string;
+  adminID: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isOwner: boolean;
+}
+
+interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
+  perkNames: string[];
+}
+
 interface BillingAddress {
   city: string;
   country: string;
   line1: string;
-  // can we make this non optional?
   line2?: string;
   postal_code: string;
   state: string;
-}
-
-// represents a perk group in a business
-interface PerkGroup {
-  perkNames: string[];
-  userEmails: string[];
 }
 
 // represents a business
@@ -35,8 +42,6 @@ interface Business {
   businessID: string;
   // business name
   name: string;
-  // admin ids
-  admins: string[];
   // billing address
   billingAddress: BillingAddress;
   // stripe info
@@ -83,22 +88,19 @@ interface UserCard {
   };
 }
 
-// User object
-// firstName, lastName, and card are optional
-type User = {
+type Employee = {
+  employeeID: string;
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
 };
 
-// once a user is activated, all types are required
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
-// TODO camelCase keys
 interface PerkDefinition {
   Name: string;
   Cost: number;

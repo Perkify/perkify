@@ -25,8 +25,9 @@ interface BillingAddress {
 
 // represents a perk group in a business
 interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
   perkNames: string[];
-  userEmails: string[];
 }
 
 // represents a business
@@ -83,12 +84,13 @@ interface UserCard {
   };
 }
 
-// User object
+// Employee object
 // firstName, lastName, and card are optional
-type User = {
+type Employee = {
+  employeeID: string;
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
@@ -96,7 +98,7 @@ type User = {
 };
 
 // once a user is activated, all types are required
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
 // TODO camelCase keys
 interface PerkDefinition {

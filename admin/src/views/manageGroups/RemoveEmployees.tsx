@@ -14,7 +14,7 @@ import { PerkifyApi } from 'services';
 interface AddEmployeesProps {
   isRemoveEmployeesModalVisible: boolean;
   setIsRemoveEmployeesModalVisible: (arg0: boolean) => void;
-  employees: { email: string; group: string; id: string }[];
+  employees: { email: string; group: string; id: string; employeeID: string }[];
   group: string;
   selectedEmployees: GridSelectionModel;
   setSelectedEmployees: (model: GridSelectionModel) => void;
@@ -47,28 +47,22 @@ const RemoveEmployees = ({
         const afterEmployees = employees.filter(
           (employee, index) => selectedEmployees.indexOf(index) == -1
         );
-        const afterEmails = afterEmployees.map((employee) => employee.email);
-
-        if (afterEmails.length == 0) {
-          setDashboardLoading(false);
-          setFreezeNav(false);
-          alert('Error: cannot remove all employees from a perk group');
-          return;
-        }
-
-        await PerkifyApi.put(
-          `rest/perkGroup/${group}`,
-          {
-            userEmails: afterEmails,
-            perkNames: business.perkGroups[group].perkNames,
-          } as UpdatePerkGroupPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
+        const afterEmails = afterEmployees.map(
+          (employee) => employee.employeeID
         );
+
+        const payload: UpdatePerkGroupPayload = {
+          employeeIDs: afterEmails,
+          perkNames: business.perkGroups[group].perkNames,
+          perkGroupName: business.perkGroups[group].perkGroupName,
+        };
+
+        await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemoveEmployeesModalVisible(false);
