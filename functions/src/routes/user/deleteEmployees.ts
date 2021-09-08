@@ -68,6 +68,8 @@ export const deleteEmployees = adminPerkifyRequestTransform(
           .collection('employees')
           .doc(employeeID);
         employeeDeleteBatch.delete(employeeRef);
+
+        await admin.auth().deleteUser(employeeID);
       }
       await employeeDeleteBatch.commit();
 
