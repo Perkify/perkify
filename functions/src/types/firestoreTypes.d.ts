@@ -102,6 +102,7 @@ interface UserToCreate {
   employeeID: string;
   businessID: string;
   perkGroupID: string;
+  businessName: string;
   newPerkNames: string[];
 }
 

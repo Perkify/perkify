@@ -12,6 +12,10 @@ import {
   deletePerkGroupValidators,
   registerAdminAndBusiness,
   registerAdminAndBusinessValidators,
+  sendEmailVerificationLink,
+  sendEmailVerificationLinkValidators,
+  sendPasswordResetLink,
+  sendPasswordResetLinkValidators,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './admin';
@@ -22,6 +26,8 @@ import {
   deleteEmployeesValidators,
   registerUser,
   registerUserValidators,
+  sendSignInLink,
+  sendSignInLinkValidators,
 } from './user';
 
 const app = express();
@@ -55,9 +61,30 @@ app.post('/employee/delete', deleteEmployeesValidators, deleteEmployees);
 // regiser an employee with a card
 app.post('/employee/register', registerUserValidators, registerUser);
 
+// send a sign-in link to user
+app.post(
+  '/user/:userEmail/signInLink',
+  sendSignInLinkValidators,
+  sendSignInLink
+);
+
 // create a portal link for a user
 // app.post('/portalLink', createPerkGroupValidators, createPortalLink);
 app.post('/portalLink', createPortalLinkValidators, createPortalLink);
+
+// resend email confirmation link to admin
+app.post(
+  '/admin/:adminEmail/emailVerificationLink',
+  sendEmailVerificationLinkValidators,
+  sendEmailVerificationLink
+);
+
+// send a password-reset link to admin
+app.post(
+  '/admin/:adminEmail/passwordResetLink',
+  sendPasswordResetLinkValidators,
+  sendPasswordResetLink
+);
 
 // perk group crud
 app.post('/perkGroup', createPerkGroupValidators, createPerkGroup);

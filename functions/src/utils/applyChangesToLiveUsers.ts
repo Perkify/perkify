@@ -125,6 +125,7 @@ export const applyChangesToLiveUsers = async (
           perkGroupID,
           businessID,
           email: existingEmployeesDict[employeeID].email,
+          businessName: updatedBusiness.name,
         }))
       );
 

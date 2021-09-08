@@ -21,6 +21,7 @@ import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -94,24 +95,18 @@ export default function SignInSide(props: any) {
     setOpen(false);
   };
 
-  function resetPass() {
-    app
-      .auth()
-      .sendPasswordResetEmail(resetEmail)
-      .then(() => {
-        console.log('SENT');
-        setDidResetPass(true);
-        // Password reset email sent!
-        // ..
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-        // ..
-      });
-  }
+  const resetPass = async () => {
+    setLoading(true);
+    try {
+      await PerkifyApi.post(`/rest/admin/${resetEmail}/passwordResetLink`);
+      setLoading(false);
+      setDidResetPass(true);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
+    }
+  };
 
   return (
     <div style={{ background: '#5289f2' }}>
@@ -139,6 +134,7 @@ export default function SignInSide(props: any) {
             width: '100vw',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 2000,
           }}
         >
           <CircularProgress color="secondary" style={{ zIndex: 20 }} />
