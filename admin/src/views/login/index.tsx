@@ -82,7 +82,13 @@ export default function SignInSide(props: any) {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      errorAlert(error.message);
+      // use replace to remove text 'The user may have been deleted.
+      // this text might scare a user who accidentally uses the wrong email address
+      const errorMessage = error.message.replace(
+        'The user may have been deleted.',
+        ''
+      );
+      errorAlert(errorMessage);
     }
   };
 
