@@ -21,16 +21,18 @@ interface Admin {
   isOwner: boolean;
 }
 
+// represents a perk group in a business
 interface PerkGroup {
   perkGroupName: string;
   employeeIDs: string[];
   perkNames: string[];
 }
-
+// represents a businesses billing address
 interface BillingAddress {
   city: string;
   country: string;
   line1: string;
+  // can we make this non optional?
   line2?: string;
   postal_code: string;
   state: string;
@@ -42,6 +44,8 @@ interface Business {
   businessID: string;
   // business name
   name: string;
+  // admin ids
+  admins: string[];
   // billing address
   billingAddress: BillingAddress;
   // stripe info
@@ -55,14 +59,6 @@ interface Business {
   perkGroups: {
     [key: string]: PerkGroup;
   };
-}
-
-// represents an admin
-interface Admin {
-  businessID: string;
-  email: string;
-  firstName: string;
-  lastName: string;
 }
 
 // list of timestamps corresponding to perk uses
@@ -88,6 +84,8 @@ interface UserCard {
   };
 }
 
+// Employee object
+// firstName, lastName, and card are optional
 type Employee = {
   employeeID: string;
   email: string;
@@ -99,8 +97,10 @@ type Employee = {
   card?: UserCard;
 };
 
+// once a user is activated, all types are required
 type ActivatedUser = Required<Employee>;
 
+// TODO camelCase keys
 interface PerkDefinition {
   Name: string;
   Cost: number;

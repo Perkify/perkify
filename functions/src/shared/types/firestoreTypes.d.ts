@@ -12,6 +12,21 @@ interface SimpleCardPaymentMethod {
   paymentMethodID: string;
 }
 
+interface Admin {
+  businessID: string;
+  adminID: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isOwner: boolean;
+}
+
+// represents a perk group in a business
+interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
+  perkNames: string[];
+}
 // represents a businesses billing address
 interface BillingAddress {
   city: string;
@@ -21,13 +36,6 @@ interface BillingAddress {
   line2?: string;
   postal_code: string;
   state: string;
-}
-
-// represents a perk group in a business
-interface PerkGroup {
-  perkGroupName: string;
-  employeeIDs: string[];
-  perkNames: string[];
 }
 
 // represents a business
@@ -51,14 +59,6 @@ interface Business {
   perkGroups: {
     [key: string]: PerkGroup;
   };
-}
-
-// represents an admin
-interface Admin {
-  businessID: string;
-  email: string;
-  firstName: string;
-  lastName: string;
 }
 
 // list of timestamps corresponding to perk uses

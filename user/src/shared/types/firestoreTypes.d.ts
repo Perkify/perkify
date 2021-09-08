@@ -12,6 +12,21 @@ interface SimpleCardPaymentMethod {
   paymentMethodID: string;
 }
 
+interface Admin {
+  businessID: string;
+  adminID: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isOwner: boolean;
+}
+
+// represents a perk group in a business
+interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
+  perkNames: string[];
+}
 // represents a businesses billing address
 interface BillingAddress {
   city: string;
@@ -21,12 +36,6 @@ interface BillingAddress {
   line2?: string;
   postal_code: string;
   state: string;
-}
-
-// represents a perk group in a business
-interface PerkGroup {
-  perkNames: string[];
-  userEmails: string[];
 }
 
 // represents a business
@@ -52,14 +61,6 @@ interface Business {
   };
 }
 
-// represents an admin
-interface Admin {
-  businessID: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
 // list of timestamps corresponding to perk uses
 type PerkUses = FirebaseFirestore.Timestamp[];
 
@@ -83,12 +84,13 @@ interface UserCard {
   };
 }
 
-// User object
+// Employee object
 // firstName, lastName, and card are optional
-type User = {
+type Employee = {
+  employeeID: string;
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
@@ -96,7 +98,7 @@ type User = {
 };
 
 // once a user is activated, all types are required
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
 // TODO camelCase keys
 interface PerkDefinition {
