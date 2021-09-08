@@ -21,7 +21,6 @@ import { Alert } from '@material-ui/lab';
 import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-import { PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -134,6 +133,7 @@ export default function SignInSide(props: any) {
             width: '100vw',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 2000,
           }}
         >
           <CircularProgress color="secondary" style={{ zIndex: 20 }} />
