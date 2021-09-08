@@ -12,6 +12,7 @@ import app from 'firebaseApp';
 import logo from 'images/logo.png';
 import React from 'react';
 import { PerkifyApi } from 'services';
+import { validateEmails } from 'utils/emailValidation';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -120,7 +121,13 @@ const SignUpBusinessWebflow = () => {
           return true;
         } catch (error) {
           setDashboardLoading(false);
-          alert(error);
+          if (error.toString().includes('500')) {
+            alert(
+              'An account has already been created with this email. Please try signing in instead.'
+            );
+          } else {
+            alert(error);
+          }
           return false;
         }
         return true;
@@ -152,9 +159,11 @@ const SignUpBusinessWebflow = () => {
             invalidStep={invalidStep}
             nextStep={handleNext}
             nextReady={
-              !Object.values(AdminFormProps).some(
-                (fieldprop) => fieldprop === ''
-              )
+              !Object.values(AdminFormProps).some((fieldprop) => {
+                return fieldprop === '';
+              }) &&
+              AdminFormProps.password.length > 6 &&
+              validateEmails(AdminFormProps.email)
             }
           />
         );
@@ -169,7 +178,10 @@ const SignUpBusinessWebflow = () => {
             nextReady={
               !Object.values(BusinessFormProps).some(
                 (fieldprop) => fieldprop === ''
-              )
+              ) &&
+              BusinessFormProps.postalCode.length === 5 &&
+              BusinessFormProps.state.length === 2 &&
+              BusinessFormProps.phone.length > 10
             }
           />
         );

@@ -7,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  IconButton,
   MenuItem,
   Select,
   TextField,
@@ -16,9 +17,15 @@ import {
 import Chip from '@material-ui/core/Chip';
 import InputBase from '@material-ui/core/InputBase';
 import Paper from '@material-ui/core/Paper';
-import { alpha, createStyles, makeStyles } from '@material-ui/core/styles';
+import {
+  alpha,
+  createStyles,
+  makeStyles,
+  withStyles,
+} from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import { DataGrid } from '@material-ui/data-grid';
+import InfoIcon from '@material-ui/icons/Info';
 import SearchIcon from '@material-ui/icons/Search';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
@@ -314,6 +321,15 @@ const CreateGroup = () => {
     setConfirmationModalVisible(true);
   }
 
+  const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 300,
+      fontSize: theme.typography.pxToRem(15),
+      border: '1px solid #dadde9',
+    },
+  }))(Tooltip);
   useEffect(() => {
     if (employees) {
       setEmployeesData(
@@ -343,15 +359,79 @@ const CreateGroup = () => {
         creatingGroup={true}
       />
 
-      <Header
-        title="Create Group"
-        crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
-      />
-
-      <Card style={{ width: 700, padding: 30, marginTop: 30 }} elevation={4}>
+      {business && Object.keys(business.perkGroups).length === 0 ? (
+        <Header
+          title="Create Group"
+          crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
+        />
+      ) : (
+        <Header
+          title="Create Group"
+          crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
+          icon={
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <p
+                    style={{
+                      paddingTop: 3,
+                      paddingBottom: 3,
+                      paddingLeft: 5,
+                      paddingRight: 5,
+                    }}
+                  >
+                    Perkify uses Perk Groups to manage the different
+                    subscriptions you'd like to give to different employees.
+                    Just give your group a name, select the people that you'd
+                    like to have in the group, and choose the perks you want to
+                    give that group access to.
+                  </p>
+                </React.Fragment>
+              }
+              placement="bottom"
+            >
+              <IconButton>
+                <InfoIcon></InfoIcon>
+              </IconButton>
+            </HtmlTooltip>
+          }
+        />
+      )}
+      <Card
+        style={{
+          width: 700,
+          padding: 30,
+          marginTop: 30,
+        }}
+        elevation={4}
+      >
         {/* <Typography variant="body2" color="textSecondary" component="p">
             Create a perk group
+            
           </Typography> */}
+        {business && Object.keys(business.perkGroups).length === 0 && (
+          <Card
+            style={{
+              width: 650,
+              marginBottom: '15px',
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingTop: 10,
+              paddingBottom: 10,
+              backgroundColor: '#e6edff',
+            }}
+            elevation={4}
+          >
+            <p>
+              {' '}
+              Perkify uses Perk Groups to manage the different subscriptions
+              you'd like to give to different employees. Just give your group a
+              name, select the people that you'd like to have in the group, and
+              choose the perks you want to give that group access to.
+            </p>
+          </Card>
+        )}
+
         <Typography style={{ marginBottom: '15px' }}>Group Name</Typography>
         <TextField
           id="group_name"
