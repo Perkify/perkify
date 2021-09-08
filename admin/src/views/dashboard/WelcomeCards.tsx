@@ -3,6 +3,9 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
   Grid,
   Typography,
 } from '@material-ui/core';
@@ -41,6 +44,7 @@ export const WelcomeCards = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                    zIndex: 9999,
                   }}
                   onClick={() => {
                     history.push('/dashboard/billing');
@@ -48,6 +52,45 @@ export const WelcomeCards = () => {
                 >
                   Set up billing
                 </Button>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FormGroup row>
+                  <div
+                    aria-disabled
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      right: 0,
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 5000,
+                    }}
+                  ></div>
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Set Up Billing" />}
+                    label="Set Up Billing"
+                  ></FormControlLabel>
+
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Add Employees" />}
+                    label="Add Employees"
+                  />
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Create a Perk Group" />}
+                    label="Create a Perk Group"
+                  />
+                </FormGroup>
               </div>
               <img
                 src="/welcome_graphic.svg"
