@@ -35,7 +35,7 @@ const Header = (props: HeaderProps) => {
       <div>
         <Typography gutterBottom variant="h5" component="h2">
           <Box fontWeight="bold">
-            {props.title} {props.icon && props.icon}{' '}
+            {props.title} {props.icon && props.icon}
           </Box>
         </Typography>
         {props.crumbs && (

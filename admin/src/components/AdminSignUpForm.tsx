@@ -139,8 +139,10 @@ const AdminSignUpForm = (props: AdminSignUpFormProps) => {
           placeholder="johnsmith@mybusiness.com"
           id="email"
           variant="outlined"
-          onInput={fillTextbox(props.setEmail)}
-          onChange={handleEmailChange}
+          onChange={(event) => {
+            fillTextbox(props.setEmail)(event);
+            handleEmailChange(event);
+          }}
           value={props.email}
           error={
             (props.email === '' && props.invalidStep) || emailsError !== ''
