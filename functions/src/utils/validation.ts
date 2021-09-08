@@ -32,6 +32,18 @@ export const validateUserEmail = async (email: string) => {
   }
 };
 
+export const validateAdminEmail = async (email: string) => {
+  const adminRef = await db
+    .collection('admins')
+    .where('email', '==', email)
+    .get();
+  if (adminRef.empty) {
+    return Promise.reject(new Error('You do not have an account'));
+  } else {
+    return Promise.resolve();
+  }
+};
+
 export const validateEmails = async (emails: string[]) => {
   if (Array.isArray(emails) && emails.length > 0) {
     for (const email of emails) {

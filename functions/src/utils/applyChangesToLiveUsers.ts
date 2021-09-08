@@ -118,6 +118,7 @@ export const applyChangesToLiveUsers = async (
           newPerkNames: intersectedPerkGroupData.perkNames,
           perkGroupName,
           businessID,
+          businessName: updatedBusiness.name,
         }))
       );
 

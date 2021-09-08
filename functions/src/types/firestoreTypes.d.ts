@@ -93,6 +93,7 @@ type ActivatedUser = Required<User>;
 interface UserToCreate {
   email: string;
   businessID: string;
+  businessName: string;
   perkGroupName: string;
   newPerkNames: string[];
 }

@@ -1,5 +1,4 @@
 import { logger } from 'firebase-functions';
-import { newUserTemplateGenerator } from '../../shared';
 import admin, { db, functions, stripe } from '../services';
 import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
 
@@ -26,13 +25,14 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
           ? 'https://app.getperkify.com/dashboard'
           : functions.config()['stripe-firebase'].environment == 'staging'
           ? 'https://app.dev.getperkify.com/dashboard'
-          : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
+          : 'http://localhost:3001/dashboard',
     });
 
   // if in development or staging mode, print the sign in link
   if (
-    functions.config()['stripe-firebase'].environment == 'development' ||
-    functions.config()['stripe-firebase'].environment == 'staging'
+    ['development', 'staging'].includes(
+      functions.config()['stripe-firebase'].environment
+    )
   ) {
     logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
   }
@@ -40,9 +40,18 @@ export const createUserHelper = async (userToCreate: UserToCreate) => {
   // send email
   await db.collection('mail').add({
     to: userToCreate.email,
-    message: {
-      subject: 'Your employer has signed you up for Perkify!',
-      html: newUserTemplateGenerator({ signInLink }),
+    template: {
+      name: 'userOnboarding',
+      data: {
+        businessName: userToCreate.businessName,
+        perks:
+          userToCreate.newPerkNames.length > 1
+            ? userToCreate.newPerkNames.slice(0, -1).join(', ') +
+              ', and ' +
+              userToCreate.newPerkNames[userToCreate.newPerkNames.length - 1]
+            : userToCreate.newPerkNames[0],
+        signInLink,
+      },
     },
   });
 };

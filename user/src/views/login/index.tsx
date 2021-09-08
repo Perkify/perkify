@@ -14,8 +14,8 @@ import Typography from '@material-ui/core/Typography';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
-import app, { db } from 'firebaseApp';
 import React, { useState } from 'react';
+import { PerkifyApi } from '../../services';
 
 function Copyright() {
   return (
@@ -77,26 +77,13 @@ export default function SignInSide(props) {
     event.preventDefault();
     setLoading(true);
     try {
-      const userDoc = await db.collection('users').doc(email).get();
-      if (!userDoc) {
-        throw new Error('Your employer has not signed you up with that email');
-      }
-      await app.auth().sendSignInLinkToEmail(email, {
-        url: `${
-          process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
-            ? 'https://app.getperkify.com/dashboard'
-            : process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'staging'
-            ? 'https://app.dev.getperkify.com/dashboard'
-            : 'http://localhost:3001/dashboard'
-        }`,
-        handleCodeInApp: true,
-      });
+      await PerkifyApi.post(`/rest/user/${email}/signInLink`);
       window.localStorage.setItem('emailForSignIn', email);
       setLoading(false);
       setOpenSuccess(true);
     } catch (error) {
       setLoading(false);
-      errorAlert(error.message);
+      errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
     }
   };
 
