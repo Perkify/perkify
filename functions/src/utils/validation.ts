@@ -72,7 +72,7 @@ export const sanitizeEmails = (emails: string[]) => {
 };
 
 export const validatePerkNames = async (perkNames: string[]) => {
-  if (Array.isArray(perkNames) && perkNames.length > 0) {
+  if (Array.isArray(perkNames)) {
     for (const perk of perkNames) {
       if (!allPerks.some((truePerk) => truePerk.Name === perk)) {
         return Promise.reject(new Error(`perk: ${perk} is not supported`));
@@ -83,7 +83,7 @@ export const validatePerkNames = async (perkNames: string[]) => {
       throw new Error('Trying to add duplicate perkNames');
     }
   } else {
-    return Promise.reject(new Error('send array of perkNames'));
+    return Promise.reject(new Error('Send array of perkNames'));
   }
   return Promise.resolve();
 };

@@ -51,13 +51,6 @@ const RemoveEmployees = ({
           (employee) => employee.employeeID
         );
 
-        if (afterEmails.length == 0) {
-          setDashboardLoading(false);
-          setFreezeNav(false);
-          alert('Error: cannot remove all employees from a perk group');
-          return;
-        }
-
         const payload: UpdatePerkGroupPayload = {
           employeeIDs: afterEmails,
           perkNames: business.perkGroups[group].perkNames,
