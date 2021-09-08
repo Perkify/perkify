@@ -10,17 +10,17 @@ import {
   Typography,
 } from '@material-ui/core';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
-import { AuthContext, LoadingContext } from 'contexts';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from 'shared';
+import { allPerks, allPerksDict } from 'shared';
 
 interface AddPerksProps {
   isAddPerksModalVisible: boolean;
   setIsAddPerksModalVisible: (arg0: boolean) => void;
   group: string;
   groupPerks: PerkDefinition[];
-  emails: { email: string; group: string; id: string }[];
+  emails: { email: string; group: string; id: string; employeeID: string }[];
 }
 
 const AddPerks = ({
@@ -39,6 +39,7 @@ const AddPerks = ({
   const { currentUser } = useContext(AuthContext);
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
+  const { business } = useContext(BusinessContext);
 
   React.useEffect(() => {
     setAvailablePerks(
@@ -71,19 +72,17 @@ const AddPerks = ({
         );
 
         try {
-          await PerkifyApi.put(
-            `rest/perkGroup/${group}`,
-            {
-              userEmails: emails.map((emailObj) => emailObj.email),
-              perkNames: afterPerks,
-            } as UpdatePerkGroupPayload,
-            {
-              headers: {
-                Authorization: `Bearer ${bearerToken}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          const payload: UpdatePerkGroupPayload = {
+            employeeIDs: emails.map((emailObj) => emailObj.employeeID),
+            perkNames: afterPerks,
+            perkGroupName: business.perkGroups[group].perkGroupName,
+          };
+          await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
 
           setFreezeNav(false);
           setDashboardLoading(false);
@@ -163,7 +162,12 @@ const AddPerks = ({
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
-              {name}
+              {name +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
+                allPerksDict[name].Period +
+                ')'}
             </MenuItem>
           ))}
         </Select>

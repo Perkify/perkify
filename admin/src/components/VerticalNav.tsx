@@ -102,7 +102,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     useState('');
 
   const { currentUser } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
     useContext(LoadingContext);
@@ -146,7 +146,11 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
     if (business) {
       const tmpGroupViews = Object.keys(business.perkGroups)
         .sort()
-        .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
+        .map((perkGroupID) => [
+          business.perkGroups[perkGroupID].perkGroupName,
+          '/dashboard/group/' + perkGroupID,
+          <GroupIcon />,
+        ]);
 
       tmpGroupViews.push([
         'Add New Perk Group',
@@ -170,16 +174,16 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
           ['General', generalNav],
           ['Account', accountNav],
         ]
-      : business && Object.keys(business.perkGroups).length == 0
+      : employees && employees.length == 0
       ? [
           ['General', generalNav],
-          ['Perk Groups', infoNav],
+          ['People', peopleNav],
           ['Account', accountNav],
         ]
       : [
           ['General', generalNav],
-          ['Perk Groups', infoNav],
           ['People', peopleNav],
+          ['Perk Groups', infoNav],
           ['Account', accountNav],
         ];
   const drawer = (
@@ -277,6 +281,13 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
                               event.stopPropagation();
                               event.preventDefault();
                               setAnchorEl(null);
+                              setIsDeletePerkGroupModalVisible(
+                                Object.keys(business.perkGroups).find(
+                                  (perkGroupID) =>
+                                    business.perkGroups[perkGroupID]
+                                      .perkGroupName == name
+                                )
+                              );
                             }}
                             elevation={4}
                             anchorOrigin={{

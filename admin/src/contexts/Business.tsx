@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 interface ContextProps {
   business: Business;
+  employees: Employee[];
 }
 
 interface BusinessProviderProps {
@@ -14,11 +15,15 @@ export const BusinessContext = React.createContext<ContextProps>(null);
 
 export const BusinessProvider = ({ children }: BusinessProviderProps) => {
   const [business, setBusiness] = useState<Business>();
+  const [employees, setEmployees] = useState<Employee[]>();
   const { admin } = useContext(AuthContext);
 
   useEffect(() => {
     if (admin) {
+      // get the business ID
       const businessId = admin['businessID'];
+
+      // get business
       db.collection('businesses')
         .doc(businessId)
         .onSnapshot(
@@ -32,6 +37,16 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
             console.error('Snapshot permissions error');
           }
         );
+
+      // get employees
+      db.collection('businesses')
+        .doc(businessId)
+        .collection('employees')
+        .onSnapshot((employeesSnapshot) => {
+          setEmployees(
+            employeesSnapshot.docs.map((doc) => doc.data() as Employee)
+          );
+        });
     }
   }, [admin]);
 
@@ -39,6 +54,7 @@ export const BusinessProvider = ({ children }: BusinessProviderProps) => {
     <BusinessContext.Provider
       value={{
         business,
+        employees,
       }}
     >
       {children}

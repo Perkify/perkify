@@ -2,6 +2,7 @@ import Button from '@material-ui/core/Button';
 import firebase from 'firebase/app';
 import { ReactComponent as EmailSVG } from 'images/email.svg';
 import React from 'react';
+import { PerkifyApi } from '../services';
 
 interface VerifyEmailProps {
   email: string;
@@ -11,14 +12,19 @@ interface VerifyEmailProps {
 const VerifyEmail = ({ email, newUser }: VerifyEmailProps) => {
   const resendVerificationEmail = async () => {
     try {
-      await newUser.sendEmailVerification({
-        url:
-          process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'production'
-            ? 'https://admin.getperkify.com/login'
-            : process.env.REACT_APP_FIREBASE_ENVIRONMENT == 'staging'
-            ? 'https://admin.dev.getperkify.com/login'
-            : 'http://localhost:3000/login',
-      });
+      const bearerToken = await newUser.getIdToken();
+
+      // call the api to resend verification email
+      await PerkifyApi.post(
+        `rest/admin/${email}/emailVerificationLink`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     } catch (e) {
       alert(e);
     }

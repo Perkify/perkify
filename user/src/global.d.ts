@@ -77,17 +77,17 @@ interface UserCard {
   };
 }
 
-type User = {
+type Employee = {
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
 };
 
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
 interface UserToCreate {
   email: string;

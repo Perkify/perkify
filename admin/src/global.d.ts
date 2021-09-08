@@ -11,18 +11,22 @@ interface SimpleCardPaymentMethod {
   expYear: number;
   funding: string;
   last4: string;
+  fingerprint: string;
 }
 
 interface Admin {
   businessID: string;
+  adminID: string;
   email: string;
   firstName: string;
   lastName: string;
+  isOwner: boolean;
 }
 
 interface PerkGroup {
+  perkGroupName: string;
+  employeeIDs: string[];
   perkNames: string[];
-  userEmails: string[];
 }
 
 interface BillingAddress {
@@ -40,8 +44,6 @@ interface Business {
   businessID: string;
   // business name
   name: string;
-  // admin ids
-  admins: string[];
   // billing address
   billingAddress: BillingAddress;
   // stripe info
@@ -77,27 +79,31 @@ interface UserCard {
   };
 }
 
-type User = {
+type Employee = {
+  employeeID: string;
   email: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   perkUsesDict: PerkUsesDict;
   firstName?: string;
   lastName?: string;
   card?: UserCard;
 };
 
-type ActivatedUser = Required<User>;
+type ActivatedUser = Required<Employee>;
 
 interface UserToCreate {
   email: string;
+  employeeID: string;
   businessID: string;
-  perkGroupName: string;
+  perkGroupID: string;
   newPerkNames: string[];
 }
 
 interface UserToUpdate {
-  email: string;
+  businessID: string;
+  employeeID: string;
+  perkGroupID: string;
   newPerkNames: string[];
   oldPerkUsesDict: {
     [key: string]: PerkUses;
@@ -105,7 +111,8 @@ interface UserToUpdate {
 }
 
 interface UserToDelete {
-  email: string;
+  businessID: string;
+  employeeID: string;
   card?: UserCard;
 }
 
@@ -131,6 +138,8 @@ interface ExpandUsersPayload {
 
 // api payloads
 
+// api payloads
+
 interface RegisterAdminAndBusinessPayload {
   firstName: string;
   lastName: string;
@@ -144,6 +153,14 @@ interface RegisterAdminAndBusinessPayload {
   postalCode: string;
 }
 
+interface CreateEmployeesPayload {
+  employeeEmails: string[];
+}
+
+interface DeleteEmployeesPayload {
+  employeeIDs: string[];
+}
+
 interface RegisterUserPayload {
   firstName: string;
   lastName: string;
@@ -155,10 +172,12 @@ interface CreatePortalLinkPayload {
 
 interface CreatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
+  perkGroupName: string;
 }
 
 interface UpdatePerkGroupPayload {
   perkNames: string[];
-  userEmails: string[];
+  employeeIDs: string[];
+  perkGroupName: string;
 }

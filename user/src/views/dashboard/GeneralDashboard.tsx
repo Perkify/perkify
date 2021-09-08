@@ -88,7 +88,7 @@ const GeneralDashboard = () => {
                     employee.card.exp.month.toString().length === 1 ? '0' : ''
                   }${employee.card.exp.month}/${String(
                     employee.card.exp.year
-                  ).substring(0, 2)}`}
+                  ).substring(2, 4)}`}
                   focused={'number'}
                   name={`${employee.firstName} ${employee.lastName}`}
                   number={employee.card.number}
