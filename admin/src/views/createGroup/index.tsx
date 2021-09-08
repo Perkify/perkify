@@ -1,28 +1,31 @@
 import {
   Button,
   Card,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Grid,
+  IconButton,
   MenuItem,
   Select,
   TextField,
   Theme,
   Typography,
 } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import InfoIcon from '@material-ui/icons/Info';
 import Chip from '@material-ui/core/Chip';
 import InputBase from '@material-ui/core/InputBase';
 import Paper from '@material-ui/core/Paper';
-import { alpha, createStyles, makeStyles } from '@material-ui/core/styles';
+import {
+  alpha,
+  createStyles,
+  makeStyles,
+  withStyles,
+} from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import { DataGrid } from '@material-ui/data-grid';
+import InfoIcon from '@material-ui/icons/Info';
 import SearchIcon from '@material-ui/icons/Search';
 import Header from 'components/Header';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
@@ -354,10 +357,6 @@ const CreateGroup = () => {
         perks={selectedPerks}
         numPeople={employeeChipData.length}
         creatingGroup={true}
-      />
-      <Header
-        title="Create Group"
-        crumbs={['Dashboard', 'Perk Groups', 'Create Group']}
       />
 
       {business && Object.keys(business.perkGroups).length === 0 ? (
