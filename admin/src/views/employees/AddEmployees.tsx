@@ -143,12 +143,13 @@ const AddEmployees = ({
       </DialogContent>
       <DialogActions>
         <Button
+          disabled={freezeNav}
           onClick={() => setIsAddEmployeesModalVisible(false)}
           color="primary"
         >
           Cancel
         </Button>
-        <Button onClick={addUsers} color="primary">
+        <Button disabled={freezeNav} onClick={addUsers} color="primary">
           Add Users
         </Button>
       </DialogActions>

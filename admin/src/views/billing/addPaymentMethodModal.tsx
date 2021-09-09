@@ -51,11 +51,13 @@ const AddPaymentMethodModal = ({
   const { business } = useContext(BusinessContext);
   const { currentUser } = useContext(AuthContext);
 
-  const { setDashboardLoading } = useContext(LoadingContext);
+  const { setDashboardLoading, setFreezeNav, freezeNav } =
+    useContext(LoadingContext);
 
   const handleSubmit = async (event: any) => {
     // Block native form submission.
     event.preventDefault();
+    setFreezeNav(false);
     setDashboardLoading(true);
 
     if (!stripe || !elements) {
@@ -118,6 +120,7 @@ const AddPaymentMethodModal = ({
       }
     }
     setDashboardLoading(false);
+    setFreezeNav(false);
   };
 
   return (
@@ -151,10 +154,15 @@ const AddPaymentMethodModal = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setIsModalVisible(false)} color="primary">
+        <Button
+          disabled={freezeNav}
+          onClick={() => setIsModalVisible(false)}
+          color="primary"
+        >
           Cancel
         </Button>
         <Button
+          disabled={freezeNav}
           onClick={async (event) => {
             await handleSubmit(event);
             setIsModalVisible(false);

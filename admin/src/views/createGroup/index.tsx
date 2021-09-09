@@ -256,8 +256,8 @@ const CreateGroup = () => {
     }
 
     if (!error) {
-      setDashboardLoading(true);
       setFreezeNav(true);
+      setDashboardLoading(true);
 
       const employeeIDList = employeeChipData.map(
         (employeeChip) => employeeChip.employeeID
@@ -281,6 +281,7 @@ const CreateGroup = () => {
           .then((response) => {
             setDashboardLoading(false);
             setFreezeNav(false);
+
             history.push(`/dashboard/group/${response.data.perkGroupID}`);
           })
           .catch((err) => {
@@ -594,6 +595,7 @@ const CreateGroup = () => {
           </DialogContent>
           <DialogActions>
             <Button
+              disabled={freezeNav}
               onClick={() => {
                 setIsAddEmployeesModalVisible(false);
                 setSelection([]);
@@ -605,6 +607,7 @@ const CreateGroup = () => {
               Cancel
             </Button>
             <Button
+              disabled={freezeNav}
               onClick={() => {
                 if (selectedUsers.length === 0) {
                   return;
