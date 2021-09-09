@@ -89,7 +89,11 @@ export const validateNewPerkGroupName = async (
 ) => {
   if (perkGroupName) {
     const businessData = req.businessData as Business;
-    if (Object.keys(businessData.perkGroups).includes(perkGroupName)) {
+    if (
+      Object.values(businessData.perkGroups)
+        .map((perkGroup) => perkGroup.perkGroupName)
+        .includes(perkGroupName)
+    ) {
       throw new Error(
         'Trying to create a perk group with a name that already exists'
       );
