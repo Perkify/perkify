@@ -57,7 +57,7 @@ const AddPaymentMethodModal = ({
   const handleSubmit = async (event: any) => {
     // Block native form submission.
     event.preventDefault();
-    setFreezeNav(false);
+    setFreezeNav(true);
     setDashboardLoading(true);
 
     if (!stripe || !elements) {

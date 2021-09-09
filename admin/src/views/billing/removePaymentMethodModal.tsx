@@ -34,10 +34,12 @@ const RemovePaymentMethodModal = ({
   const classes = useDisplayCardPaymentMethodsStyles();
   const { business } = useContext(BusinessContext);
   const { currentUser } = useContext(AuthContext);
-  const { setDashboardLoading } = useContext(LoadingContext);
+  const { setDashboardLoading, setFreezeNav, freezeNav } =
+    useContext(LoadingContext);
 
   const removePaymentMethod = async (event: any) => {
     setDashboardLoading(true);
+    setFreezeNav(true);
     // Block native form submission.
     event.preventDefault();
 
@@ -61,6 +63,7 @@ const RemovePaymentMethodModal = ({
       console.log('Success');
     }
     setDashboardLoading(false);
+    setFreezeNav(false);
   };
 
   return (
@@ -79,12 +82,14 @@ const RemovePaymentMethodModal = ({
       </DialogContent>
       <DialogActions>
         <Button
+          disabled={freezeNav}
           onClick={() => setPaymentMethodIDToRemove(null)}
           color="primary"
         >
           Cancel
         </Button>
         <Button
+          disabled={freezeNav}
           onClick={async (event) => {
             await removePaymentMethod(event);
             setPaymentMethodIDToRemove(null);

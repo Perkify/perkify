@@ -198,6 +198,11 @@ const AddEmployees = ({
           .filter((employee) => !('perkGroupID' in employee))
       );
       setSelection([]);
+      setPreSearch(
+        employees
+          .map((employee) => ({ ...employee, id: employee.email }))
+          .filter((employee) => !('perkGroupID' in employee))
+      );
     }
   }, [employees]);
 
@@ -316,6 +321,7 @@ const AddEmployees = ({
               setIsAddEmployeesModalVisible(false);
               setSelection([]);
               setEmployeeSearchState('');
+              console.log(preSearch);
               setEmployeesData(preSearch);
             }}
             color="primary"
