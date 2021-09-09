@@ -119,9 +119,9 @@ export const deleteUserHelper = async (userToDelete: UserToDelete) => {
 };
 
 export const expandUsers = async (updatedBusiness: Business) => {
-  applyChangesToLiveUsers(updatedBusiness, 'expand');
+  await applyChangesToLiveUsers(updatedBusiness, 'expand');
 };
 
 export const shrinkUsers = async (updatedBusiness: Business) => {
-  applyChangesToLiveUsers(updatedBusiness, 'shrink');
+  await applyChangesToLiveUsers(updatedBusiness, 'shrink');
 };
