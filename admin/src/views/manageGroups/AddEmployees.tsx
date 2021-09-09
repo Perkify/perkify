@@ -257,7 +257,7 @@ const AddEmployees = ({
       }}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add Employees</DialogTitle>
       <DialogContent>
         <DialogContentText>
           To add employees to this perk group, please select them from the
@@ -323,7 +323,7 @@ const AddEmployees = ({
             Cancel
           </Button>
           <Button onClick={setVisible} color="primary">
-            Add Users
+            Add Employees
           </Button>
         </DialogActions>
       </DialogContent>

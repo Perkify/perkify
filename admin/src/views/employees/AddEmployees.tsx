@@ -117,11 +117,11 @@ const AddEmployees = ({
       onClose={() => setIsAddEmployeesModalVisible(false)}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add Employees</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          To add users to this organization, please enter their email addresses
-          below.
+          To add employees to this organization, please enter their email
+          addresses below.
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Emails
@@ -150,7 +150,7 @@ const AddEmployees = ({
           Cancel
         </Button>
         <Button disabled={freezeNav} onClick={addUsers} color="primary">
-          Add Users
+          Add Employees
         </Button>
       </DialogActions>
     </Dialog>

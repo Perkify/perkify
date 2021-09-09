@@ -545,8 +545,8 @@ const CreateGroup = () => {
           <DialogTitle id="form-dialog-title">Select Employees</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              To add users to the perk group, please select them from the table
-              below.
+              To add employees to the perk group, please select them from the
+              table below.
             </DialogContentText>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
@@ -642,7 +642,7 @@ const CreateGroup = () => {
               }}
               color="primary"
             >
-              Add Users
+              Add Employees
             </Button>
           </DialogActions>
         </Dialog>
