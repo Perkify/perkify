@@ -10,9 +10,7 @@ import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
-import { AddEmployeesCard } from './AddEmployeesCard';
 import BChart from './BarChart';
-import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
 import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
@@ -289,15 +287,18 @@ const GeneralDashboard = () => {
             )}
         </Grid>
       </Grid>
-      {loadingAuthState || !business ? (
+      {loadingAuthState || !business || !employees ? (
         <p>Loading</p>
-      ) : Object.keys(business.cardPaymentMethods).length == 0 ? (
-        <WelcomeCards />
-      ) : !employees || employees.length == 0 ? (
-        <AddEmployeesCard></AddEmployeesCard>
-      ) : business.perkGroups == null ||
+      ) : Object.keys(business.cardPaymentMethods).length == 0 ||
+        employees.length == 0 ||
         Object.keys(business.perkGroups).length == 0 ? (
-        <CreatePerkGroupCard />
+        <WelcomeCards
+          hasPaymentMethods={
+            !(Object.keys(business.cardPaymentMethods).length == 0)
+          }
+          hasEmployees={!(employees.length == 0)}
+          hasPerkGroup={!(Object.keys(business.perkGroups).length == 0)}
+        />
       ) : (
         <Grid container spacing={4}>
           <Grid item xs={4}>
