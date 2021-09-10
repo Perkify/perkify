@@ -19,10 +19,10 @@ export const emailNormalizationOptions = {
 };
 
 // check that the employee document exists
-export const validateEmployee = async (employeeID: string) => {
+export const validateEmployeeEmail = async (email: string) => {
   const employeeRef = await db
     .collectionGroup('employees')
-    .where('employeeID', '==', employeeID)
+    .where('email', '==', email)
     .get();
   if (!employeeRef.empty) {
     return Promise.reject(new Error('You are not added by your employer'));

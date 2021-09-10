@@ -5,14 +5,14 @@ import admin, { db, functions } from '../../services';
 import {
   checkValidationResult,
   emailNormalizationOptions,
-  validateEmployee,
+  validateEmployeeEmail,
 } from '../../utils';
 
 export const sendSignInLinkValidators = [
   param('userEmail')
     .isEmail()
     .normalizeEmail(emailNormalizationOptions)
-    .custom(validateEmployee),
+    .custom(validateEmployeeEmail),
   checkValidationResult,
 ];
 
