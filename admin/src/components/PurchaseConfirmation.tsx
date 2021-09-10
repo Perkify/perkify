@@ -56,7 +56,9 @@ const PurchaseConfirmation = ({
     >
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{text + calculateCost()}?</DialogContentText>
+        <DialogContentText>
+          {text + calculateCost() + '/month'}?
+        </DialogContentText>
         <DialogActions>
           <Button
             disabled={freezeNav}

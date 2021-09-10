@@ -656,7 +656,7 @@ const CreateGroup = () => {
         </Dialog>
 
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
-          Estimated Cost (Fees Included): ${totalCost}
+          Estimated Cost (Fees Included): ${totalCost}/month
         </Typography>
         <Tooltip
           disableFocusListener={
