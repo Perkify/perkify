@@ -309,7 +309,7 @@ const GeneralDashboard = () => {
           </Grid>
           <Grid item xs={4}>
             <MetricCard
-              title={'Number of Employees'}
+              title={'Number of Employees in Perk Groups'}
               number={calculateNumEmployees().toString()}
             />
           </Grid>
