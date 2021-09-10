@@ -8,7 +8,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import withStyles from '@material-ui/core/styles/withStyles';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { db } from 'services';
 import { allPerksDict } from '../../shared';
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +53,29 @@ interface ViewPerksProps {
 
 const ViewPerks = ({ employee, business }: ViewPerksProps) => {
   const classes = useStyles();
+  const [lastBillingDate, setLastBillingDate] = useState<Number>();
+
+  useEffect(() => {
+    if (business) {
+      (async () => {
+        const subscriptionsSnapshot = await db
+          .collection('businesses')
+          .doc(business.businessID)
+          .collection('subscriptions')
+          .get();
+
+        const staticSubscriptionItem = subscriptionsSnapshot.docs.filter(
+          (doc) =>
+            (doc.data() as Subscription).canceled_at == null &&
+            (doc.data() as Subscription).status == 'active'
+        )?.[0];
+
+        setLastBillingDate(
+          staticSubscriptionItem.data().current_period_start.seconds
+        );
+      })();
+    }
+  }, [business]);
 
   const perksList = () => {
     let increasingDelay = 0;
@@ -73,43 +97,50 @@ const ViewPerks = ({ employee, business }: ViewPerksProps) => {
               to={`/dashboard/perks/${perk}`}
             >
             */}
-              <PerkCard>
-                {perkUses.length === 0 ||
-                perkUses[perkUses.length - 1].seconds + billingCycle <
-                  new Date('2012.08.10').getTime() / 1000 ? (
-                  <InfoOutlinedIcon
-                    style={{
-                      fontSize: 32,
-                      color: orange[400],
-                      position: 'absolute',
-                      right: '0',
-                      top: '0',
-                      margin: '18px',
-                    }}
+              <a
+                style={{ textDecoration: 'none' }}
+                href={allPerksDict[perkName].BillingInstructionsURL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <PerkCard>
+                  {lastBillingDate &&
+                    (perkUses.length === 0 ||
+                    perkUses[perkUses.length - 1].seconds < lastBillingDate ? (
+                      <InfoOutlinedIcon
+                        style={{
+                          fontSize: 32,
+                          color: orange[400],
+                          position: 'absolute',
+                          right: '0',
+                          top: '0',
+                          margin: '18px',
+                        }}
+                      />
+                    ) : (
+                      <CheckCircleOutlineIcon
+                        style={{
+                          fontSize: 32,
+                          color: green[400],
+                          position: 'absolute',
+                          right: '0',
+                          top: '0',
+                          margin: '18px',
+                        }}
+                      />
+                    ))}
+                  <Avatar
+                    src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perkName].Img}`}
+                    alt={perkName}
+                    style={{ height: '70px', width: '70px' }}
                   />
-                ) : (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 32,
-                      color: green[400],
-                      position: 'absolute',
-                      right: '0',
-                      top: '0',
-                      margin: '18px',
-                    }}
-                  />
-                )}
-                <Avatar
-                  src={`${process.env.PUBLIC_URL}/perkLogos/${allPerksDict[perkName].Img}`}
-                  alt={perkName}
-                  style={{ height: '70px', width: '70px' }}
-                />
-                <Typography variant="body1">
-                  <Box fontWeight={600} mt={2}>
-                    {perkName}
-                  </Box>
-                </Typography>
-              </PerkCard>
+                  <Typography variant="body1">
+                    <Box fontWeight={600} mt={2}>
+                      {perkName}
+                    </Box>
+                  </Typography>
+                </PerkCard>
+              </a>
               {/*
             </Link>
             */}

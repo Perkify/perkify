@@ -119,6 +119,7 @@ interface PerkDefinition {
   Product: string;
   NetworkId: string;
   PaymentName: string;
+  BillingInstructionsURL: string;
 }
 
 interface PerkDefinitionsDict {
