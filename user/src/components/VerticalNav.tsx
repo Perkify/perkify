@@ -105,7 +105,11 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
 
   const accountNav: [string, string, any][] = [
     // ['Settings', '/settings', <SettingsIcon />],
-    ['Support', 'mailto: abc@example.com', <ContactSupportIcon />],
+    [
+      'Support',
+      'https://www.getperkify.com/contact-us',
+      <ContactSupportIcon />,
+    ],
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
@@ -117,9 +121,10 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const ListItemLink = (props: any) => {
     const newProps = Object.keys(props).reduce((acc: any, prop: string) => {
       if (prop == 'route') {
-        if (props.route.includes(':')) {
+        if (props.route.includes('https://')) {
           acc['component'] = 'a';
           acc['href'] = props.route;
+          acc['target'] = '_blank';
         } else {
           acc['component'] = Link;
           acc['to'] = props.route;
