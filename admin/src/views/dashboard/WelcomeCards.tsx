@@ -1,132 +1,152 @@
 import {
-  Box,
   Button,
   Card,
-  CardContent,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
   Grid,
+  Theme,
   Typography,
+  useTheme,
 } from '@material-ui/core';
+import CheckIcon from '@material-ui/icons/Check';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-export const WelcomeCards = () => {
+interface OnboardingCardProps {
+  number: string;
+  title: string;
+  caption: string;
+  buttonText: string;
+  status: number;
+  onClick: any;
+}
+
+const OnboardingCard = ({
+  number,
+  title,
+  caption,
+  buttonText,
+  status,
+  onClick,
+}: OnboardingCardProps) => {
+  const theme = useTheme<Theme>();
+
+  const getColor = () =>
+    status === 2
+      ? '#5DB521'
+      : status === 1
+      ? theme.palette.primary.main
+      : 'rgba(0, 0, 0, .25)';
+
+  const getBorder = () =>
+    status === 1 ? `1px solid ${getColor()}` : `1px solid ${getColor()}`;
+
+  return (
+    <Card
+      elevation={4}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '50px',
+        height: '300px',
+        border: getBorder(),
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          width: '70px',
+          height: '70px',
+          borderRadius: '50%',
+          textAlign: 'center',
+          fontSize: '32px',
+          border: getBorder(),
+          transform: 'translateY(-90px)',
+          backgroundColor: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: getColor(),
+        }}
+      >
+        {status === 2 ? <CheckIcon fontSize="large" /> : number}
+      </div>
+      <Typography
+        variant="h5"
+        style={{ textAlign: 'center', fontWeight: 'bold' }}
+      >
+        {title}
+      </Typography>
+
+      <Typography variant="body1" style={{ textAlign: 'center' }}>
+        {caption}
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ visibility: status === 1 ? 'visible' : 'hidden' }}
+        onClick={onClick}
+      >
+        {buttonText}
+      </Button>
+    </Card>
+  );
+};
+
+interface WelcomeCardsProps {
+  hasPaymentMethods: boolean;
+  hasEmployees: boolean;
+  hasPerkGroup: boolean;
+}
+
+export const WelcomeCards = ({
+  hasPaymentMethods,
+  hasEmployees,
+  hasPerkGroup,
+}: WelcomeCardsProps) => {
   const history = useHistory();
   return (
     <div>
-      <div
-        aria-disabled
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          zIndex: 5000,
-        }}
-      ></div>
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <Card style={{ backgroundColor: '#C8FACD' }}>
-            <CardContent style={{ display: 'flex', padding: '50px' }}>
-              <div
-                style={{
-                  width: '50%',
-                  margin: '30px 0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-around',
-                }}
-              >
-                <Typography gutterBottom variant="h4" component="h2">
-                  <Box fontWeight="bold">Welcome to Perkify!</Box>
-                </Typography>
-                <Typography gutterBottom variant="h5" component="h3">
-                  Connect a payment method to start creating live benefits for
-                  your employees.
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    marginTop: '30px',
-                    width: '250px',
-                    fontWeight: 'bold',
-                    backgroundColor: '#00AB55',
-                    zIndex: 9999,
-                  }}
-                  onClick={() => {
-                    history.push('/dashboard/billing');
-                  }}
-                >
-                  Set up billing
-                </Button>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <FormGroup row>
-                  <FormControlLabel
-                    style={{ width: '100%' }}
-                    control={<Checkbox name="Set Up Billing" />}
-                    label="Set Up Billing"
-                  ></FormControlLabel>
-
-                  <FormControlLabel
-                    style={{ width: '100%' }}
-                    control={<Checkbox name="Add Employees" />}
-                    label="Add Employees"
-                  />
-                  <FormControlLabel
-                    style={{ width: '100%' }}
-                    control={<Checkbox name="Create a Perk Group" />}
-                    label="Create a Perk Group"
-                  />
-                </FormGroup>
-              </div>
-              <img
-                src="/welcome_graphic.svg"
-                alt="Welcome Graphic"
-                style={{ width: '400px', marginLeft: 'auto' }}
-              />
-            </CardContent>
-          </Card>
+      <Typography variant="h3" gutterBottom>
+        Welcome to Perkify!
+      </Typography>
+      <Typography variant="h6" style={{ marginBottom: '100px' }}>
+        Complete the following steps in order to finish setting up your Perkify
+        account.
+      </Typography>
+      <Grid container spacing={8}>
+        <Grid item xs={4}>
+          <OnboardingCard
+            number="1"
+            title="Connect a Payment Method"
+            caption="Connect a payment method to be used when creating perk groups"
+            buttonText="Connect a payment method"
+            status={hasPaymentMethods ? 2 : 1}
+            onClick={() => history.push('/dashboard/billing')}
+          />
         </Grid>
-        {/* <Grid item xs={12}>
-          <Card style={{ backgroundColor: '#C8FACD' }}>
-            <CardContent style={{ display: 'flex', padding: '50px' }}>
-              <div style={{ width: '50%', margin: '30px 0' }}>
-                <Typography gutterBottom variant="h5" component="h2">
-                  <Box fontWeight="bold">Welcome back to Perkify!</Box>
-                </Typography>
-                <Typography gutterBottom variant="body1" component="h3">
-                  We see you haven't created any perk groups yet, get started
-                  now
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    marginTop: '30px',
-                    fontWeight: 'bold',
-                    backgroundColor: '#00AB55',
-                  }}
-                >
-                  Create New Perk Group
-                </Button>
-              </div>
-              <img
-                src="/welcome_graphic.svg"
-                alt="Welcome Graphic"
-                style={{ width: '400px', marginLeft: 'auto' }}
-              />
-            </CardContent>
-          </Card>
-        </Grid> */}
+
+        <Grid item xs={4}>
+          <OnboardingCard
+            number="2"
+            title="Add Your Employees"
+            caption="Populate your employees directory so that you can add them to perk groups."
+            buttonText="Add Your Employees"
+            status={hasEmployees ? 2 : hasPaymentMethods ? 1 : 0}
+            onClick={() => history.push('/dashboard/people')}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <OnboardingCard
+            number="3"
+            title="Create Your First Perk Group"
+            caption="Create a perk group to start generating live benefits for your employees"
+            buttonText="Create A Perk Group"
+            status={hasPerkGroup ? 2 : hasEmployees ? 1 : 0}
+            onClick={() => history.push('/dashboard/create/group')}
+          />
+        </Grid>
       </Grid>
     </div>
   );
