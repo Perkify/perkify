@@ -91,27 +91,12 @@ export default function ManageGroups(props: any) {
     if (employees && business) {
       // set email data
 
-      const employeeIDsToPendingPerkGroupID = [].concat(
-        ...Object.keys(business.perkGroups).map((perkGroupID) =>
-          business.perkGroups[perkGroupID].employeeIDs.map((employeeID) => ({
-            employeeID,
-            perkGroupID,
-          }))
-        )
-      );
+      const employeeIDsInPerkGroup = business.perkGroups[id].employeeIDs;
 
       setEmails(
         employees
           .filter((employee) =>
-            employeeIDsToPendingPerkGroupID.find(
-              (obj) => obj.employeeID == employee.employeeID
-            )
-              ? (employeeIDsToPendingPerkGroupID.find(
-                  (obj) => obj.employeeID == employee.employeeID
-                ).perkGroupID ==
-                  id) !=
-                undefined
-              : false
+            employeeIDsInPerkGroup.includes(employee.employeeID)
           )
           .map((employee, index) => ({
             email: employee.email,
