@@ -25,12 +25,15 @@ export const removePaymentMethod = adminPerkifyRequestTransform(
     const cardPaymentMethods = req.businessData.cardPaymentMethods;
 
     // check if the business has a backup card payment method
-    if (Object.keys(cardPaymentMethods).length == 1) {
+    if (
+      Object.keys(cardPaymentMethods).length == 1 &&
+      Object.keys(businessData.perkGroups).length != 0
+    ) {
       const error: PerkifyError = {
         status: 400,
         reason: 'Not enough payment methods',
         reasonDetail:
-          "Can't delete a payment method when you only have 1 left. Please add a payment method first.",
+          "Can't delete your last payment method when you have an active subscription. Please add another payment method first.",
       };
       return next(error);
     }
@@ -53,8 +56,11 @@ export const removePaymentMethod = adminPerkifyRequestTransform(
     // remove the card to be deleted from the payment methods
     delete cardPaymentMethods[simpleCardToBeDeleted.fingerprint];
 
-    // check if we were removing the default card
-    if (simpleCardToBeDeleted.default) {
+    // check if we were removing the default card and we will have a remaining payment method to set as default
+    if (
+      Object.keys(cardPaymentMethods).length != 0 &&
+      simpleCardToBeDeleted.default
+    ) {
       // if so, set another card as the default
       const newDefaultCardKey = Object.keys(cardPaymentMethods)[0];
       cardPaymentMethods[newDefaultCardKey].default = true;
