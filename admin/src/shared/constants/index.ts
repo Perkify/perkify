@@ -8,6 +8,7 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Netflix Standard',
+    BillingInstructionsURL: 'https://help.netflix.com/en/node/244',
   },
   {
     Name: 'Hulu',
@@ -18,6 +19,8 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Hulu',
+    BillingInstructionsURL:
+      'https://help.hulu.com/s/article/update-payment-information',
   },
   {
     Name: 'Audible Plus',
@@ -28,6 +31,8 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Audible Plus',
+    BillingInstructionsURL:
+      'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w',
   },
   {
     Name: 'Disney Plus',
@@ -38,6 +43,8 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Disney Plus',
+    BillingInstructionsURL:
+      'https://help.disneyplus.com/csp?id=csp_article_content&sys_kb_id=21dda2fcdb0580100a2af56e0f96192f',
   },
   {
     Name: 'Headspace',
@@ -48,6 +55,8 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Headspace',
+    BillingInstructionsURL:
+      'https://help.headspace.com/hc/en-us/articles/115008362508-How-can-I-update-my-payment-details-',
   },
   {
     Name: 'Spotify Individual',
@@ -58,6 +67,8 @@ export const allProductionPerks: PerkDefinition[] = [
     Product: 'prod_K4UBKT9PixGkHS',
     NetworkId: '123',
     PaymentName: 'Spotify Individual',
+    BillingInstructionsURL:
+      'https://support.spotify.com/us/article/update-payment-details/',
   },
 ];
 
@@ -72,6 +83,7 @@ export const allProductionPerksDict = allProductionPerks.reduce(
       PaymentName: perk.PaymentName,
       Product: perk.Product,
       NetworkId: perk.NetworkId,
+      BillingInstructionsURL: perk.BillingInstructionsURL,
     }),
     map
   ),
@@ -89,6 +101,7 @@ export const allProductionPerksByPriceIDDict = allProductionPerks.reduce(
       PaymentName: perk.PaymentName,
       Product: perk.Product,
       NetworkId: perk.NetworkId,
+      BillingInstructionsURL: perk.BillingInstructionsURL,
     }),
     map
   ),
@@ -101,10 +114,11 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Cost: 13.99,
     Period: 'Monthly',
     stripePriceId: 'price_1JMiKdKuQQHSHZsmeSywK8YU',
-    Img: 'netflix.jpg',
+    Img: 'netflix.jpeg',
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Netflix Standard',
+    BillingInstructionsURL: 'https://help.netflix.com/en/node/244',
   },
   {
     Name: 'Hulu',
@@ -115,6 +129,8 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Hulu',
+    BillingInstructionsURL:
+      'https://help.hulu.com/s/article/update-payment-information',
   },
   {
     Name: 'Audible Plus',
@@ -125,6 +141,8 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Audible Plus',
+    BillingInstructionsURL:
+      'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA',
   },
   {
     Name: 'Disney Plus',
@@ -135,6 +153,8 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Disney Plus',
+    BillingInstructionsURL:
+      'https://help.disneyplus.com/csp?id=csp_article_content&sys_kb_id=21dda2fcdb0580100a2af56e0f96192f',
   },
   {
     Name: 'Headspace',
@@ -145,6 +165,8 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Headspace',
+    BillingInstructionsURL:
+      'https://help.headspace.com/hc/en-us/articles/115008362508-How-can-I-update-my-payment-details-',
   },
   {
     Name: 'Spotify Individual',
@@ -155,6 +177,8 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Product: 'prod_K0joFcwnLJ2uXG',
     NetworkId: '123',
     PaymentName: 'Spotify Individual',
+    BillingInstructionsURL:
+      'https://support.spotify.com/us/article/update-payment-details/',
   },
 ];
 
@@ -169,6 +193,7 @@ export const allDevelopmentPerksDict = allDevelopmentPerks.reduce(
       PaymentName: perk.PaymentName,
       Product: perk.Product,
       NetworkId: perk.NetworkId,
+      BillingInstructionsURL: perk.BillingInstructionsURL,
     }),
     map
   ),
@@ -186,6 +211,7 @@ export const allDevelopmentPerksByPriceIDDict = allDevelopmentPerks.reduce(
       PaymentName: perk.PaymentName,
       Product: perk.Product,
       NetworkId: perk.NetworkId,
+      BillingInstructionsURL: perk.BillingInstructionsURL,
     }),
     map
   ),
