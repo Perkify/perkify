@@ -37,13 +37,25 @@ export default function ManagePeople(props: any) {
 
   useEffect(() => {
     if (employees) {
+      const employeeIDsToPendingPerkGroupName = [].concat(
+        ...Object.keys(business.perkGroups).map((perkGroupID) =>
+          business.perkGroups[perkGroupID].employeeIDs.map((employeeID) => ({
+            employeeID,
+            perkGroupName: business.perkGroups[perkGroupID].perkGroupName,
+          }))
+        )
+      );
       setPeopleData(
         employees.map((employee) => ({
           ...employee,
           id: employee.email,
-          perkGroupName:
-            employee.perkGroupID &&
-            business.perkGroups[employee.perkGroupID].perkGroupName,
+          perkGroupName: employeeIDsToPendingPerkGroupName.find(
+            (obj) => obj.employeeID == employee.employeeID
+          )
+            ? employeeIDsToPendingPerkGroupName.find(
+                (obj) => obj.employeeID == employee.employeeID
+              ).perkGroupName
+            : 'Not assigned',
         }))
       );
       setSelection([]);

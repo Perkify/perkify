@@ -88,11 +88,16 @@ export default function ManageGroups(props: any) {
   }, [business, id]);
 
   useEffect(() => {
-    if (employees) {
+    if (employees && business && business.perkGroups[id]) {
       // set email data
+
+      const employeeIDsInPerkGroup = business.perkGroups[id].employeeIDs;
+
       setEmails(
         employees
-          .filter((employee) => employee.perkGroupID == id)
+          .filter((employee) =>
+            employeeIDsInPerkGroup.includes(employee.employeeID)
+          )
           .map((employee, index) => ({
             email: employee.email,
             id: index,
@@ -101,7 +106,7 @@ export default function ManageGroups(props: any) {
       );
       setSelectedEmployees([]);
     }
-  }, [id, employees]);
+  }, [id, employees, business]);
 
   if (groupNotFound) {
     return (
