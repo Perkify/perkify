@@ -83,7 +83,10 @@ export const InvoiceDetails = ({
 
       // get the new cost breakdown table rows
       const newRows: CostBreakdownRow[] = Object.values(mergedLineItems)
-        .filter((lineItem) => lineItem.priceID in allPerksByPriceIDDict)
+        .filter(
+          (lineItem) =>
+            lineItem.priceID in allPerksByPriceIDDict && lineItem.quantity != 0
+        )
         .map((simpleLineItem) => ({
           perkName: allPerksByPriceIDDict[simpleLineItem.priceID].Name,
           price: allPerksByPriceIDDict[simpleLineItem.priceID].Cost,
