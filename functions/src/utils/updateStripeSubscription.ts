@@ -107,7 +107,7 @@ export const updateStripeSubscription = async (
       });
 
       // payment succeeded
-      propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
+      await propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
     } catch (e) {
       logger.error(e);
       // payment failed
@@ -237,7 +237,10 @@ export const updateStripeSubscription = async (
         );
 
         // payment succeeded
-        propogateSubscriptionUpdateToLiveUsers(businessData, subscription);
+        await propogateSubscriptionUpdateToLiveUsers(
+          businessData,
+          subscription
+        );
       } catch (e) {
         // payment fails
 

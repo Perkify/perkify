@@ -85,9 +85,7 @@ export default function PriceBreakdownTable({
               style={{ border: 'none', display: 'flex', alignItems: 'center' }}
               align="right"
             >
-              <p style={{ order: 1, padding: 0, margin: 0 }}>
-                Perkify Volume Fee
-              </p>
+              <p style={{ order: 1, padding: 0, margin: 0 }}>Volume Fee</p>
               <div
                 style={{
                   display: 'flex',
@@ -124,7 +122,7 @@ export default function PriceBreakdownTable({
               align="right"
             >
               <p style={{ order: 1, padding: 0, margin: 0 }}>
-                Perkify Card Maintenance Fee
+                Card Maintenance Fee
               </p>
               <div
                 style={{
