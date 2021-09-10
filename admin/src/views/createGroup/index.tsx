@@ -333,10 +333,18 @@ const CreateGroup = () => {
   }))(Tooltip);
   useEffect(() => {
     if (employees) {
+      const employeeIDsInPerkGroups = [].concat(
+        ...Object.keys(business.perkGroups).map(
+          (perkGroupID) => business.perkGroups[perkGroupID].employeeIDs
+        )
+      );
+
       setEmployeesData(
         employees
           .map((employee) => ({ ...employee, id: employee.email }))
-          .filter((employee) => !('perkGroupID' in employee))
+          .filter(
+            (employee) => !employeeIDsInPerkGroups.includes(employee.employeeID)
+          )
       );
       setSelection([]);
     }
