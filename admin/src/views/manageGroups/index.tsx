@@ -88,11 +88,28 @@ export default function ManageGroups(props: any) {
   }, [business, id]);
 
   useEffect(() => {
-    if (employees) {
+    if (employees && business) {
       // set email data
+
+      const employeeIDsToPendingPerkGroupID = [].concat(
+        ...Object.keys(business.perkGroups).map((perkGroupID) =>
+          business.perkGroups[perkGroupID].employeeIDs.map((employeeID) => ({
+            employeeID,
+            perkGroupID,
+          }))
+        )
+      );
+
       setEmails(
         employees
-          .filter((employee) => employee.perkGroupID == id)
+          .filter(
+            (employee) =>
+              (employeeIDsToPendingPerkGroupID.find(
+                (obj) => obj.employeeID == employee.employeeID
+              ).perkGroupID ==
+                id) !=
+              undefined
+          )
           .map((employee, index) => ({
             email: employee.email,
             id: index,
@@ -101,7 +118,7 @@ export default function ManageGroups(props: any) {
       );
       setSelectedEmployees([]);
     }
-  }, [id, employees]);
+  }, [id, employees, business]);
 
   if (groupNotFound) {
     return (
