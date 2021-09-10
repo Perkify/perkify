@@ -6,7 +6,8 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import React from 'react';
+import { LoadingContext } from 'contexts';
+import React, { useContext } from 'react';
 import { allPerksDict } from 'shared';
 
 interface PurchaseConfirmationProps {
@@ -35,6 +36,7 @@ const PurchaseConfirmation = ({
   function roundNumber(num: number) {
     return Math.round(100 * num) / 100;
   }
+  const { freezeNav } = useContext(LoadingContext);
 
   function calculateCost() {
     let cost = 0;
@@ -57,6 +59,7 @@ const PurchaseConfirmation = ({
         <DialogContentText>{text + calculateCost()}?</DialogContentText>
         <DialogActions>
           <Button
+            disabled={freezeNav}
             onClick={() => {
               setIsAddPerksModalVisible(false);
               setConfirmationModalVisible(false);
@@ -65,7 +68,7 @@ const PurchaseConfirmation = ({
           >
             Cancel
           </Button>
-          <Button onClick={onConfirmation} color="primary">
+          <Button disabled={freezeNav} onClick={onConfirmation} color="primary">
             Confirm
           </Button>
         </DialogActions>

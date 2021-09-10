@@ -198,6 +198,11 @@ const AddEmployees = ({
           .filter((employee) => !('perkGroupID' in employee))
       );
       setSelection([]);
+      setPreSearch(
+        employees
+          .map((employee) => ({ ...employee, id: employee.email }))
+          .filter((employee) => !('perkGroupID' in employee))
+      );
     }
   }, [employees]);
 
@@ -257,7 +262,7 @@ const AddEmployees = ({
       }}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add Employees</DialogTitle>
       <DialogContent>
         <DialogContentText>
           To add employees to this perk group, please select them from the
@@ -316,6 +321,7 @@ const AddEmployees = ({
               setIsAddEmployeesModalVisible(false);
               setSelection([]);
               setEmployeeSearchState('');
+              console.log(preSearch);
               setEmployeesData(preSearch);
             }}
             color="primary"
@@ -323,7 +329,7 @@ const AddEmployees = ({
             Cancel
           </Button>
           <Button onClick={setVisible} color="primary">
-            Add Users
+            Add Employees
           </Button>
         </DialogActions>
       </DialogContent>
