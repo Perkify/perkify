@@ -88,7 +88,7 @@ export default function ManageGroups(props: any) {
   }, [business, id]);
 
   useEffect(() => {
-    if (employees && business) {
+    if (employees && business && business.perkGroups[id]) {
       // set email data
 
       const employeeIDsInPerkGroup = business.perkGroups[id].employeeIDs;
