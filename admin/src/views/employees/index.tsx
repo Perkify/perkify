@@ -51,7 +51,11 @@ export default function ManagePeople(props: any) {
           id: employee.email,
           perkGroupName: employeeIDsToPendingPerkGroupName.find(
             (obj) => obj.employeeID == employee.employeeID
-          ).perkGroupName,
+          )
+            ? employeeIDsToPendingPerkGroupName.find(
+                (obj) => obj.employeeID == employee.employeeID
+              ).perkGroupName
+            : 'Not assigned',
         }))
       );
       setSelection([]);

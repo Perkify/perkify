@@ -102,13 +102,16 @@ export default function ManageGroups(props: any) {
 
       setEmails(
         employees
-          .filter(
-            (employee) =>
-              (employeeIDsToPendingPerkGroupID.find(
-                (obj) => obj.employeeID == employee.employeeID
-              ).perkGroupID ==
-                id) !=
-              undefined
+          .filter((employee) =>
+            employeeIDsToPendingPerkGroupID.find(
+              (obj) => obj.employeeID == employee.employeeID
+            )
+              ? (employeeIDsToPendingPerkGroupID.find(
+                  (obj) => obj.employeeID == employee.employeeID
+                ).perkGroupID ==
+                  id) !=
+                undefined
+              : false
           )
           .map((employee, index) => ({
             email: employee.email,
