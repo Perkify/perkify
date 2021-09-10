@@ -68,7 +68,8 @@ export const DisplayCurrentPlan = () => {
                     price: allPerksByPriceIDDict[itemObj.price.id].Cost,
                     amount:
                       (itemObj.quantity * itemObj.price.unit_amount) / 100,
-                  }));
+                  }))
+                  .filter((row) => row.quantity != 0);
 
                 const subtotal = newRows.reduce((acc, row) => {
                   return acc + row.amount;
