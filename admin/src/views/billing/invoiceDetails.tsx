@@ -37,9 +37,11 @@ export const InvoiceDetails = ({
         .doc(invoiceObject.payment_intent)
         .get()
         .then((paymentIntentDoc) => {
-          setCardData(
-            paymentIntentDoc.data().charges.data[0].payment_method_details.card
-          );
+          paymentIntentDoc.exists &&
+            setCardData(
+              paymentIntentDoc.data().charges.data[0].payment_method_details
+                .card
+            );
         });
 
       // merge line items together if they are related to the same priceID
