@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { privateStripeKey } from "../configs";
 
 admin.initializeApp();
-// axios.defaults.baseURL = rapydBaseURL;
+
 const db = admin.firestore();
 const auth = admin.auth();
 
@@ -11,6 +11,8 @@ const stripe = new Stripe(privateStripeKey, {
   apiVersion: "2020-08-27",
 });
 
+const environment = "production";
+
 export default admin;
 
-export { db, auth, stripe };
+export { db, auth, stripe, environment };

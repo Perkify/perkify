@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stripeWebhooks = void 0;
 const configs_1 = require("../../configs");
-const models_1 = require("../../models");
+const services_1 = require("../../services");
 const utils_1 = require("../../utils");
 const handleAuthorizationRequest_1 = require("./handleAuthorizationRequest");
 const stripeWebhooks = async (request, response) => {
     const sig = request.headers["stripe-signature"];
     let event;
     try {
-        event = models_1.stripe.webhooks.constructEvent(request.rawBody, sig, configs_1.stripeWebhookSecret);
+        event = services_1.stripe.webhooks.constructEvent(request.rawBody, sig, configs_1.stripeWebhookSecret);
     }
     catch (err) {
         console.log(err);
@@ -24,7 +24,7 @@ const stripeWebhooks = async (request, response) => {
         }
     }
     catch (err) {
-        await models_1.db
+        await services_1.db
             .collection("transactions")
             .doc(event.data.object.id)
             .set(event.data.object);

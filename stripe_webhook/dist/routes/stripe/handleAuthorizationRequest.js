@@ -1,36 +1,48 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleAuthorizationRequest = void 0;
-const constants_1 = require("../../constants");
-const models_1 = require("../../models");
-const verifyRequest = (perkInfo, userPerks, amount) => {
+const services_1 = require("../../services");
+const constants_1 = require("../../shared/constants");
+const verifyRequest = async (perkInfo, employeeData, amount) => {
+    var _a;
     // if we offer perk and the user has been granted the perk
-    if (perkInfo && perkInfo.Name in userPerks) {
+    if (perkInfo && perkInfo.Name in employeeData.perkUsesDict) {
         // get list of last authorized transactions of perk
-        const userPerkUses = userPerks[perkInfo.Name];
-        const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
+        const employeePerkUses = employeeData.perkUsesDict[perkInfo.Name];
+        // const billingCycle = 28 * 24 * 60 * 60; // 28 days in seconds
         const taxPercent = 1.5;
-        console.log(`user perks uses: ${userPerkUses}`);
+        const subscriptionsSnapshot = await services_1.db
+            .collection("businesses")
+            .doc(employeeData.businessID)
+            .collection("subscriptions")
+            .get();
+        const staticSubscriptionItem = (_a = subscriptionsSnapshot.docs.filter((doc) => doc.data().canceled_at == null &&
+            doc.data().status == "active")) === null || _a === void 0 ? void 0 : _a[0];
+        const lastBillingDate = staticSubscriptionItem.data().current_period_start.seconds;
+        console.log(`user perks uses: ${employeePerkUses}`);
         console.log(`matched perk: ${perkInfo.Name}`);
         console.log(`amount charged: ${amount}`);
-        console.log(`userPerkUses length: ${userPerkUses.length}`);
-        console.log(`perkinfo cost: ${perkInfo.Cost}`);
-        console.log(`max cost: ${perkInfo.Cost * taxPercent}`);
-        console.log(`amount check: ${amount < perkInfo.Cost * taxPercent}`);
+        console.log(`last billing date: ${lastBillingDate}`);
         // if perk hasn't been used or hasn't been used in last 28 days and is less than the price
-        return ((userPerkUses.length === 0 ||
-            userPerkUses[userPerkUses.length - 1].seconds + billingCycle <
-                models_1.default.firestore.Timestamp.now().seconds) &&
+        return ((employeePerkUses.length === 0 ||
+            employeePerkUses[employeePerkUses.length - 1].seconds <
+                lastBillingDate) &&
             amount < perkInfo.Cost * taxPercent);
     }
     else
         return false;
 };
-const handleApprove = async (userRef, userData, perkInfo) => {
-    const timestamp = models_1.default.firestore.Timestamp.now();
+const handleApprove = async (employeeData, perkInfo) => {
+    const timestamp = services_1.default.firestore.Timestamp.now();
     // note the timestamp it was used so it can't be for the next 28 days
-    await userRef.update({
-        [`perkUsesDict.${perkInfo.Name}`]: models_1.default.firestore.FieldValue.arrayUnion(timestamp),
+    // alternatively use employeeSnap.foreach()
+    await services_1.db
+        .collection("businesses")
+        .doc(employeeData.businessID)
+        .collection("employees")
+        .doc(employeeData.employeeID)
+        .update({
+        [`perkUsesDict.${perkInfo.Name}`]: services_1.default.firestore.FieldValue.arrayUnion(timestamp),
     });
 };
 const handleAuthorizationRequest = async (auth, response) => {
@@ -40,12 +52,29 @@ const handleAuthorizationRequest = async (auth, response) => {
     // functions.logger.log('email', email);
     console.log(email);
     console.log(`DB Call Start: ${Date.now()}`);
-    const userRef = models_1.db.collection("users").doc(email);
+    const employeeSnap = await services_1.db
+        .collectionGroup("employees")
+        .where("email", "==", email)
+        .get();
     // functions.logger.log('getting user data');
-    const userData = (await userRef.get()).data();
-    console.log(`DB Call End: ${Date.now()}`);
     // console.log(userData);
-    if (!userData) {
+    if (employeeSnap.size !== 1) {
+        const error = employeeSnap.size < 1
+            ? {
+                status: 500,
+                reason: "employee account does not exist",
+                reasonDetail: "employee account does not exist",
+            }
+            : {
+                status: 500,
+                reason: "multiple employee accounts exist",
+                reasonDetail: "multiple employee accounts exist",
+            };
+        throw error;
+    }
+    const employeeData = employeeSnap.docs[0].data();
+    console.log(`DB Call End: ${Date.now()}`);
+    if (!employeeData) {
         const error = {
             status: 500,
             reason: "Missing documents",
@@ -54,10 +83,10 @@ const handleAuthorizationRequest = async (auth, response) => {
         throw error;
     }
     // get perks usage associated with the user who made purchase
-    const userPerks = userData.perkUsesDict;
-    console.log(`user perks: ${JSON.stringify(userPerks)}`);
+    const employeePerks = employeeData.perkUsesDict;
+    console.log(`employee perks: ${JSON.stringify(employeePerks)}`);
     // check if the transaction was using a perk that we offer (and get info on that perk)
-    const perkInfo = constants_1.allPerks.find((perk) => auth.merchant_data.name
+    const perkInfo = constants_1.allProductionPerks.find((perk) => auth.merchant_data.name
         .toLowerCase()
         .includes(perk.PaymentName.toLowerCase())
     // && auth.merchant_data.network_id === perk.NetworkId
@@ -65,10 +94,8 @@ const handleAuthorizationRequest = async (auth, response) => {
     console.log(perkInfo);
     // we still have to check if it's an auth hold otherwise we count non auth holds towards a perk use
     let isAuthorizationHold = false;
-    if (perkInfo &&
-        perkInfo.Name in userPerks &&
-        perkInfo.AuthorizationHoldFields) {
-        isAuthorizationHold = perkInfo.AuthorizationHoldFields.every((field) => 
+    if (perkInfo && perkInfo.Name in employeePerks && perkInfo.AuthHoldFields) {
+        isAuthorizationHold = perkInfo.AuthHoldFields.every((field) => 
         // see if the accepted value includes auth value (pointed to by keyPath)
         field.acceptedValues.includes(field.keyPath.reduce((acc, cur) => acc[cur], auth)));
     }
@@ -76,30 +103,30 @@ const handleAuthorizationRequest = async (auth, response) => {
     let resultingAuth;
     if (isAuthorizationHold) {
         // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
-        resultingAuth = await models_1.stripe.issuing.authorizations.approve(auth["id"]);
+        resultingAuth = await services_1.stripe.issuing.authorizations.approve(auth["id"]);
         // resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
         response.status(200).send({ received: true });
         console.log("auth hold accepted");
     }
     else if (perkInfo &&
-        verifyRequest(perkInfo, userPerks, auth.pending_request.amount)) {
+        verifyRequest(perkInfo, employeeData, auth.pending_request.amount)) {
         // if verified approve it
         // TODO: RECOMMENT THIS TO AUTHORIZE PERKS
-        resultingAuth = await models_1.stripe.issuing.authorizations.approve(auth["id"]);
+        resultingAuth = await services_1.stripe.issuing.authorizations.approve(auth["id"]);
         // resultingAuth = await stripe.issuing.authorizations.decline(auth["id"]);
         // functions.logger.log('declined');
         // TODO: reorganize so this line isn't repeated
         response.status(200).send({ received: true });
         console.log("verified and accepted");
         // call handle approve async so function returns within 2 seconds
-        await handleApprove(userRef, userData, perkInfo);
+        await handleApprove(employeeData, perkInfo);
     }
     else {
-        resultingAuth = await models_1.stripe.issuing.authorizations.decline(auth["id"]);
+        resultingAuth = await services_1.stripe.issuing.authorizations.decline(auth["id"]);
         response.status(200).send({ received: true });
         console.log("declined");
     }
-    await models_1.db.collection("transactions").doc(resultingAuth.id).set(resultingAuth);
+    await services_1.db.collection("transactions").doc(resultingAuth.id).set(resultingAuth);
 };
 exports.handleAuthorizationRequest = handleAuthorizationRequest;
 //# sourceMappingURL=handleAuthorizationRequest.js.map

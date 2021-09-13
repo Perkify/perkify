@@ -1,6 +1,6 @@
 import * as bodyParser from "body-parser";
-import { db } from "./models";
 import { stripeWebhooks } from "./routes";
+import { db } from "./services";
 
 const express = require("express");
 const app = express();
@@ -18,8 +18,10 @@ const app = express();
 app.get("/_ah/warmup", async (req, res) => {
   // Handle your warmup logic. Initiate db connection, etc.
   // get some random data to establish connection to db
-  const userRef = db.collection("users").doc("g.cole.killian@gmail.com");
-  const userData = (await userRef.get()).data();
+  const userRef = db
+    .collectionGroup("employees")
+    .where("email", "==", "g.cole.killian@gmail.com");
+  const userData = (await userRef.get()).docs;
   console.log("Warmup!");
   console.log(userData);
   res.status(200).end();

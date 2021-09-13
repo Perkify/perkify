@@ -1,5 +1,5 @@
 import { stripeWebhookSecret } from "../../configs";
-import { db, stripe } from "../../models";
+import { db, stripe } from "../../services";
 import { handleError } from "../../utils";
 import { handleAuthorizationRequest } from "./handleAuthorizationRequest";
 
