@@ -19,6 +19,12 @@ const columns = [
     width: 200,
     editable: false,
   },
+  {
+    field: 'activated',
+    headerName: 'Activated',
+    width: 200,
+    editable: false,
+  },
 ];
 
 export default function ManagePeople(props: any) {
@@ -56,6 +62,7 @@ export default function ManagePeople(props: any) {
                 (obj) => obj.employeeID == employee.employeeID
               ).perkGroupName
             : 'Not assigned',
+          activated: 'card' in employee ? 'Yes' : 'No',
         }))
       );
       setSelection([]);
@@ -101,6 +108,8 @@ export default function ManagePeople(props: any) {
       })();
     }
   };
+
+  console.log(peopleData);
 
   return (
     <>
