@@ -33,7 +33,7 @@ const db = app.firestore();
 const auth = app.auth();
 const functions = app.functions();
 
-const environment = process.env.FIREBASE_STRIPE_ENVIRONMENT;
+const environment = process.env.REACT_APP_FIREBASE_ENVIRONMENT;
 
 if (process.env.REACT_APP_FIREBASE_MODE == 'emulator') {
   console.info('Using emulator firestore');
