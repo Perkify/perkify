@@ -24,7 +24,7 @@ export const validateEmployeeEmail = async (email: string) => {
     .collectionGroup('employees')
     .where('email', '==', email)
     .get();
-  if (!employeeRef.empty) {
+  if (employeeRef.empty) {
     return Promise.reject(new Error('You are not added by your employer'));
   } else {
     return Promise.resolve();
