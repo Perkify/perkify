@@ -1,3 +1,7 @@
+import { IconButton } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
+import InfoIcon from '@material-ui/icons/Info';
 import { AddRemoveTable } from 'components/AddRemoveTable';
 import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
@@ -5,6 +9,16 @@ import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useEffect, useState } from 'react';
 import { PerkifyApi } from '../../services';
 import AddEmployees from './AddEmployees';
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 300,
+    fontSize: theme.typography.pxToRem(15),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
 
 const columns = [
   {
@@ -24,6 +38,34 @@ const columns = [
     headerName: 'Activated',
     width: 200,
     editable: false,
+    renderHeader: () => (
+      <div>
+        Activated{' '}
+        <HtmlTooltip
+          title={
+            <React.Fragment>
+              <p
+                style={{
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  paddingLeft: 5,
+                  paddingRight: 5,
+                }}
+              >
+                Please expect a 2 day delay before we can issue your employees a
+                virtual credit card to claim their perks. When a user logs into
+                their account, we'll register them as activated.
+              </p>
+            </React.Fragment>
+          }
+          placement="bottom"
+        >
+          <IconButton>
+            <InfoIcon></InfoIcon>
+          </IconButton>
+        </HtmlTooltip>{' '}
+      </div>
+    ),
   },
 ];
 
@@ -108,8 +150,6 @@ export default function ManagePeople(props: any) {
       })();
     }
   };
-
-  console.log(peopleData);
 
   return (
     <>
