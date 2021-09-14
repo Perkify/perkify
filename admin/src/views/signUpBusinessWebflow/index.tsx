@@ -214,7 +214,7 @@ const SignUpBusinessWebflow = () => {
           className={classes.content}
         >
           <a href="https://getperkify.com" className={classes.logo}>
-            <img src={logo} style={{ width: '100%' }} />
+            <img src={logo} style={{ width: '100%', height: '45px' }} />
           </a>
           <Grid
             container

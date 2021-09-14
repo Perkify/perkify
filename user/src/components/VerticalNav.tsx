@@ -143,7 +143,7 @@ export default function ClippedDrawer({ children }: ClippedDrawerProps) {
       {/* <Toolbar /> */}
       <div className={classes.drawerContainer}>
         <div style={{ padding: '40px 30px' }}>
-          <img style={{ height: '30px' }} src={logo} />
+          <img style={{ height: '45px' }} src={logo} />
         </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
