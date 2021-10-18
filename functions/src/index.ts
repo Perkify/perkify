@@ -1,5 +1,3 @@
-// import axios from 'axios';
-import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import { functions } from './models';
@@ -13,7 +11,6 @@ import {
   registerAdminAndBusinessValidators,
   registerUser,
   registerUserValidators,
-  stripeWebhooks,
   updatePerkGroup,
   updatePerkGroupValidators,
 } from './routes';
@@ -22,7 +19,6 @@ import { validateFirebaseIdToken } from './utils';
 // express endpoint
 
 const app = express();
-const stripeWebhooksApp = express();
 
 app.use(
   cors({
@@ -67,11 +63,3 @@ app.use((err, req, res, next) => {
 });
 
 exports.user = functions.https.onRequest(app);
-
-stripeWebhooksApp.use(express.json());
-stripeWebhooksApp.post(
-  '/webhook',
-  bodyParser.raw({ type: 'application/json' }),
-  stripeWebhooks
-);
-exports.stripe = functions.https.onRequest(stripeWebhooksApp);
