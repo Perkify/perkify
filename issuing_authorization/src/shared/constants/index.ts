@@ -82,6 +82,18 @@ export const allProductionPerks: PerkDefinition[] = [
     NetworkId: "420429000200209",
     PaymentName: "spotify",
   },
+  {
+    Name: "Leetcode Premium",
+    Cost: 159.0,
+    Period: "Yearly",
+    stripePriceId: "price_1Jm0bkKuQQHSHZsmLZCTKcqm",
+    Img: "leetcode.png",
+    Product: "prod_K4UBKT9PixGkHS",
+    BillingInstructionsURL:
+      "https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w",
+    NetworkId: "123",
+    PaymentName: "leetcode",
+  },
 ];
 
 export const allProductionPerksDict = allProductionPerks.reduce(
@@ -204,6 +216,18 @@ export const allDevelopmentPerks: PerkDefinition[] = [
       "https://support.spotify.com/us/article/update-payment-details/",
     NetworkId: "420429000200209",
     PaymentName: "spotify",
+  },
+  {
+    Name: "Leetcode Premium",
+    Cost: 159.0,
+    Period: "Yearly",
+    stripePriceId: "price_1Jm0cVKuQQHSHZsmGll7sZr5",
+    Img: "leetcode.png",
+    Product: "prod_K4UBKT9PixGkHS",
+    BillingInstructionsURL:
+      "https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w",
+    NetworkId: "123",
+    PaymentName: "leetcode",
   },
 ];
 
