@@ -3,9 +3,8 @@ import { AddRemoveTable } from 'components/AddRemoveTable';
 import Header from 'components/Header';
 import { BusinessContext, LoadingContext } from 'contexts';
 import { AuthContext } from 'contexts/Auth';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { allPerksDict } from 'shared';
 import AddEmployees from './AddEmployees';
 import AddPerks from './AddPerks';
@@ -42,8 +41,8 @@ const perkColumns = [
   },
 ];
 
-export default function ManageGroups(props) {
-  let { id } = useParams();
+export default function ManageGroups(props: any) {
+  let { id } = useParams<{ id: string }>();
 
   const [
     isRemoveEmployeesModalVisible,
@@ -63,29 +62,7 @@ export default function ManageGroups(props) {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [groupPerks, setPerksData] = useState([]);
 
-  const { business } = useContext(BusinessContext);
-
-  const history = useHistory();
-
-  function getPerkNames(perks) {
-    const retNames = perks.map((perk) => {
-      retNames.push(perk.Name);
-    });
-
-    return retNames;
-  }
-
-  let groupData: any[] = [];
-  const fillerGroupData = [
-    {
-      name: 'A',
-      id: 'abc123',
-    },
-    {
-      name: 'B',
-      id: 'abc133',
-    },
-  ];
+  const { business, employees } = useContext(BusinessContext);
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
@@ -96,54 +73,62 @@ export default function ManageGroups(props) {
     setFreezeNav,
   } = useContext(LoadingContext);
 
-  useEffect(() => {
-    if (Object.keys(admin).length != 0) {
-      setDashboardLoading(true);
-      // get list of emails that belong to the perk group
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .where('group', '==', id)
-        .onSnapshot(
-          (querySnapshot) => {
-            setEmails(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error('Error getting documents: ', error);
-          }
-        );
-      return () => setDashboardLoading(false);
-    }
-  }, [admin, id]);
+  const [perkGroupName, setPerkGroupName] = useState('');
 
   useEffect(() => {
-    if (Object.keys(business).length != 0) {
-      if (Object.keys(business.groups).includes(id)) {
+    if (business) {
+      if (Object.keys(business.perkGroups).includes(id)) {
+        setPerkGroupName(business.perkGroups[id].perkGroupName);
+        // set perk group data
         setPerksData(
-          business.groups[id].map((perk, index) => ({
+          business.perkGroups[id].perkNames.map((perkName, index) => ({
+            ...allPerksDict[perkName],
             id: index,
-            ...allPerksDict[perk],
           }))
         );
+
         setGroupNotFound(false);
       } else {
         setGroupNotFound(true);
       }
+      setSelectedPerks([]);
     }
   }, [business, id]);
+
+  useEffect(() => {
+    if (employees && business && business.perkGroups[id]) {
+      // set email data
+
+      const employeeIDsInPerkGroup = business.perkGroups[id].employeeIDs;
+
+      setEmails(
+        employees
+          .filter((employee) =>
+            employeeIDsInPerkGroup.includes(employee.employeeID)
+          )
+          .map((employee, index) => ({
+            email: employee.email,
+            id: index,
+            employeeID: employee.employeeID,
+          }))
+      );
+      setSelectedEmployees([]);
+    }
+  }, [id, employees, business]);
 
   if (groupNotFound) {
     return (
       <>
-        <Header
-          title={`Manage ${id} Group`}
-          crumbs={['Dashboard', 'Perk Groups', id]}
-        />
+        {/* <Header
+          title={`Manage ${
+            business && business.perkGroups[id].perkGroupName
+          } Group`}
+          crumbs={[
+            'Dashboard',
+            'Perk Groups',
+            business && business.perkGroups[id].perkGroupName,
+          ]}
+        /> */}
         <div style={{ width: '50%', marginTop: '100px' }}>
           <Typography variant="h2">Perk Group Not Found</Typography>
           <Typography variant="h5" style={{ marginTop: '20px' }}>
@@ -158,8 +143,8 @@ export default function ManageGroups(props) {
   return (
     <>
       <Header
-        title={`Manage ${id} Group`}
-        crumbs={['Dashboard', 'Perk Groups', id]}
+        title={`Manage ${perkGroupName} Group`}
+        crumbs={['Dashboard', 'Perk Groups', perkGroupName]}
         // button={{
         //   type: 'delete',
         //   onClick: () => {
@@ -183,7 +168,7 @@ export default function ManageGroups(props) {
               setIsRemovePerksModalVisible(true);
             }}
             tableName="Group Perks"
-            addButtonText="Add Group Perk"
+            addButtonText="Add Perks"
             loading={dashboardLoading}
           />
         </Grid>
@@ -211,7 +196,7 @@ export default function ManageGroups(props) {
         isAddEmployeesModalVisible={isAddEmployeesModalVisible}
         setIsAddEmployeesModalVisible={setIsAddEmployeesModalVisible}
         group={id}
-        employees={groupEmails}
+        groupEmployees={groupEmails}
         groupPerks={groupPerks}
       />
       <RemoveEmployees

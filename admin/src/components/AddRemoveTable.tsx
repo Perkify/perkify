@@ -5,6 +5,9 @@ import { lighten } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   DataGrid,
+  GridColumns,
+  GridRowsProp,
+  GridSelectionModel,
   GridToolbarContainer,
   useGridSlotComponentProps,
 } from '@material-ui/data-grid';
@@ -21,8 +24,8 @@ const columns = [
     editable: false,
   },
   {
-    field: 'group',
-    headerName: 'Group',
+    field: 'perkGroupName',
+    headerName: 'Perk Group',
     width: 200,
     editable: false,
   },
@@ -61,6 +64,20 @@ const useDataGridStyles = makeStyles((theme: Theme) =>
   })
 );
 
+interface AddRemoveTableProps {
+  rows: GridRowsProp;
+  columns: GridColumns;
+  selectedRows: GridSelectionModel;
+  setSelectedRows: (model: GridSelectionModel) => void;
+  onClickAdd: () => void;
+  onClickDelete: () => void;
+  tableName: string;
+  addButtonText: string;
+  height: number;
+  loading?: boolean;
+  addButtonHidden?: boolean;
+}
+
 export const AddRemoveTable = ({
   rows,
   columns,
@@ -72,7 +89,7 @@ export const AddRemoveTable = ({
   addButtonText,
   height,
   ...rest
-}) => {
+}: AddRemoveTableProps) => {
   const dataGridClasses = useDataGridStyles();
 
   const CustomToolbar = () => {
@@ -112,6 +129,8 @@ export const AddRemoveTable = ({
               <DeleteIcon />
             </IconButton>
           </Tooltip>
+        ) : rest.addButtonHidden ? (
+          <div></div>
         ) : (
           <Button
             color="primary"

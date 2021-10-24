@@ -11,4 +11,11 @@ const PerkifyApi = axios.create({
 
 PerkifyApi.defaults.withCredentials = true;
 
+// // request interceptor for adding token
+// PerkifyApi.interceptors.request.use((config) => {
+//   // add token to request headers
+//   config.headers['Authorization'] = localStorage.getItem('token');
+//   return config;
+// });
+
 export { PerkifyApi };

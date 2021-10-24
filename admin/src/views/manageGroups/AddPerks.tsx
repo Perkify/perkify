@@ -9,10 +9,20 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import { AuthContext, LoadingContext } from 'contexts';
+import axios from 'axios';
+import PurchaseConfirmation from 'components/PurchaseConfirmation';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
-import { allPerks } from 'shared';
+import { allPerks, allPerksDict } from 'shared';
+
+interface AddPerksProps {
+  isAddPerksModalVisible: boolean;
+  setIsAddPerksModalVisible: (arg0: boolean) => void;
+  group: string;
+  groupPerks: PerkDefinition[];
+  emails: { email: string; group: string; id: string; employeeID: string }[];
+}
 
 const AddPerks = ({
   isAddPerksModalVisible,
@@ -20,18 +30,17 @@ const AddPerks = ({
   groupPerks,
   group,
   emails,
-}) => {
+}: AddPerksProps) => {
   const [perksToAdd, setPerksToAdd] = useState([]);
   const [groupPerksError, setSelectedPerksError] = useState('');
   const [availablePerks, setAvailablePerks] = useState([]);
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   const { currentUser } = useContext(AuthContext);
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
+  const { business } = useContext(BusinessContext);
 
   React.useEffect(() => {
     setAvailablePerks(
@@ -43,7 +52,7 @@ const AddPerks = ({
     );
   }, [groupPerks]);
 
-  const addPerksToPerkGroup = (event) => {
+  const addPerksToPerkGroup = (event: any) => {
     event.preventDefault();
     let error = false;
     if (perksToAdd.length == 0) {
@@ -53,6 +62,8 @@ const AddPerks = ({
 
     if (!error) {
       (async () => {
+        setConfirmationModalVisible(false);
+        setIsAddPerksModalVisible(false);
         setDashboardLoading(true);
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
@@ -61,30 +72,62 @@ const AddPerks = ({
           groupPerks.map((perkObj) => perkObj.Name)
         );
 
-        await PerkifyApi.put(
-          'user/auth/updatePerkGroup',
-          JSON.stringify({
-            group,
-            emails: emails.map((emailObj) => emailObj.email),
-            perks: afterPerks,
-          }),
-          {
+        try {
+          const payload: UpdatePerkGroupPayload = {
+            employeeIDs: emails.map((emailObj) => emailObj.employeeID),
+            perkNames: afterPerks,
+            perkGroupName: business.perkGroups[group].perkGroupName,
+          };
+          await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
               'Content-Type': 'application/json',
             },
-          }
-        );
+          });
 
-        setFreezeNav(false);
-        setDashboardLoading(false);
-        setIsAddPerksModalVisible(false);
-        setPerksToAdd([]);
+          setFreezeNav(false);
+          setDashboardLoading(false);
+          setPerksToAdd([]);
+        } catch (err) {
+          setDashboardLoading(false);
+          setFreezeNav(false);
+          if (axios.isAxiosError(err)) {
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
+          } else {
+            alert('Error. Reason unknown. Pleaser');
+          }
+        }
       })();
     }
   };
 
-  return (
+  function setVisible() {
+    let error = false;
+    if (perksToAdd.length == 0) {
+      setSelectedPerksError('Select perks');
+      error = true;
+    }
+    if (error) {
+      return;
+    }
+    setConfirmationModalVisible(true);
+  }
+
+  return isConfirmationModalVisible ? (
+    <PurchaseConfirmation
+      isAddPerksModalVisible={isAddPerksModalVisible}
+      setIsAddPerksModalVisible={setIsAddPerksModalVisible}
+      title={'Add Perks'}
+      text={'Are you sure you want to add these perks for a total cost of $'}
+      onConfirmation={addPerksToPerkGroup}
+      setConfirmationModalVisible={setConfirmationModalVisible}
+      perks={perksToAdd}
+      numPeople={emails.length}
+      creatingGroup={false}
+    />
+  ) : (
     <Dialog
       open={isAddPerksModalVisible}
       onClose={() => setIsAddPerksModalVisible(false)}
@@ -93,8 +136,7 @@ const AddPerks = ({
       <DialogTitle id="form-dialog-title">Add Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          To add users to this organization, please enter their email addresses
-          below and select a group from the dropdown.
+          To add perks to this group, please select them from the dropbox below.
         </DialogContentText>
         <Typography style={{ marginTop: '30px', marginBottom: '15px' }}>
           Perks
@@ -121,7 +163,12 @@ const AddPerks = ({
         >
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
-              {name}
+              {name +
+                ' (' +
+                allPerksDict[name].Cost +
+                '/' +
+                allPerksDict[name].Period +
+                ')'}
             </MenuItem>
           ))}
         </Select>
@@ -133,7 +180,7 @@ const AddPerks = ({
         >
           Cancel
         </Button>
-        <Button onClick={addPerksToPerkGroup} color="primary">
+        <Button onClick={setVisible} color="primary">
           Add Perks
         </Button>
       </DialogActions>

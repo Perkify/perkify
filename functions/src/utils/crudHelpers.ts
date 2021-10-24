@@ -1,133 +1,127 @@
-import { allPerks, newUserTemplateGenerator } from '../../shared';
-import admin, { db, functions, stripe } from '../models';
+import { firestore } from 'firebase-admin/lib/firestore';
+import { logger } from 'firebase-functions';
+import admin, { db, functions, stripe } from '../services';
+import { applyChangesToLiveUsers } from './applyChangesToLiveUsers';
+import FieldValue = firestore.FieldValue;
 
-export const createUserHelper = async (email, businessID, group, perks) => {
-  const docRef = db.collection('users').doc(email);
+export const createUserHelper = async (userToCreate: UserToCreate) => {
+  const docRef = db
+    .collection('businesses')
+    .doc(userToCreate.businessID)
+    .collection('employees')
+    .doc(userToCreate.employeeID);
 
-  await docRef.set({
-    businessID,
-    group,
-    perks: perks.reduce((map, perk) => ((map[perk] = []), map), {}),
-  });
+  const user: { perkGroupID: string; perkUsesDict: PerkUsesDict } = {
+    perkGroupID: userToCreate.perkGroupID,
+    perkUsesDict: userToCreate.newPerkNames.reduce(
+      (map, perk) => ((map[perk] = []), map),
+      {} as { [key: string]: FirebaseFirestore.Timestamp[] }
+    ),
+  };
 
-  const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
-    url:
-      functions.config()['stripe-firebase'].environment == 'production'
-        ? 'https://app.getperkify.com/dashboard'
-        : functions.config()['stripe-firebase'].environment == 'staging'
-        ? 'https://app.dev.getperkify.com/dashboard'
-        : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
-  });
+  await docRef.update(user);
+
+  const signInLink = await admin
+    .auth()
+    .generateSignInWithEmailLink(userToCreate.email, {
+      url:
+        functions.config()['stripe-firebase'].environment == 'production'
+          ? 'https://app.getperkify.com/dashboard'
+          : functions.config()['stripe-firebase'].environment == 'staging'
+          ? 'https://app.dev.getperkify.com/dashboard'
+          : 'http://localhost:3001/dashboard',
+    });
+
+  // if in development or staging mode, print the sign in link
+  if (
+    ['development', 'staging'].includes(
+      functions.config()['stripe-firebase'].environment
+    )
+  ) {
+    logger.log(`Generated sign in link for ${userToCreate.email}`, signInLink);
+  }
 
   // send email
   await db.collection('mail').add({
-    to: email,
-    message: {
-      subject: 'Your employer has signed you up for Perkify!',
-      html: newUserTemplateGenerator({ signInLink }),
+    to: userToCreate.email,
+    template: {
+      name: 'userOnboarding',
+      data: {
+        businessName: userToCreate.businessName,
+        perks:
+          userToCreate.newPerkNames.length > 1
+            ? userToCreate.newPerkNames.slice(0, -1).join(', ') +
+              ', and ' +
+              userToCreate.newPerkNames[userToCreate.newPerkNames.length - 1]
+            : userToCreate.newPerkNames[0],
+        signInLink,
+      },
     },
   });
 };
 
-export const deleteUserHelper = async (userDoc) => {
-  if (userDoc.data().card)
-    await stripe.issuing.cards.update(userDoc.data().card.id, {
-      status: 'canceled',
-    });
-  await db.collection('users').doc(userDoc.id).delete();
+export const updateUserHelper = async (userToUpdate: UserToUpdate) => {
+  const docRef = db
+    .collection('businesses')
+    .doc(userToUpdate.businessID)
+    .collection('employees')
+    .doc(userToUpdate.employeeID);
+
+  const updatedPerkUsesDict = userToUpdate.newPerkNames.reduce((acc, perk) => {
+    if (perk in userToUpdate.oldPerkUsesDict) {
+      acc[perk] = userToUpdate.oldPerkUsesDict[perk];
+    } else {
+      acc[perk] = [];
+    }
+    return acc;
+  }, {} as PerkUsesDict);
+
+  await docRef.update({
+    perkUsesDict: updatedPerkUsesDict,
+  } as Partial<Employee>);
+
+  // // does this create a user?
+  // const signInLink = await admin.auth().generateSignInWithEmailLink(email, {
+  //   url:
+  //     functions.config()['stripe-firebase'].environment == 'production'
+  //       ? 'https://app.getperkify.com/dashboard'
+  //       : functions.config()['stripe-firebase'].environment == 'staging'
+  //       ? 'https://app.dev.getperkify.com/dashboard'
+  //       : 'http://localhost:3001/dashboard', // I don't think you're supposed to do it this way. Maybe less secure
+  // });
+
+  // // send email
+  // await db.collection('mail').add({
+  //   to: email,
+  //   message: {
+  //     subject: 'Your employer has signed you up for Perkify!',
+  //     html: newUserTemplateGenerator({ signInLink }),
+  //   },
+  // });
 };
 
-export const syncStripeSubscriptionsWithFirestorePerks = async (
-  userUid,
-  businessID
-) => {
-  const businessData = (
-    await db.collection('businesses').doc(businessID).get()
-  ).data();
-
-  if (!businessData) {
-    const error = {
-      status: 500,
-      reason: 'Missing document',
-      reasonDetail: 'Could not find business data document',
-    };
-    throw error;
-  }
-
-  // get list of perks that business has
-  const perkSet = new Set();
-  Object.keys(businessData.groups).forEach((perkGroupName) => {
-    businessData.groups[perkGroupName].forEach((perkName) =>
-      perkSet.add(perkName)
-    );
-  });
-
-  // compare the list of perks to the list of subscriptions, and cancel any subscriptions for which no perks are being offered
-  const subscriptionsSnapshot = await db
-    .collection('customers')
-    .doc(userUid)
-    .collection('subscriptions')
-    .get();
-
-  const subscriptionItems = subscriptionsSnapshot.docs
-    .filter((doc) => doc.data().canceled_at == null)
-    .map((doc) => {
-      return {
-        subscription_id: doc.data().items[0].subscription,
-        name: doc.data().items[0].price.product.name,
-      };
+export const deleteUserHelper = async (userToDelete: UserToDelete) => {
+  // if user has a card, delete it
+  if (userToDelete.card) {
+    await stripe.issuing.cards.update(userToDelete.card.id, {
+      status: 'canceled',
     });
-
-  // get the subscriptions that exist but do not exist in the active perks
-  // TODO: handle case where subscription is canceled
-  const subscriptionsToCancel = subscriptionItems.filter(
-    (subObj) => !perkSet.has(subObj.name)
-  );
-
-  // get the perks that exist but for which there aren't any subscriptions
-  const perkNamesToCreate = Array.from(perkSet).filter(
-    (perkName) =>
-      !subscriptionItems.map((subObj) => subObj.name).includes(perkName)
-  );
-  const perkObjectsToCreate = allPerks.filter((perk) =>
-    perkNamesToCreate.includes(perk.Name)
-  );
-
-  try {
-    await Promise.all(
-      subscriptionsToCancel.map(async (subObj) => {
-        await stripe.subscriptions.del(subObj.subscription_id);
-      })
-    );
-  } catch (e) {
-    console.log('Problem with deleting subscriptions');
-    console.log(e);
   }
+  await db
+    .collection('businesses')
+    .doc(userToDelete.businessID)
+    .collection('employees')
+    .doc(userToDelete.employeeID)
+    .update({
+      perkGroupID: FieldValue.delete(),
+      perkUsesDict: FieldValue.delete(),
+    });
+};
 
-  const customerData = (
-    await db.collection('customers').doc(userUid).get()
-  ).data();
+export const expandUsers = async (updatedBusiness: Business) => {
+  await applyChangesToLiveUsers(updatedBusiness, 'expand');
+};
 
-  if (customerData == null) {
-    const error = {
-      status: 500,
-      reason: 'Missing documents',
-      reasonDetail: `Documents missing from firestore`,
-    };
-    throw error;
-  }
-
-  try {
-    await Promise.all(
-      perkObjectsToCreate.map(async (perkObj) => {
-        await stripe.subscriptions.create({
-          customer: customerData.stripeId,
-          items: [{ price: perkObj.stripePriceId }],
-        });
-      })
-    );
-  } catch (e) {
-    console.log('Problem with creating subscriptions');
-    console.log(e);
-  }
+export const shrinkUsers = async (updatedBusiness: Business) => {
+  await applyChangesToLiveUsers(updatedBusiness, 'shrink');
 };

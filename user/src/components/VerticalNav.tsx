@@ -81,7 +81,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function ClippedDrawer({ children }) {
+interface ClippedDrawerProps {
+  children: React.ReactNode;
+}
+
+export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -101,7 +105,11 @@ export default function ClippedDrawer({ children }) {
 
   const accountNav: [string, string, any][] = [
     // ['Settings', '/settings', <SettingsIcon />],
-    ['Support', 'mailto: abc@example.com', <ContactSupportIcon />],
+    [
+      'Support',
+      'https://www.getperkify.com/contact-us',
+      <ContactSupportIcon />,
+    ],
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
@@ -110,12 +118,13 @@ export default function ClippedDrawer({ children }) {
     ['Account', accountNav],
   ];
 
-  const ListItemLink = (props) => {
-    const newProps = Object.keys(props).reduce((acc: object, prop: string) => {
+  const ListItemLink = (props: any) => {
+    const newProps = Object.keys(props).reduce((acc: any, prop: string) => {
       if (prop == 'route') {
-        if (props.route.includes(':')) {
+        if (props.route.includes('https://')) {
           acc['component'] = 'a';
           acc['href'] = props.route;
+          acc['target'] = '_blank';
         } else {
           acc['component'] = Link;
           acc['to'] = props.route;
@@ -124,7 +133,7 @@ export default function ClippedDrawer({ children }) {
         acc[prop] = props[prop];
       }
       return acc;
-    }, {});
+    }, {} as { [key: string]: any });
 
     return <ListItem {...newProps} />;
   };
@@ -134,7 +143,7 @@ export default function ClippedDrawer({ children }) {
       {/* <Toolbar /> */}
       <div className={classes.drawerContainer}>
         <div style={{ padding: '40px 30px' }}>
-          <img style={{ height: '30px' }} src={logo} />
+          <img style={{ height: '45px' }} src={logo} />
         </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar

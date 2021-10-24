@@ -1,11 +1,19 @@
 import { AuthContext } from 'contexts/Auth';
 import firebase from 'firebase';
-import { auth, db } from 'firebaseApp';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
+import { auth, db } from 'services';
 import GettingStarted from '../views/gettingStarted';
 
-const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
+interface PrivateRouteProps {
+  component: React.ElementType;
+  [key: string]: any;
+}
+
+const PrivateRoute = ({
+  component: RouteComponent,
+  ...rest
+}: PrivateRouteProps) => {
   const { currentUser, loadingAuthState, employee } = useContext(AuthContext);
   const redirectLoginTimer = useRef(null);
   const history = useHistory();
@@ -26,11 +34,10 @@ const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
       // the better long term solution is probs to use auth roles and check the account is logged in as either a user or admin
       if (currentUser) {
         const userDoc = await db
-          .collection('users')
-          .doc(currentUser.email)
+          .collectionGroup('employees')
+          .where('employeeID', '==', currentUser.uid)
           .get();
-        // could also check for employee data here
-        if (!userDoc.exists) {
+        if (userDoc.empty) {
           await auth.signOut();
           alert('You have not yet been added by your employer');
         }

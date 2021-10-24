@@ -6,9 +6,22 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import { AuthContext, LoadingContext } from 'contexts';
+import { GridSelectionModel } from '@material-ui/data-grid';
+import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { PerkifyApi } from 'services';
+
+interface RemovePerksProps {
+  isRemovePerksModalVisible: boolean;
+  setIsRemovePerksModalVisible: (arg0: boolean) => void;
+
+  selectedPerks: GridSelectionModel;
+  setSelectedPerks: (model: GridSelectionModel) => void;
+
+  groupPerks: PerkDefinition[];
+  group: string;
+  emails: { email: string; group: string; id: string; employeeID: string }[];
+}
 
 const RemovePerks = ({
   isRemovePerksModalVisible,
@@ -18,7 +31,7 @@ const RemovePerks = ({
   groupPerks,
   group,
   emails,
-}) => {
+}: RemovePerksProps) => {
   const { currentUser } = useContext(AuthContext);
 
   const {
@@ -28,7 +41,8 @@ const RemovePerks = ({
     setFreezeNav,
   } = useContext(LoadingContext);
 
-  const removePerksFromPerkGroup = (event) => {
+  const { business } = useContext(BusinessContext);
+  const removePerksFromPerkGroup = (event: any) => {
     let error = false;
 
     event.preventDefault();
@@ -52,24 +66,20 @@ const RemovePerks = ({
           setSelectedPerks([]);
           return;
         }
-        await PerkifyApi.put(
-          'user/auth/updatePerkGroup',
-          JSON.stringify({
-            group,
-            emails: emails.map((emailObj) => emailObj.email),
-            perks: afterPerksNames,
-          }),
-          {
-            headers: {
-              Authorization: `Bearer ${bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const payload: UpdatePerkGroupPayload = {
+          employeeIDs: emails.map((emailObj) => emailObj.employeeID),
+          perkNames: afterPerksNames,
+          perkGroupName: business.perkGroups[group].perkGroupName,
+        };
+        await PerkifyApi.put(`rest/perkGroup/${group}`, payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
         setDashboardLoading(false);
         setFreezeNav(false);
         setIsRemovePerksModalVisible(false);
-        setSelectedPerks([]);
       })();
     }
   };
@@ -80,7 +90,7 @@ const RemovePerks = ({
       onClose={() => setIsRemovePerksModalVisible(false)}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Delete Users</DialogTitle>
+      <DialogTitle id="form-dialog-title">Delete Perks</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Are you sure you want to remove these perks?

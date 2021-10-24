@@ -3,6 +3,9 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
   Grid,
   Typography,
 } from '@material-ui/core';
@@ -13,6 +16,15 @@ export const CreatePerkGroupCard = () => {
   const history = useHistory();
   return (
     <div>
+      <div
+        aria-disabled
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          zIndex: 5000,
+        }}
+      ></div>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <Card style={{ backgroundColor: '#C8FACD' }}>
@@ -44,10 +56,37 @@ export const CreatePerkGroupCard = () => {
                     width: '250px',
                     fontWeight: 'bold',
                     backgroundColor: '#00AB55',
+                    zIndex: 9999,
                   }}
                 >
                   Create Perk Group
                 </Button>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FormGroup row>
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox checked={true} name="Set Up Billing" />}
+                    label="Set Up Billing"
+                  ></FormControlLabel>
+
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox checked={true} name="Add Employees" />}
+                    label="Add Employees"
+                  />
+                  <FormControlLabel
+                    style={{ width: '100%' }}
+                    control={<Checkbox name="Create a Perk Group" />}
+                    label="Create a Perk Group"
+                  />
+                </FormGroup>
               </div>
               <img
                 src="/welcome_graphic.svg"

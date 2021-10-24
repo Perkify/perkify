@@ -1,5 +1,11 @@
-import { Snackbar } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+} from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -11,11 +17,10 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Alert } from '@material-ui/lab';
-import app from 'firebaseApp';
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { app, PerkifyApi } from 'services';
 
 const useStyles = makeStyles((theme) => ({
   loginRoot: {
@@ -44,33 +49,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignInSide(props) {
+export default function SignInSide(props: any) {
   const classes = useStyles();
 
   const [email, setEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [didResetPass, setDidResetPass] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { user, setUser } = props;
   const history = useHistory();
+  const [isForgotPasswordModalVisible, setForgotPasswordModalVisible] =
+    useState(false);
 
-  const errorAlert = (error) => {
+  const errorAlert = (error: any) => {
     console.error(error);
     setErrorMessage(error);
     setOpen(true);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
+    if (isForgotPasswordModalVisible) {
+      return;
+    }
     setLoading(true);
     try {
       await app.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      errorAlert(error.message);
+      // use replace to remove text 'The user may have been deleted.
+      // this text might scare a user who accidentally uses the wrong email address
+      const errorMessage = error.message.replace(
+        'The user may have been deleted.',
+        ''
+      );
+      errorAlert(errorMessage);
     }
   };
 
@@ -80,6 +98,19 @@ export default function SignInSide(props) {
     }
 
     setOpen(false);
+  };
+
+  const resetPass = async () => {
+    setLoading(true);
+    try {
+      await PerkifyApi.post(`/rest/admin/${resetEmail}/passwordResetLink`);
+      setLoading(false);
+      setDidResetPass(true);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorAlert(JSON.parse(error.response.data?.reasonDetail)[0]?.msg);
+    }
   };
 
   return (
@@ -108,6 +139,7 @@ export default function SignInSide(props) {
             width: '100vw',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 2000,
           }}
         >
           <CircularProgress color="secondary" style={{ zIndex: 20 }} />
@@ -158,9 +190,6 @@ export default function SignInSide(props) {
               square
             >
               <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                  <LockOutlinedIcon />
-                </Avatar>
                 <Typography component="h1" variant="h5">
                   Perkify Admin Login
                 </Typography>
@@ -218,7 +247,7 @@ export default function SignInSide(props) {
                   >
                     Sign In
                   </Button>
-                  <Grid container>
+                  <Grid container spacing={0}>
                     {/* <Grid item xs>
                       <Link
                         href="https://www.mcgill.ca/it/stay-safe-online/pw-reset"
@@ -227,9 +256,29 @@ export default function SignInSide(props) {
                         Forgot password?
                       </Link>
                     </Grid> */}
-                    <Grid item>
+                    <Grid item xs={12}>
                       <Link to="/signup" variant="body2" component={RouterLink}>
                         {"Don't have an account? Sign Up"}
+                      </Link>
+                    </Grid>
+                  </Grid>
+                  <Grid container spacing={0}>
+                    <Grid
+                      item
+                      xs={12}
+                      style={{ textAlign: 'left', float: 'right' }}
+                    >
+                      <Link
+                        component="button"
+                        onClick={() => setForgotPasswordModalVisible(true)}
+                        style={{
+                          textTransform: 'none',
+                          paddingTop: '20px',
+                          fontSize: '14px',
+                        }}
+                        color="primary"
+                      >
+                        Forgot Your Password?
                       </Link>
                     </Grid>
                     {/* <Grid item>
@@ -244,6 +293,65 @@ export default function SignInSide(props) {
             </Grid>
           </Grid>
         </Card>
+        <Dialog
+          open={isForgotPasswordModalVisible}
+          onClose={() => setForgotPasswordModalVisible(false)}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">{'Reset Password'}</DialogTitle>
+          <DialogContent style={{ width: '400px' }}>
+            <DialogContentText>
+              {didResetPass ? (
+                <div>
+                  {'We sent an email to ' +
+                    resetEmail +
+                    '. Click on the link to reset your password.'}
+                </div>
+              ) : (
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                />
+              )}
+            </DialogContentText>
+            <DialogActions>
+              {didResetPass ? (
+                <Button
+                  onClick={() => {
+                    setForgotPasswordModalVisible(false);
+                    setDidResetPass(false);
+                  }}
+                  color="primary"
+                >
+                  Done
+                </Button>
+              ) : (
+                <div>
+                  <Button
+                    onClick={() => {
+                      setForgotPasswordModalVisible(false);
+                    }}
+                    color="primary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={resetPass} color="primary">
+                    Reset Password
+                  </Button>
+                </div>
+              )}
+            </DialogActions>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   useTheme,
 } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import AddIcon from '@material-ui/icons/Add';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -87,7 +88,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function ClippedDrawer({ children }) {
+interface ClippedDrawerProps {
+  children: React.ReactNode;
+}
+
+export default function ClippedDrawer({ children }: ClippedDrawerProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -100,7 +105,7 @@ export default function ClippedDrawer({ children }) {
   ] = useState('');
 
   const { currentUser } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { business, employees } = useContext(BusinessContext);
 
   const {
     dashboardLoading,
@@ -120,18 +125,12 @@ export default function ClippedDrawer({ children }) {
     setDashboardLoading(true);
     setFreezeNav(true);
 
-    await PerkifyApi.post(
-      'user/auth/deletePerkGroup',
-      JSON.stringify({
-        group: isDeletePerkGroupModalVisible,
-      }),
-      {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await PerkifyApi.delete(`rest/perkGroup/${isDeletePerkGroupModalVisible}`, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     setDashboardLoading(false);
     setFreezeNav(false);
@@ -153,13 +152,17 @@ export default function ClippedDrawer({ children }) {
   ] = useState([]);
 
   useEffect(() => {
-    if (Object.keys(business).length != 0) {
-      const tmpGroupViews = Object.keys(business.groups)
+    if (business) {
+      const tmpGroupViews = Object.keys(business.perkGroups)
         .sort()
-        .map((group) => [group, '/dashboard/group/' + group, <GroupIcon />]);
+        .map((perkGroupID) => [
+          business.perkGroups[perkGroupID].perkGroupName,
+          '/dashboard/group/' + perkGroupID,
+          <GroupIcon />,
+        ]);
 
       tmpGroupViews.push([
-        'Add New Group',
+        'Add New Perk Group',
         '/dashboard/create/group',
         <AddIcon />,
       ]);
@@ -170,23 +173,35 @@ export default function ClippedDrawer({ children }) {
   const infoNav: [string, string, any][] = groupViews;
 
   const accountNav: [string, string, any][] = [
-    ['Billing', '/dashboard/billing', <SettingsIcon />],
+    ['Business Settings', '/dashboard/settings', <SettingsIcon />],
+    ['Billing', '/dashboard/billing', <AccountBalanceWalletIcon />],
     ['Logout', '/dashboard/logout', <ExitToAppIcon />],
   ];
 
-  const navSections: [string, [string, string, any][]][] = [
-    ['General', generalNav],
-    ['People', peopleNav],
-    ['Perk Groups', infoNav],
-    ['Account', accountNav],
-  ];
-
+  const navSections: [string, [string, string, any][]][] =
+    !business || Object.keys(business.cardPaymentMethods).length == 0
+      ? [
+          ['General', generalNav],
+          ['Account', accountNav],
+        ]
+      : employees && employees.length == 0
+      ? [
+          ['General', generalNav],
+          ['People', peopleNav],
+          ['Account', accountNav],
+        ]
+      : [
+          ['General', generalNav],
+          ['People', peopleNav],
+          ['Perk Groups', infoNav],
+          ['Account', accountNav],
+        ];
   const drawer = (
     <div>
       {/* <Toolbar /> */}
       <div className={classes.drawerContainer}>
         <div style={{ padding: '40px 30px' }}>
-          <img style={{ height: '30px' }} src={logo} />
+          <img style={{ height: '45px' }} src={logo} />
         </div>
         <Paper className={classes.avatarCard} variant="outlined">
           <Avatar
@@ -248,57 +263,65 @@ export default function ClippedDrawer({ children }) {
                     <ListItemText classes={{ primary: classes.listItem }}>
                       {name}
                     </ListItemText>
-                    {sectionName == 'Perk Groups' && name != 'Add New Group' && (
-                      <>
-                        <IconButton
-                          style={{ padding: 0 }}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            setAnchorEl(event.currentTarget);
-                          }}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          id={`${name} simple menu`}
-                          open={Boolean(anchorEl)}
-                          keepMounted
-                          anchorEl={anchorEl}
-                          onClose={(
-                            event: React.MouseEvent<
-                              HTMLButtonElement,
-                              MouseEvent
-                            >
-                          ) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            setAnchorEl(null);
-                          }}
-                          elevation={4}
-                          anchorOrigin={{
-                            vertical: 'center',
-                            horizontal: 'right',
-                          }}
-                          transformOrigin={{
-                            vertical: 'center',
-                            horizontal: 'left',
-                          }}
-                          getContentAnchorEl={null}
-                        >
-                          <MenuItem
+                    {sectionName == 'Perk Groups' &&
+                      name != 'Add New Perk Group' && (
+                        <>
+                          <IconButton
+                            style={{ padding: 0 }}
                             onClick={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
-                              setAnchorEl(null);
-                              setIsDeletePerkGroupModalVisible(name);
+                              setAnchorEl(event.currentTarget);
                             }}
                           >
-                            Delete Perk Group
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
+                            <MoreVertIcon />
+                          </IconButton>
+
+                          <Menu
+                            id={`${name} simple menu`}
+                            open={Boolean(anchorEl)}
+                            keepMounted
+                            anchorEl={anchorEl}
+                            onClose={(
+                              event: React.MouseEvent<
+                                HTMLButtonElement,
+                                MouseEvent
+                              >
+                            ) => {
+                              event.stopPropagation();
+                              event.preventDefault();
+                              setAnchorEl(null);
+                            }}
+                            elevation={4}
+                            anchorOrigin={{
+                              vertical: 'center',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'center',
+                              horizontal: 'left',
+                            }}
+                            getContentAnchorEl={null}
+                          >
+                            <MenuItem
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setAnchorEl(null);
+                                setIsDeletePerkGroupModalVisible(
+                                  Object.keys(business.perkGroups).find(
+                                    (perkGroupID) =>
+                                      business.perkGroups[perkGroupID]
+                                        .perkGroupName == name
+                                  )
+                                );
+                              }}
+                            >
+                              Delete Perk Group
+                            </MenuItem>
+                          </Menu>
+                        </>
+                      )}
                   </ListItem>
                 ))}
               </List>

@@ -24,5 +24,8 @@ module.exports = {
   plugins: ['@typescript-eslint', 'import'],
   rules: {
     'max-len': 'off',
+    camelcase: 'off',
+    'valid-jsdoc': 'off',
+    'require-jsdoc': 'off',
   },
 };

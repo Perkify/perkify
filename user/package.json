@@ -27,6 +27,7 @@
   },
   "scripts": {
     "start": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
+    "start:emulator": "export REACT_APP_FIREBASE_MODE='emulator' && export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
     "start:development": "export REACT_APP_FIREBASE_ENVIRONMENT='development' && export PORT=3001 && react-scripts start",
     "start:staging": "export REACT_APP_FIREBASE_ENVIRONMENT='staging' && export PORT=3001 && react-scripts start",
     "start:production": "export REACT_APP_FIREBASE_ENVIRONMENT='production' && export PORT=3001 && react-scripts start",
@@ -58,6 +59,8 @@
     ]
   },
   "devDependencies": {
+    "@types/react-credit-cards": "^0.8.1",
+    "@types/react-router-dom": "^5.1.8",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "prettier": "^2.3.2",

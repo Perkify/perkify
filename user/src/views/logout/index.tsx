@@ -1,6 +1,6 @@
 import Header from 'components/Header';
-import { auth } from 'firebaseApp';
 import React, { useEffect } from 'react';
+import { auth } from 'services';
 
 const Login = () => {
   useEffect(() => {

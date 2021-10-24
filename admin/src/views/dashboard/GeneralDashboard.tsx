@@ -8,33 +8,33 @@ import {
 } from '@material-ui/core';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
 import { allPerksDict } from 'shared';
 import BChart from './BarChart';
-import { CreatePerkGroupCard } from './CreatePerkGroupCard';
 import MetricCard from './MetricCard';
 import PChart from './piechart';
 import { WelcomeCards } from './WelcomeCards';
 
+interface DashboardUser {
+  email: string;
+  id: string;
+  group: string;
+  perks: PerkUsesDict;
+}
+
 const GeneralDashboard = () => {
-  const {
-    currentUser,
-    admin,
-    hasPaymentMethods,
-    loadingAuthState,
-  } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
+  const { currentUser, admin, loadingAuthState } = useContext(AuthContext);
+  const { business, employees } = useContext(BusinessContext);
   const { dashboardLoading, setDashboardLoading } = useContext(LoadingContext);
 
-  var [employees, setEmployees] = useState([]);
-  var [selectedGroup, setSelectedGroup] = useState('All Groups');
+  var [oldStyleEmployees, setOldStyleEmployees] = useState<DashboardUser[]>([]);
+  var [selectedGroup, setSelectedGroup] = useState('All Perk Groups');
 
-  function roundNumber(num) {
+  function roundNumber(num: any) {
     return Math.round(10 * num) / 10;
   }
 
-  function roundNumberHundredth(num) {
+  function roundNumberHundredth(num: any) {
     return Math.round(100 * num) / 100;
   }
 
@@ -42,8 +42,8 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let retArr = Object.keys(business.groups);
-    retArr.push('All Groups');
+    let retArr = Object.keys(business.perkGroups);
+    retArr.push('All Perk Groups');
     return retArr;
   }
 
@@ -52,17 +52,10 @@ const GeneralDashboard = () => {
     if (dashboardLoading) {
       return [];
     }
-    let tempDict = {};
-    employees.forEach((employee) => {
-      //Looks through each employee to create dict of total costs per perk
-      let group = employee['group'];
-      if (
-        business.groups === undefined ||
-        business.groups[group] === undefined
-      ) {
-        return 0;
-      }
-      business.groups[group].forEach((perk) => {
+    let tempDict: { [key: string]: number } = {};
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
         } else {
@@ -70,7 +63,7 @@ const GeneralDashboard = () => {
         }
       });
     });
-    let data = [];
+    let data: { name: string; value: number }[] = [];
     let totalValue = 0;
     Object.keys(tempDict).forEach((perk) => {
       //Creates array of total cost per perk
@@ -78,6 +71,7 @@ const GeneralDashboard = () => {
       totalValue = totalValue + tempDict[perk];
       data.push(newRow);
     });
+    console.log(data);
     let totalPercentage = 100; //Rounds number if all values don't add up to 100
     data.forEach((perkObj) => {
       perkObj.value = roundNumber((perkObj.value / totalValue) * 100);
@@ -95,22 +89,23 @@ const GeneralDashboard = () => {
     }
     //Calculates total cost to display cost per employee
     let totalCost = 0;
-    if (business.groups === undefined) {
+    let numEmployees = 0;
+    if (business.perkGroups === undefined) {
       return 0;
     }
-    let groupCost = {};
-    employees.forEach((employee) => {
-      let cost = 0;
-      let group = employee['group'];
-      if (business.groups[group] === undefined) {
-        return 0;
-      }
-      business.groups[group].forEach((perk) => {
-        cost += allPerksDict[perk].Cost;
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
+        totalCost +=
+          allPerksDict[perk].Cost * localGroup.employeeIDs.length * 1.1;
       });
-      totalCost += cost;
+      totalCost += localGroup.employeeIDs.length * 4;
+      numEmployees += localGroup.employeeIDs.length;
     });
-    return totalCost / employees.length;
+    if (numEmployees == 0) {
+      return 0;
+    }
+    return totalCost / numEmployees;
   }
 
   function calculatePerksOffered() {
@@ -119,49 +114,43 @@ const GeneralDashboard = () => {
     }
     //returns num of perks offered
     let perks = new Set([]);
-    Object.keys(business.groups).forEach((group) => {
-      business.groups[group].forEach((perk) => {
+    Object.keys(business.perkGroups).forEach((group) => {
+      business.perkGroups[group].perkNames.forEach((perk) => {
         perks.add(perk);
       });
     });
+
     return perks.size;
   }
 
-  function getRandomInt(max) {
+  function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
 
   function calculateBarGraphData() {
     //returns bar graph data in array form
-    let retData = [];
+    let retData: { name: string; spent: number; total: number }[] = [];
     if (dashboardLoading) {
       return retData;
     }
-    let tempDict = {};
-    employees.forEach((employee) => {
-      //Creates dictionary of total amount spent per perk
-      let group = employee['group'];
-      if (selectedGroup != 'All Groups') {
-        //If group is selected only look at employees belonging to the selected group
-        if (group !== selectedGroup) {
-          return 0;
-        }
-      }
-      if (business.groups[group] === undefined) {
-        return 0;
-      }
-      business.groups[group].forEach((perk) => {
+    let tempDict: { [key: string]: number } = {};
+    let numTempDict: { [key: string]: number } = {};
+    Object.keys(business.perkGroups).forEach((group) => {
+      let localGroup = business.perkGroups[group];
+      localGroup.perkNames.forEach((perk) => {
         if (perk in tempDict) {
           tempDict[perk] += allPerksDict[perk].Cost;
+          numTempDict[perk] += localGroup.employeeIDs.length;
         } else {
           tempDict[perk] = allPerksDict[perk].Cost;
+          numTempDict[perk] = localGroup.employeeIDs.length;
         }
       });
     });
     Object.keys(tempDict).forEach((perk) => {
       let newRow = {
         name: perk,
-        spent: calculateAmountSpentPerPerk(perk),
+        spent: calculateAmountSpentPerPerk(perk, numTempDict[perk]),
         total: 100,
       };
       retData.push(newRow);
@@ -170,24 +159,22 @@ const GeneralDashboard = () => {
     return retData;
   }
 
-  function calculateAmountSpentPerPerk(perk) {
-    let totalPossibleCost = 0;
-    let moneySpent = 0;
-    console.log(employees);
-    employees.forEach((employee) => {
+  function calculateAmountSpentPerPerk(perk: string, totalPeople: number) {
+    let numPeople = 0;
+    oldStyleEmployees.forEach((employee) => {
       if (employee.perks[perk]) {
-        console.log('changing');
-        totalPossibleCost += allPerksDict[perk].Cost;
         if (didSpendPerkLastMonth(employee.perks[perk])) {
-          moneySpent += allPerksDict[perk].Cost;
+          numPeople += 1;
         }
       }
     });
-    moneySpent *= 100;
-    return Math.round(moneySpent / totalPossibleCost);
+    if (totalPeople == 0) {
+      return 0;
+    }
+    return Math.round(numPeople / totalPeople);
   }
 
-  function didSpendPerkLastMonth(employeeArray) {
+  function didSpendPerkLastMonth(employeeArray: PerkUses) {
     if (employeeArray.length == 0) {
       return false;
     }
@@ -226,11 +213,11 @@ const GeneralDashboard = () => {
         'Total spent in ' + d.getFullYear(),
       ],
     ];
-    employees.forEach((employee) => {
+    oldStyleEmployees.forEach((employee) => {
       let monthlyCost = 0;
       let yearlyCost = 0;
-      Object.keys(employee['perks']).forEach((perk) => {
-        employee['perks'][perk].forEach((date) => {
+      Object.keys(employee.perks).forEach((perk) => {
+        employee.perks[perk].forEach((date: any) => {
           if (d.getFullYear() === date.toDate().getFullYear()) {
             yearlyCost += allPerksDict[perk].Cost;
           }
@@ -241,8 +228,8 @@ const GeneralDashboard = () => {
       });
       let newRow = [
         employee.email,
-        roundNumberHundredth(monthlyCost),
-        roundNumberHundredth(yearlyCost),
+        roundNumberHundredth(monthlyCost).toString(),
+        roundNumberHundredth(yearlyCost).toString(),
       ];
       arrayContent.push(newRow);
     });
@@ -257,39 +244,30 @@ const GeneralDashboard = () => {
   }
 
   useEffect(() => {
-    setDashboardLoading(true);
-    if (Object.keys(admin).length != 0 && business) {
-      const businessId = admin['companyID'];
-
-      db.collection('users')
-        .where('businessID', '==', businessId)
-        .get()
-        .then((querySnapshot) => {
-          const people = querySnapshot.docs.map((doc, index) => ({
-            email: doc.id,
-            id: index,
-            group: doc.data()['group'],
-            perks: doc.data()['perks'],
-          }));
-          setEmployees(people);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    } else {
-      console.info('No such document!');
+    if (employees) {
+      setOldStyleEmployees(
+        employees
+          .filter((employee) => employee.perkGroupID != undefined)
+          .map((employee) => ({
+            email: employee.email,
+            id: employee.email,
+            group: employee.perkGroupID,
+            perks: employee.perkUsesDict,
+          }))
+      );
     }
-    return () => setDashboardLoading(false);
-  }, [currentUser, admin, business]);
+  }, [employees]);
 
-  useEffect(() => {
-    if (hasPaymentMethods != null) {
-      setDashboardLoading(false);
-    }
-  }, [hasPaymentMethods]);
-
-  function handleGroupChange(event) {
+  function handleGroupChange(event: any) {
     setSelectedGroup(event.target.value[1]);
+  }
+
+  function calculateNumEmployees() {
+    let retNum = 0;
+    Object.keys(business.perkGroups).forEach((group) => {
+      retNum += business.perkGroups[group].employeeIDs.length;
+    });
+    return retNum;
   }
 
   return (
@@ -299,36 +277,46 @@ const GeneralDashboard = () => {
           <Header title="Dashboard" crumbs={['General', 'Dashboard']} />
         </Grid>
         <Grid item xs={2}>
-          <Button variant="contained" color="primary" onClick={generateCSV}>
-            Download Financial Records
-          </Button>
+          {business &&
+            Object.keys(business.cardPaymentMethods).length != 0 &&
+            Object.keys(business.perkGroups).length != 0 &&
+            false && (
+              <Button color="primary" onClick={generateCSV}>
+                Download Financial Records
+              </Button>
+            )}
         </Grid>
       </Grid>
-      {loadingAuthState || hasPaymentMethods == null ? (
+      {loadingAuthState || !business || !employees ? (
         <p>Loading</p>
-      ) : !(hasPaymentMethods == true) ? (
-        <WelcomeCards />
-      ) : business['groups'] == null ||
-        Object.keys(business['groups']).length == 0 ? (
-        <CreatePerkGroupCard />
+      ) : Object.keys(business.cardPaymentMethods).length == 0 ||
+        employees.length == 0 ||
+        Object.keys(business.perkGroups).length == 0 ? (
+        <WelcomeCards
+          hasPaymentMethods={
+            !(Object.keys(business.cardPaymentMethods).length == 0)
+          }
+          hasEmployees={!(employees.length == 0)}
+          hasPerkGroup={!(Object.keys(business.perkGroups).length == 0)}
+        />
       ) : (
         <Grid container spacing={4}>
           <Grid item xs={4}>
             <MetricCard
-              title={'Cost Per Employee'}
+              title={'Average Cost Per Employee'}
               number={'$' + roundNumber(calculateTotalCost())}
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
-              title={'Number of Employees'}
-              number={employees.length}
+              title={'Number of Employees in Perk Groups'}
+              number={calculateNumEmployees().toString()}
             />
           </Grid>
           <Grid item xs={4}>
             <MetricCard
               title={'Total Perks Offered'}
-              number={calculatePerksOffered()}
+              number={calculatePerksOffered().toString()}
             ></MetricCard>
           </Grid>
           <Grid item xs={4}>

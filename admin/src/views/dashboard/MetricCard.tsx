@@ -2,7 +2,12 @@ import { Box, Card, Typography } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
-const MetricCard = ({ title, number }) => {
+interface MetricCardProps {
+  title: string;
+  number: string;
+}
+
+const MetricCard = ({ title, number }: MetricCardProps) => {
   return (
     <div>
       <Card style={{ padding: 30 }} elevation={4}>

@@ -3,6 +3,7 @@ import { LoadingContext } from 'contexts';
 import React, { useContext } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import Billing from 'views/billing';
+import Settings from 'views/businessSettings';
 import CreateGroup from 'views/createGroup';
 import ManagePeople from 'views/employees';
 import Logout from 'views/logout';
@@ -28,6 +29,7 @@ const Dashboard = () => {
           <Route path={`${path}/group/:id`} component={ManageGroups} />
           <Route path={`${path}/create/group`} component={CreateGroup} />
           <Route path={`${path}/logout`} component={Logout} />
+          <Route path={`${path}/settings`} component={Settings} />
           <Route path={`${path}/billing`} component={Billing} />
         </Switch>
       </VerticalNav>

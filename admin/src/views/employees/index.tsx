@@ -1,11 +1,24 @@
+import { IconButton } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
+import InfoIcon from '@material-ui/icons/Info';
 import { AddRemoveTable } from 'components/AddRemoveTable';
 import ConfirmationModal from 'components/ConfirmationModal';
 import Header from 'components/Header';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
-import { PerkifyApi } from 'services';
+import { PerkifyApi } from '../../services';
 import AddEmployees from './AddEmployees';
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 300,
+    fontSize: theme.typography.pxToRem(15),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
 
 const columns = [
   {
@@ -15,117 +28,124 @@ const columns = [
     editable: false,
   },
   {
-    field: 'group',
-    headerName: 'Group',
+    field: 'perkGroupName',
+    headerName: 'Perk Group',
     width: 200,
     editable: false,
   },
+  {
+    field: 'activated',
+    headerName: 'Activated',
+    width: 200,
+    editable: false,
+    renderHeader: () => (
+      <div>
+        Activated{' '}
+        <HtmlTooltip
+          title={
+            <React.Fragment>
+              <p
+                style={{
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  paddingLeft: 5,
+                  paddingRight: 5,
+                }}
+              >
+                Please expect a 2 day delay before we can issue your employees a
+                virtual credit card to claim their perks. When a user logs into
+                their account, we'll register them as activated.
+              </p>
+            </React.Fragment>
+          }
+          placement="bottom"
+        >
+          <IconButton>
+            <InfoIcon></InfoIcon>
+          </IconButton>
+        </HtmlTooltip>{' '}
+      </div>
+    ),
+  },
 ];
 
-export default function ManagePeople(props) {
+export default function ManagePeople(props: any) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
-  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] = useState(
-    false
-  );
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
+    useState(false);
   const [selectedUsers, setSelection] = useState([]);
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
   const { currentUser, admin } = useContext(AuthContext);
-  const { business } = useContext(BusinessContext);
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { business, employees } = useContext(BusinessContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
-    if (business && business['groups']) {
-      setGroupData(Object.keys(business['groups']).sort());
+    if (employees) {
+      const employeeIDsToPendingPerkGroupName = [].concat(
+        ...Object.keys(business.perkGroups).map((perkGroupID) =>
+          business.perkGroups[perkGroupID].employeeIDs.map((employeeID) => ({
+            employeeID,
+            perkGroupName: business.perkGroups[perkGroupID].perkGroupName,
+          }))
+        )
+      );
+      setPeopleData(
+        employees.map((employee) => ({
+          ...employee,
+          id: employee.email,
+          perkGroupName: employeeIDsToPendingPerkGroupName.find(
+            (obj) => obj.employeeID == employee.employeeID
+          )
+            ? employeeIDsToPendingPerkGroupName.find(
+                (obj) => obj.employeeID == employee.employeeID
+              ).perkGroupName
+            : 'Not assigned',
+          activated: 'card' in employee ? 'Yes' : 'No',
+        }))
+      );
+      setSelection([]);
     }
-  }, [business]);
-
-  useEffect(() => {
-    setDashboardLoading(true);
-    // get list of employees that belong to the business
-    if (Object.keys(admin).length != 0) {
-      db.collection('users')
-        .where('businessID', '==', admin.companyID)
-        .onSnapshot(
-          (querySnapshot) => {
-            setPeopleData(
-              querySnapshot.docs.map((doc, index) => ({
-                email: doc.id,
-                id: index,
-                group: doc.data()['group'],
-              }))
-            );
-            setDashboardLoading(false);
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
-    }
-    return () => setDashboardLoading(false);
-  }, [admin]);
+  }, [employees]);
 
   const removeUsers = async () => {
     let error = false;
-
     if (!error) {
       await (async () => {
         setDashboardLoading(true);
         setFreezeNav(true);
         const bearerToken = await currentUser.getIdToken();
-        // get all employees that are not selected
-        // by removing all employees that were selected
-        const afterEmployees = peopleData.filter(
-          (employee, index) => selectedUsers.indexOf(index) == -1
+        const employeeIDs = selectedUsers.map(
+          (user) =>
+            employees.find((employee) => employee.email == user).employeeID
         );
-
-        const perkGroupToAfterEmails = afterEmployees.reduce(
-          (accumulator, employeeObj) => {
-            if (accumulator[employeeObj.group] != null) {
-              accumulator[employeeObj.group].push(employeeObj.email);
-            } else {
-              accumulator[employeeObj.group] = [employeeObj.email];
-            }
-            return accumulator;
+        const payload: DeleteEmployeesPayload = {
+          employeeIDs,
+        };
+        PerkifyApi.post('rest/employee/delete', payload, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
           },
-          {}
-        );
-
-        // this is not an extensive check.
-        if (afterEmployees.length === 0) {
-          alert('Error: cannot remove all perks from a perk group');
-        }
-
-        await Promise.all(
-          Object.keys(perkGroupToAfterEmails).map(async (perkGroup) => {
-            const afterEmails = perkGroupToAfterEmails[perkGroup];
-
-            await PerkifyApi.put(
-              'user/auth/updatePerkGroup',
-              JSON.stringify({
-                group: perkGroup,
-                emails: afterEmails,
-                perks: undefined,
-              }),
-              {
-                headers: {
-                  Authorization: `Bearer ${bearerToken}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
+        })
+          .then((response) => {
+            setDashboardLoading(false);
+            setFreezeNav(false);
+            setIsRemoveModalVisible(false);
           })
-        );
-        setDashboardLoading(false);
-        setFreezeNav(false);
-        setIsRemoveModalVisible(false);
-        setSelection([]);
+          .catch((err) => {
+            console.error(err);
+            console.error(err.response);
+
+            setDashboardLoading(false);
+            setFreezeNav(false);
+
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
+          });
       })();
     }
   };
@@ -149,6 +169,7 @@ export default function ManagePeople(props) {
         }}
         tableName="Employees"
         addButtonText="Add Employees"
+        addButtonHidden={false}
         loading={dashboardLoading}
       />
       <AddEmployees

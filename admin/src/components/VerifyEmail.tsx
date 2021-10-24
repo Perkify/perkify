@@ -1,13 +1,30 @@
 import Button from '@material-ui/core/Button';
+import firebase from 'firebase/app';
 import { ReactComponent as EmailSVG } from 'images/email.svg';
 import React from 'react';
+import { PerkifyApi } from '../services';
 
-const VerifyEmail = ({ email, newUser }) => {
+interface VerifyEmailProps {
+  email: string;
+  newUser: firebase.User;
+}
+
+const VerifyEmail = ({ email, newUser }: VerifyEmailProps) => {
   const resendVerificationEmail = async () => {
     try {
-      await newUser.sendEmailVerification({
-        url: 'https://admin.getperkify.com/login',
-      });
+      const bearerToken = await newUser.getIdToken();
+
+      // call the api to resend verification email
+      await PerkifyApi.post(
+        `rest/admin/${email}/emailVerificationLink`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     } catch (e) {
       alert(e);
     }

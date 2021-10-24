@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 const PerkInstructions = () => {
-  let { perk } = useParams();
+  let { perk } = useParams<{ perk: string }>();
   const history = useHistory();
   const [show, setShow] = useState(true);
 

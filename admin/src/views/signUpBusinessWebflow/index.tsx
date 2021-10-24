@@ -8,10 +8,10 @@ import AdminSignUpForm from 'components/AdminSignUpForm';
 import BusinessSignUpForm from 'components/BusinessSignUpForm';
 import VerifyEmail from 'components/VerifyEmail';
 import firebase from 'firebase/app';
-import app from 'firebaseApp';
 import logo from 'images/logo.png';
 import React from 'react';
-import { PerkifyApi } from 'services';
+import { app, PerkifyApi } from 'services';
+import { validateEmails } from 'utils/emailValidation';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -100,30 +100,33 @@ const SignUpBusinessWebflow = () => {
     null as firebase.User | null
   );
 
-  const processStep = async (step) => {
+  const processStep = async (step: any) => {
     switch (step) {
       case 0:
         return true;
       case 1:
         try {
           setDashboardLoading(true);
-          await PerkifyApi.post('user/registerAdminAndBusiness', {
+          await PerkifyApi.post('rest/admin', {
             ...AdminFormProps,
             ...BusinessFormProps,
             line2: '',
-          });
+          } as RegisterAdminAndBusinessPayload);
           const result = await app
             .auth()
             .signInWithEmailAndPassword(email, password);
           setNewUser(result.user);
-          await result?.user?.sendEmailVerification({
-            url: 'https://admin.getperkify.com/login',
-          });
           setDashboardLoading(false);
           return true;
         } catch (error) {
           setDashboardLoading(false);
-          alert(error);
+          if (error.toString().includes('500')) {
+            alert(
+              'An account has already been created with this email. Please try signing in instead.'
+            );
+          } else {
+            alert(error);
+          }
           return false;
         }
         return true;
@@ -132,7 +135,7 @@ const SignUpBusinessWebflow = () => {
     }
   };
 
-  const handleNext = async (validnext) => {
+  const handleNext = async (validnext: boolean) => {
     if (validnext && (await processStep(activeStep))) {
       setInvalidStep(false);
       setActiveStep(activeStep + 1);
@@ -145,7 +148,7 @@ const SignUpBusinessWebflow = () => {
     setActiveStep(activeStep - 1);
   };
 
-  const getStepContent = (step) => {
+  const getStepContent = (step: any) => {
     switch (step) {
       case 0:
         return (
@@ -155,9 +158,11 @@ const SignUpBusinessWebflow = () => {
             invalidStep={invalidStep}
             nextStep={handleNext}
             nextReady={
-              !Object.values(AdminFormProps).some(
-                (fieldprop) => fieldprop === ''
-              )
+              !Object.values(AdminFormProps).some((fieldprop) => {
+                return fieldprop === '';
+              }) &&
+              AdminFormProps.password.length > 6 &&
+              validateEmails(AdminFormProps.email)
             }
           />
         );
@@ -172,7 +177,10 @@ const SignUpBusinessWebflow = () => {
             nextReady={
               !Object.values(BusinessFormProps).some(
                 (fieldprop) => fieldprop === ''
-              )
+              ) &&
+              BusinessFormProps.postalCode.length === 5 &&
+              BusinessFormProps.state.length === 2 &&
+              BusinessFormProps.phone.length > 10
             }
           />
         );
@@ -206,7 +214,7 @@ const SignUpBusinessWebflow = () => {
           className={classes.content}
         >
           <a href="https://getperkify.com" className={classes.logo}>
-            <img src={logo} style={{ width: '100%' }} />
+            <img src={logo} style={{ width: '100%', height: '45px' }} />
           </a>
           <Grid
             container

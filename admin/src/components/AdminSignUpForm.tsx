@@ -4,7 +4,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SignUpGraphic from 'images/SignUpGraphic.png';
-import React from 'react';
+import React, { useState } from 'react';
+import { validateEmails } from 'utils/emailValidation';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -58,11 +59,46 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const AdminSignUpForm = (props) => {
+interface AdminSignUpFormProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  setFirstName: (arg0: string) => void;
+  setLastName: (arg0: string) => void;
+  setEmail: (arg0: string) => void;
+  setPassword: (arg0: string) => void;
+  invalidStep: boolean;
+  nextStep: (arg0: boolean) => void;
+  nextReady: boolean;
+}
+
+const AdminSignUpForm = (props: AdminSignUpFormProps) => {
+  const [emailsError, setEmailsError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
   const classes = useStyles();
 
-  const fillTextbox = (setFunction) => (event) => {
+  const fillTextbox = (setFunction: (arg0: string) => void) => (event: any) => {
     setFunction(event.target.value);
+  };
+
+  const handlePasswordChange = (event: any) => {
+    if (event.target.value.length < 6 && event.target.value.length > 0) {
+      setPasswordError(
+        'Please make sure your password is at least 6 characters long'
+      );
+    } else {
+      setPasswordError('');
+    }
+  };
+
+  const handleEmailChange = (event: any) => {
+    if (!validateEmails(event.target.value) && event.target.value.length > 0) {
+      setEmailsError('Please input a valid email');
+    } else {
+      setEmailsError('');
+    }
   };
 
   return (
@@ -103,10 +139,16 @@ const AdminSignUpForm = (props) => {
           placeholder="johnsmith@mybusiness.com"
           id="email"
           variant="outlined"
-          onChange={fillTextbox(props.setEmail)}
+          onChange={(event) => {
+            fillTextbox(props.setEmail)(event);
+            handleEmailChange(event);
+          }}
           value={props.email}
-          error={props.email === '' && props.invalidStep}
+          error={
+            (props.email === '' && props.invalidStep) || emailsError !== ''
+          }
           style={{ width: '100%' }}
+          helperText={emailsError}
         />
       </Grid>
       <Grid item xs={12} md={12}>
@@ -119,9 +161,14 @@ const AdminSignUpForm = (props) => {
           type="password"
           variant="outlined"
           style={{ width: '100%' }}
-          onChange={fillTextbox(props.setPassword)}
+          onInput={fillTextbox(props.setPassword)}
           value={props.password}
-          error={props.password === '' && props.invalidStep}
+          error={
+            (props.password === '' && props.invalidStep) ||
+            (props.password.length < 6 && props.password.length > 0)
+          }
+          onChange={handlePasswordChange}
+          helperText={passwordError}
         />
       </Grid>
       <Grid item xs={12} md={12}>

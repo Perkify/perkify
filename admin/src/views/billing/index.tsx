@@ -1,36 +1,35 @@
+import { Theme } from '@material-ui/core';
+import { createStyles, makeStyles } from '@material-ui/styles';
 import Header from 'components/Header';
-import { LoadingContext } from 'contexts';
-import { functions } from 'firebaseApp';
-import React, { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import React from 'react';
+import { DisplayBillingHistory } from './billingHistorySection';
+import { DisplayCurrentPlan } from './currentPlanSection';
+import { PaymentMethodsSection } from './paymentMethodSection';
+
+const useBillingPageStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      maxWidth: '800px',
+    },
+    title: {
+      flex: '1 1 auto',
+      marginLeft: '10px',
+    },
+  })
+);
 
 const Billing = () => {
-  const history = useHistory();
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const classes = useBillingPageStyles();
 
-  setFreezeNav(true);
-  useEffect(() => {
-    (async () => {
-      setDashboardLoading(true);
-      const functionRef = functions.httpsCallable(
-        'ext-firestore-stripe-subscriptions-createPortalLink'
-      );
-      const { data } = await functionRef({
-        returnUrl: window.location.origin,
-      });
-      history.push('/dashboard');
-      window.location.assign(data.url);
-    })();
-  }, []);
   return (
-    <div>
+    <div className={classes.root}>
       <Header title="Billing" crumbs={['Dashboard', 'Account', 'Billing']} />
-      <p>Redirecting you to the billing portal...</p>
+
+      <PaymentMethodsSection />
+
+      <DisplayCurrentPlan />
+
+      <DisplayBillingHistory />
     </div>
   );
 };

@@ -56,6 +56,7 @@ jobs:
           args: deploy --only functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FUNCTIONS }}
+          PROJECT_ID: perkify-5790b
 
   build_and_deploy_admin:
     needs: check_which_projects_changed

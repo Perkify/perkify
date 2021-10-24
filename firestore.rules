@@ -1,21 +1,61 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow only authenticated content owners access
-    match /admins/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId
-      allow create: if false //DOESN'T ALLOW CREATION FROM FRONT-END; is this fine? 
-      allow update: if request.auth != null && request.auth.uid == userId && request.resource.data.companyID == resource.data.companyID
+
+    // helper functions
+    function isEmailVerified(request) {
+      return request.auth.token.email_verified;
     }
-    match /businesses/{docId}{
-    	allow read: if get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.companyID == docId
-      allow write: if false //Don't want people to be able to write to businesses without us charging them 
+
+    function adminExists(businessID, adminID) {
+      return exists(/databases/$(database)/documents/businesses/$(businessID)/admins/$(adminID));
     }
-    match /users/{user_id}{
-    allow read: if true
-    	// allow read: if resource.data.businessID == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.companyID
-      allow write: if false
+
+    function employeeExists(businessID, employeeID) {
+      return exists(/databases/$(database)/documents/businesses/$(businessID)/employees/$(employeeID));
     }
-    //What do we want to do for mail? 
+
+    function getAdminBusinessID(businessID, adminID) {
+      return get(/databases/$(database)/documents/businesses/$(businessID)/admins/$(adminID)).data.businessID;
     }
+
+    function getUserBusinessID(userID) {
+      return get(/databases/$(database)/documents/users/$(userID)).data.businessID;
+    }
+
+
+    // match admin documents during collectionGroup queries
+    match /{path=**}/admins/{adminID} {
+      // let admins read their own documents
+      allow read: if request.auth.uid == resource.data.adminID;
+
+      // don't let anyone update their admin document except through the backend
+      allow write: if false;
+    }
+
+    // match employee documents during collectionGroup queries
+    match /{path=**}/employees/{employeeID} {
+      // let employees read their own documents
+      allow read: if request.auth.uid == resource.data.employeeID;
+
+      // don't let anyone update their admin document except through the backend
+      allow write: if false;
+    }
+
+
+    // match business documents and their subcollections
+    match /businesses/{businessID}/{document=**} {
+      // let verified admins read the business doc they belong to
+      allow read: if adminExists(businessID,request.auth.uid) || employeeExists(businessID,request.auth.uid);
+
+      // don't let anyone write to business documents
+      allow write: if false;
+
+    }
+
+    // don't let anyone read or write mail documents
+    match /mail/{mailID} {
+      allow read, write: if false;
+    }
+  }
 }

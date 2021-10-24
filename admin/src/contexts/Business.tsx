@@ -1,22 +1,35 @@
 import { AuthContext } from 'contexts';
-import { db } from 'firebaseApp';
 import React, { useContext, useEffect, useState } from 'react';
+import { db } from 'services';
 
-export const BusinessContext = React.createContext<any>({});
+interface ContextProps {
+  business: Business;
+  employees: Employee[];
+}
 
-export const BusinessProvider = ({ children }) => {
-  const [business, setBusiness] = useState({});
+interface BusinessProviderProps {
+  children: React.ReactNode;
+}
+
+export const BusinessContext = React.createContext<ContextProps>(null);
+
+export const BusinessProvider = ({ children }: BusinessProviderProps) => {
+  const [business, setBusiness] = useState<Business>();
+  const [employees, setEmployees] = useState<Employee[]>();
   const { admin } = useContext(AuthContext);
 
   useEffect(() => {
     if (admin) {
-      const businessId = admin['companyID'];
+      // get the business ID
+      const businessId = admin['businessID'];
+
+      // get business
       db.collection('businesses')
         .doc(businessId)
         .onSnapshot(
           (businessDoc) => {
-            const businessData = businessDoc.data();
-            if (businessData) {
+            const businessData = businessDoc.data() as Business;
+            if (businessData && Object.keys(businessData).length != 0) {
               setBusiness({ ...businessData });
             }
           },
@@ -24,6 +37,16 @@ export const BusinessProvider = ({ children }) => {
             console.error('Snapshot permissions error');
           }
         );
+
+      // get employees
+      db.collection('businesses')
+        .doc(businessId)
+        .collection('employees')
+        .onSnapshot((employeesSnapshot) => {
+          setEmployees(
+            employeesSnapshot.docs.map((doc) => doc.data() as Employee)
+          );
+        });
     }
   }, [admin]);
 
@@ -31,7 +54,7 @@ export const BusinessProvider = ({ children }) => {
     <BusinessContext.Provider
       value={{
         business,
-        setBusiness,
+        employees,
       }}
     >
       {children}

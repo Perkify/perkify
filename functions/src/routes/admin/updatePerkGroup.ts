@@ -1,149 +1,64 @@
-import { body, validationResult } from 'express-validator';
-import { db } from '../../models';
+import { NextFunction, Response } from 'express';
+import { body, param } from 'express-validator';
+import { db } from '../../services';
 import {
-  createUserHelper,
-  deleteUserHelper,
-  sanitizeEmails,
-  syncStripeSubscriptionsWithFirestorePerks,
-  validateEmails,
+  adminPerkifyRequestTransform,
+  checkEmployeesExistInBusiness,
+  checkValidationResult,
+  updateStripeSubscription,
+  validateAdminDoc,
+  validateBusinessDoc,
+  validateExistingPerkGroupID,
+  validateFirebaseIdToken,
+  validatePerkNames,
 } from '../../utils';
 
 export const updatePerkGroupValidators = [
-  body('group').not().isEmpty(),
-  body('emails').custom(validateEmails).customSanitizer(sanitizeEmails),
+  validateFirebaseIdToken,
+  validateAdminDoc,
+  validateBusinessDoc,
+  body('employeeIDs').custom(checkEmployeesExistInBusiness),
+  body('perkNames').custom(validatePerkNames),
+  param('perkGroupID').custom(validateExistingPerkGroupID),
+  checkValidationResult,
 ];
 
-export const updatePerkGroup = async (req, res, next) => {
-  const { group, emails } = req.body;
-  let { perks } = req.body;
+export const updatePerkGroup = adminPerkifyRequestTransform(
+  async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
+    const perkGroupID = req.params.perkGroupID;
+    const {
+      employeeIDs,
+      perkNames,
+      perkGroupName,
+    } = req.body as UpdatePerkGroupPayload;
+    const adminData = req.adminData;
+    const businessID = adminData.businessID;
 
-  try {
-    const errors = validationResult(req);
-    console.log(errors, errors.isEmpty());
-    if (!errors.isEmpty()) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: JSON.stringify(errors.array()),
+    const preUpdateBusinessData = req.businessData;
+
+    try {
+      // update business doc
+      // this makes pendingBusiness equal updatedBusiness
+
+      const newPerkGroup: PerkGroup = {
+        perkGroupName,
+        perkNames,
+        employeeIDs,
       };
-      return next(error);
-    }
 
-    // prevent from duplicate perks being passed at once
-    if (perks && new Set(perks).size !== perks.length) {
-      const error = {
-        status: 400,
-        reason: 'Bad Request',
-        reasonDetail: 'Trying to add duplicate perks',
-      };
-      return next(error);
-    }
-
-    console.log('Starting update perk group');
-
-    // get admins business
-    const adminData = (
-      await db.collection('admins').doc(req.user.uid).get()
-    ).data();
-
-    if (!adminData) {
-      const error = {
-        status: 500,
-        reason: 'Missing documents',
-        reasonDetail: `Documents missing from firestore`,
-      };
-      return next(error);
-    }
-
-    const businessID = adminData.companyID;
-
-    // if perks defined, reassign perks
-    if (perks && perks.length != 0) {
       await db
         .collection('businesses')
         .doc(businessID)
         .update({
-          [`groups.${group}`]: perks,
+          [`perkGroups.${perkGroupID}`]: newPerkGroup,
         });
-    } else if (!perks) {
-      const businessData = (
-        await db.collection('businesses').doc(businessID).get()
-      ).data();
-      perks = businessData?.groups[group];
+
+      // sync to stripe subscription
+      await updateStripeSubscription(preUpdateBusinessData, next);
+
+      res.status(200).end();
+    } catch (error) {
+      next(error);
     }
-
-    const usersRef = db.collection('users');
-    const groupUsersSnapshot = await usersRef.where('group', '==', group).get();
-
-    const deleteUsers: any[] = [];
-    const oldUserEmails: any[] = [];
-
-    // partition existing emails into those to delete and those not to delete
-    groupUsersSnapshot.forEach(async (userDoc) => {
-      if (emails.includes(userDoc.id)) {
-        oldUserEmails.push(userDoc.id);
-        const oldUserPerks = userDoc.data().perks;
-        if (perks !== oldUserPerks) {
-          const oldUserNewPerks = perks.reduce((acc, perk) => {
-            if (perk in oldUserPerks) {
-              acc[perk] = oldUserPerks[perk];
-            } else {
-              acc[perk] = [];
-            }
-            return acc;
-          }, {});
-          await db
-            .collection('users')
-            .doc(userDoc.id)
-            .update({ perks: oldUserNewPerks });
-        }
-      } else {
-        deleteUsers.push(userDoc);
-      }
-    });
-
-    // get emails that weren't already added
-    const addUserEmails = emails.filter(
-      (email) => !oldUserEmails.includes(email)
-    );
-
-    // move this to a function
-    for (const email of addUserEmails) {
-      const docRef = db.collection('users').doc(email);
-
-      const docSnapshot = await docRef.get();
-      if (docSnapshot.exists) {
-        const error = {
-          status: 400,
-          reason: 'Bad Request',
-          reasonDetail: `added email ${email} that is already in another group`,
-        };
-        return next(error);
-      }
-    }
-
-    // TODO: move this to a function as well and create multiple files
-    const usersToCreate = addUserEmails.map((email) =>
-      createUserHelper(email, businessID, group, perks)
-    );
-    await Promise.all(usersToCreate);
-
-    // TODO: move this to a function as well and create multiple files
-    const usersToDelete = deleteUsers.map((user) => deleteUserHelper(user));
-    await Promise.all(usersToDelete);
-
-    try {
-      await syncStripeSubscriptionsWithFirestorePerks(req.user.uid, businessID);
-    } catch (e) {
-      return next(e);
-    }
-
-    res.status(200).end();
-  } catch (err) {
-    // TODO: if globalWalletID is set then use rapid api to delete the wallet
-    // handleError(err, res);
-    console.log(err);
-
-    res.status(500).end();
   }
-};
+);

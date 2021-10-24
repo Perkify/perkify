@@ -27,8 +27,8 @@ const GeneralDashboard = () => {
 
   const classes = useStyles();
 
-  const detailsList = (listObject) => {
-    return listObject.map((pair) => (
+  const detailsList = (listObject: any) => {
+    return listObject.map((pair: any) => (
       <React.Fragment key={pair.name}>
         <Grid item xs={6}>
           <Typography variant="body1" className={classes.details}>
@@ -88,7 +88,7 @@ const GeneralDashboard = () => {
                     employee.card.exp.month.toString().length === 1 ? '0' : ''
                   }${employee.card.exp.month}/${String(
                     employee.card.exp.year
-                  ).substring(0, 2)}`}
+                  ).substring(2, 4)}`}
                   focused={'number'}
                   name={`${employee.firstName} ${employee.lastName}`}
                   number={employee.card.number}
