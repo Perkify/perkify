@@ -9,6 +9,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
+import axios from 'axios';
 import PurchaseConfirmation from 'components/PurchaseConfirmation';
 import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
@@ -88,15 +89,15 @@ const AddPerks = ({
           setDashboardLoading(false);
           setPerksToAdd([]);
         } catch (err) {
-          console.error(err);
-          console.error(err.response);
-
           setDashboardLoading(false);
           setFreezeNav(false);
-
-          alert(
-            `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
-          );
+          if (axios.isAxiosError(err)) {
+            alert(
+              `Error. Reason: ${err.response.data.reason}. Details: ${err.response.data.reasonDetail}`
+            );
+          } else {
+            alert('Error. Reason unknown. Pleaser');
+          }
         }
       })();
     }

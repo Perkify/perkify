@@ -109,6 +109,12 @@ interface PerkDefinition {
   NetworkId: string;
   PaymentName: string;
   BillingInstructionsURL: string;
+  AuthHoldFields?: PerkAuthHoldFields[];
+}
+
+interface PerkAuthHoldFields {
+  keyPath: string[];
+  acceptedValues: any[];
 }
 
 interface PerkDefinitionsDict {

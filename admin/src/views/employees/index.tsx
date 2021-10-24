@@ -71,7 +71,6 @@ const columns = [
 
 export default function ManagePeople(props: any) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
-
   const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
     useState(false);
   const [selectedUsers, setSelection] = useState([]);

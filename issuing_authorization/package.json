@@ -1,0 +1,24 @@
+{
+  "name": "stripe_webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "export NODE_ENV=production && node .",
+    "gcp-build": "tsc -p .",
+    "pretest": "npm run build",
+    "test": "export NODE_ENV=development && node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "firebase-admin": "^9.11.0",
+    "stripe": "^8.169.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}

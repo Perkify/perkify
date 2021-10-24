@@ -6,9 +6,15 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsmDumwGzZO',
     Img: 'netflix.jpeg',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
     BillingInstructionsURL: 'https://help.netflix.com/en/node/244',
+    NetworkId: '123',
+    PaymentName: 'netflix',
+    AuthHoldFields: [
+      {
+        keyPath: ['verification_data', 'cvc_check'],
+        acceptedValues: ['not_provided'],
+      },
+    ],
   },
   {
     Name: 'Hulu',
@@ -17,10 +23,16 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsmONWkPuco',
     Img: 'hulu.png',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Hulu',
     BillingInstructionsURL:
       'https://help.hulu.com/s/article/update-payment-information',
+    NetworkId: '395709102324',
+    PaymentName: 'hulu',
+    AuthHoldFields: [
+      {
+        keyPath: ['pending_request', 'amount'],
+        acceptedValues: [100],
+      },
+    ],
   },
   {
     Name: 'Audible Plus',
@@ -29,10 +41,10 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsm4AKknHlG',
     Img: 'audible.png',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Audible Plus',
     BillingInstructionsURL:
       'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w',
+    NetworkId: '123',
+    PaymentName: 'audible',
   },
   {
     Name: 'Disney Plus',
@@ -41,10 +53,10 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsmy9hQBoua',
     Img: 'disneyplus.png',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Disney Plus',
     BillingInstructionsURL:
       'https://help.disneyplus.com/csp?id=csp_article_content&sys_kb_id=21dda2fcdb0580100a2af56e0f96192f',
+    NetworkId: '395704333146',
+    PaymentName: 'disney',
   },
   {
     Name: 'Headspace',
@@ -53,10 +65,10 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsmYkEC0shJ',
     Img: 'headspace.png',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Headspace',
     BillingInstructionsURL:
       'https://help.headspace.com/hc/en-us/articles/115008362508-How-can-I-update-my-payment-details-',
+    NetworkId: '123',
+    PaymentName: 'headspace',
   },
   {
     Name: 'Spotify Individual',
@@ -65,10 +77,22 @@ export const allProductionPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JQLCwKuQQHSHZsmsONWEqGC',
     Img: 'spotify.jpg',
     Product: 'prod_K4UBKT9PixGkHS',
-    NetworkId: '123',
-    PaymentName: 'Spotify Individual',
     BillingInstructionsURL:
       'https://support.spotify.com/us/article/update-payment-details/',
+    NetworkId: '420429000200209',
+    PaymentName: 'spotify',
+  },
+  {
+    Name: 'Leetcode Premium',
+    Cost: 159.0,
+    Period: 'Yearly',
+    stripePriceId: 'price_1Jm0bkKuQQHSHZsmLZCTKcqm',
+    Img: 'leetcode.png',
+    Product: 'prod_K4UBKT9PixGkHS',
+    BillingInstructionsURL:
+      'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w',
+    NetworkId: '123',
+    PaymentName: 'leetcode',
   },
 ];
 
@@ -84,6 +108,7 @@ export const allProductionPerksDict = allProductionPerks.reduce(
       Product: perk.Product,
       NetworkId: perk.NetworkId,
       BillingInstructionsURL: perk.BillingInstructionsURL,
+      AuthHoldFields: perk?.AuthHoldFields,
     }),
     map
   ),
@@ -116,9 +141,15 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsmeSywK8YU',
     Img: 'netflix.jpeg',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Netflix Standard',
     BillingInstructionsURL: 'https://help.netflix.com/en/node/244',
+    NetworkId: '123',
+    PaymentName: 'netflix',
+    AuthHoldFields: [
+      {
+        keyPath: ['verification_data', 'cvc_check'],
+        acceptedValues: ['not_provided'],
+      },
+    ],
   },
   {
     Name: 'Hulu',
@@ -127,10 +158,16 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsmDtISKvuX',
     Img: 'hulu.png',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Hulu',
     BillingInstructionsURL:
       'https://help.hulu.com/s/article/update-payment-information',
+    NetworkId: '395709102324',
+    PaymentName: 'hulu',
+    AuthHoldFields: [
+      {
+        keyPath: ['pending_request', 'amount'],
+        acceptedValues: [100],
+      },
+    ],
   },
   {
     Name: 'Audible Plus',
@@ -139,10 +176,10 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsmhxvfp9Nj',
     Img: 'audible.png',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Audible Plus',
     BillingInstructionsURL:
       'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA',
+    NetworkId: '123',
+    PaymentName: 'audible',
   },
   {
     Name: 'Disney Plus',
@@ -151,10 +188,10 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsmcjOXLZQ5',
     Img: 'disneyplus.png',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Disney Plus',
     BillingInstructionsURL:
       'https://help.disneyplus.com/csp?id=csp_article_content&sys_kb_id=21dda2fcdb0580100a2af56e0f96192f',
+    NetworkId: '395704333146',
+    PaymentName: 'disney',
   },
   {
     Name: 'Headspace',
@@ -163,10 +200,10 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsm6MkAUBVb',
     Img: 'headspace.png',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Headspace',
     BillingInstructionsURL:
       'https://help.headspace.com/hc/en-us/articles/115008362508-How-can-I-update-my-payment-details-',
+    NetworkId: '123',
+    PaymentName: 'headspace',
   },
   {
     Name: 'Spotify Individual',
@@ -175,10 +212,22 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     stripePriceId: 'price_1JMiKdKuQQHSHZsmZ5ARUKue',
     Img: 'spotify.jpg',
     Product: 'prod_K0joFcwnLJ2uXG',
-    NetworkId: '123',
-    PaymentName: 'Spotify Individual',
     BillingInstructionsURL:
       'https://support.spotify.com/us/article/update-payment-details/',
+    NetworkId: '420429000200209',
+    PaymentName: 'spotify',
+  },
+  {
+    Name: 'Leetcode Premium',
+    Cost: 159.0,
+    Period: 'Yearly',
+    stripePriceId: 'price_1Jm0cVKuQQHSHZsmGll7sZr5',
+    Img: 'leetcode.png',
+    Product: 'prod_K4UBKT9PixGkHS',
+    BillingInstructionsURL:
+      'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w',
+    NetworkId: '123',
+    PaymentName: 'leetcode',
   },
 ];
 
@@ -194,6 +243,7 @@ export const allDevelopmentPerksDict = allDevelopmentPerks.reduce(
       Product: perk.Product,
       NetworkId: perk.NetworkId,
       BillingInstructionsURL: perk.BillingInstructionsURL,
+      AuthHoldFields: perk?.AuthHoldFields,
     }),
     map
   ),
