@@ -35,6 +35,7 @@ import { useHistory } from 'react-router-dom';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
 import { validateEmails } from 'utils/emailValidation';
+import { convertPeriodToInterval } from 'utils/periodConversions';
 
 const columns = [
   {
@@ -528,10 +529,10 @@ const CreateGroup = () => {
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
               {name +
-                ' (' +
-                allPerksDict[name].Cost +
-                '/' +
-                allPerksDict[name].Period +
+                ' ($' +
+                allPerksDict[name].Cost.toFixed(2) +
+                ' / ' +
+                convertPeriodToInterval(allPerksDict[name].Period) +
                 ')'}
             </MenuItem>
           ))}
