@@ -24,15 +24,20 @@ const columns = [
 
 export default function ManagePeople(props) {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
-  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
-    useState(false);
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] = useState(
+    false
+  );
   const [selectedUsers, setSelection] = useState([]);
 
   const [peopleData, setPeopleData] = useState<any[]>([]);
   const { currentUser, admin } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {

@@ -21,8 +21,12 @@ const RemovePerks = ({
 }) => {
   const { currentUser } = useContext(AuthContext);
 
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   const removePerksFromPerkGroup = (event) => {
     let error = false;

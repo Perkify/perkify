@@ -1,4 +1,4 @@
-import { environment } from '../services';
+import { environment } from "../services";
 import {
   allDevelopmentPerks,
   allDevelopmentPerksByPriceIDDict,
@@ -10,25 +10,25 @@ import {
   developmentTaxRates,
   productionCardMaintenancePerk,
   productionTaxRates,
-} from './constants';
+} from "./constants";
 
 export const allPerks =
-  environment == 'production' ? allProductionPerks : allDevelopmentPerks;
+  environment == "production" ? allProductionPerks : allDevelopmentPerks;
 
 export const allPerksDict =
-  environment == 'production'
+  environment == "production"
     ? allProductionPerksDict
     : allDevelopmentPerksDict;
 
 export const allPerksByPriceIDDict =
-  environment == 'production'
+  environment == "production"
     ? allProductionPerksByPriceIDDict
     : allDevelopmentPerksByPriceIDDict;
 
 export const cardMaintenancePerk =
-  environment == 'production'
+  environment == "production"
     ? productionCardMaintenancePerk
     : developmentCardMaintenancePerk;
 
 export const taxRates =
-  environment == 'production' ? productionTaxRates : developmentTaxRates;
+  environment == "production" ? productionTaxRates : developmentTaxRates;

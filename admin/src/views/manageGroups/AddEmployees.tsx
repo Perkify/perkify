@@ -23,8 +23,12 @@ const AddEmployees = ({
   const [emailsToAdd, setEmailsToAdd] = useState('');
   const [emailsError, setEmailsError] = useState('');
 
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event) => {

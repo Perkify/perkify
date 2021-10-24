@@ -21,8 +21,8 @@ const verifyRequest = async (perkInfo, employeeData, amount) => {
         (doc.data() as Subscription).status == "active"
     )?.[0];
 
-    const lastBillingDate =
-      staticSubscriptionItem.data().current_period_start.seconds;
+    const lastBillingDate = staticSubscriptionItem.data().current_period_start
+      .seconds;
 
     console.log(`user perks uses: ${employeePerkUses}`);
     console.log(`matched perk: ${perkInfo.Name}`);
@@ -49,8 +49,9 @@ const handleApprove = async (employeeData, perkInfo) => {
     .collection("employees")
     .doc(employeeData.employeeID)
     .update({
-      [`perkUsesDict.${perkInfo.Name}`]:
-        admin.firestore.FieldValue.arrayUnion(timestamp),
+      [`perkUsesDict.${perkInfo.Name}`]: admin.firestore.FieldValue.arrayUnion(
+        timestamp
+      ),
     });
 };
 

@@ -26,8 +26,12 @@ const AddPerks = ({
   const [availablePerks, setAvailablePerks] = useState([]);
 
   const { currentUser } = useContext(AuthContext);
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   React.useEffect(() => {
     setAvailablePerks(

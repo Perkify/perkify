@@ -94,14 +94,20 @@ export default function ClippedDrawer({ children }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const history = useHistory();
 
-  const [isDeletePerkGroupModalVisible, setIsDeletePerkGroupModalVisible] =
-    useState('');
+  const [
+    isDeletePerkGroupModalVisible,
+    setIsDeletePerkGroupModalVisible,
+  ] = useState('');
 
   const { currentUser } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
 
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   const location = useLocation();
 
@@ -141,8 +147,10 @@ export default function ClippedDrawer({ children }) {
     ['Employees', '/dashboard/people', <PersonIcon />],
   ];
 
-  let [groupViews, setGroupViews]: [[string, string, any][], Function] =
-    useState([]);
+  let [groupViews, setGroupViews]: [
+    [string, string, any][],
+    Function
+  ] = useState([]);
 
   useEffect(() => {
     if (Object.keys(business).length != 0) {

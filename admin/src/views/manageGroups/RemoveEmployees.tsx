@@ -19,8 +19,12 @@ const RemoveEmployees = ({
   employees,
 }) => {
   const { currentUser } = useContext(AuthContext);
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   const removeUsers = (event) => {
     let error = false;

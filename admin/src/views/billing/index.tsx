@@ -6,8 +6,12 @@ import { useHistory } from 'react-router-dom';
 
 const Billing = () => {
   const history = useHistory();
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   setFreezeNav(true);
   useEffect(() => {

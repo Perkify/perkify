@@ -12,8 +12,12 @@ import GeneralDashboard from './GeneralDashboard';
 const Dashboard = () => {
   const { path, url } = useRouteMatch();
 
-  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
-    useContext(LoadingContext);
+  const {
+    dashboardLoading,
+    setDashboardLoading,
+    freezeNav,
+    setFreezeNav,
+  } = useContext(LoadingContext);
 
   return (
     <div style={freezeNav ? { pointerEvents: 'none', opacity: '0.4' } : {}}>
