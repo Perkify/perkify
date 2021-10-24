@@ -44,17 +44,13 @@ const perkColumns = [
 export default function ManageGroups(props: any) {
   let { id } = useParams<{ id: string }>();
 
-  const [
-    isRemoveEmployeesModalVisible,
-    setIsRemoveEmployeesModalVisible,
-  ] = useState(false);
-  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] = useState(
-    false
-  );
+  const [isRemoveEmployeesModalVisible, setIsRemoveEmployeesModalVisible] =
+    useState(false);
+  const [isAddEmployeesModalVisible, setIsAddEmployeesModalVisible] =
+    useState(false);
 
-  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] = useState(
-    false
-  );
+  const [isRemovePerksModalVisible, setIsRemovePerksModalVisible] =
+    useState(false);
   const [isAddPerksModalVisible, setIsAddPerksModalVisible] = useState(false);
   const [groupNotFound, setGroupNotFound] = useState(false);
 
@@ -66,12 +62,8 @@ export default function ManageGroups(props: any) {
 
   const [groupEmails, setEmails] = useState([]);
   const { currentUser, admin } = useContext(AuthContext);
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const [perkGroupName, setPerkGroupName] = useState('');
 

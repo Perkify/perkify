@@ -33,12 +33,8 @@ const AddEmployees = ({
   const [emailsError, setEmailsError] = useState('');
 
   // loading info
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
 

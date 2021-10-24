@@ -62,12 +62,8 @@ const CreateGroup = () => {
   const [availablePerks, setAvailablePerks] = useState(
     allPerks.map((perkObj) => perkObj.Name)
   );
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const { business, employees } = useContext(BusinessContext);
 

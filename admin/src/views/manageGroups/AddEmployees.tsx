@@ -108,12 +108,8 @@ const AddEmployees = ({
     useState(false);
   const classes = useStyles();
 
-  const {
-    dashboardLoading,
-    setDashboardLoading,
-    freezeNav,
-    setFreezeNav,
-  } = useContext(LoadingContext);
+  const { dashboardLoading, setDashboardLoading, freezeNav, setFreezeNav } =
+    useContext(LoadingContext);
 
   const { currentUser } = useContext(AuthContext);
   const handleEmailError = (event: any) => {
