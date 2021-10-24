@@ -15,6 +15,7 @@ import { AuthContext, BusinessContext, LoadingContext } from 'contexts';
 import React, { useContext, useState } from 'react';
 import { PerkifyApi } from 'services';
 import { allPerks, allPerksDict } from 'shared';
+import { convertPeriodToInterval } from 'utils/periodConversions';
 
 interface AddPerksProps {
   isAddPerksModalVisible: boolean;
@@ -164,10 +165,10 @@ const AddPerks = ({
           {availablePerks.map((name) => (
             <MenuItem value={name} key={name}>
               {name +
-                ' (' +
-                allPerksDict[name].Cost +
-                '/' +
-                allPerksDict[name].Period +
+                ' ($' +
+                allPerksDict[name].Cost.toFixed(2) +
+                ' / ' +
+                convertPeriodToInterval(allPerksDict[name].Period) +
                 ')'}
             </MenuItem>
           ))}
