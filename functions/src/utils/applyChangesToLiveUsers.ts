@@ -112,14 +112,11 @@ export const applyChangesToLiveUsers = async (
       );
 
       // get the emails patch
-      const {
-        employeesToCreate,
-        employeesToUpdate,
-        employeesToDelete,
-      } = generateEmailsPatch(
-        intersectedPerkGroupData.employeeIDs,
-        livePerkGroup.employeeIDs
-      );
+      const { employeesToCreate, employeesToUpdate, employeesToDelete } =
+        generateEmailsPatch(
+          intersectedPerkGroupData.employeeIDs,
+          livePerkGroup.employeeIDs
+        );
 
       usersToCreate.push(
         ...employeesToCreate.map((employeeID) => ({

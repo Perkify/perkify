@@ -139,7 +139,8 @@ const manageSubscriptionStatusChange = async (
     expand: ['default_payment_method', 'items.data.price.product'],
   });
   const price: Stripe.Price = subscription.items.data[0].price;
-  const prices: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] = [];
+  const prices: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] =
+    [];
   for (const item of subscription.items.data) {
     prices.push(
       admin

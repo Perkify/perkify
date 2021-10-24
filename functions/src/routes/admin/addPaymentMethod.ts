@@ -22,10 +22,8 @@ export const addPaymentMethod = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
     const businessData = req.businessData;
 
-    const {
-      paymentMethodID,
-      useAsDefaultCreditCard,
-    } = req.body as AddPaymentMethodPayload;
+    const { paymentMethodID, useAsDefaultCreditCard } =
+      req.body as AddPaymentMethodPayload;
 
     // get the full payment method
     const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodID);

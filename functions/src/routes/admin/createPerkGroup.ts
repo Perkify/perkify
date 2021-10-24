@@ -25,11 +25,8 @@ export const createPerkGroupValidators = [
 
 export const createPerkGroup = adminPerkifyRequestTransform(
   async (req: AdminPerkifyRequest, res: Response, next: NextFunction) => {
-    const {
-      employeeIDs,
-      perkNames,
-      perkGroupName,
-    } = req.body as CreatePerkGroupPayload;
+    const { employeeIDs, perkNames, perkGroupName } =
+      req.body as CreatePerkGroupPayload;
     const businessData = req.businessData as Business;
 
     const preUpdateBusinessData = req.businessData;

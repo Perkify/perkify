@@ -56,19 +56,19 @@ export const updateStripeSubscription = async (
   );
 
   // convert the count of each perk to a list of items
-  const newSubscriptionItemsList = (Object.keys(quantityByPriceID).map(
-    (priceID) => ({
+  const newSubscriptionItemsList = (
+    Object.keys(quantityByPriceID).map((priceID) => ({
       price: priceID,
       quantity: quantityByPriceID[priceID],
       tax_rates: [taxRates.perkifyTax.stripeTaxID],
-    })
-  ) as {
-    price: string;
-    quantity: number;
-    id?: string;
-    tax_rates?: string[];
-    deleted?: boolean;
-  }[]).concat([
+    })) as {
+      price: string;
+      quantity: number;
+      id?: string;
+      tax_rates?: string[];
+      deleted?: boolean;
+    }[]
+  ).concat([
     // add the perkify cost per employee with no tax rate
     {
       price: cardMaintenancePerk.stripePriceID,

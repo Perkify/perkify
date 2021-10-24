@@ -45,9 +45,8 @@ export const deleteEmployees = adminPerkifyRequestTransform(
             .collection('businesses')
             .doc(businessID)
             .update({
-              [`perkGroups.${employeeData?.perkGroupID}.employeeIDs`]: admin.firestore.FieldValue.arrayRemove(
-                employeeID
-              ),
+              [`perkGroups.${employeeData?.perkGroupID}.employeeIDs`]:
+                admin.firestore.FieldValue.arrayRemove(employeeID),
             });
         }
       }
