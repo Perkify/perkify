@@ -20,7 +20,7 @@ export const allProductionPerks: PerkDefinition[] = [
     Name: 'Hulu',
     Cost: 6.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JQLCwKuQQHSHZsmONWkPuco',
+    stripePriceId: 'price_1KOo7MKuQQHSHZsmPbgxXhig',
     Img: 'hulu.png',
     Product: 'prod_K4UBKT9PixGkHS',
     BillingInstructionsURL:
@@ -167,7 +167,7 @@ export const allDevelopmentPerks: PerkDefinition[] = [
     Name: 'Hulu',
     Cost: 6.99,
     Period: 'Monthly',
-    stripePriceId: 'price_1JMiKdKuQQHSHZsmDtISKvuX',
+    stripePriceId: 'price_1KOo7MKuQQHSHZsmPbgxXhig',
     Img: 'hulu.png',
     Product: 'prod_K0joFcwnLJ2uXG',
     BillingInstructionsURL:
