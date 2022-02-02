@@ -18,7 +18,7 @@ export const allProductionPerks: PerkDefinition[] = [
   },
   {
     Name: 'Hulu',
-    Cost: 5.99,
+    Cost: 6.99,
     Period: 'Monthly',
     stripePriceId: 'price_1JQLCwKuQQHSHZsmONWkPuco',
     Img: 'hulu.png',
@@ -94,6 +94,18 @@ export const allProductionPerks: PerkDefinition[] = [
     NetworkId: '123',
     PaymentName: 'leetcode',
   },
+  {
+    Name: 'Babbel',
+    Cost: 30.0,
+    Period: 'Monthly',
+    stripePriceId: 'price_1KOnIVKuQQHSHZsmdaRSBA2K',
+    Img: 'babbel.png',
+    Product: 'prod_K4UBKT9PixGkHS',
+    BillingInstructionsURL:
+      'https://support.babbel.com/hc/en-us/articles/205600288-How-do-I-change-to-a-different-subscription-or-payment-plan-',
+    NetworkId: '123',
+    PaymentName: 'babbel',
+  },
 ];
 
 export const allProductionPerksDict = allProductionPerks.reduce(
@@ -153,7 +165,7 @@ export const allDevelopmentPerks: PerkDefinition[] = [
   },
   {
     Name: 'Hulu',
-    Cost: 5.99,
+    Cost: 6.99,
     Period: 'Monthly',
     stripePriceId: 'price_1JMiKdKuQQHSHZsmDtISKvuX',
     Img: 'hulu.png',
@@ -228,6 +240,18 @@ export const allDevelopmentPerks: PerkDefinition[] = [
       'https://help.audible.ca/s/article/how-can-i-add-or-edit-my-credit-card?language=en_CA:w',
     NetworkId: '123',
     PaymentName: 'leetcode',
+  },
+  {
+    Name: 'Babbel',
+    Cost: 30.0,
+    Period: 'Monthly',
+    stripePriceId: 'price_1KOnIVKuQQHSHZsmdaRSBA2K',
+    Img: 'babbel.png',
+    Product: 'prod_K4UBKT9PixGkHS',
+    BillingInstructionsURL:
+      'https://support.babbel.com/hc/en-us/articles/205600288-How-do-I-change-to-a-different-subscription-or-payment-plan-',
+    NetworkId: '123',
+    PaymentName: 'babbel',
   },
 ];
 
